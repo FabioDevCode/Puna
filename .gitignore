@@ -1,0 +1,9 @@
+.vscode
+.env
+.DS_Store
+.dockerignore
+node_modules
+node_modules/*
+package-lock.json
+src/config/database.js
+src/config/keys.json
