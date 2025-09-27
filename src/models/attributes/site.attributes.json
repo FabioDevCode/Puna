@@ -1,0 +1,16 @@
+{
+    "id": {
+        "type": "UUID",
+		"allowNull": false,
+		"unique": true,
+		"primaryKey": true
+    },
+    "domain": {
+        "type": "STRING(100)",
+        "allowNull": false
+    },
+    "url": {
+        "type": "STRING(250)",
+        "allowNull": false
+    }
+}

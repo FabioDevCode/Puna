@@ -1,12 +1,13 @@
-import dayjs from "dayjs";
 import * as path from "node:path";
+import consoleStamp from "console-stamp";
+import cookieParser from "cookie-parser";
+import dayjs from "dayjs";
+import express from "express";
 import timezone from "dayjs/plugin/timezone.js";
 import utc from "dayjs/plugin/utc.js";
 import morgan from "morgan";
 import split from "split";
 import i18n from "i18n";
-
-import routes from "./routes/index.js";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -14,6 +15,9 @@ dayjs.extend(timezone);
 import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+import routes from "./routes/index.js";
+import models from "./models/index.js";
 
 const app = express();
 
@@ -55,6 +59,14 @@ consoleStamp(console, {
 	dateSuffix: "",
 });
 
+await models.sequelize
+.sync()
+.then(() => {
+	console.log("Database & tables updated !");
+})
+.catch((err) => {
+	console.error("Error sync database:", err);
+});
 
 app.disable("x-powered-by");
 // app.use(helmet(helmet_config));

@@ -1,0 +1,20 @@
+{
+    "id": {
+        "type": "UUID",
+		"allowNull": false,
+		"unique": true,
+		"primaryKey": true
+    },
+    "name": {
+        "type": "STRING(100)",
+        "allowNull": false
+    },
+    "code": {
+        "type": "GCODE",
+        "allowNull": false
+    },
+    "template": {
+        "type": "LONGTEXT",
+        "allowNull": true
+    }
+}

@@ -1,0 +1,8 @@
+[
+	{
+		"relation": "belongsTo",
+		"target": "user",
+		"foreignKey": "fk_id_user",
+		"as": "user"
+	}
+]

@@ -1,0 +1,26 @@
+{
+    "id": {
+        "type": "UUID",
+		"allowNull": false,
+		"unique": true,
+		"primaryKey": true
+    },
+    "email": {
+        "type": "STRING",
+		"allowNull": true
+    },
+    "login": {
+		"type": "STRING(100)",
+		"allowNull": false,
+		"unique": true
+	},
+    "password": {
+		"type": "STRING",
+		"allowNull": true
+	},
+    "enabled": {
+        "type": "BOOLEAN",
+        "allowNull": false,
+        "defaultValue": false
+    }
+}

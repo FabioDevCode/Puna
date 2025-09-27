@@ -1,6 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize";
 import stringUtils from "../utils/string.js";
 
+
 export const buildAttributes = (attributes) => {
 	const object = {};
 	for (const prop in attributes) {
@@ -15,10 +16,19 @@ export const buildAttributes = (attributes) => {
 					object[prop] = { ...currentValue };
 					object[prop].type = DataTypes.STRING(100);
 					break;
+				case "STRING(250)":
+					object[prop] = { ...currentValue };
+					object[prop].type = DataTypes.STRING(250);
+					break;
 				case "UUID":
 					object[prop] = { ...currentValue };
 					object[prop].type = DataTypes[currentValue.type];
 					object[prop].defaultValue = Sequelize.UUIDV4;
+					break;
+				case "GCODE":
+					object[prop] = { ...currentValue };
+					object[prop].type = DataTypes.STRING(100);
+					object[prop].defaultValue = stringUtils.generateCode(10);
 					break;
 				case "LONGTEXT":
 					object[prop] = { ...currentValue };
@@ -42,9 +52,7 @@ export const buildIndexes = (attributes) => {
 	const indexes = [];
 	for (const key in attributes) {
 		if (
-			// biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
 			attributes.hasOwnProperty(key) &&
-			// biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
 			attributes[key].hasOwnProperty("primaryKey") &&
 			attributes[key].primaryKey
 		) {

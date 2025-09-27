@@ -1,0 +1,8 @@
+[
+    {
+		"relation": "belongsTo",
+		"target": "form",
+		"foreignKey": "fk_id_form",
+		"as": "form"
+	}
+]
