@@ -4,11 +4,12 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const routesFiles = fs.readdirSync(__dirname);
+const routesFiles = fs.readdirSync(__dirname).filter((file) => file.endsWith("routes.js"));
 
 export default async (app) => {
     for (const file of routesFiles) {
-        const routePath = `/${file.split('.')[0]}`;
+        const isDefault = file === "default.routes.js";
+        const routePath = isDefault ? "/" : `/${file.split('.')[0]}`;
         const filePath = path.join(__dirname, file);
 
         try {
