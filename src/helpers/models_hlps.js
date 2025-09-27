@@ -68,27 +68,27 @@ export const buildIndexes = (attributes) => {
 };
 
 export const buildRelations = (modelName, relations) => {
-	return (models) => {
-		for (let i = 0; i < relations[i]; i++) {
-			const relation = relations[i];
-			const options = {};
-			const target = stringUtils.capitalizeFirstLetter(relation.target);
+       return (models) => {
+	       for (let i = 0; i < relations.length; i++) {
+		       const relation = relations[i];
+		       const options = {};
+		       const target = stringUtils.capitalizeFirstLetter(relation.target);
 
-			options.foreignKey = relation.foreignKey.toLowerCase();
-			options.as = relation.as.toLowerCase();
+		       options.foreignKey = relation.foreignKey.toLowerCase();
+		       options.as = relation.as.toLowerCase();
 
-			if (relation.relation === "belongsToMany") {
-				options.otherKey = relation.otherKey;
-				options.through = relation.through;
-			}
+		       if (relation.relation === "belongsToMany") {
+			       options.otherKey = relation.otherKey;
+			       options.through = relation.through;
+		       }
 
-			options.allowNull = true;
+		       options.allowNull = true;
 
-			if (relation.constraints != null) {
-				options.constraints = relation.constraints;
-			}
+		       if (relation.constraints != null) {
+			       options.constraints = relation.constraints;
+		       }
 
-			models[modelName][relation.relation](models[target], options);
-		}
-	};
+		       models[modelName][relation.relation](models[target], options);
+	       }
+       };
 };
