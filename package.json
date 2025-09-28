@@ -8,8 +8,8 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "dev": "node --watch server.js",
-    "start": "node server.js"
+    "dev": "node --env-file=.env --watch server.js",
+    "start": "node --env-file=.env server.js"
   },
   "keywords": [
     "Puna"
@@ -32,6 +32,8 @@
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.4.5",
     "morgan": "^1.10.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
     "sequelize": "^6.37.7",
     "split": "^1.0.1",
     "xss": "^1.0.15"

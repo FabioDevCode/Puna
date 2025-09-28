@@ -1,3 +1,9 @@
-// Routes get token pour JWT
+import express from 'express';
+const router = express.Router();
 
-// post pour submit un formulaire
+
+
+
+
+
+export default router;

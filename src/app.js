@@ -16,8 +16,12 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import routes from "./routes/index.js";
 import models from "./models/index.js";
+import routes from "./routes/index.js";
+import api from "./api/index.js";
+
+import { initAdminUSer } from "./helpers/init_admin_user.js";
+
 
 const app = express();
 
@@ -118,7 +122,8 @@ app.set("view engine", "hbs");
 app.set("views", [`${__dirname}/views/pages`]);
 app.use("/public", express.static(path.join(__dirname, "public")));
 
+await initAdminUSer()
 await routes(app);
-
+await api(app);
 
 export default app;
