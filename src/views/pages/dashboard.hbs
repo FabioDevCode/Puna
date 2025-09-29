@@ -1,5 +1,38 @@
-<h1>
+{{> _ui/stats
+    title="Boite de réception"
+    value="8"
+    desc="Aujourd'hui"
+    icon="fas fa-inbox"
+}}
 
-    Dashboard
+{{> _ui/stats
+    title="Boite de réception"
+    value="89"
+    desc="7 jours glissant"
+    icon="fas fa-mail-bulk"
+}}
 
-</h1>
+{{> _ui/stats
+    title="Site web"
+    value=3
+    desc="À ce jour"
+    icon="fas fa-globe"
+}}
+
+{{> _ui/stats
+    title="Formulaire"
+    value="12"
+    desc="À ce jour"
+    icon="fas fa-file-alt"
+}}
+
+<div class="flex items-center justify-between gap-4 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
+    <h2>
+        Site web
+    </h2>
+    <button class="btn btn-sm btn-secondary">
+        <i class="fas fa-plus"></i>
+        Nouveau
+    </button>
+</div>
+

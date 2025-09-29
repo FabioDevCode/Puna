@@ -1,0 +1,34 @@
+{{!--
+    Name: stats-
+    Parameters:
+    - title: STRING
+    - value: INTEGER
+    - desc: STRING
+    Usage:
+        {{> _ui/stats
+            title="Valider"
+            value="89"
+            desc="voici ma description"
+            icon="fas fa-inbox"
+        }}
+--}}
+
+<div class="stats shadow h-max bg-secondary-content col-span-2 md:col-span-3 lg:col-span-3 {{fallback class ''}}">
+    <div class="stat">
+        {{#icon}}
+        <div class="stat-figure text-4xl">
+            <i class="{{.}}"></i>
+        </div>
+        {{/icon}}
+
+        <div class="stat-title">
+            {{fallback title ''}}
+        </div>
+        <div class="stat-value">
+            {{fallback value ''}}
+        </div>
+        <div class="stat-desc">
+            {{fallback desc ''}}
+        </div>
+    </div>
+</div>

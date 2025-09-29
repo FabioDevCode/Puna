@@ -1,0 +1,45 @@
+* {
+    font-family: "Inter", sans-serif;
+}
+
+#puna {
+    background: linear-gradient(to right, #2F6EA9, #101E26);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+body, html {
+    overscroll-behavior: none;
+}
+
+body {
+    position: relative;
+    overflow-x: hidden;
+    min-width: 320px;
+    min-height: 100svh;
+}
+
+main {
+    overflow: auto;
+    overflow-x: hidden;
+    min-height: max-content;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Orbitron", sans-serif;
+}
+
+h2 {
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+}
+
+.font-orbitron {
+    font-family: "Orbitron", sans-serif !important;
+}
+
+.font-inter {
+    font-family: "Inter", sans-serif !important;
+}
