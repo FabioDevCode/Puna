@@ -73,8 +73,6 @@ await models.sequelize
 });
 
 app.disable("x-powered-by");
-// app.use(helmet(helmet_config));
-// app.use(cors());
 app.use(cookieParser());
 app.use(i18n.init);
 app.use(express.static(`${__dirname}/public`));
