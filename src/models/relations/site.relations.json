@@ -4,5 +4,11 @@
 		"target": "user",
 		"foreignKey": "fk_id_user",
 		"as": "user"
-	}
+	},
+	{
+        "relation": "hasMany",
+        "target": "url",
+        "foreignKey": "fk_id_site",
+        "as": "urls"
+    }
 ]

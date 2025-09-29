@@ -8,9 +8,5 @@
     "domain": {
         "type": "STRING(100)",
         "allowNull": false
-    },
-    "url": {
-        "type": "STRING(250)",
-        "allowNull": false
     }
 }
