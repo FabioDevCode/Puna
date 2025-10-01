@@ -89,24 +89,23 @@ const MySQLStore = MySQLStoreConstructor(session);
 const sessionStore = new MySQLStore(database);
 
 app.use(
-       session({
-	       name: "puna",
-	       secret: "example_secret",
-	       store: sessionStore,
-	       resave: false,
-	       saveUninitialized: false,
-	       cookie: {
-		       secure: process.env.NODE_ENV === "production", // true if https (HTTPS requis)
-		       httpOnly: true,
-		       maxAge: 24 * 60 * 60 * 1000, // 1 jour
-		       sameSite: "lax",
-	       },
-	       rolling: false,
-	       unset: "destroy",
-       }),
+	session({
+		name: "puna",
+		secret: "example_secret",
+		store: sessionStore,
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			secure: process.env.NODE_ENV === "production", // true if https (HTTPS requis)
+			httpOnly: true,
+			maxAge: 12 * 60 * 60 * 1000, // 12 heures
+			sameSite: "lax",
+		},
+		rolling: false,
+		unset: "destroy",
+	}),
 );
 
-// Initialisation de Passport
 initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
