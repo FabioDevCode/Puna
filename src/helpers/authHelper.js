@@ -3,41 +3,43 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
 import models from '../models/index.js';
 
-// Initialisation de Passport
 export function initializePassport() {
-    passport.use(
+	passport.use(
 		new LocalStrategy(
-        	{
+			{
 				usernameField: 'login',
 				passwordField: 'password',
 				passReqToCallback: true
 			},
 			async (req, login, password, done) => {
 				try {
-					const user = users.find(u => u.login === login);
-					if (!user) return done(null, false, { message: 'Utilisateur non trouvé' });
-
-					const isValid = await bcrypt.compare(password, user.passwordHash);
+					const user = await models.User.findOne({ where: { login, enabled: true } });
+					if (!user) return done(null, false, { message: 'Utilisateur non trouvé ou non activé' });
+					const isValid = await bcrypt.compare(password, user.password);
 					if (!isValid) return done(null, false, { message: 'Mot de passe incorrect' });
-
-
-					// Mettre les données du user dans req.session.user
-
 					return done(null, user);
 				} catch (err) {
 					return done(err);
 				}
-        	}
-        )
-    );
+			}
+		)
+	);
 
-    // Sérialisation de l'utilisateur
-    passport.serializeUser((user, done) => done(null, user.id));
+	passport.serializeUser((user, done) => done(null, user.id));
+	passport.deserializeUser(async (id, done) => {
+		try {
+			const user = await models.User.findByPk(id);
+			done(null, user || false);
+		} catch (err) {
+			done(err);
+		}
+	});
+}
 
-    // Désérialisation de l'utilisateur
-    passport.deserializeUser((id, done) => {
-        const user = users.find(u => u.id === id);
-        done(null, user || false);
-    });
+export function isConnected(req, res, next) {
+	if (req.session && req.session.user) {
+		return next();
+	}
+	return res.redirect('/dp-login');
 }
 

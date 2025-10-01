@@ -1,5 +1,6 @@
-import models from '../models/index.js';
 import bcrypt from 'bcrypt';
+import passport from 'passport';
+import models from '../models/index.js';
 
 export const dashboard = (req, res) => {
     res.render('dashboard');
@@ -59,29 +60,18 @@ export const dpFirstCoPost = async (req, res) => {
     }
 };
 
-export const dpConnect = async (req, res) => {
-    const { login, password } = req.body;
-    try {
-        const user = await models.User.findOne({
-            where: {
-                login,
-                enabled: true
-            }
-        });
-
-        if (!user) {
-            throw new Error('Utilisateur non trouvé ou non activé.');
+export const dpConnect = (req, res, next) => {
+    passport.authenticate('local', async (err, user, info) => {
+        if (err || !user) {
+            return res.redirect('/dp-login');
         }
-
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            throw new Error('Mot de passe incorrect.');
-        }
-
-        res.redirect('/dashboard');
-    } catch (err) {
-        res.redirect('/error');
-    }
+        req.session.user = {
+            id: user.id,
+            login: user.login,
+            email: user.email
+        };
+        return res.redirect('/dashboard');
+    })(req, res, next);
 };
 
 

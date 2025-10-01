@@ -3,6 +3,7 @@ import consoleStamp from "console-stamp";
 import cookieParser from "cookie-parser";
 import dayjs from "dayjs";
 import express from "express";
+import passport from "passport";
 import timezone from "dayjs/plugin/timezone.js";
 import utc from "dayjs/plugin/utc.js";
 import morgan from "morgan";
@@ -20,6 +21,7 @@ import models from "./models/index.js";
 import routes from "./routes/index.js";
 import api from "./api/index.js";
 
+import { initializePassport } from "./helpers/authHelper.js";
 import { initAdminUSer } from "./helpers/init_admin_user.js";
 
 
@@ -87,22 +89,27 @@ const MySQLStore = MySQLStoreConstructor(session);
 const sessionStore = new MySQLStore(database);
 
 app.use(
-	session({
-		name: "puna",
-		secret: "example_secret",
-		store: sessionStore,
-		resave: false,
-		saveUninitialized: false,
-		cookie: {
-			secure: process.env.NODE_ENV === "production", // true if https (HTTPS requis)
-			httpOnly: true,
-			maxAge: 24 * 60 * 60 * 1000, // 1 jour
-			sameSite: "lax",
-		},
-		rolling: false,
-		unset: "destroy",
-	}),
+       session({
+	       name: "puna",
+	       secret: "example_secret",
+	       store: sessionStore,
+	       resave: false,
+	       saveUninitialized: false,
+	       cookie: {
+		       secure: process.env.NODE_ENV === "production", // true if https (HTTPS requis)
+		       httpOnly: true,
+		       maxAge: 24 * 60 * 60 * 1000, // 1 jour
+		       sameSite: "lax",
+	       },
+	       rolling: false,
+	       unset: "destroy",
+       }),
 );
+
+// Initialisation de Passport
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 import { create } from "express-handlebars";
 import hbs_fn from "./helpers/hbs_fn.js";
