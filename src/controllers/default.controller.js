@@ -60,7 +60,7 @@ export const dpFirstCoPost = async (req, res) => {
     }
 };
 
-export const dpConnect = (req, res, next) => {
+export const dpConnect = (req, res) => {
     passport.authenticate('local', async (err, user, info) => {
         if (err || !user) {
             return res.redirect('/dp-login');
@@ -71,7 +71,15 @@ export const dpConnect = (req, res, next) => {
             email: user.email
         };
         return res.redirect('/dashboard');
-    })(req, res, next);
+    })(req, res);
 };
 
-
+export const dpLogout = (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.redirect('/dashboard');
+        }
+        res.clearCookie('puna');
+        return res.redirect('/dp-login');
+    });
+};

@@ -8,7 +8,12 @@ router.get('/dp-login',  dctl.dpLogin);
 router.get('/dp-first-connexion', dctl.dpFirstCo);
 router.post('/dp-first-co', dctl.dpFirstCoPost);
 router.post('/dp-connect', dctl.dpConnect);
-router.get('/dashboard', isConnected, dctl.dashboard)
+router.get('/dp-logout', dctl.dpLogout);
+
+router.get('/dashboard', isConnected, dctl.dashboard);
+
+
+
 
 
 // create site_web
