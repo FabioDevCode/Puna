@@ -7,7 +7,7 @@ export const dashboard = (req, res) => {
 
 export const error = async(req, res) => {
     res.render('error', {
-        layout: false
+        layout: false,
     })
 };
 
@@ -25,31 +25,30 @@ export const dpFirstCo = (req, res) => {
 
 export const dpFirstCoPost = async (req, res) => {
     const { login, password, confirm_password } = req.body;
-    // Vérifier si le login existe
-    const user = await models.User.findOne({
-        where: {
-            login,
-            enabled: false
-        }
-    });
-    if (!user) {
-        return res.render('first_co', {
-            layout: "login",
-            error: "Login inconnu."
-        });
-    }
-    // Vérifier que les deux mots de passe sont identiques
-    if (password !== confirm_password) {
-        return res.render('first_co', {
-            layout: "login",
-            error: "Les mots de passe ne correspondent pas."
-        });
-    }
-    // Générer le hash du mot de passe
-    const saltRounds = 10;
 
     try {
-        const hash = await bcrypt.hash(password, saltRounds);
+        const user = await models.User.findOne({
+            where: {
+                login,
+                enabled: false
+            }
+        });
+
+        if (!user) {
+            return res.render('first_co', {
+                layout: "login",
+                error: "Login inconnu."
+            });
+        };
+
+        if (password !== confirm_password) {
+            return res.render('first_co', {
+                layout: "login",
+                error: "Les mots de passe ne correspondent pas."
+            });
+        };
+
+        const hash = await bcrypt.hash(password, 10);
         await user.update({ password: hash, enabled: true });
         return res.redirect('/dp-login');
     } catch (err) {
@@ -73,7 +72,7 @@ export const dpConnect = async (req, res) => {
         if (!user) {
             throw new Error('Utilisateur non trouvé ou non activé.');
         }
-        // Vérifier le mot de passe
+
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
             throw new Error('Mot de passe incorrect.');
