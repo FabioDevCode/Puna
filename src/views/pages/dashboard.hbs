@@ -37,13 +37,38 @@
 </div>
 
 <!-- Card Domaine -->
-<div class="col-span-2 md:col-span-2 lg:col-span-2">
-    <div class="card bg-base-100 shadow-lg relative p-4 flex flex-col gap-2">
+<div class="col-span-2 md:col-span-2 lg:col-span-3">
+    <div class="card bg-neutral text-neutral-content shadow-lg relative p-4 px-6 flex flex-col gap-2">
         <!-- Pastille d'état -->
-        <span class="absolute top-3 right-3">
+        <span class="absolute top-4 right-6">
             <!-- Exemple : vert si actif, rouge si inactif -->
             <span class="badge badge-xs rounded-full bg-success"></span>
             <!-- <span class="badge badge-xs rounded-full bg-error"></span> -->
+        </span>
+        <!-- Domaine principal -->
+        <div class="text-lg font-bold mb-1">exemple.com</div>
+        <!-- Infos secondaires -->
+        <div class="flex gap-4 text-sm items-center">
+            <span class="flex items-center gap-1">
+                <i class="fas fa-file-alt"></i>
+                5
+            </span>
+            <span class="flex items-center gap-1">
+                <i class="fas fa-inbox"></i>
+                12
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Card Domaine -->
+<div class="col-span-2 md:col-span-2 lg:col-span-3">
+    <div class="card bg-neutral text-neutral-content shadow-lg relative p-4 px-6 flex flex-col gap-2">
+        <!-- Pastille d'état -->
+        <span class="absolute top-4 right-6">
+            <!-- Exemple : vert si actif, rouge si inactif -->
+            <span class="badge badge-xs rounded-full bg-error"></span>
+            {{!-- <span class="badge badge-xs rounded-full bg-success"></span> --}}
         </span>
         <!-- Domaine principal -->
         <div class="text-lg font-bold mb-1">exemple.com</div>
