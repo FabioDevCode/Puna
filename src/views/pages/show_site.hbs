@@ -1,0 +1,21 @@
+<div class="flex items-center justify-start gap-2 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
+    <a href="/dashboard" class="btn btn-ghost">
+        <i class="fas fa-chevron-left"></i>
+        Retour
+    </a>
+    <button class="btn btn-secondary">
+        <i class="fas fa-plus"></i>
+        Nouveau formulaire
+    </button>
+
+    {{> _ui/delete_site
+        id=site.id
+        domain=site.domain
+    }}
+</div>
+
+<div class="flex items-start justify-start gap-2 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
+    <h3 class="font-inter">
+        {{site.domain}}
+    </h3>
+</div>

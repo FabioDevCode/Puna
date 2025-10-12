@@ -40,9 +40,47 @@ export const createSite = async (req, res) => {
     const { domain } = req.body;
     const userId = req.session.user?.id;
     try {
-        await models.Site.create({ domain, fk_id_user: userId });
-        return res.redirect('/dashboard');
+        const site = await models.Site.create({ domain, fk_id_user: userId });
+        return res.redirect(`/site/${site.id}`);
     } catch (err) {
         return res.redirect('/error');
+    }
+};
+
+export const showSite = async (req, res) => {
+    const siteId = req.params.id;
+    try {
+        const site = await models.Site.findByPk(siteId, {raw: true});
+
+        if (!site) {
+            throw new Error('error');
+        }
+
+        res.render('show_site', {
+            site
+        });
+    } catch (err) {
+        res.redirect('/dashboard');
+    }
+};
+
+export const deleteSite = async (req, res) => {
+    const siteId = req.params.id;
+    const { confirm_domain } = req.body;
+    try {
+        const site = await models.Site.findByPk(siteId);
+
+        if (!site) {
+            throw new Error('error');
+        }
+
+        if (site.domain === confirm_domain.trim()) {
+            await site.destroy();
+            throw new Error('error');
+        } else {
+            return res.redirect(`/site/${siteId}`);
+        }
+    } catch (err) {
+        return res.redirect('/dashboard');
     }
 };

@@ -11,14 +11,12 @@ router.post('/dp-first-co', authCtl.dpFirstCoPost);
 router.post('/dp-connect', authCtl.dpConnect);
 router.get('/dp-logout', authCtl.dpLogout);
 
-
+// CONNECTED =======================================================
 router.get('/dashboard', isConnected, dctl.dashboard);
+
 router.post('/create-site', isConnected, dctl.createSite);
-
-// Show inbox
-// Update inbox
-// Delte inbox
-
+router.get('/site/:id', isConnected, dctl.showSite);
+router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 
 
 export default router;
