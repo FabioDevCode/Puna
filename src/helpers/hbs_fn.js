@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import i18n from "i18n";
 
 export default {
@@ -16,6 +17,11 @@ export default {
 	},
 	_lowercase: (str) => {
 		typeof str === "string" ? str.toLowerCase() : "";
+	},
+
+	_dateFr: (date) => {
+		if (!date) return "";
+		return dayjs(date).format("DD/MM/YYYY");
 	},
 
 	log: (context) => {
