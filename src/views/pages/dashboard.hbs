@@ -1,23 +1,11 @@
-{{> _ui/stats
-    title="Boite de réception"
-    value="8"
-    desc=""
-    icon="fas fa-inbox"
-}}
-
-{{> _ui/stats
-    title="Site web"
-    value=3
-    desc=""
-    icon="fas fa-globe"
-}}
-
-{{> _ui/stats
-    title="Formulaire"
-    value="12"
-    desc=""
-    icon="fas fa-file-alt"
-}}
+{{#each stats}}
+    {{> _ui/stats
+        title=name
+        value=value
+        desc=""
+        icon=icon
+    }}
+{{/each}}
 
 <div class="flex items-center justify-between gap-4 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
     <h2>
@@ -27,16 +15,12 @@
     {{> _ui/btn_new_site }}
 </div>
 
-{{> _ui/site
-    actif=true
-    domain="fabiolopes.fr"
-    form="2"
-    inbox="12"
-}}
+{{#each sites}}
+    {{> _ui/site
+        id=id
+        domain=domain
+        form=form
+        inbox=inbox
+    }}
+{{/each}}
 
-{{> _ui/site
-    actif=true
-    domain="puna.fabiolopes.fr"
-    form="1"
-    inbox="34"
-}}

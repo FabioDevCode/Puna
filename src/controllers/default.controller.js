@@ -1,9 +1,21 @@
-import bcrypt from 'bcrypt';
-import passport from 'passport';
 import models from '../models/index.js';
+import {
+    getSitesWithCounts,
+    getGlobalStats
+} from '../helpers/site.helpers.js';
 
-export const dashboard = (req, res) => {
-    res.render('dashboard');
+export const dashboard = async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+        const sitesWithCounts = await getSitesWithCounts(userId);
+
+        res.render('dashboard', {
+            sites: sitesWithCounts,
+            stats: getGlobalStats(sitesWithCounts)
+        });
+    } catch (err) {
+        res.render('dashboard', {});
+    }
 };
 
 export const error = async(req, res) => {
@@ -24,62 +36,13 @@ export const dpFirstCo = (req, res) => {
     })
 };
 
-export const dpFirstCoPost = async (req, res) => {
-    const { login, password, confirm_password } = req.body;
-
+export const createSite = async (req, res) => {
+    const { domain } = req.body;
+    const userId = req.session.user?.id;
     try {
-        const user = await models.User.findOne({
-            where: {
-                login,
-                enabled: false
-            }
-        });
-
-        if (!user) {
-            return res.render('first_co', {
-                layout: "login",
-                error: "Login inconnu."
-            });
-        };
-
-        if (password !== confirm_password) {
-            return res.render('first_co', {
-                layout: "login",
-                error: "Les mots de passe ne correspondent pas."
-            });
-        };
-
-        const hash = await bcrypt.hash(password, 10);
-        await user.update({ password: hash, enabled: true });
-        return res.redirect('/dp-login');
-    } catch (err) {
-        return res.render('first_co', {
-            layout: "login",
-            error: "Erreur lors de la mise à jour du mot de passe."
-        });
-    }
-};
-
-export const dpConnect = (req, res) => {
-    passport.authenticate('local', async (err, user, info) => {
-        if (err || !user) {
-            return res.redirect('/dp-login');
-        }
-        req.session.user = {
-            id: user.id,
-            login: user.login,
-            email: user.email
-        };
+        await models.Site.create({ domain, fk_id_user: userId });
         return res.redirect('/dashboard');
-    })(req, res);
-};
-
-export const dpLogout = (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.redirect('/dashboard');
-        }
-        res.clearCookie('puna');
-        return res.redirect('/dp-login');
-    });
+    } catch (err) {
+        return res.redirect('/error');
+    }
 };
