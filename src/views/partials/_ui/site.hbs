@@ -1,37 +1,33 @@
 {{!--
     Name: site
     Parameters:
-    - actif: BOOLEAN
     - domain: STRING
     - form: INTEGER
     - inbox: INTEGER
     Usage:
         {{> _ui/site
-            actif=true
             domain="domain.fr"
             form="1"
             inbox="2"
         }}
 --}}
 
-<div class="col-span-2 md:col-span-2 lg:col-span-3">
-    <div class="card bg-neutral text-neutral-content shadow-lg relative p-4 px-6 flex flex-col gap-2">
-        <span class="absolute top-4 right-6">
-            <!-- <span class="badge badge-xs rounded-full bg-success"></span> -->
-            <!-- <span class="badge badge-xs rounded-full bg-error"></span> -->
-        </span>
-        <div class="text-lg font-bold mb-1">
-            {{fallback domain '-'}}
-        </div>
-        <div class="flex gap-4 text-sm items-center">
-            <span class="flex items-center gap-1">
-                <i class="fas fa-file-alt"></i>
-                {{fallback form '0'}}
-            </span>
-            <span class="flex items-center gap-1">
-                <i class="fas fa-inbox"></i>
-                {{fallback inbox '0'}}
-            </span>
+<div class="col-span-2 md:col-span-6 lg:col-span-6">
+    <div class="card bg-neutral text-neutral-content shadow-lg relative p-4 px-6">
+        <div class="flex flex-col md:flex-row lg:flex-row items-start md:items-center lg:items-center justify-between gap-2 w-full">
+            <div class="text-lg font-bold">
+                {{fallback domain '-'}}
+            </div>
+            <div class="flex gap-4 text-sm items-center">
+                <span class="flex items-center gap-1">
+                    <i class="fas fa-file-alt"></i>
+                    {{fallback form '0'}}
+                </span>
+                <span class="flex items-center gap-1">
+                    <i class="fas fa-inbox"></i>
+                    {{fallback inbox '0'}}
+                </span>
+            </div>
         </div>
     </div>
 </div>
