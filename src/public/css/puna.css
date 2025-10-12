@@ -8,6 +8,7 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
+    margin-top: 3px;
 }
 
 body, html {
@@ -28,16 +29,26 @@ main {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Orbitron", sans-serif;
+    font-family: "Bebas Neue", sans-serif;
 }
 
 h2 {
-    font-size: 1.2rem !important;
+    font-size: 1.6rem !important;
     font-weight: 700 !important;
+    margin-top: 5px !important;
 }
 
-.font-orbitron {
-    font-family: "Orbitron", sans-serif !important;
+.badge {
+    border: 0px solid transparent;
+}
+
+.badge-xs {
+    height: .75rem;
+    width: .75rem;
+}
+
+.font-bebas {
+    font-family: "Bebas Neue", sans-serif !important;
 }
 
 .font-inter {

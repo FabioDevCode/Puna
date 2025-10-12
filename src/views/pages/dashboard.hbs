@@ -1,32 +1,25 @@
 {{> _ui/stats
     title="Boite de réception"
     value="8"
-    desc="Aujourd'hui"
+    desc=""
     icon="fas fa-inbox"
-}}
-
-{{> _ui/stats
-    title="Boite de réception"
-    value="89"
-    desc="7 jours glissant"
-    icon="fas fa-mail-bulk"
 }}
 
 {{> _ui/stats
     title="Site web"
     value=3
-    desc="À ce jour"
+    desc=""
     icon="fas fa-globe"
 }}
 
 {{> _ui/stats
     title="Formulaire"
     value="12"
-    desc="À ce jour"
+    desc=""
     icon="fas fa-file-alt"
 }}
 
-<div class="flex items-center justify-between gap-4 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
+<div class="flex items-center justify-start gap-4 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
     <h2>
         Site web
     </h2>
@@ -35,6 +28,13 @@
         Nouveau
     </button>
 </div>
+
+{{> _ui/site
+    actif=true
+    domain="fabiolopes.fr"
+    form="1"
+    inbox="2"
+}}
 
 <!-- Card Domaine -->
 <div class="col-span-2 md:col-span-2 lg:col-span-3">

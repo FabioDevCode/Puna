@@ -9,9 +9,6 @@
         <h1 id="puna" class="text-3xl font-bold">Puna</h1>
     </div>
     <div class="flex-none gap-2">
-        <div class="form-control hidden md:block">
-            <input type="text" placeholder="Recherche un site" class="input input-bordered w-24 md:w-auto" />
-        </div>
         <div class="dropdown dropdown-end">
             <div tabindex="0" role="button" class="text-base-100 text-xl btn btn-neutral w-12 h-12 p-0 rounded-full overflow-hidden avatar">
                 F
@@ -20,12 +17,12 @@
                 tabindex="0"
                 class="menu menu-md dropdown-content bg-base-100 rounded-xl z-[1] mt-3 w-52 p-2 shadow"
             >
-                <li>
+                {{!-- <li>
                     <a>
                         <i class="fas fa-cog"></i>
                         Paramètres
                     </a>
-                </li>
+                </li> --}}
                 <li>
                     <a href="/dp-logout">
                         <i class="fas fa-sign-out-alt"></i>
