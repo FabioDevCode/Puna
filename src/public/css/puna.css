@@ -2,6 +2,10 @@
     font-family: "Inter", sans-serif;
 }
 
+:root:has(:is(.modal-open,.modal:target,.modal-toggle:checked + .modal,.modal[open])) {
+    scrollbar-gutter: auto !important;
+}
+
 #puna {
     background: linear-gradient(to right, #2F6EA9, #101E26);
     -webkit-background-clip: text;
