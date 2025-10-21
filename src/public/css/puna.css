@@ -61,3 +61,16 @@ h3 {
 .font-inter {
     font-family: "Inter", sans-serif !important;
 }
+
+/* Bouton ghost gris clair : fond clair et s'assombrit au hover */
+.btn-ghost-gray {
+    background-color: var(--btn-ghost-gray, #e5e7eb);
+    color: var(--btn-ghost-gray-text, inherit);
+    border: 0;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+.btn-ghost-gray:hover,
+.btn-ghost-gray:focus {
+    background-color: var(--btn-ghost-gray-hover, #e0e2e6);
+}
+
