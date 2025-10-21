@@ -10,25 +10,47 @@
         }}
 --}}
 
-<button class="btn btn-error" onclick="delete_site_modal.showModal()">
+<button class="btn btn-error" onclick="document.getElementById('delete_site_modal_{{id}}').showModal()">
 	<i class="far fa-trash-alt"></i>
 	<span>Supprimer <b>{{domain}}</b></span>
 </button>
 
-<dialog id="delete_site_modal" class="modal">
+<dialog id="delete_site_modal_{{id}}" class="modal">
 	<div class="modal-box w-4/12 max-w-5xl">
 		<h2 class="text-lg font-bold mb-4 text-error">
 			Confirmer la suppression du site
 		</h2>
 		<p class="mb-2">Pour supprimer ce site, veuillez saisir <b>{{domain}}</b>&nbsp;:</p>
-		<form id="formDeleteSite" action="/delete-site/{{id}}" method="post" class="flex flex-col gap-4">
-			<input type="text" name="confirm_domain" class="input input-bordered w-full" placeholder="{{site.domain}}" required="" />
+		<form id="formDeleteSite_{{id}}" action="/delete-site/{{id}}" method="post" class="flex flex-col gap-4">
+			<input id="confirm_domain_{{id}}" type="text" name="confirm_domain" class="input input-bordered w-full" placeholder="{{domain}}" required />
 		</form>
 		<div class="modal-action flex gap-1">
-			<button type="submit" form="formDeleteSite" class="btn btn-error">Confirmer la suppression</button>
+			<button id="btnConfirmDelete_{{id}}" type="submit" form="formDeleteSite_{{id}}" class="btn btn-error" disabled>Confirmer la suppression</button>
 			<form method="dialog">
 				<button class="btn">Annuler</button>
 			</form>
 		</div>
 	</div>
 </dialog>
+
+<script>
+	(function() {
+		try {
+			const input = document.getElementById('confirm_domain_{{id}}');
+			const btn = document.getElementById('btnConfirmDelete_{{id}}');
+			const domain = '{{domain}}';
+			if (!input || !btn) return;
+			btn.disabled = true;
+			input.addEventListener('input', function (e) {
+				const v = (e.target.value || '').trim();
+				if (v === domain) {
+					btn.disabled = false;
+				} else {
+					btn.disabled = true;
+				}
+			});
+		} catch (err) {
+			// silent
+		}
+	})();
+</script>
