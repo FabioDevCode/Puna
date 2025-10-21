@@ -82,3 +82,13 @@ h3 {
 .tab-active {
     font-weight: 600;
 }
+
+/* utility to hide elements */
+.none {
+    display: none !important;
+}
+
+/* clickable copy area */
+.copy-clickable {
+    cursor: pointer;
+}

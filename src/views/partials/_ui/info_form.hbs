@@ -1,18 +1,13 @@
-{{!-- info_form partial: displays basic data for a Form --}}
-<div id="info_form_panel" class="w-full">
-    <h4 class="text-xl font-bold">...</h4>
+<div id="info_form_panel" class="w-full none flex flex-col items-start justify-start mt-6 md:mt-12 h-max col-span-2 md:col-span-3 lg:col-span-6">
+    <h4 class="text-2xl font-bold">
+        {{!-- name --}}
+    </h4>
 
-    <div class="flex jutify-center items-center gap-2">
+    <div class="flex jutify-center items-center gap-2 copy-clickable" id="info_form_code_wrap">
         <strong>CODE :</strong>
         <p id="info_form_code">
-            ...
+            {{!-- code --}}
         </p>
-    </div>
-
-    <div>
-        <strong>Template :</strong>
-        <div class="text-sm text-muted">
-            {{!-- zone réservée pour le template (non utilisée pour l'instant) --}}
-        </div>
+        <i class="far fa-clone" id="info_form_copy_icon"></i>
     </div>
 </div>

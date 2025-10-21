@@ -20,25 +20,33 @@ document.addEventListener('DOMContentLoaded', () => {
 			target.classList.add('tab-active');
 			target.setAttribute('aria-selected', 'true');
 
-			// If the clicked tab has form data, update the info panel
-			const infoPanel = document.getElementById('info_form_panel');
-			if (infoPanel && target.dataset && target.dataset.name) {
-				const name = target.dataset.name || '';
-				const code = target.dataset.code || '';
-				const template = target.dataset.template || '';
+            // If the clicked tab has form data (data-id), update the info panel and show it
+            const infoPanel = document.getElementById('info_form_panel');
+            if (infoPanel) {
+                if (target.dataset && target.dataset.id) {
+                    const name = target.dataset.name || '';
+                    const code = target.dataset.code || '';
+                    const template = target.dataset.template || '';
 
-				// Update title
-				const h4 = infoPanel.querySelector('h4');
-				if (h4) h4.textContent = name || 'Formulaire';
+                    // Remove hidden class
+                    infoPanel.classList.remove('none');
 
-				// Update code
-				const codeEl = infoPanel.querySelector('#info_form_code');
-				if (codeEl) codeEl.textContent = code;
+                    // Update title
+                    const h4 = infoPanel.querySelector('h4');
+                    if (h4) h4.textContent = name || 'Formulaire';
 
-				// Placeholder for template - keep commented in DOM for later
-				// const tplEl = infoPanel.querySelector('.template-area');
-				// if (tplEl) tplEl.textContent = template;
-			}
+                    // Update code
+                    const codeEl = infoPanel.querySelector('#info_form_code');
+                    if (codeEl) codeEl.textContent = code;
+
+                    // Placeholder for template - keep commented in DOM for later
+                    // const tplEl = infoPanel.querySelector('.template-area');
+                    // if (tplEl) tplEl.textContent = template;
+                } else {
+                    // Hide panel when clicked tab has no data-id
+                    infoPanel.classList.add('none');
+                }
+            }
 		});
 
 		// Initialize panel from any active tab on load
@@ -47,4 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
 			active.click();
 		}
 	});
+
+	// Copy-to-clipboard for info_form_code
+	const codeWrap = document.getElementById('info_form_code_wrap');
+	if (codeWrap) {
+		codeWrap.addEventListener('click', async (e) => {
+			e.preventDefault();
+			const codeEl = document.getElementById('info_form_code');
+			const icon = document.getElementById('info_form_copy_icon');
+			if (!codeEl) return;
+			const text = codeEl.textContent.trim();
+			if (!text) return;
+
+			try {
+				await navigator.clipboard.writeText(text);
+				// temporary feedback: change icon to check
+				if (icon) {
+					const old = icon.className;
+					icon.className = 'fas fa-check text-success';
+					setTimeout(() => { icon.className = old; }, 800);
+				}
+			} catch (err) {
+				// ignore copy errors silently
+			}
+		});
+	}
 });
