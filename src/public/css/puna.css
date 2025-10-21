@@ -13,6 +13,7 @@
     -webkit-text-fill-color: transparent;
     color: transparent;
     margin-top: 3px;
+    cursor: default !important;
 }
 
 body, html {
@@ -43,6 +44,10 @@ h2 {
 h3 {
     font-size: 1.8rem !important;
     font-weight: 800 !important;
+}
+
+.btn:not(.navbar .btn) {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 
 .badge {

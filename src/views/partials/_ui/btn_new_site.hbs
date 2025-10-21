@@ -1,21 +1,21 @@
-<button class="btn btn-secondary" onclick="my_modal_new_site.showModal()">
+<button class="btn btn-sm btn-secondary" onclick="my_modal_new_site.showModal()">
     <i class="fas fa-plus"></i>
     Nouveau site web
 </button>
 
 <dialog id="my_modal_new_site" class="modal">
-    <div class="modal-box w-4/12 max-w-5xl">
+    <div class="modal-box w-12/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
         <h2 class="text-lg font-bold mb-4">
             Créer un nouveau site
         </h2>
         <form id="fromCreateSite" action="/create-site" method="post" class="flex flex-col gap-4">
             <input type="text" name="domain" class="input input-bordered w-full" placeholder="Nom de domaine" required />
         </form>
-        <div class="modal-action flex gap-1">
-            <button type="submit" form="fromCreateSite" class="btn btn-secondary">Créer</button>
+        <div class="modal-action flex flex-wrap gap-1">
             <form method="dialog">
-                <button class="btn">Fermer</button>
+                <button class="btn btn-sm">Annuler</button>
             </form>
+            <button type="submit" class="btn btn-sm btn-secondary" form="fromCreateSite">Créer</button>
         </div>
     </div>
 </dialog>

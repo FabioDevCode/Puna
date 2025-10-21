@@ -10,13 +10,13 @@
         }}
 --}}
 
-<button class="btn btn-error" onclick="document.getElementById('delete_site_modal_{{id}}').showModal()">
+<button class="btn btn-sm btn-error" onclick="document.getElementById('delete_site_modal_{{id}}').showModal()">
 	<i class="far fa-trash-alt"></i>
 	<span>Supprimer <b>{{domain}}</b></span>
 </button>
 
 <dialog id="delete_site_modal_{{id}}" class="modal">
-	<div class="modal-box w-4/12 max-w-5xl">
+	<div class="modal-box w-12/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
 		<h2 class="text-lg font-bold mb-4 text-error">
 			Confirmer la suppression du site
 		</h2>
@@ -25,10 +25,10 @@
 			<input id="confirm_domain_{{id}}" type="text" name="confirm_domain" class="input input-bordered w-full" placeholder="{{domain}}" required />
 		</form>
 		<div class="modal-action flex gap-1">
-			<button id="btnConfirmDelete_{{id}}" type="submit" form="formDeleteSite_{{id}}" class="btn btn-error" disabled>Confirmer la suppression</button>
 			<form method="dialog">
-				<button class="btn">Annuler</button>
+				<button class="btn btn-sm">Annuler</button>
 			</form>
+			<button id="btnConfirmDelete_{{id}}" class="btn btn-sm btn-error" type="submit" form="formDeleteSite_{{id}}" disabled="">Confirmer la suppression</button>
 		</div>
 	</div>
 </dialog>
@@ -49,8 +49,6 @@
 					btn.disabled = true;
 				}
 			});
-		} catch (err) {
-			// silent
-		}
+		} catch (err) {}
 	})();
 </script>
