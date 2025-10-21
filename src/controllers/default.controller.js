@@ -1,8 +1,7 @@
 import models from '../models/index.js';
-import {
-    getSitesWithCounts,
-    getGlobalStats
-} from '../helpers/site.helpers.js';
+import stringUtils from "../utils/string.js";
+import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
+
 
 export const dashboard = async (req, res) => {
     try {
@@ -56,8 +55,25 @@ export const showSite = async (req, res) => {
             throw new Error('error');
         }
 
+        // Ensure the current user owns the site
+        const userId = req.session.user?.id;
+        if (site.fk_id_user !== userId) {
+            return res.redirect('/dashboard');
+        }
+
+        // Fetch all forms attached to this site
+        const forms = await models.Form.findAll({
+            where: { fk_id_site: siteId },
+            raw: true,
+            order: [['createdAt', 'ASC']]
+        });
+
+        const activeForm = forms && forms.length ? forms[0] : null;
+
         res.render('show_site', {
-            site
+            site,
+            forms,
+            activeForm
         });
     } catch (err) {
         res.redirect('/dashboard');
@@ -82,5 +98,26 @@ export const deleteSite = async (req, res) => {
         }
     } catch (err) {
         return res.redirect('/dashboard');
+    }
+};
+
+export const createForm = async (req, res) => {
+    const { name, fk_id_site } = req.body;
+    const userId = req.session.user?.id;
+
+    try {
+        // Verify site exists and belongs to current user
+        const site = await models.Site.findByPk(fk_id_site);
+        if (!site || site.fk_id_user !== userId) {
+            return res.redirect('/dashboard');
+        }
+
+        const code = stringUtils.generateCode(10);
+
+        await models.Form.create({ name, fk_id_site, code });
+
+        return res.redirect(`/site/${fk_id_site}`);
+    } catch (err) {
+        return res.redirect('/error');
     }
 };

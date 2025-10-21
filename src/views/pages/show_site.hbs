@@ -1,4 +1,4 @@
-<div class="flex flex-col items-start flex-wrap justify-center gap-6 py-2 h-max col-span-2 md:col-span-3 lg:col-span-6">
+<div class="flex flex-col items-start flex-wrap justify-center gap-6 h-max col-span-2 md:col-span-3 lg:col-span-6">
     <h3 class="font-inter col-12">
         {{site.domain}}
     </h3>
@@ -12,23 +12,38 @@
             id=site.id
             domain=site.domain
         }}
-        <button class="btn btn-sm btn-secondary">
-            <i class="fas fa-plus"></i>
-            Nouveau formulaire
-        </button>
+
+        {{> _ui/btn_new_form
+            id=site.id
+        }}
     </div>
 </div>
 
-<div class="flex items-start justify-start gap-2 py-2 h-max col-span-2 md:col-span-3 lg:col-span-6">
-    info du formulaire
+<div class="flex items-start justify-start gap-2 mt-6 md:mt-8 h-max col-span-2 md:col-span-3 lg:col-span-6">
+    {{> _ui/info_form
+        name=activeForm.name
+        code=activeForm.code
+        template=activeForm.template
+    }}
 </div>
 
-<div class="flex flex-col items-start justify-cneter gap-4 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
-
-    <div role="tablist" class="tabs tabs-lifted">
-        <a role="tab" class="tab">page acceuil</a>
-        <a role="tab" class="tab tab-active">contact</a>
-        <a role="tab" class="tab">candidature</a>
-    </div>
+<div class="flex flex-col items-start justify-cneter gap-4 mt-4 md:mt-8 h-max col-span-2 md:col-span-6 lg:col-span-12">
+    {{#if forms}}
+        <div role="tablist" class="tabs tabs-lifted">
+            <a role="tab" class="tab tab-active">
+                <i class="fas fa-caret-right"></i>
+            </a>
+            {{#each forms}}
+                <a role="tab" class="tab" data-id="{{this.id}}" data-code="{{this.code}}" data-name="{{this.name}}" data-template="{{this.template}}">
+                    {{this.name}}
+                </a>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="col-12 flex justify-center items-center gap-2">
+            <i class="fas fa-caret-right"></i>
+            <p>Ce site ne possède encore aucun formulaire.</p>
+        </div>
+    {{/if}}
 
 </div>

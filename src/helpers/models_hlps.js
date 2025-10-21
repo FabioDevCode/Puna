@@ -28,7 +28,7 @@ export const buildAttributes = (attributes) => {
 				case "GCODE":
 					object[prop] = { ...currentValue };
 					object[prop].type = DataTypes.STRING(100);
-					object[prop].defaultValue = stringUtils.generateCode(10);
+					// object[prop].defaultValue = stringUtils.generateCode(10);
 					break;
 				case "LONGTEXT":
 					object[prop] = { ...currentValue };

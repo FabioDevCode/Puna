@@ -79,3 +79,6 @@ h3 {
     background-color: var(--btn-ghost-gray-hover, #e0e2e6);
 }
 
+.tab-active {
+    font-weight: 600;
+}

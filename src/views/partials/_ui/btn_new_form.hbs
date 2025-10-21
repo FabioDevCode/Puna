@@ -1,0 +1,33 @@
+{{!--
+    Name: btn_new_form
+    Parameters:
+    - id: STRING (site id)
+    Usage:
+        {{> _ui/btn_new_form
+            id=site.id
+        }}
+--}}
+
+<a class="tab btn btn-sm btn-secondary" onclick="document.getElementById('modal_create_form_{{id}}').showModal()">
+    <i class="fas fa-plus"></i>
+    Nouveau formulaire
+</a>
+
+<dialog id="modal_create_form_{{id}}" class="modal">
+    <div class="modal-box w-11/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
+        <h2 class="text-lg font-bold mb-4">Créer un nouveau formulaire</h2>
+        <form id="formCreateForm_{{id}}" action="/create-form" method="post" class="flex flex-col gap-4">
+            <input type="hidden" name="fk_id_site" value="{{id}}" />
+            <label class="flex flex-col gap-2">
+                <span class="font-bold">Nom du formulaire</span>
+                <input type="text" name="name" class="input input-bordered w-full" placeholder="Ex: Contact" required />
+            </label>
+        </form>
+        <div class="modal-action flex flex-wrap gap-2">
+            <form method="dialog">
+                <button class="btn btn-sm">Annuler</button>
+            </form>
+            <button type="submit" form="formCreateForm_{{id}}" class="btn btn-sm btn-secondary">Créer</button>
+        </div>
+    </div>
+</dialog>

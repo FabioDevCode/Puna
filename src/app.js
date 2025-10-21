@@ -46,7 +46,8 @@ const morgan_config = {
 			req.url.includes("/js") ||
 			req.url.includes("/plugins") ||
 			req.url.includes("/devtools") ||
-			req.url.includes("/favicon.ico")
+			req.url.includes("/favicon.ico") ||
+			req.url.includes("/.well-known/appspecific/com.chrome.devtools.json")
 		) {
 			return true;
 		}

@@ -18,5 +18,8 @@ router.post('/create-site', isConnected, dctl.createSite);
 router.get('/site/:id', isConnected, dctl.showSite);
 router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 
+router.post('/create-form', isConnected, dctl.createForm);
+
+
 
 export default router;
