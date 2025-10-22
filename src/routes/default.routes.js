@@ -12,7 +12,7 @@ router.post('/dp-first-co', authCtl.dpFirstCoPost);
 router.post('/dp-connect', authCtl.dpConnect);
 router.get('/dp-logout', authCtl.dpLogout);
 
-// CONNECTED =======================================================
+// CONNECTED ===================================================
 router.get('/dashboard', isConnected, dctl.dashboard);
 
 router.post('/create-site', isConnected, dctl.createSite);

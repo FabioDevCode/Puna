@@ -25,11 +25,6 @@ export const buildAttributes = (attributes) => {
 					object[prop].type = DataTypes[currentValue.type];
 					object[prop].defaultValue = Sequelize.UUIDV4;
 					break;
-				case "GCODE":
-					object[prop] = { ...currentValue };
-					object[prop].type = DataTypes.STRING(100);
-					// object[prop].defaultValue = stringUtils.generateCode(10);
-					break;
 				case "LONGTEXT":
 					object[prop] = { ...currentValue };
 					object[prop].type = DataTypes.TEXT("long");
