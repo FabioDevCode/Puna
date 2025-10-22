@@ -121,3 +121,24 @@ export const createForm = async (req, res) => {
         return res.redirect('/error');
     }
 };
+
+export const deleteForm = async (req, res) => {
+    const { form_id } = req.body;
+    const userId = req.session.user?.id;
+
+    try {
+        const form = await models.Form.findByPk(form_id);
+        if (!form) return res.redirect('/dashboard');
+
+        // get site id and verify ownership
+        const site = await models.Site.findByPk(form.fk_id_site);
+        if (!site || site.fk_id_user !== userId) return res.redirect('/dashboard');
+
+        const siteId = site.id;
+        await form.destroy();
+
+        return res.redirect(`/site/${siteId}`);
+    } catch (err) {
+        return res.redirect('/error');
+    }
+};

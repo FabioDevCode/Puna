@@ -4,6 +4,7 @@ import * as dctl from "../controllers/default.controller.js";
 import * as authCtl from "../controllers/auth.controller.js";
 import { isConnected } from "../helpers/authHelper.js";
 
+
 router.get('/error', dctl.error);
 router.get('/dp-login',  dctl.dpLogin);
 router.get('/dp-first-connexion', dctl.dpFirstCo);
@@ -19,7 +20,7 @@ router.get('/site/:id', isConnected, dctl.showSite);
 router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 
 router.post('/create-form', isConnected, dctl.createForm);
-
+router.post('/delete-form', isConnected, dctl.deleteForm);
 
 
 export default router;

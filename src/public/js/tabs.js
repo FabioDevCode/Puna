@@ -32,8 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     infoPanel.classList.remove('none');
 
                     // Update title
-                    const h4 = infoPanel.querySelector('h4');
-                    if (h4) h4.textContent = name || 'Formulaire';
+					const h4 = document.getElementById('info_form_name');
+					if (h4) h4.textContent = name || 'Formulaire';
+
+					// Set delete form id in modal hidden input
+					const deleteInput = document.getElementById('form_delete_id');
+					if (deleteInput) deleteInput.value = target.dataset.id;
 
                     // Update code
                     const codeEl = infoPanel.querySelector('#info_form_code');
@@ -45,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     // Hide panel when clicked tab has no data-id
                     infoPanel.classList.add('none');
+						// Clear delete input
+						const deleteInput = document.getElementById('form_delete_id');
+						if (deleteInput) deleteInput.value = '';
                 }
             }
 		});
