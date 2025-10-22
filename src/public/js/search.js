@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
         applyFilter(input.value.trim());
-        }, 600);
+        }, 500);
     });
 
     // Filtering and ordering logic
