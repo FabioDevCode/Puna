@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import jwt from 'jsonwebtoken';
 import models from '../models/index.js';
 import stringUtils from "../utils/string.js";
 import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
@@ -39,7 +42,11 @@ export const createSite = async (req, res) => {
     const { domain } = req.body;
     const userId = req.session.user?.id;
     try {
-        const site = await models.Site.create({ domain, fk_id_user: userId });
+        const site = await models.Site.create({
+            domain,
+            fk_id_user: userId,
+            control_code: stringUtils.generateCode(16)
+        });
         return res.redirect(`/site/${site.id}`);
     } catch (err) {
         return res.redirect('/error');
@@ -91,8 +98,8 @@ export const deleteSite = async (req, res) => {
         }
 
         if (site.domain === confirm_domain.trim()) {
+            await models.Form.destroy({ where: { fk_id_site: siteId } });
             await site.destroy();
-            throw new Error('error');
         } else {
             return res.redirect(`/site/${siteId}`);
         }
@@ -140,5 +147,40 @@ export const deleteForm = async (req, res) => {
         return res.redirect(`/site/${siteId}`);
     } catch (err) {
         return res.redirect('/error');
+    }
+};
+
+export const getSiteToken = async (req, res) => {
+    const siteId = req.params.id;
+    const userId = req.session.user?.id;
+
+    try {
+        const site = await models.Site.findByPk(siteId);
+        if (!site) return res.status(404).json({ error: 'Site not found' });
+        if (site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
+
+        // load key from env or config file
+        let secret = process.env.KEY_TK;
+        if (!secret) {
+            const keysPath = path.resolve('src/config/keys.json');
+            if (fs.existsSync(keysPath)) {
+                const raw = fs.readFileSync(keysPath, 'utf8');
+                const cfg = JSON.parse(raw);
+                secret = cfg.KEY_TK;
+            }
+        }
+
+        if (!secret) return res.status(500).json({ error: 'Server key not configured' });
+
+        const payload = {
+            id: site.id,
+            control_code: site.control_code
+        };
+
+        const token = jwt.sign(payload, secret);
+
+        return res.json({ token });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
     }
 };
