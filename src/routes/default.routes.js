@@ -16,6 +16,7 @@ router.get('/dp-logout', authCtl.dpLogout);
 router.get('/dashboard', isConnected, dctl.dashboard);
 
 router.post('/create-site', isConnected, dctl.createSite);
+router.get('/site/:id/token', isConnected, dctl.getSiteToken);
 router.get('/site/:id', isConnected, dctl.showSite);
 router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 

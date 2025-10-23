@@ -8,5 +8,9 @@
     "domain": {
         "type": "STRING(100)",
         "allowNull": false
+    },
+    "control_code": {
+        "type": "STRING(100)",
+        "allowNull": false
     }
 }
