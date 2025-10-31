@@ -1,38 +1,9 @@
-<div class="navbar bg-base-100 gap-2 p-4">
+<div class="navbar app-navbar bg-base-100 gap-2 p-4">
     <div class="flex-1">
         {{!-- left side moved to left_menu --}}
     </div>
 
-    <input id="search" type="text" placeholder="Recherche un site" class="input input-bordered w-36 md:w-72 lg:w-96" />
+    <input id="search" type="text" placeholder="Recherche un site" class="input input-sm input-bordered w-36 md:w-72 lg:w-96" />
 
-    <div class="flex-none gap-2">
-        <div class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost text-neutral text-xl w-12 h-12 p-0 overflow-hidden avatar hover:bg-neutral hover:text-base-100">
-                <i class="fas fa-bars"></i>
-            </div>
-            <ul
-                tabindex="0"
-                class="menu menu-md dropdown-content bg-base-100 rounded-xl z-[1] mt-3 w-52 p-2 shadow-lg border border-neutral"
-            >
-                <li>
-                    <a class="hover:bg-neutral hover:text-base-100 rounded-lg">
-                        <i class="fas fa-info-circle"></i>
-                        Informations
-                    </a>
-                </li>
-                <li>
-                    <a class="hover:bg-neutral hover:text-base-100 rounded-lg">
-                        <i class="fas fa-cog"></i>
-                        Paramètres
-                    </a>
-                </li>
-                <li>
-                    <a href="/dp-logout" class="hover:bg-neutral hover:text-base-100 rounded-lg">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Se déconnecter
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <div class="flex-none gap-2"></div>
 </div>

@@ -6,6 +6,11 @@
     scrollbar-gutter: auto !important;
 }
 
+/* layout variables */
+:root {
+    --navbar-height: 4rem; /* 64px */
+}
+
 #puna {
     background: linear-gradient(to right, #2F6EA9, #101E26);
     -webkit-background-clip: text;
@@ -94,5 +99,15 @@ h3 {
 }
 
 .rounded-4xl {
-    border-radius: 2rem;
+    border-radius: 2rem 2rem 0rem 0rem;
+}
+
+/* App layout helpers */
+.app-navbar {
+    height: var(--navbar-height);
+}
+
+.app-main {
+    height: calc(100vh - var(--navbar-height));
+    overflow: auto;
 }

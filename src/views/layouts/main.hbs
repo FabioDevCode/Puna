@@ -6,15 +6,17 @@
     <script src="/js/search.js"></script>
     <script src="/js/token.js"></script>
 </head>
-<body>
-    <div class="flex">
-        {{> left_menu}}
-        <div class="flex-1 min-h-screen">
-            {{> navbar}}
-            <main class="p-4 bg-gray-100 rounded-4xl grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-2">
-                {{{body}}}
-            </main>
+    <body>
+        <div class="flex h-screen overflow-hidden">
+            {{> left_menu}}
+            <div class="flex-1 h-full">
+                {{> navbar}}
+                <main class="p-4 bg-secondary-content/50 rounded-4xl app-main">
+                    <div class="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-2">
+                        {{{body}}}
+                    </div>
+                </main>
+            </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>
