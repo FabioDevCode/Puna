@@ -15,6 +15,7 @@ router.get('/dp-logout', authCtl.dpLogout);
 // CONNECTED ===================================================
 router.get('/dashboard', isConnected, dctl.dashboard);
 
+router.get('/all-site', isConnected, dctl.allSite)
 router.post('/create-site', isConnected, dctl.createSite);
 router.get('/site/:id/token', isConnected, dctl.getSiteToken);
 router.get('/site/:id', isConnected, dctl.showSite);
@@ -22,6 +23,8 @@ router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 
 router.post('/create-form', isConnected, dctl.createForm);
 router.post('/delete-form', isConnected, dctl.deleteForm);
+
+
 
 
 export default router;

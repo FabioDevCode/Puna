@@ -1,9 +1,11 @@
 <div class="navbar app-navbar bg-base-100 gap-2 p-4">
     <div class="flex-1">
-        {{!-- left side moved to left_menu --}}
+        <h2 class="mt-[6px]">
+            {{{ renderSlot "title" }}}
+        </h2>
     </div>
 
-    <input id="search" type="text" placeholder="Recherche un site" class="input input-sm input-bordered w-36 md:w-72 lg:w-96" />
-
-    <div class="flex-none gap-2"></div>
+    <div class="gap-2">
+        {{{ renderSlot "buttons" }}}
+    </div>
 </div>

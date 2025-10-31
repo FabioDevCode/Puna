@@ -1,3 +1,7 @@
+{{#slot "title"}}
+    Dashboard
+{{/slot}}
+
 {{#each stats}}
     {{> _ui/stats
         title=name
@@ -7,20 +11,5 @@
     }}
 {{/each}}
 
-<div class="flex items-center justify-between gap-4 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
-    <h2 style="margin-top: 6px;">
-        Site web
-    </h2>
-
-    {{> _ui/btn_new_site }}
-</div>
-
-{{#each sites}}
-    {{> _ui/site
-        id=id
-        domain=domain
-        form=form
-        inbox=inbox
-    }}
-{{/each}}
+{{!-- Faire de diagrame etc pour les stats --}}
 

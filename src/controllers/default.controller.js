@@ -12,7 +12,6 @@ export const dashboard = async (req, res) => {
         const sitesWithCounts = await getSitesWithCounts(userId);
 
         res.render('dashboard', {
-            sites: sitesWithCounts,
             stats: getGlobalStats(sitesWithCounts)
         });
     } catch (err) {
@@ -184,3 +183,18 @@ export const getSiteToken = async (req, res) => {
         return res.status(500).json({ error: err.message });
     }
 };
+
+export const allSite = async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+        const sitesWithCounts = await getSitesWithCounts(userId);
+
+        res.render('site_list', {
+            sites: sitesWithCounts
+        });
+    } catch (err) {
+        res.render('site_list', {});
+    }
+
+
+}
