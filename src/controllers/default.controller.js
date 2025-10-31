@@ -76,7 +76,7 @@ export const showSite = async (req, res) => {
 
         const activeForm = forms && forms.length ? forms[0] : null;
 
-        res.render('show_site', {
+        res.render('site_show', {
             site,
             forms,
             activeForm
@@ -195,6 +195,4 @@ export const allSite = async (req, res) => {
     } catch (err) {
         res.render('site_list', {});
     }
-
-
-}
+};

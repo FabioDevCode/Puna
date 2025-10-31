@@ -1,26 +1,31 @@
-<div class="flex flex-col items-start flex-wrap justify-center gap-6 mb-0 md:mb-10 h-max col-span-2 md:col-span-3 lg:col-span-6">
+{{#slot "title"}}
     <h3 class="font-inter col-12">
         {{site.domain}}
     </h3>
+{{/slot}}
+{{#slot "buttons"}}
+    <button id="btn_copy_token" class="btn btn-sm btn-outline btn-primary" data-site-id="{{site.id}}">
+        <i class="fas fa-key"></i>
+        Copier un token
+    </button>
 
+    {{> _ui/delete_site
+        id=site.id
+        domain=site.domain
+    }}
+
+    {{> _ui/btn_new_form
+        id=site.id
+    }}
+{{/slot}}
+
+
+<div class="flex flex-col items-start flex-wrap justify-center gap-6 mb-0 md:mb-10 h-max col-span-2 md:col-span-3 lg:col-span-6">
     <div class="flex flex-wrap gap-2 col-12">
-        <a href="/dashboard" class="btn btn-sm btn-ghost-gray">
+        {{!-- <a href="/dashboard" class="btn btn-sm btn-ghost-gray">
             <i class="fas fa-chevron-left"></i>
             Retour
-        </a>
-        {{> _ui/delete_site
-            id=site.id
-            domain=site.domain
-        }}
-
-        {{> _ui/btn_new_form
-            id=site.id
-        }}
-
-        <button id="btn_copy_token" class="btn btn-sm btn-outline" data-site-id="{{site.id}}">
-            <i class="fas fa-key"></i>
-            Copier token
-        </button>
+        </a> --}}
     </div>
 </div>
 
