@@ -7,9 +7,14 @@
     <script src="/js/token.js"></script>
 </head>
 <body>
-    {{> navbar}}
-    <main class="p-4 pt-[96px] grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-2">
-        {{{body}}}
-    </main>
+    <div class="flex">
+        {{> left_menu}}
+        <div class="flex-1 min-h-screen">
+            {{> navbar}}
+            <main class="p-4 bg-gray-100 rounded-4xl grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-2">
+                {{{body}}}
+            </main>
+        </div>
+    </div>
 </body>
 </html>
