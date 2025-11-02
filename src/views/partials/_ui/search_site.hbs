@@ -1,0 +1,26 @@
+<div class="flex items-center gap-2">
+    <div id="search-badges" class="flex items-center gap-2"></div>
+
+    <div onclick="openSearchModal()" class="btn btn-sm hidden md:inline-flex items-center gap-2">
+        <i class="fas fa-search"></i>
+        <span class="ml-1">
+            <kbd class="kbd kbd-sm">Ctrl/Cmd</kbd>
+            +
+            <kbd class="kbd kbd-sm">K</kbd>
+        </span>
+    </div>
+</div>
+
+<input type="checkbox" id="search-modal-toggle" class="modal-toggle" />
+<div class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Rechercher un site</h3>
+        <div class="py-4">
+            <input id="modal-search-input" type="text" placeholder="Tapez le nom de domaine..." class="input input-bordered w-full" />
+        </div>
+        <div class="modal-action">
+            <label id="modal-cancel-btn" for="search-modal-toggle" class="btn btn-sm">Annuler</label>
+            <button id="modal-search-btn" class="btn btn-sm btn-secondary">Rechercher</button>
+        </div>
+    </div>
+</div>

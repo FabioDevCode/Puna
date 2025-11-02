@@ -1,13 +1,13 @@
 {{#slot "title"}}
-    Site web
+    <h2 class="mt-[6px]">
+        Site web
+    </h2>
 {{/slot}}
 {{#slot "buttons"}}
+    {{> _ui/search_site }}
+
     {{> _ui/btn_new_site }}
 {{/slot}}
-
-{{!-- <div class="flex items-center justify-between px-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
-    <input id="search" type="text" placeholder="Recherche un site" class="input input-bordered w-full" />
-</div> --}}
 
 {{#each sites}}
     {{> _ui/site
@@ -18,6 +18,5 @@
     }}
 {{/each}}
 
-<div class="flex items-center justify-between gap-4 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
-
-</div>
+{{!-- <div class="flex items-center justify-between gap-4 py-2 h-max col-span-2 md:col-span-6 lg:col-span-12">
+</div> --}}
