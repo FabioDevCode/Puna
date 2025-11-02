@@ -20,68 +20,79 @@ document.addEventListener('DOMContentLoaded', () => {
 			target.classList.add('tab-active');
 			target.setAttribute('aria-selected', 'true');
 
-            // If the clicked tab has form data (data-id), update the info panel and show it
-            const infoPanel = document.getElementById('info_form_panel');
-            if (infoPanel) {
-                if (target.dataset && target.dataset.id) {
-                    const name = target.dataset.name || '';
-                    const code = target.dataset.code || '';
-                    const template = target.dataset.template || '';
+			// Update the info panel fields (name, code, delete input) — panel DOM now lives in `site_show.hbs`
+			const infoPanel = document.getElementById('info_form_panel');
+			if (infoPanel) {
+				const name = target.dataset.name || 'Formulaire';
+				const code = target.dataset.code || '';
+				const hasId = !!(target.dataset && target.dataset.id);
 
-                    // Remove hidden class
-                    infoPanel.classList.remove('none');
+				// Update title
+				const h4 = document.getElementById('info_form_name');
+				if (h4) {
+					h4.textContent = name;
+					if (hasId) h4.classList.remove('opacity-25'); else h4.classList.add('opacity-25');
+				}
 
-                    // Update title
-					const h4 = document.getElementById('info_form_name');
-					if (h4) h4.textContent = name || 'Formulaire';
+				// Set delete form id in modal hidden input (empty if none) and toggle delete button visibility
+				const deleteInput = document.getElementById('form_delete_id');
+				const deleteBtn = document.getElementById('btn_delete_form');
+				if (deleteInput) deleteInput.value = target.dataset.id || '';
+				if (deleteBtn) {
+					if (hasId) deleteBtn.classList.remove('none');
+					else deleteBtn.classList.add('none');
+				}
 
-					// Set delete form id in modal hidden input
-					const deleteInput = document.getElementById('form_delete_id');
-					if (deleteInput) deleteInput.value = target.dataset.id;
-
-                    // Update code
-                    const codeEl = infoPanel.querySelector('#info_form_code');
-                    if (codeEl) codeEl.textContent = code;
-
-                    // Placeholder for template - keep commented in DOM for later
-                    // const tplEl = infoPanel.querySelector('.template-area');
-                    // if (tplEl) tplEl.textContent = template;
-                } else {
-                    // Hide panel when clicked tab has no data-id
-                    infoPanel.classList.add('none');
-						// Clear delete input
-						const deleteInput = document.getElementById('form_delete_id');
-						if (deleteInput) deleteInput.value = '';
-                }
-            }
+				// Update code and toggle opacity + copy icon visibility
+				const codeEl = document.getElementById('info_form_code');
+				const codeWrap = document.getElementById('info_form_code_wrap');
+				const copyBtn = document.getElementById('btn_copy_code');
+				if (codeEl) codeEl.textContent = code;
+				if (codeWrap) {
+					if (hasId) codeWrap.classList.remove('opacity-25'); else codeWrap.classList.add('opacity-25');
+				}
+				if (copyBtn) {
+					if (hasId) copyBtn.classList.remove('none');
+					else copyBtn.classList.add('none');
+				}
+			}
 		});
 
 		// Initialize panel from any active tab on load
-		const active = tabList.querySelector('.tab-active[data-name], [role="tab"].tab-active[data-name]');
+		const active = tabList.querySelector('.tab.tab-active[data-id], [role="tab"].tab-active[data-id]');
 		if (active) {
 			active.click();
+		} else {
+			// no active form tab selected on load -> ensure panel is in empty state
+			const deleteBtn = document.getElementById('btn_delete_form');
+			const copyBtn = document.getElementById('btn_copy_code');
+			const h4 = document.getElementById('info_form_name');
+			const codeWrap = document.getElementById('info_form_code_wrap');
+			const codeEl = document.getElementById('info_form_code');
+			if (deleteBtn) deleteBtn.classList.add('none');
+			if (copyBtn) copyBtn.classList.add('none');
+			if (h4) h4.classList.add('opacity-25');
+			if (codeWrap) codeWrap.classList.add('opacity-25');
+			if (codeEl) codeEl.textContent = '';
 		}
 	});
 
-	// Copy-to-clipboard for info_form_code
-	const codeWrap = document.getElementById('info_form_code_wrap');
-	if (codeWrap) {
-		codeWrap.addEventListener('click', async (e) => {
+	// Copy-to-clipboard for info_form_code via button
+	const copyBtn = document.getElementById('btn_copy_code');
+	if (copyBtn) {
+		copyBtn.addEventListener('click', async (e) => {
 			e.preventDefault();
 			const codeEl = document.getElementById('info_form_code');
-			const icon = document.getElementById('info_form_copy_icon');
 			if (!codeEl) return;
 			const text = codeEl.textContent.trim();
 			if (!text) return;
 
 			try {
 				await navigator.clipboard.writeText(text);
-				// temporary feedback: change icon to check
-				if (icon) {
-					const old = icon.className;
-					icon.className = 'fas fa-check text-success';
-					setTimeout(() => { icon.className = old; }, 800);
-				}
+				// temporary feedback: change button text/icon like token.js but without green color
+				const old = copyBtn.innerHTML;
+				copyBtn.innerHTML = '<i class="fas fa-check"></i> Copié';
+				setTimeout(() => { copyBtn.innerHTML = old; }, 1200);
 			} catch (err) {
 				// ignore copy errors silently
 			}

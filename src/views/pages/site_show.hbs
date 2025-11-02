@@ -5,7 +5,7 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-    <button id="btn_copy_token" class="btn btn-sm btn-outline btn-primary" data-site-id="{{site.id}}">
+    <button id="btn_copy_token" class="btn btn-sm btn-outline" data-site-id="{{site.id}}">
         <i class="fas fa-key"></i>
         Copier un token
     </button>
@@ -21,20 +21,38 @@
 {{/slot}}
 
 
-<div class="flex flex-col items-start flex-wrap justify-center gap-6 mb-0 md:mb-10 h-max col-span-2 md:col-span-3 lg:col-span-6">
+<div class="flex flex-col items-start flex-wrap justify-center gap-6 h-max col-span-2 md:col-span-6 lg:col-span-12">
+
     <div class="flex flex-wrap gap-2 col-12">
-        {{!-- <a href="/dashboard" class="btn btn-sm btn-ghost-gray">
-            <i class="fas fa-chevron-left"></i>
-            Retour
-        </a> --}}
+        <div id="info_form_panel" class="w-full min-h-[72px] flex flex-col items-start justify-start gap-1 col-span-2 md:col-span-3 lg:col-span-6">
+            <div class="w-full min-h-[36px] flex items-center justify-start gap-3">
+                <h4 class="text-2xl font-bold mt-1 opacity-25" id="info_form_name">
+                    Formulaire
+                </h4>
+                <button class="btn btn-sm btn-error none" id="btn_delete_form" onclick="document.getElementById('modal_delete_form').showModal()">
+                    <i class="far fa-trash-alt"></i>
+                    <span>Supprimer</span>
+                </button>
+                {{> _ui/delete_form_modal }}
+            </div>
+
+            <div class="flex min-h-[36px] jutify-center items-center gap-2 opacity-25" id="info_form_code_wrap">
+                <strong>CODE :</strong>
+                <p id="info_form_code">
+                    {{!-- code --}}
+                </p>
+                <button id="btn_copy_code" class="btn btn-sm btn-outline none">
+                    <i class="far fa-clone"></i>
+                    <span>Copier le code</span>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
-{{> _ui/info_form }}
-
 <div class="flex flex-col items-start justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
     {{#if forms}}
-        <div role="tablist" class="tabs tabs-lifted">
+        <div role="tablist" class="tabs tabs-bordered">
             <a role="tab" class="tab tab-active">
                 <i class="fas fa-caret-right"></i>
             </a>
