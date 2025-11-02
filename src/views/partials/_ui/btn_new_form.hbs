@@ -18,10 +18,7 @@
         <h2 class="text-lg font-bold mb-4">Créer un nouveau formulaire</h2>
         <form id="formCreateForm_{{id}}" action="/create-form" method="post" class="flex flex-col gap-4">
             <input type="hidden" name="fk_id_site" value="{{id}}" />
-            <label class="flex flex-col gap-2">
-                <span class="font-bold">Nom du formulaire</span>
-                <input type="text" name="name" class="input input-bordered w-full" placeholder="Ex: Contact" required />
-            </label>
+            <input type="text" name="name" class="input input-bordered w-full" placeholder="Ex: Contact" required />
         </form>
         <div class="modal-action flex flex-wrap gap-2">
             <form method="dialog">

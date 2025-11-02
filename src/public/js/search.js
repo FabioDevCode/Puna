@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const badgesContainer = document.getElementById('search-badges');
 
     if (modalInput) {
-        attachInputHandler(modalInput);
+        // Do NOT attach input handler to modal input - only search on Enter or button click
 
         // Enter key in modal input triggers search and closes modal
         modalInput.addEventListener('keydown', (e) => {
