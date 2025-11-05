@@ -50,7 +50,7 @@ export async function authApiKeyAccess(req, res, next) {
 		if (!formCode) return res.status(400).json({ error: 'Missing form code param' });
 
 		const form = await models.Form.findOne({ where: { code: formCode, fk_id_site: siteId }, raw: true });
-		if (!form) return res.status(404).json({ error: 'Form not found for this site' });
+		if (!form) return res.status(404).json({ error: 'Form not found' });
 
 		req.site = site;
 		req.form = form;
