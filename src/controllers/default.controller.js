@@ -99,6 +99,7 @@ export const deleteSite = async (req, res) => {
         if (site.domain === confirm_domain.trim()) {
             await models.Form.destroy({ where: { fk_id_site: siteId } });
             await site.destroy();
+            return res.redirect('/all-site');
         } else {
             return res.redirect(`/site/${siteId}`);
         }
