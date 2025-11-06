@@ -20,12 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
 			target.classList.add('tab-active');
 			target.setAttribute('aria-selected', 'true');
 
+			// Compute helper values used in multiple places
+			const hasId = !!(target.dataset && target.dataset.id);
+
 			// Update the info panel fields (name, code, delete input) — panel DOM now lives in `site_show.hbs`
 			const infoPanel = document.getElementById('info_form_panel');
 			if (infoPanel) {
 				const name = target.dataset.name || 'Formulaire';
 				const code = target.dataset.code || '';
-				const hasId = !!(target.dataset && target.dataset.id);
 
 				// Update title
 				const h4 = document.getElementById('info_form_name');
@@ -55,6 +57,63 @@ document.addEventListener('DOMContentLoaded', () => {
 					if (hasId) copyBtn.classList.remove('none');
 					else copyBtn.classList.add('none');
 				}
+			}
+
+			// Also update the template modal/button
+			const btnOpenTemplate = document.getElementById('btn_open_template');
+			const modalForm = document.getElementById('modal_template_form');
+			const keysContainer = document.getElementById('modal_template_keys');
+			const valuesContainer = document.getElementById('modal_template_values');
+
+			function clearModalContainers() {
+				if (keysContainer) keysContainer.innerHTML = '';
+				if (valuesContainer) valuesContainer.innerHTML = '';
+			}
+
+			if (hasId) {
+				// show button
+				if (btnOpenTemplate) btnOpenTemplate.classList.remove('none');
+				// set form action
+				if (modalForm) modalForm.action = `/form/${target.dataset.id}/template`;
+				// populate modal content from data-template attribute
+				let tpl = {};
+				try {
+					const raw = target.dataset.template || '';
+					if (raw) tpl = JSON.parse(raw);
+				} catch (e) {
+					tpl = {};
+				}
+
+				clearModalContainers();
+				const keys = Object.keys(tpl || {});
+				if (!keys.length) {
+					if (keysContainer) keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>';
+					if (valuesContainer) valuesContainer.innerHTML = '';
+				} else {
+					keys.forEach((k) => {
+						// left: key
+						const d = document.createElement('div');
+						d.className = 'px-2 py-1 rounded h-[32px] bg-neutral-content/50 text-sm bg-base-100';
+						d.textContent = k;
+						keysContainer.appendChild(d);
+
+						// right: input
+						const wrap = document.createElement('div');
+						wrap.className = 'flex items-center gap-2';
+						const input = document.createElement('input');
+						input.type = 'text';
+						input.name = `template[${k}]`;
+						input.value = tpl[k] || '';
+						input.className = 'input input-bordered w-full input-sm';
+						wrap.appendChild(input);
+						valuesContainer.appendChild(wrap);
+					});
+				}
+			} else {
+				// hide button and clear modal
+				if (btnOpenTemplate) btnOpenTemplate.classList.add('none');
+				if (modalForm) modalForm.action = '#';
+				clearModalContainers();
 			}
 		});
 
