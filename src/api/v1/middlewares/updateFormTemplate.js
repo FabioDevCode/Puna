@@ -42,7 +42,8 @@ export async function updateFormTemplate(req, res, next) {
         // Ensure every received key exists in template; if not, add key: key
         for (const k of receivedKeys) {
             if (!Object.prototype.hasOwnProperty.call(templateObj, k)) {
-                templateObj[k] = String(k).toLocaleUpperCase();
+                const capitalized = str => str.charAt(0).toUpperCase() + str.slice(1);
+                templateObj[k] = capitalized(String(k))
                 changed = true;
             }
         }
