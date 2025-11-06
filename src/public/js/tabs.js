@@ -109,6 +109,110 @@ document.addEventListener('DOMContentLoaded', () => {
 						valuesContainer.appendChild(wrap);
 					});
 				}
+
+				// Also fetch and render inbox rows for this form
+				const inboxHead = document.getElementById('inbox_table_head');
+				const inboxBody = document.getElementById('inbox_table_body');
+
+				function clearInbox() {
+					if (inboxHead) inboxHead.innerHTML = '';
+					if (inboxBody) inboxBody.innerHTML = '';
+				}
+
+				// build header row based on template keys
+				function buildHead(keysArr) {
+					if (!inboxHead) return;
+					const tr = document.createElement('tr');
+					const thCheck = document.createElement('th');
+					thCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
+					tr.appendChild(thCheck);
+
+					// Always add a Date column after the checkbox
+					const thDate = document.createElement('th');
+					thDate.textContent = 'Date';
+					tr.appendChild(thDate);
+
+					if (!keysArr.length) {
+						const th = document.createElement('th');
+						th.textContent = 'Données';
+						tr.appendChild(th);
+					} else {
+						keysArr.forEach((k) => {
+							const th = document.createElement('th');
+							th.textContent = tpl[k] || k;
+							tr.appendChild(th);
+						});
+					}
+
+					const thAction = document.createElement('th');
+					tr.appendChild(thAction);
+
+					inboxHead.appendChild(tr);
+				}
+
+				function buildRows(items, keysArr) {
+					if (!inboxBody) return;
+					items.forEach((it) => {
+						const tr = document.createElement('tr');
+						tr.dataset.id = it.id;
+
+						const tdCheck = document.createElement('th');
+						tdCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
+						tr.appendChild(tdCheck);
+
+						const content = it.content || {};
+						// Date column
+						const tdDate = document.createElement('td');
+
+						if (it.createdAt) {
+							try {
+								const d = new Date(it.createdAt);
+								tdDate.textContent = d.toLocaleString();
+							} catch (e) {
+								tdDate.textContent = it.createdAt;
+							}
+						} else {
+							tdDate.textContent = ' - ';
+						}
+
+						tr.appendChild(tdDate);
+
+						if (!keysArr.length) {
+							const td = document.createElement('td');
+							td.textContent = JSON.stringify(content);
+							tr.appendChild(td);
+						} else {
+							keysArr.forEach((k) => {
+								const td = document.createElement('td');
+								td.textContent = content[k] !== undefined && content[k] !== null ? String(content[k]) : '';
+								tr.appendChild(td);
+							});
+						}
+
+						const tdAct = document.createElement('th');
+						tdAct.innerHTML = '<button class="btn btn-xs">actions</button>';
+						tr.appendChild(tdAct);
+
+						console.log(tr);
+
+						inboxBody.appendChild(tr);
+					});
+				}
+
+				// Fetch inbox
+				clearInbox();
+
+				fetch(`/form/${target.dataset.id}/inbox`, { credentials: 'same-origin' })
+				.then((r) => r.json())
+				.then((data) => {
+					const items = data.items || [];
+					buildHead(keys);
+					buildRows(items, keys);
+				})
+				.catch(() => {
+					clearInbox();
+				});
+
 			} else {
 				// hide button and clear modal
 				if (btnOpenTemplate) btnOpenTemplate.classList.add('none');

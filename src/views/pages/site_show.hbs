@@ -46,8 +46,7 @@
         </div>
     </div>
 
-        {{!-- Template component (button + modal) : button hidden by default, populated by tabs.js on tab selection --}}
-        {{> _ui/form_template_modal }}
+    {{> _ui/form_template_modal }}
 </div>
 
 <div class="flex flex-col items-start justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
@@ -68,5 +67,19 @@
             <p>Ce site ne possède encore aucun formulaire.</p>
         </div>
     {{/if}}
+</div>
+
+<div class="flex flex-col items-start justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
+
+<div id="tableInbox" class="overflow-x-auto w-full">
+  <table class="table w-full">
+    <thead id="inbox_table_head">
+      <!-- Filled dynamically: first column = checkbox, then columns from form.template keys, last column = actions -->
+    </thead>
+    <tbody id="inbox_table_body">
+      <!-- Rows inserted dynamically by JS -->
+    </tbody>
+  </table>
+</div>
 
 </div>

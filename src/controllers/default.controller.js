@@ -197,6 +197,39 @@ export const updateFormTemplateSave = async (req, res) => {
     }
 };
 
+export const getFormInbox = async (req, res) => {
+    const formId = req.params.id;
+    const userId = req.session.user?.id;
+
+    try {
+        const form = await models.Form.findByPk(formId);
+        if (!form) return res.status(404).json({ error: 'Form not found' });
+
+        const site = await models.Site.findByPk(form.fk_id_site);
+        if (!site || site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
+
+        const inboxRows = await models.Inbox.findAll({ where: { fk_id_form: formId }, order: [['createdAt', 'DESC']], raw: true });
+
+        const items = (inboxRows || []).map((r) => {
+            let parsed = null;
+            try {
+                parsed = typeof r.content === 'string' ? JSON.parse(r.content) : r.content;
+            } catch (e) {
+                parsed = null;
+            }
+            return {
+                id: r.id,
+                content: parsed,
+                createdAt: r.createdAt
+            };
+        });
+
+        return res.json({ items });
+    } catch (err) {
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const getSiteToken = async (req, res) => {
     const siteId = req.params.id;
     const userId = req.session.user?.id;
