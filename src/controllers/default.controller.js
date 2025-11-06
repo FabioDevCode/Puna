@@ -68,10 +68,31 @@ export const showSite = async (req, res) => {
         }
 
         // Fetch all forms attached to this site
-        const forms = await models.Form.findAll({
+        const formsRaw = await models.Form.findAll({
             where: { fk_id_site: siteId },
             raw: true,
             order: [['createdAt', 'ASC']]
+        });
+
+        // Parse template JSON into an iterable structure for the view
+        const forms = (formsRaw || []).map((f) => {
+            let templateObj = {};
+            try {
+                if (f.template) {
+                    templateObj = typeof f.template === 'string' ? JSON.parse(f.template) : f.template;
+                }
+            } catch (e) {
+                templateObj = {};
+            }
+
+            // Convert to an array of entries for easy iteration in Handlebars
+            const template_entries = Object.keys(templateObj || {}).map((k) => ({ key: k, value: templateObj[k] }));
+
+            return {
+                ...f,
+                templateObj,
+                template_entries
+            };
         });
 
         const activeForm = forms && forms.length ? forms[0] : null;
@@ -145,6 +166,32 @@ export const deleteForm = async (req, res) => {
         await form.destroy();
 
         return res.redirect(`/site/${siteId}`);
+    } catch (err) {
+        return res.redirect('/error');
+    }
+};
+
+export const updateFormTemplateSave = async (req, res) => {
+    const formId = req.params.id;
+    const userId = req.session.user?.id;
+
+    try {
+        const form = await models.Form.findByPk(formId);
+        if (!form) return res.redirect('/dashboard');
+
+        const site = await models.Site.findByPk(form.fk_id_site);
+        if (!site || site.fk_id_user !== userId) return res.redirect('/dashboard');
+
+        // Expecting nested fields in req.body.template (e.g. template[fieldName]=New label)
+        const newTemplate = req.body?.template || {};
+
+        // Ensure object
+        const templateObj = typeof newTemplate === 'object' ? newTemplate : {};
+
+        form.template = JSON.stringify(templateObj);
+        await form.save();
+
+        return res.redirect(`/site/${form.fk_id_site}`);
     } catch (err) {
         return res.redirect('/error');
     }

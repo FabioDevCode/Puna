@@ -24,6 +24,9 @@ router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 router.post('/create-form', isConnected, dctl.createForm);
 router.post('/delete-form', isConnected, dctl.deleteForm);
 
+// Update template for a form (rename template fields)
+router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
+
 
 
 
