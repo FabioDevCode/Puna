@@ -103,6 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (hasId) {
 				// show button
 				if (btnOpenTemplate) btnOpenTemplate.classList.remove('none');
+				// show table-level buttons
+				const tableBtns = document.getElementById('tableBtns');
+				if (tableBtns) tableBtns.classList.remove('none');
 				// set form action
 				if (modalForm) modalForm.action = `/form/${target.dataset.id}/template`;
 				// populate modal content from data-template attribute
@@ -147,15 +150,19 @@ document.addEventListener('DOMContentLoaded', () => {
 				function clearInbox() {
 					if (inboxHead) inboxHead.innerHTML = '';
 					if (inboxBody) inboxBody.innerHTML = '';
+					// reset counter display
+					const countEl = document.getElementById('count_inbox');
+					if (countEl) countEl.textContent = '';
 				}
 
 				// build header row based on template keys
 				function buildHead(keysArr) {
 					if (!inboxHead) return;
 					const tr = document.createElement('tr');
-					const thCheck = document.createElement('th');
-					thCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
-					tr.appendChild(thCheck);
+
+					// const thCheck = document.createElement('th');
+					// thCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
+					// tr.appendChild(thCheck);
 
 					// Always add a Date column after the checkbox
 					const thDate = document.createElement('th');
@@ -186,9 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
 						const tr = document.createElement('tr');
 						tr.dataset.id = it.id;
 
-						const tdCheck = document.createElement('th');
-						tdCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
-						tr.appendChild(tdCheck);
+						// const tdCheck = document.createElement('th');
+						// tdCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
+						// tr.appendChild(tdCheck);
 
 						const content = it.content || {};
 						// Date column
@@ -244,10 +251,11 @@ document.addEventListener('DOMContentLoaded', () => {
 							}
 
 						const tdAct = document.createElement('th');
-						tdAct.innerHTML = '<button class="btn btn-xs">actions</button>';
+						tdAct.innerHTML = `<button class="btn btn-sm btn-neutral btn-circle pt-[2px]">
+							<i class="fa-solid fa-ellipsis"></i>
+						</button>`;
 						tr.appendChild(tdAct);
 
-						console.log(tr);
 
 						inboxBody.appendChild(tr);
 					});
@@ -260,8 +268,15 @@ document.addEventListener('DOMContentLoaded', () => {
 				.then((r) => r.json())
 				.then((data) => {
 					const items = data.items || [];
-					buildHead(keys);
-					buildRows(items, keys);
+						buildHead(keys);
+						buildRows(items, keys);
+						// update counter
+						const countEl = document.getElementById('count_inbox');
+						if (countEl) {
+							const n = items.length || 0;
+							const word = n <= 1 ? 'élément' : 'éléments';
+							countEl.textContent = `${n} ${word}`;
+						}
 				})
 				.catch(() => {
 					clearInbox();
@@ -272,6 +287,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				if (btnOpenTemplate) btnOpenTemplate.classList.add('none');
 				if (modalForm) modalForm.action = '#';
 				clearModalContainers();
+				// hide table-level buttons and clear inbox table
+				const tableBtns = document.getElementById('tableBtns');
+				if (tableBtns) tableBtns.classList.add('none');
+				const inboxHead = document.getElementById('inbox_table_head');
+				const inboxBody = document.getElementById('inbox_table_body');
+				if (inboxHead) inboxHead.innerHTML = '';
+				if (inboxBody) inboxBody.innerHTML = '';
 			}
 		});
 
@@ -291,6 +313,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (h4) h4.classList.add('opacity-25');
 			if (codeWrap) codeWrap.classList.add('opacity-25');
 			if (codeEl) codeEl.textContent = '';
+			// hide table buttons and clear inbox table when nothing is selected
+			const tableBtns = document.getElementById('tableBtns');
+			if (tableBtns) tableBtns.classList.add('none');
+			const inboxHeadInit = document.getElementById('inbox_table_head');
+			const inboxBodyInit = document.getElementById('inbox_table_body');
+			if (inboxHeadInit) inboxHeadInit.innerHTML = '';
+			if (inboxBodyInit) inboxBodyInit.innerHTML = '';
 		}
 	});
 

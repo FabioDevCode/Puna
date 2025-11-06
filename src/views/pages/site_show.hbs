@@ -70,6 +70,21 @@
 </div>
 
 <div class="flex flex-col items-start justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
+    <div id="tableBtns" class="w-full flex items-end justify-between gap-2 mt-2">
+        <div id="count_inbox" class="font-bold text-xl"></div>
+
+        <div class="flex gap-2">
+            <button class="btn btn-sm">
+                <i class="fa-solid fa-filter"></i>
+                Filtre
+            </button>
+            <button class="btn btn-sm">
+                <i class="fa-solid fa-chart-simple"></i>
+                Choix des colonnes
+            </button>
+        </div>
+    </div>
+
     <div id="tableInbox" class="overflow-x-auto w-full">
         <table class="table w-full">
             <thead id="inbox_table_head"></thead>
