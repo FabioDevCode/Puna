@@ -20,6 +20,32 @@
     margin-top: 3px;
 }
 
+/* Inbox tooltip for long cell preview */
+.inbox-tooltip {
+    position: fixed;
+    z-index: 9999;
+    max-width: 56rem; /* approx 896px */
+    max-height: 60vh;
+    overflow: auto;
+    background: rgba(17, 24, 39, 0.96); /* dark */
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.inbox-cell-truncated {
+    min-width: 100px;
+    cursor: default;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 body, html {
     overscroll-behavior: none;
 }

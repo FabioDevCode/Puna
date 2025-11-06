@@ -1,4 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
+	// Tooltip helpers for inbox long-content preview
+	let _inboxTooltipEl = null;
+	function ensureInboxTooltip() {
+		if (_inboxTooltipEl) return _inboxTooltipEl;
+		_inboxTooltipEl = document.createElement('div');
+		_inboxTooltipEl.id = 'inbox-tooltip';
+		_inboxTooltipEl.className = 'inbox-tooltip none';
+		document.body.appendChild(_inboxTooltipEl);
+		return _inboxTooltipEl;
+	}
+
+	function showInboxTooltip(text, x, y) {
+		const el = ensureInboxTooltip();
+		el.textContent = text;
+		el.style.left = `${x}px`;
+		el.style.top = `${y}px`;
+		el.classList.remove('none');
+	}
+
+	function moveInboxTooltip(x, y) {
+		const el = ensureInboxTooltip();
+		el.style.left = `${x}px`;
+		el.style.top = `${y}px`;
+	}
+
+	function hideInboxTooltip() {
+		if (!_inboxTooltipEl) return;
+		_inboxTooltipEl.classList.add('none');
+	}
+
 	// Find all tab containers (daisyui uses .tabs)
 	const tabLists = document.querySelectorAll('.tabs');
 
@@ -177,17 +207,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
 						tr.appendChild(tdDate);
 
-						if (!keysArr.length) {
-							const td = document.createElement('td');
-							td.textContent = JSON.stringify(content);
-							tr.appendChild(td);
-						} else {
-							keysArr.forEach((k) => {
+							// Helper to render a cell with optional truncation + tooltip
+							function renderCell(value) {
 								const td = document.createElement('td');
-								td.textContent = content[k] !== undefined && content[k] !== null ? String(content[k]) : '';
+								const str = value !== undefined && value !== null ? String(value) : '';
+								const MAX = 100;
+								if (str.length > MAX) {
+									// truncated preview
+									td.textContent = str.substring(0, MAX) + '...';
+									td.classList.add('inbox-cell-truncated');
+
+									// show tooltip box near mouse with full content
+									td.addEventListener('mouseenter', (ev) => {
+										showInboxTooltip(str, ev.pageX + 12, ev.pageY + 12);
+									});
+									td.addEventListener('mousemove', (ev) => {
+										moveInboxTooltip(ev.pageX + 12, ev.pageY + 12);
+									});
+									td.addEventListener('mouseleave', () => {
+										hideInboxTooltip();
+									});
+								} else {
+									td.textContent = str;
+								}
+								return td;
+							}
+
+							if (!keysArr.length) {
+								const td = renderCell(JSON.stringify(content));
 								tr.appendChild(td);
-							});
-						}
+							} else {
+								keysArr.forEach((k) => {
+									const td = renderCell(content[k]);
+									tr.appendChild(td);
+								});
+							}
 
 						const tdAct = document.createElement('th');
 						tdAct.innerHTML = '<button class="btn btn-xs">actions</button>';
