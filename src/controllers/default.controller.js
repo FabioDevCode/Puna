@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import models from '../models/index.js';
 import stringUtils from "../utils/string.js";
 import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
-
+import { encryptObject } from '../utils/crypto.js';
 
 export const dashboard = async (req, res) => {
     try {
@@ -253,8 +253,10 @@ export const getSiteToken = async (req, res) => {
         if (!secret) return res.status(500).json({ error: 'Server key not configured' });
 
         const payload = {
-            id: site.id,
-            control_code: site.control_code
+            data: encryptObject({
+                id: site.id,
+                control_code: site.control_code
+            })
         };
 
         const token = jwt.sign(payload, secret);

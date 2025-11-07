@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import jwt from 'jsonwebtoken';
 import models from '../../../models/index.js';
+import { decryptObject } from '../../../utils/crypto.js';
 
 export async function authApiKeyAccess(req, res, next) {
 	try {
@@ -33,7 +34,7 @@ export async function authApiKeyAccess(req, res, next) {
 
 		let payload;
 		try {
-			payload = jwt.verify(token, secret);
+			payload = decryptObject(jwt.verify(token, secret).data);
 		} catch (err) {
 			return res.status(401).json({ error: 'Invalid token' });
 		}
