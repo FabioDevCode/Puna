@@ -190,10 +190,10 @@ h3 {
 }
 
 #tableInbox {
-    max-height: calc(100vh - var(--navbar-height) - 12rem);
+    max-height: calc(100vh - var(--navbar-height) - 15rem);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 1rem;
+    padding-bottom: 1.2rem;
 }
 
 #tableInbox table thead {
