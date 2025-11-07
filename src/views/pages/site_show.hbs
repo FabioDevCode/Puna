@@ -55,9 +55,9 @@
     {{> _ui/form_template_modal }}
 </div>
 
-<div class="flex flex-col items-start justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
+<div class="flex items-start items-center justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
     {{#if forms}}
-        <div role="tablist" class="tabs tabs-bordered">
+        <div role="tablist" class="tabs tabs-boxed">
             {{#each forms}}
                 <a role="tab" class="tab {{#if @first}}tab-active{{/if}}" data-id="{{this.id}}" data-code="{{this.code}}" data-name="{{this.name}}" data-template="{{this.template}}">
                     {{this.name}}
