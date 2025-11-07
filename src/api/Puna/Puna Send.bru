@@ -5,18 +5,21 @@ meta {
 }
 
 post {
-  url: http://localhost:3022/api/v1/send/azerty
+  url: http://localhost:3022/api/v1/send/3EC4QQ41A5
   body: json
   auth: none
 }
 
 headers {
-  Authorization: Bearer xxx
-  X-KEY-PUNA: ...
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiNTUzMjQ2NzM2NDQ3NTY2YjU4MzEzOTVhNTQ3Njc3NzE0NzM3NDI1NDRlNDM2NDU4NDc2YjRjN2E2ZjY4NzI0YzRhNTM3ODMxMzc0ZTYzMmY2MTMzNjU0ZjUxNTk2NjZhNjkyZjRiNWE1OTU3Nzc1MDYzNGE3NzUyMmY1NDU2MzM1NzU3NzkzMTM0MzE3MjMzNDI1MDQxMmI1NTM1NDc2YjQ3NWE0YzUyNmU2NDc4NDc0ZTRlNmI3NjU2NDc3MjUwNzI3MjMzMzY1MzM1NzE2MTUyNzk0MTUyNzU0ZjY2MzU1YTY1MzM2Mjc2NTM3NjZhNmM2ZjJmNmY2MzYzNmU0OCIsImlhdCI6MTc2MjU1MDkyMH0.XyzicdqPznMOsb5TIQri3arUPPuEPzQqePiw4C3tRQw
+  X-KEY-PUNA: puna
 }
 
 body:json {
   {
-    "coucou": "test"
+    "mail": "chate-erton@indy.com",
+    "entreprise": "Indy",
+    "nom": "CHATE",
+    "prenom": "Eyrton"
   }
 }
