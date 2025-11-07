@@ -9,6 +9,8 @@
 /* layout variables */
 :root {
     --navbar-height: 4rem; /* 64px */
+    --table-head-bg: #F3F8FC;
+    /* --table-head-bg: #202A37; */
 }
 
 #puna {
@@ -139,4 +141,24 @@ h3 {
 .app-main {
     height: calc(100vh - var(--navbar-height));
     overflow: auto;
+}
+
+/* Make the inbox table wrapper scrollable so the table can be scrolled
+independently of the page. Adjust the -12rem offset if your header
+or surrounding content has a different height. */
+#tableInbox {
+    max-height: calc(100vh - var(--navbar-height) - 12rem);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 1rem;
+}
+
+#tableInbox table thead {
+    background: var(--table-head-bg);
+    overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 2px;
+    border-radius: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
