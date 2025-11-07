@@ -27,7 +27,7 @@
     max-width: 56rem; /* approx 896px */
     max-height: 60vh;
     overflow: auto;
-    background: rgba(17, 24, 39, 0.96); /* dark */
+    background: rgba(17, 24, 39, 0.96);
     color: #fff;
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
