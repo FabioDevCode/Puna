@@ -103,9 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (hasId) {
 				// show button
 				if (btnOpenTemplate) btnOpenTemplate.classList.remove('none');
-				// show table-level buttons
-				const tableBtns = document.getElementById('tableBtns');
-				if (tableBtns) tableBtns.classList.remove('none');
 				// set form action
 				if (modalForm) modalForm.action = `/form/${target.dataset.id}/template`;
 				// populate modal content from data-template attribute
@@ -214,44 +211,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
 						tr.appendChild(tdDate);
 
-							// Helper to render a cell with optional truncation + tooltip
-							function renderCell(value) {
-								const td = document.createElement('td');
-								const str = value !== undefined && value !== null ? String(value) : '';
-								const MAX = 100;
-								if (str.length > MAX) {
-									// truncated preview
-									td.textContent = str.substring(0, MAX) + '...';
-									td.classList.add('inbox-cell-truncated');
+						// Helper to render a cell with optional truncation + tooltip
+						function renderCell(value) {
+							const td = document.createElement('td');
+							const str = value !== undefined && value !== null ? String(value) : '';
+							const MAX = 100;
+							if (str.length > MAX) {
+								// truncated preview
+								td.textContent = str.substring(0, MAX) + '...';
+								td.classList.add('inbox-cell-truncated');
 
-									// show tooltip box near mouse with full content
-									td.addEventListener('mouseenter', (ev) => {
-										showInboxTooltip(str, ev.pageX + 12, ev.pageY + 12);
-									});
-									td.addEventListener('mousemove', (ev) => {
-										moveInboxTooltip(ev.pageX + 12, ev.pageY + 12);
-									});
-									td.addEventListener('mouseleave', () => {
-										hideInboxTooltip();
-									});
-								} else {
-									td.textContent = str;
-								}
-								return td;
-							}
-
-							if (!keysArr.length) {
-								const td = renderCell(JSON.stringify(content));
-								tr.appendChild(td);
-							} else {
-								keysArr.forEach((k) => {
-									const td = renderCell(content[k]);
-									tr.appendChild(td);
+								// show tooltip box near mouse with full content
+								td.addEventListener('mouseenter', (ev) => {
+									showInboxTooltip(str, ev.pageX + 12, ev.pageY + 12);
 								});
+								td.addEventListener('mousemove', (ev) => {
+									moveInboxTooltip(ev.pageX + 12, ev.pageY + 12);
+								});
+								td.addEventListener('mouseleave', () => {
+									hideInboxTooltip();
+								});
+							} else {
+								td.textContent = str;
 							}
+							return td;
+						}
+
+						if (!keysArr.length) {
+							const td = renderCell(JSON.stringify(content));
+							tr.appendChild(td);
+						} else {
+							keysArr.forEach((k) => {
+								const td = renderCell(content[k]);
+								tr.appendChild(td);
+							});
+						}
 
 						const tdAct = document.createElement('th');
-						tdAct.innerHTML = `<button class="btn btn-sm btn-neutral btn-circle pt-[2px]">
+						tdAct.innerHTML = `<button class="btn btn-sm btn-neutral btn-outline btn-circle noo pt-[2px]">
 							<i class="fa-solid fa-ellipsis"></i>
 						</button>`;
 						tr.appendChild(tdAct);
@@ -268,14 +265,20 @@ document.addEventListener('DOMContentLoaded', () => {
 				.then((r) => r.json())
 				.then((data) => {
 					const items = data.items || [];
-						buildHead(keys);
-						buildRows(items, keys);
-						// update counter
+						if(items?.length) {
+							buildHead(keys);
+							buildRows(items, keys);
+										// show table-level buttons
+							const tableBtns = document.getElementById('tableBtns');
+							if (tableBtns) tableBtns.classList.remove('none');
+						}
+
 						const countEl = document.getElementById('count_inbox');
 						if (countEl) {
 							const n = items.length || 0;
-							const word = n <= 1 ? 'élément' : 'éléments';
-							countEl.textContent = `${n} ${word}`;
+							const word = n === 1 ? 'élément' : 'éléments';
+							const result = n === 0 ? "Aucun élément" : `${n} ${word}`;
+							countEl.textContent = result;
 						}
 				})
 				.catch(() => {
