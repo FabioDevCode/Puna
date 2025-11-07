@@ -12,12 +12,13 @@ router.post('/dp-first-co', authCtl.dpFirstCoPost);
 router.post('/dp-connect', authCtl.dpConnect);
 router.get('/dp-logout', authCtl.dpLogout);
 
-// CONNECTED ===================================================
+// CONNECTED ==================================================================
 router.get('/dashboard', isConnected, dctl.dashboard);
 
 router.get('/all-site', isConnected, dctl.allSite)
 router.post('/create-site', isConnected, dctl.createSite);
 router.get('/site/:id/token', isConnected, dctl.getSiteToken);
+router.put('/site/:id/revoke-tokens', isConnected, dctl.revokeSiteTokens);
 router.get('/site/:id', isConnected, dctl.showSite);
 router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 
@@ -25,11 +26,7 @@ router.post('/create-form', isConnected, dctl.createForm);
 router.post('/delete-form', isConnected, dctl.deleteForm);
 
 router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
-
-// Fetch inbox items for a form (used by client-side to display data)
 router.get('/form/:id/inbox', isConnected, dctl.getFormInbox);
-
-
 
 
 export default router;

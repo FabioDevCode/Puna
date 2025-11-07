@@ -267,6 +267,25 @@ export const getSiteToken = async (req, res) => {
     }
 };
 
+export const revokeSiteTokens = async (req, res) => {
+    const siteId = req.params.id;
+    const userId = req.session.user?.id;
+
+    try {
+        const site = await models.Site.findByPk(siteId);
+        if (!site) return res.status(404).json({ error: 'Site not found' });
+        if (site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
+
+        const newCode = stringUtils.generateCode(16);
+        site.control_code = newCode;
+        await site.save();
+
+        return res.json({ success: true, control_code: newCode });
+    } catch (err) {
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const allSite = async (req, res) => {
     try {
         const userId = req.session.user?.id;
@@ -279,3 +298,4 @@ export const allSite = async (req, res) => {
         res.render('site_list', {});
     }
 };
+

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const siteId = btn.dataset.siteId;
         if (!siteId) return;
-
+        const old = btn.innerHTML;
         try {
             const resp = await fetch(`/site/${siteId}/token`, { method: 'GET', credentials: 'same-origin' });
             if (!resp.ok) throw new Error('Network response not ok');
@@ -13,12 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (json.token) {
                 await navigator.clipboard.writeText(json.token);
                 // show temporary success state
-                const old = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Token copié !';
+                btn.innerHTML = '<i class="fas fa-check"></i> Token copié';
                 setTimeout(() => { btn.innerHTML = old; }, 1200);
             }
         } catch (err) {
-            const old = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur';
             setTimeout(() => { btn.innerHTML = old; }, 1600);
         }

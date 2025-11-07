@@ -5,13 +5,14 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-    <button class="btn btn-sm btn-outline btn-primary">
+    <button id="btn_revoke_tokens" data-site-id="{{site.id}}" class="btn btn-sm btn-outline btn-primary">
         <i class="fa-solid fa-rotate"></i>
         Revoquer tous les tokens
     </button>
 
+
     <button id="btn_copy_token" class="btn btn-sm btn-outline" data-site-id="{{site.id}}">
-        <i class="fas fa-key"></i>
+        <i class="fa-solid fa-clone"></i>
         Copier un token
     </button>
 
@@ -81,7 +82,7 @@
                 Filtre
             </button>
             <button class="btn btn-sm">
-                <i class="fa-solid fa-chart-simple"></i>
+                <i class="fa-solid fa-table-columns"></i>
                 Choix des colonnes
             </button>
         </div>

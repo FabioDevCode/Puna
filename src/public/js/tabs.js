@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				await navigator.clipboard.writeText(text);
 				// temporary feedback: change button text/icon like token.js but without green color
 				const old = copyBtn.innerHTML;
-				copyBtn.innerHTML = '<i class="fas fa-check"></i> Copié';
+				copyBtn.innerHTML = '<i class="fas fa-check"></i> Code copié';
 				setTimeout(() => { copyBtn.innerHTML = old; }, 1200);
 			} catch (err) {
 				// ignore copy errors silently
