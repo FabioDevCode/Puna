@@ -4,12 +4,13 @@ Work in progress...
 
 ### TODO - Developpement (SIMPLE) :
 
-- Limite de formulaire par site (5 max)
-- Page show pour visualisé un éléments
-- Rendre page Dashboard scrollable
-- Rendre page liste des Site scrollable
-- Update models User pour mettre date de dernière connexion.
-- Update models Site count nombre de form existant.
+- Limiter la taille des inputs de création **Site** & **From**
+- Page show pour visualisé un éléments **Inbox**
+- Rendre page **Dashboard** scrollable
+- Rendre page liste des **Site** scrollable
+- Update models **User** pour mettre date de dernière connexion.
+- Update models **Site** count nombre de form existant.
+- Faire en sorte de pouvoir rediriger vers le show d'un **Site** en ciblant un **From**.
 
 ### TODO - Developpement (COMPLEXE) :
 
@@ -19,6 +20,6 @@ Work in progress...
   2. répartition de la quantité (inobx) par Site.
   3. date et heure du dernier form reçu
 - Pré-paramétré le template du formulaire. (checkbox à mettre)
-- Faire filtre sur datalist de des élements.
-- Choix colonne sur datalist et gérer l'affichage en fonction
+- Faire filtre sur datalist de des élements. (persitant sauvegarde local-storage)
+- Choix colonne sur datalist et gérer l'affichage en fonction du template (persistance sauvagarde en base, nouvelle table ?)
 - Faire responsive & surtout le menu latéral prévoir autre chose.

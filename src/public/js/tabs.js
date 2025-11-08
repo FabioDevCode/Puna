@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						if (countEl) {
 							const n = items.length || 0;
 							const word = n === 1 ? 'élément' : 'éléments';
-							const result = n === 0 ? "Aucun élément" : `${n} ${word}`;
+							const result = n === 0 ? "" : `${n} ${word}`;
 							countEl.textContent = result;
 						}
 				})
