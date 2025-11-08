@@ -193,14 +193,13 @@ h3 {
     max-height: calc(100vh - var(--navbar-height) - 15rem);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 1.2rem;
+    border-radius: 10px;
 }
 
 #tableInbox table thead {
     background: var(--table-head-bg);
     overflow: hidden;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 2px;
-    border-radius: 8px;
     position: sticky;
     top: 0px;
     z-index: 10;
