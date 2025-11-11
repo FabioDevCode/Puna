@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import jwt from 'jsonwebtoken';
 import models from '../models/index.js';
+import { Op } from 'sequelize';
 import stringUtils from "../utils/string.js";
 import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
 import { encryptObject } from '../utils/crypto.js';
@@ -225,6 +226,66 @@ export const getFormInbox = async (req, res) => {
         });
 
         return res.json({ items });
+    } catch (err) {
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
+// Return inbox counts per day for the logged user for the last N days (7 or 30)
+export const getInboxCounts = async (req, res) => {
+    const userId = req.session.user?.id;
+    const daysRaw = parseInt(req.query.days, 10) || 7;
+    const days = [7, 30].includes(daysRaw) ? daysRaw : 7;
+
+    try {
+        // compute start date (00:00 of day (days-1) ago) to include today
+        const end = new Date();
+        end.setHours(23, 59, 59, 999);
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        start.setDate(start.getDate() - (days - 2));
+
+        // fetch Inbox rows linked to forms/sites owned by the user
+        const inboxRows = await models.Inbox.findAll({
+            where: {
+                createdAt: {
+                    [Op.gte]: start,
+                    [Op.lte]: end
+                }
+            },
+            include: [{
+                model: models.Form,
+                as: "form",
+                include: [{
+                    model: models.Site,
+                    as: "site",
+                    where: { fk_id_user: userId }
+                }]
+            }]
+        });
+
+        // prepare labels (dates) and initialize counts to 0
+        const labels = [];
+        const countsMap = {};
+
+        for (let i = 0; i < days; i++) {
+            const d = new Date(start);
+            d.setDate(start.getDate() + i);
+            const key = d.toISOString().slice(0, 10);
+            labels.push(key);
+            countsMap[key] = 0;
+        }
+
+        // aggregate counts per day from fetched rows
+        inboxRows.forEach((r) => {
+            const created = new Date(r.createdAt);
+            const key = created.toISOString().slice(0, 10);
+            if (countsMap[key] !== undefined) countsMap[key]++;
+        });
+
+        const data = labels.map((l) => countsMap[l] || 0);
+
+        return res.json({ labels, data });
     } catch (err) {
         return res.status(500).json({ error: 'Server error' });
     }

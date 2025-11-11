@@ -14,6 +14,9 @@ router.get('/dp-logout', authCtl.dpLogout);
 
 // CONNECTED ==================================================================
 router.get('/dashboard', isConnected, dctl.dashboard);
+// Stats API for dashboard
+router.get('/stats/inbox-counts', isConnected, dctl.getInboxCounts);
+
 
 router.get('/all-site', isConnected, dctl.allSite)
 router.post('/create-site', isConnected, dctl.createSite);
@@ -27,6 +30,8 @@ router.post('/delete-form', isConnected, dctl.deleteForm);
 
 router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
 router.get('/form/:id/inbox', isConnected, dctl.getFormInbox);
+
+
 
 
 export default router;
