@@ -2,11 +2,18 @@
 
 Work in progress...
 
+fontawesome v6 Free : https://fontawesome.com/v6/search?ic=free&o=r
+
+daisyUI v4 : https://v4.daisyui.com/
+
+tailwindCSS : https://tailwindcss.com/
+
+ApexCharts : https://apexcharts.com/
+
 ### TODO - Developpement (SIMPLE) :
 
 - Limiter la taille des inputs de création **Site** & **From**
 - Page show pour visualisé un éléments **Inbox**
-- Rendre page **Dashboard** scrollable
 - Rendre page liste des **Site** scrollable
 - Update models **User** pour mettre date de dernière connexion.
 - Update models **Site** count nombre de form existant.
