@@ -24,6 +24,11 @@
                     width: 2,
                     colors: '#CFE4F5'
                 },
+                theme: {
+                    monochrome: {
+                        enabled: true,
+                    },
+                },
                 plotOptions: {
                     pie: {
                         donut: {

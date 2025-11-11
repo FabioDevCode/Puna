@@ -17,6 +17,7 @@ router.get('/dashboard', isConnected, dctl.dashboard);
 
 router.get('/stats/inbox-counts', isConnected, dctl.getInboxCounts);
 router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
+router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
 
 router.get('/all-site', isConnected, dctl.allSite)
 router.post('/create-site', isConnected, dctl.createSite);

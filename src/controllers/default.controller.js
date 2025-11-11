@@ -333,6 +333,44 @@ export const getInboxCountsBySite = async (req, res) => {
     }
 };
 
+// Return last inbox entry date/time for the logged user
+export const getLastInboxEntry = async (req, res) => {
+    const userId = req.session.user?.id;
+
+    try {
+        const lastRow = await models.Inbox.findOne({
+            include: [{
+                model: models.Form,
+                as: 'form',
+                include: [{
+                    model: models.Site,
+                    as: 'site',
+                    where: { fk_id_user: userId }
+                }]
+            }],
+            order: [['createdAt', 'DESC']]
+        });
+
+        if (!lastRow) {
+            return res.json({ date: null, time: null });
+        }
+
+        const d = new Date(lastRow.createdAt);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+
+        const date = `${day}/${month}/${year}`;
+        const time = `${hours}h${minutes}`;
+
+        return res.json({ date, time });
+    } catch (err) {
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const getSiteToken = async (req, res) => {
     const siteId = req.params.id;
     const userId = req.session.user?.id;
