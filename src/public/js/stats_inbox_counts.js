@@ -19,14 +19,37 @@ document.addEventListener('DOMContentLoaded', () => {
             chart: {
                 type: 'line',
                 height: 344,
-                toolbar: { show: false }
+                toolbar: {
+                    show: false
+                },
+                zoom: {
+                    enabled: false
+                }
             },
-            series: [{ name: 'Entrées', data: series }],
-            xaxis: { categories: labels },
+            series: [
+                {
+                    name: 'Entrées',
+                    data: series
+                }
+            ],
+            xaxis: {
+                categories: labels,
+                axisBorder: {
+                    show: false,
+                }
+            },
             stroke: { curve: 'smooth' },
             markers: { size: 5 },
-            grid: { show: true },
-            tooltip: { x: { format: 'yyyy-MM-dd' } }
+            grid: {
+                show: true,
+                borderColor: '#6C7B89',
+                strokeDashArray: 4,
+            },
+            tooltip: {
+                x: {
+                    format: 'yyyy-MM-dd'
+                }
+            }
         };
 
         if (chart) {

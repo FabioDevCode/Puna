@@ -261,9 +261,3 @@ h3 {
     height: 100%;
 }
 
-/* Example colors for demo */
-.stats-item--a { background: linear-gradient(135deg,#E3F2FD,#BBDEFB); }
-.stats-item--b { background: linear-gradient(135deg,#FFF3E0,#FFE0B2); }
-.stats-item--c { background: linear-gradient(135deg,#E8F5E9,#C8E6C9); }
-
-

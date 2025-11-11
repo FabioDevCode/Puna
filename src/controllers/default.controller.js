@@ -231,7 +231,6 @@ export const getFormInbox = async (req, res) => {
     }
 };
 
-// Return inbox counts per day for the logged user for the last N days (7 or 30)
 export const getInboxCounts = async (req, res) => {
     const userId = req.session.user?.id;
     const daysRaw = parseInt(req.query.days, 10) || 7;
@@ -284,6 +283,49 @@ export const getInboxCounts = async (req, res) => {
         });
 
         const data = labels.map((l) => countsMap[l] || 0);
+
+        return res.json({ labels, data });
+    } catch (err) {
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
+export const getInboxCountsBySite = async (req, res) => {
+    const userId = req.session.user?.id;
+
+    try {
+        // fetch Inbox rows linked to forms/sites owned by the user
+        const inboxRows = await models.Inbox.findAll({
+            include: [{
+                model: models.Form,
+                as: 'form',
+                include: [{
+                    model: models.Site,
+                    as: 'site',
+                    where: { fk_id_user: userId }
+                }]
+            }]
+        });
+
+        // aggregate counts per site
+        const countsMap = {};
+        const labelsMap = {};
+
+        (inboxRows || []).forEach((r) => {
+            const site = r.form && r.form.site ? r.form.site : null;
+            if (!site) return;
+            const key = String(site.id);
+            countsMap[key] = (countsMap[key] || 0) + 1;
+            // Use domain if available, otherwise a fallback label
+            labelsMap[key] = site.domain || `site-${site.id}`;
+        });
+
+        // prepare arrays for labels and data (preserve stable order: descending by count)
+        const entries = Object.keys(countsMap).map((k) => ({ id: k, label: labelsMap[k], count: countsMap[k] }));
+        entries.sort((a, b) => b.count - a.count);
+
+        const labels = entries.map((e) => e.label);
+        const data = entries.map((e) => e.count);
 
         return res.json({ labels, data });
     } catch (err) {
