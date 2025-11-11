@@ -5,26 +5,55 @@
 {{/slot}}
 
 
-{{!-- Mettre une div englobe le tout pour permettre le scrol --}}
-
 {{#each stats}}
-    {{> _ui/stats
-        title=name
-        value=value
-        desc=""
-        icon=icon
-    }}
+    {{#if @first}}
+        {{> _ui/stats
+            title=name
+            value=value
+            desc=""
+            icon=icon
+            class="md:col-span-6 lg:col-span-4"
+        }}
+    {{else}}
+        {{> _ui/stats
+            title=name
+            value=value
+            desc=""
+            icon=icon
+            class="md:col-span-3 lg:col-span-4"
+        }}
+    {{/if}}
 {{/each}}
+
 
 {{!-- Faire de diagrame etc pour les stats --}}
 
-{{!-- <div id="chartLastRecieve" class="card p-2 bg-secondary-content col-span-2 md:col-span-4 lg:col-span-6"></div>
+<div class="col-span-2 md:col-span-6 lg:col-span-12">
+    <div class="stats-grid gap-4">
+        <div class="stats-item stats-item--a">
+            Stat A - Nombre inbox (7 days || 30 days)
+        </div>
 
-<div id="chartRepart" class="card p-2 bg-secondary-content col-span-2 md:col-span-2 lg:col-span-6"></div> --}}
+        <div class="stats-item stats-item--b">
+            Stat B - Date + Heure (last recieve)
+        </div>
 
-{{!-- <div id="chartLast" class="card p-2 bg-secondary-content col-span-2 md:col-span-2 lg:col-span-4"></div> --}}
+        <div class="stats-item stats-item--c">
+            Stat C - Répartition par site
+        </div>
+    </div>
+</div>
 
-{{!--
+
+
+{{!-- 
+<div id="chartLastRecieve" class="card p-2 bg-secondary-content col-span-2 md:col-span-4 lg:col-span-8"></div>
+
+<div id="chartRepart" class="card p-2 bg-secondary-content col-span-2 md:col-span-2 lg:col-span-4"></div>
+
+<div id="chartLast" class="card p-2 bg-secondary-content col-span-2 md:col-span-2 lg:col-span-4"></div>
+
+
 <script>
     let options1 = {
         chart: {
@@ -94,4 +123,4 @@
     chart3.render();
 
 </script>
---}}
+ --}}

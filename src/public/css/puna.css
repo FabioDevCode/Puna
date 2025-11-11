@@ -214,3 +214,56 @@ h3 {
     margin-left: 0px !important;
 }
 
+/* Stats grid for dashboard
+   - Desktop: 12 columns
+   - Tablet: 6 columns
+   - Mobile: 2 columns
+   - 4 rows fixed at 96px each
+   - Small gap between items
+ */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* mobile: 2 cols */
+    grid-template-rows: repeat(8, 96px); /* mobile/tablet: 8 rows to host 1+4+3 */
+    gap: 0.75rem;
+    align-items: start;
+}
+
+/* Mobile / default behaviour: force full-width stacking in the exact order B -> A -> C */
+.stats-item--b { grid-column: 1 / -1; grid-row: 1; }
+.stats-item--a { grid-column: 1 / -1; grid-row: 2 / span 4; }
+.stats-item--c { grid-column: 1 / -1; grid-row: 6 / span 3; }
+
+@media (min-width: 768px) {
+    /* Tablet: keep 6 columns but keep stacking B/A/C full width (6 cols) */
+    .stats-grid { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(8, 96px); }
+    .stats-item--b { grid-column: 1 / -1; grid-row: 1; }
+    .stats-item--a { grid-column: 1 / -1; grid-row: 2 / span 4; }
+    .stats-item--c { grid-column: 1 / -1; grid-row: 6 / span 3; }
+}
+
+@media (min-width: 1024px) {
+    /* Desktop: switch back to the 12-col layout and original placements */
+    .stats-grid { grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(4, 96px); }
+    .stats-item--a { grid-column: span 8; grid-row: span 4; }
+    .stats-item--b { grid-column: span 4; grid-row: span 1; }
+    .stats-item--c { grid-column: span 4; grid-row: span 3; }
+}
+
+.stats-item {
+    padding: 0.75rem;
+    border-radius: 1rem;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    height: 100%;
+}
+
+/* Example colors for demo */
+.stats-item--a { background: linear-gradient(135deg,#E3F2FD,#BBDEFB); }
+.stats-item--b { background: linear-gradient(135deg,#FFF3E0,#FFE0B2); }
+.stats-item--c { background: linear-gradient(135deg,#E8F5E9,#C8E6C9); }
+
+
