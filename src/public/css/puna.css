@@ -184,9 +184,14 @@ h3 {
 }
 
 .app-main {
-    height: calc(100vh - var(--navbar-height));
-    min-height: min-content;
+    min-height: calc(100vh - var(--navbar-height));
+    max-height: calc(100vh - var(--navbar-height));
     overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.app-main > .grid {
+    height: auto;
 }
 
 #tableInbox {
