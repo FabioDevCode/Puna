@@ -27,6 +27,9 @@
                 theme: {
                     monochrome: {
                         enabled: true,
+                        color: '#0075C3',
+                        shadeTo: 'light',
+                        shadeIntensity: 0.5
                     },
                 },
                 plotOptions: {
@@ -38,7 +41,9 @@
                 },
                 tooltip: {
                     y: {
-                        formatter: function(val){ return val + ' entrées'; }
+                        formatter: function(val){
+                            return val;
+                        }
                     }
                 },
                 responsive: [

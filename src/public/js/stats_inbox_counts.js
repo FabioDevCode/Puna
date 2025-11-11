@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     enabled: false
                 }
             },
+            colors: ['#0075C3'],
             series: [
                 {
                     name: 'Entrées',
