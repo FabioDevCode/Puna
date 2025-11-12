@@ -16,6 +16,7 @@ router.get('/dp-logout', authCtl.dpLogout);
 router.get('/dashboard', isConnected, dctl.dashboard);
 
 router.get('/stats/inbox-counts', isConnected, dctl.getInboxCounts);
+router.get('/stats/inbox-heatmap', isConnected, dctl.getInboxHeatmap);
 router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
 router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
 

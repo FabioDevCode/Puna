@@ -6,6 +6,7 @@ import { Op } from 'sequelize';
 import stringUtils from "../utils/string.js";
 import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
 import { encryptObject } from '../utils/crypto.js';
+import dayjs from 'dayjs';
 
 export const dashboard = async (req, res) => {
     try {
@@ -333,7 +334,70 @@ export const getInboxCountsBySite = async (req, res) => {
     }
 };
 
-// Return last inbox entry date/time for the logged user
+export const getInboxHeatmap = async (req, res) => {
+    const userId = req.session.user?.id;
+    const daysRaw = parseInt(req.query.days, 10) || 30;
+    const days = [30, 90, 180].includes(daysRaw) ? daysRaw : 30;
+
+    try {
+        const end = new Date();
+        end.setHours(23, 59, 59, 999);
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        start.setDate(start.getDate() - (days - 1));
+
+        const inboxRows = await models.Inbox.findAll({
+            where: {
+                createdAt: {
+                    [Op.gte]: start,
+                    [Op.lte]: end
+                }
+            },
+            include: [{
+                model: models.Form,
+                as: 'form',
+                include: [{
+                    model: models.Site,
+                    as: 'site',
+                    where: { fk_id_user: userId }
+                }]
+            }]
+        });
+
+        // Prepare a 7x24 matrix (Monday..Sunday, 1..24)
+        const daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+        const hours = Array.from({length:24}, (_,i) => String(i+1));
+
+        const matrix = Array.from({length:7}, () => Array.from({length:24}, () => 0));
+
+        (inboxRows || []).forEach((r) => {
+            const created = dayjs(r.createdAt);
+            // day() -> 0 (Sunday) .. 6 (Saturday); we want Monday=0 .. Sunday=6
+            const dow = created.day();
+            const mondayIndex = (dow + 6) % 7;
+            let h = created.hour(); // 0..23
+            // map 0 -> 24 to keep labels 1..24; index = (col-1)
+            const col = h === 0 ? 24 : h;
+            const idx = col - 1;
+            if (matrix[mondayIndex] && typeof matrix[mondayIndex][idx] !== 'undefined') {
+                matrix[mondayIndex][idx]++;
+            }
+        });
+
+        let series = daysOfWeek.map((d, i) => ({
+            name: d,
+            data: hours.map((h, j) => ({ x: h, y: matrix[i][j] }))
+        }));
+
+        series = series.reverse();
+
+        return res.json({ hours, series });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const getLastInboxEntry = async (req, res) => {
     const userId = req.session.user?.id;
 
