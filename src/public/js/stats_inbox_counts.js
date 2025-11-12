@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             colors: ['#0075C3'],
             series: [
                 {
-                    name: 'Entrées',
+                    name: "",
                     data: series
                 }
             ],
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (chart) {
             chart.updateOptions({ xaxis: { categories: labels } });
-            chart.updateSeries([{ data: series }]);
+            chart.updateSeries([{ name: '', data: series }]);
         } else {
             chart = new ApexCharts(chartEl, options);
             chart.render();
