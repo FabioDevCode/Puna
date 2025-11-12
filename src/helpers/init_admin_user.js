@@ -5,8 +5,8 @@ export const initAdminUSer = async() => {
         const count = await models.User.count();
         if(count === 0) {
             await models.User.create({
-                email: "contact@fabiolopes.fr",
-                login: "fabio",
+                email: "",
+                login: "admin",
                 enabled: false
             });
         }
