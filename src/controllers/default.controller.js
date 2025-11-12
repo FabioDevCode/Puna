@@ -364,9 +364,10 @@ export const getInboxHeatmap = async (req, res) => {
             }]
         });
 
-        // Prepare a 7x24 matrix (Monday..Sunday, 1..24)
-        const daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-        const hours = Array.from({length:24}, (_,i) => String(i+1));
+    // Prepare a 7x24 matrix (Monday..Sunday, hours 00..23)
+    const daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+    // Hours labels: '00', '1', '2', ..., '23' so midnight is clearly represented as '00'
+    const hours = Array.from({length:24}, (_,i) => (i === 0 ? '00' : String(i)));
 
         const matrix = Array.from({length:7}, () => Array.from({length:24}, () => 0));
 
@@ -375,10 +376,8 @@ export const getInboxHeatmap = async (req, res) => {
             // day() -> 0 (Sunday) .. 6 (Saturday); we want Monday=0 .. Sunday=6
             const dow = created.day();
             const mondayIndex = (dow + 6) % 7;
-            let h = created.hour(); // 0..23
-            // map 0 -> 24 to keep labels 1..24; index = (col-1)
-            const col = h === 0 ? 24 : h;
-            const idx = col - 1;
+            const h = created.hour(); // 0..23
+            const idx = h; // column index matches hour (00->0, 23->23)
             if (matrix[mondayIndex] && typeof matrix[mondayIndex][idx] !== 'undefined') {
                 matrix[mondayIndex][idx]++;
             }
