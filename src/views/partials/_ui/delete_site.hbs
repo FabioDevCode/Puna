@@ -34,21 +34,21 @@
 </dialog>
 
 <script>
-	(function() {
-		try {
-			const input = document.getElementById('confirm_domain_{{id}}');
-			const btn = document.getElementById('btnConfirmDelete_{{id}}');
-			const domain = '{{domain}}';
-			if (!input || !btn) return;
-			btn.disabled = true;
-			input.addEventListener('input', function (e) {
-				const v = (e.target.value || '').trim();
-				if (v === domain) {
-					btn.disabled = false;
-				} else {
-					btn.disabled = true;
-				}
-			});
-		} catch (err) {}
-	})();
+(function() {
+	try {
+		const input = document.getElementById('confirm_domain_{{id}}');
+		const btn = document.getElementById('btnConfirmDelete_{{id}}');
+		const domain = '{{domain}}';
+		if (!input || !btn) return;
+		btn.disabled = true;
+		input.addEventListener('input', function (e) {
+			const v = (e.target.value || '').trim();
+			if (v === domain) {
+				btn.disabled = false;
+			} else {
+				btn.disabled = true;
+			}
+		});
+	} catch (err) {}
+})();
 </script>

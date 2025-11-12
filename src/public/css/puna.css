@@ -149,7 +149,6 @@ h3 {
     font-weight: 600;
 }
 
-
 .tabs-boxed :is(.tab-active,[aria-selected=true]):not(.tab-disabled):not([disabled]), .tabs-boxed :is(input:checked) {
     --tw-bg-opacity: 1;
     background-color: #202A37;

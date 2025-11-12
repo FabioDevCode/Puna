@@ -3,20 +3,7 @@
         {{{ renderSlot "title" }}}
     </div>
 
-    {{!-- Desktop / large screens: render buttons inline --}}
-    <div class="hidden md:flex gap-2 items-center">
+    <div class="md:flex gap-2 items-center">
         {{{ renderSlot "buttons" }}}
     </div>
-
-    {{!-- Mobile / tablet: collapse buttons into a dropdown to save space --}}
-    <div class="dropdown dropdown-end md:hidden">
-        <div tabindex="0" role="button" class="btn btn-sm m-1">
-            <span>Actions</span>
-            <i class="fa-solid fa-caret-down"></i>
-        </div>
-        <ul tabindex="0" class="dropdown-content gap-2 menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-            {{{ renderSlot "buttons" }}}
-        </ul>
-    </div>
-
 </div>

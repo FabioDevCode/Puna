@@ -29,11 +29,8 @@
                 <h4 class="text-2xl font-bold mt-1 opacity-25" id="info_form_name">
                     Formulaire
                 </h4>
-                <button class="btn btn-sm btn-error none" id="btn_delete_form" onclick="document.getElementById('modal_delete_form').showModal()">
-                    <i class="far fa-trash-alt"></i>
-                    <span>Supprimer</span>
-                </button>
-                {{> _ui/delete_form_modal }}
+
+                {{> _ui/delete_form }}
             </div>
 
             <div class="flex min-h-[36px] jutify-center items-center gap-2 opacity-25" id="info_form_code_wrap">
