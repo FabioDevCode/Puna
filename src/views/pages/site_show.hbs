@@ -7,13 +7,12 @@
 {{#slot "buttons"}}
     <button id="btn_copy_token" class="btn btn-sm btn-outline" data-site-id="{{site.id}}">
         <i class="fa-solid fa-clone"></i>
-        Copier un token
+        <span class="hidden md:flex">
+            Copier un token
+        </span>
     </button>
 
-    <button id="btn_revoke_tokens" data-site-id="{{site.id}}" class="btn btn-sm btn-outline btn-primary">
-        <i class="fa-solid fa-rotate"></i>
-        Revoquer les tokens
-    </button>
+    {{> _ui/btn_revoke_tokens id=site.id }}
 
     {{> _ui/delete_site
         id=site.id

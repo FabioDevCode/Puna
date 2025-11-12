@@ -12,7 +12,9 @@
 
 <button class="btn btn-sm btn-error" onclick="document.getElementById('delete_site_modal_{{id}}').showModal()">
 	<i class="far fa-trash-alt"></i>
-	<span>Supprimer ce site</span>
+	<span class="hidden md:flex">
+		Supprimer ce site
+	</span>
 </button>
 
 <dialog id="delete_site_modal_{{id}}" class="modal">
