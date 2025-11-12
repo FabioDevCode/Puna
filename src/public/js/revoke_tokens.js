@@ -37,4 +37,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Accessibility: manage aria-hidden and focus when the modal checkbox opens/closes
+    document.querySelectorAll('input[id^="revoke_tokens_modal_"]').forEach((chk) => {
+        // initialize aria-hidden state
+        const modal = chk.nextElementSibling;
+        if (modal) modal.setAttribute('aria-hidden', chk.checked ? 'false' : 'true');
+
+        chk.addEventListener('change', () => {
+            const m = chk.nextElementSibling;
+            if (!m) return;
+            if (chk.checked) {
+                m.setAttribute('aria-hidden', 'false');
+                // focus the confirm button for keyboard users
+                const confirm = m.querySelector('.btn-confirm-revoke');
+                if (confirm && typeof confirm.focus === 'function') {
+                    // small timeout to allow rendering
+                    setTimeout(() => confirm.focus(), 10);
+                }
+            } else {
+                m.setAttribute('aria-hidden', 'true');
+            }
+        });
+    });
 });
