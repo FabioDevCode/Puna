@@ -5,25 +5,47 @@
 {{/slot}}
 
 
-{{#each stats}}
-    {{#if @first}}
-        {{> _ui/stats
-            title=name
-            value=value
-            desc=""
-            icon=icon
-            class="md:col-span-6 lg:col-span-4"
-        }}
-    {{else}}
-        {{> _ui/stats
-            title=name
-            value=value
-            desc=""
-            icon=icon
-            class="md:col-span-3 lg:col-span-4"
-        }}
-    {{/if}}
-{{/each}}
+<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-6">
+    <div class="stat flex items-center justify-around gap-4 w-full">
+        <div class="flex items-center gap-2">
+            <div class="stat-figure text-3xl">
+                <i class="{{stats.globalInbox_icon}}"></i>
+            </div>
+            <div class="stat-value text-3xl">
+                {{stats.globalInbox}}
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="stat-figure text-3xl">
+                <i class="{{stats.globalForm_icon}}"></i>
+            </div>
+            <div class="stat-value text-3xl">
+                {{stats.globalForm}}
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="stat-figure text-3xl">
+                <i class="{{stats.globalSite_icon}}"></i>
+            </div>
+            <div class="stat-value text-3xl">
+                {{stats.globalSite}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="stats h-[68px] bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-6">
+    <div class="stat">
+        new 1
+    </div>
+    <div class="stat">
+        new 2
+    </div>
+    <div class="stat">
+        new 3
+    </div>
+</div>
+
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="stats-grid gap-4">
@@ -35,6 +57,6 @@
     </div>
 </div>
 
-<div class="col-span-2 md:col-span-6 lg:col-span-12">
+<div class="col-span-2 md:col-span-6 lg:col-span-12 h-max">
     {{> _ui/stats_inbox_heatmap }}
 </div>

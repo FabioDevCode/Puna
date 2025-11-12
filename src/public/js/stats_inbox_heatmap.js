@@ -18,8 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const options = {
             chart: {
                 type: 'heatmap',
-                height: 360,
-                toolbar: { show: false }
+                height: 280,
+                toolbar: {
+                    show: false
+                }
             },
             colors: ['#0075C3'],
             plotOptions: {
@@ -53,7 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             },
             dataLabels: { enabled: false },
-            xaxis: { categories: hours },
+            xaxis: {
+                categories: hours
+            },
             tooltip: {
                 y: { formatter: (val) => String(val) }
             }

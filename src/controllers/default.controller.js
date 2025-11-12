@@ -8,6 +8,7 @@ import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
 import { encryptObject } from '../utils/crypto.js';
 import dayjs from 'dayjs';
 
+
 export const dashboard = async (req, res) => {
     try {
         const userId = req.session.user?.id;
@@ -364,10 +365,10 @@ export const getInboxHeatmap = async (req, res) => {
             }]
         });
 
-    // Prepare a 7x24 matrix (Monday..Sunday, hours 00..23)
-    const daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-    // Hours labels: '00', '1', '2', ..., '23' so midnight is clearly represented as '00'
-    const hours = Array.from({length:24}, (_,i) => (i === 0 ? '00' : String(i)));
+        // Prepare a 7x24 matrix (Monday..Sunday, hours 00..23)
+        const daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+        // Hours labels: '00', '1', '2', ..., '23' so midnight is clearly represented as '00'
+        const hours = Array.from({length:24}, (_,i) => (i === 0 ? '00' : String(i)));
 
         const matrix = Array.from({length:7}, () => Array.from({length:24}, () => 0));
 

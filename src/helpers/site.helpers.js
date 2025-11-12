@@ -42,21 +42,15 @@ export function getGlobalStats(sitesWithCounts) {
     const globalInbox = sitesWithCounts.reduce((acc, site) => acc + (site.inbox || 0), 0);
     const globalForm = sitesWithCounts.reduce((acc, site) => acc + (site.form || 0), 0);
     const globalSite = sitesWithCounts.length;
-    return [
-        {
-            name: "Boite de réception",
-            value: globalInbox,
-            icon: "fas fa-inbox"
-        },
-        {
-            name: "Formulaire",
-            value: globalForm,
-            icon: "fas fa-file-alt"
-        },
-        {
-            name: "Site web",
-            value: globalSite,
-            icon: "fas fa-globe"
-        }
-    ];
+
+    const tinyStats = {
+        globalInbox,
+        globalInbox_icon: "fas fa-inbox",
+        globalForm,
+        globalForm_icon: "fas fa-file-alt",
+        globalSite,
+        globalSite_icon: "fas fa-globe"
+    };
+
+    return tinyStats;
 }
