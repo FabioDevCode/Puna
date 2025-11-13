@@ -258,6 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
 					// reset counter display
 					const countEl = document.getElementById('count_inbox');
 					if (countEl) countEl.textContent = '';
+
+					const tableBtns = document.getElementById('tableBtns');
+					if (tableBtns) tableBtns.classList.add('none');
 				}
 
 				// build header row based on template keys
@@ -374,12 +377,12 @@ document.addEventListener('DOMContentLoaded', () => {
 				.then((data) => {
 					const items = data.items || [];
 						if(items?.length) {
-									buildHead(visibleKeys);
-									buildRows(items, visibleKeys);
-												// show table-level buttons
-									const tableBtns = document.getElementById('tableBtns');
-									if (tableBtns) tableBtns.classList.remove('none');
-								}
+							buildHead(visibleKeys);
+							buildRows(items, visibleKeys);
+										// show table-level buttons
+							const tableBtns = document.getElementById('tableBtns');
+							if (tableBtns) tableBtns.classList.remove('none');
+						}
 
 						const countEl = document.getElementById('count_inbox');
 						if (countEl) {
