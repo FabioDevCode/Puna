@@ -233,6 +233,37 @@ export const getFormInbox = async (req, res) => {
     }
 };
 
+export const updateFormColumns = async (req, res) => {
+    const formId = req.params.id;
+    const userId = req.session.user?.id;
+    try {
+        const form = await models.Form.findByPk(formId);
+        if (!form) return res.status(404).json({ error: 'Form not found' });
+
+        const site = await models.Site.findByPk(form.fk_id_site);
+        if (!site || site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
+
+        // Expect JSON body { columns: { key1: true, key2: false, ... } }
+        let cols = req.body && req.body.columns ? req.body.columns : null;
+        if (typeof cols === 'string') {
+            try { cols = JSON.parse(cols); } catch (e) { cols = null; }
+        }
+
+        // If cols is not an object, reject
+        if (!cols || typeof cols !== 'object') {
+            return res.status(400).json({ error: 'Invalid columns payload' });
+        }
+
+        form.columns = JSON.stringify(cols);
+        await form.save();
+
+        return res.json({ success: true, columns: cols });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const getInboxCounts = async (req, res) => {
     const userId = req.session.user?.id;
     const daysRaw = parseInt(req.query.days, 10) || 7;

@@ -17,6 +17,7 @@ router.get('/dashboard', isConnected, dctl.dashboard);
 
 router.get('/stats/inbox-counts', isConnected, dctl.getInboxCounts);
 router.get('/stats/inbox-heatmap', isConnected, dctl.getInboxHeatmap);
+router.post('/form/:id/columns', isConnected, dctl.updateFormColumns);
 router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
 router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
 

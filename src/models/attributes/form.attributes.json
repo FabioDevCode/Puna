@@ -16,5 +16,9 @@
     "template": {
         "type": "LONGTEXT",
         "allowNull": true
+    },
+    "columns": {
+        "type": "LONGTEXT",
+        "allowNull": true
     }
 }

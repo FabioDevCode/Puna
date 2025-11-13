@@ -1,0 +1,20 @@
+<button id="btn_columns" class="btn btn-sm">
+    <i class="fa-solid fa-table-columns"></i>
+    <span class="hidden md:flex">
+        Choix des colonnes
+    </span>
+</button>
+
+<dialog id="modal_columns" class="modal">
+    <form id="modal_columns_form" class="modal-box w-11/12 max-w-md" method="dialog">
+        <h2 class="text-lg font-bold mb-2">Choix des colonnes</h2>
+        <p class="py-1 text-sm text-muted">Cochez les colonnes à afficher dans la liste. Les labels affichés sont les libellés définis dans le template.</p>
+
+        <div id="modal_columns_list" class="mt-4 max-h-72 overflow-auto grid grid-cols-1 gap-2"></div>
+
+        <div class="modal-action">
+            <button type="button" class="btn btn-sm" id="modal_columns_cancel">Annuler</button>
+            <button type="submit" class="btn btn-sm btn-secondary" id="modal_columns_save">Enregistrer</button>
+        </div>
+    </form>
+</dialog>

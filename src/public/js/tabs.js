@@ -32,6 +32,99 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Find all tab containers (daisyui uses .tabs)
 	const tabLists = document.querySelectorAll('.tabs');
 
+	// State for columns modal / current active form
+	let activeTpl = {};
+	let activeKeys = [];
+	let activeColumns = null;
+	let activeFormId = null;
+
+	const btnColumns = document.getElementById('btn_columns');
+	const modalColumns = document.getElementById('modal_columns');
+	const modalColumnsList = document.getElementById('modal_columns_list');
+	const modalColumnsForm = document.getElementById('modal_columns_form');
+	const modalColumnsCancel = document.getElementById('modal_columns_cancel');
+
+	function openColumnsModal() {
+		if (!modalColumns) return;
+		// populate list
+		if (modalColumnsList) {
+			modalColumnsList.innerHTML = '';
+			if (!activeKeys.length) {
+				modalColumnsList.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour ce formulaire.</p>';
+			} else {
+				activeKeys.forEach((k) => {
+					const label = document.createElement('label');
+					label.className = 'flex items-center gap-2 p-2 rounded bg-base-100';
+					const chk = document.createElement('input');
+					chk.type = 'checkbox';
+					chk.name = `col_${k}`;
+					chk.dataset.key = k;
+					chk.checked = activeColumns ? !!activeColumns[k] : true;
+					chk.className = 'checkbox checkbox-secondary';
+					const span = document.createElement('span');
+					span.textContent = activeTpl[k] || k;
+					label.appendChild(chk);
+					label.appendChild(span);
+					modalColumnsList.appendChild(label);
+				});
+			}
+		}
+		try { modalColumns.showModal(); } catch (e) { /* ignore if not supported */ }
+	}
+
+	if (btnColumns) {
+		btnColumns.addEventListener('click', (e) => {
+			e.preventDefault();
+			openColumnsModal();
+		});
+	}
+
+	if (modalColumnsCancel) {
+		modalColumnsCancel.addEventListener('click', (e) => {
+			e.preventDefault();
+			try { modalColumns.close(); } catch (e) {}
+		});
+	}
+
+	if (modalColumnsForm) {
+		modalColumnsForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			if (!activeFormId) return;
+			// read checkboxes
+			const inputs = modalColumnsList ? Array.from(modalColumnsList.querySelectorAll('input[type="checkbox"][data-key]')) : [];
+			const payload = {};
+			inputs.forEach((inp) => {
+				const k = inp.dataset.key;
+				payload[k] = !!inp.checked;
+			});
+
+			try {
+				const resp = await fetch(`/form/${activeFormId}/columns`, {
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ columns: payload })
+				});
+				const json = await resp.json().catch(() => ({}));
+				if (!resp.ok || !json.success) throw new Error(json.error || 'Network error');
+
+				// update activeColumns and dataset on active tab
+				activeColumns = payload;
+				// find active tab element and update its data-columns attribute
+				const activeTab = document.querySelector('.tab.tab-active[data-id]');
+				if (activeTab) activeTab.dataset.columns = JSON.stringify(payload);
+
+				// close modal
+				try { modalColumns.close(); } catch (e) {}
+
+				// re-trigger click on active tab to rebuild table with new columns
+				if (activeTab) activeTab.click();
+			} catch (err) {
+				alert('Erreur lors de l\'enregistrement des colonnes.');
+			}
+		});
+	}
+
 	tabLists.forEach((tabList) => {
 		// Delegate clicks on tabs
 		tabList.addEventListener('click', (e) => {
@@ -116,6 +209,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 				clearModalContainers();
 				const keys = Object.keys(tpl || {});
+				// set active tpl/keys/form for columns modal
+				activeTpl = tpl || {};
+				activeKeys = keys;
+				activeFormId = target.dataset.id || null;
+
+				// parse saved columns if present
+				let colsObj = {};
+				try {
+					const rawc = target.dataset.columns || '';
+					if (rawc) colsObj = JSON.parse(rawc);
+				} catch (e) { colsObj = {}; }
+				activeColumns = colsObj;
+
+				// compute visible keys according to saved columns (default: show all)
+				const visibleKeys = keys.filter((k) => (colsObj && typeof colsObj[k] !== 'undefined') ? !!colsObj[k] : true);
 				if (!keys.length) {
 					if (keysContainer) keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>';
 					if (valuesContainer) valuesContainer.innerHTML = '';
@@ -266,12 +374,12 @@ document.addEventListener('DOMContentLoaded', () => {
 				.then((data) => {
 					const items = data.items || [];
 						if(items?.length) {
-							buildHead(keys);
-							buildRows(items, keys);
-										// show table-level buttons
-							const tableBtns = document.getElementById('tableBtns');
-							if (tableBtns) tableBtns.classList.remove('none');
-						}
+									buildHead(visibleKeys);
+									buildRows(items, visibleKeys);
+												// show table-level buttons
+									const tableBtns = document.getElementById('tableBtns');
+									if (tableBtns) tableBtns.classList.remove('none');
+								}
 
 						const countEl = document.getElementById('count_inbox');
 						if (countEl) {

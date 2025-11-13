@@ -53,7 +53,7 @@
         <div class="flex items-center gap-0 w-full">
             <div role="tablist" class="tabs tabs-boxed flex flex-wrap">
                 {{#each forms}}
-                    <a role="tab" class="tab {{#if @first}}tab-active{{/if}}" data-id="{{this.id}}" data-code="{{this.code}}" data-name="{{this.name}}" data-template="{{this.template}}">
+                    <a role="tab" class="tab {{#if @first}}tab-active{{/if}}" data-id="{{this.id}}" data-code="{{this.code}}" data-name="{{this.name}}" data-template='{{this.template}}' data-columns='{{this.columns}}'>
                         {{this.name}}
                     </a>
                 {{/each}}
@@ -89,12 +89,8 @@
                     Filtre
                 </span>
             </button>
-            <button class="btn btn-sm">
-                <i class="fa-solid fa-table-columns"></i>
-                <span class="hidden md:flex">
-                    Choix des colonnes
-                </span>
-            </button>
+
+            {{> _ui/form_columns_modal }}
         </div>
     </div>
 
