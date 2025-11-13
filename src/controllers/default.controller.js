@@ -22,6 +22,11 @@ export const dashboard = async (req, res) => {
     }
 };
 
+export const rootRedirect = (req, res) => {
+    // user reaches this route only if `isConnected` allowed the request
+    return res.redirect('/dashboard');
+};
+
 export const error = async(req, res) => {
     res.render('error', {
         layout: false,

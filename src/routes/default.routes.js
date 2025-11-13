@@ -12,7 +12,9 @@ router.post('/dp-first-co', authCtl.dpFirstCoPost);
 router.post('/dp-connect', authCtl.dpConnect);
 router.get('/dp-logout', authCtl.dpLogout);
 
-// CONNECTED ==================================================================
+router.get('/', isConnected, dctl.rootRedirect);
+
+// CONNECTED ==============================================================
 router.get('/dashboard', isConnected, dctl.dashboard);
 
 router.get('/stats/inbox-counts', isConnected, dctl.getInboxCounts);
