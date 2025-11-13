@@ -6,9 +6,8 @@
     scrollbar-gutter: auto !important;
 }
 
-/* layout variables */
 :root {
-    --navbar-height: 4rem; /* 64px */
+    --navbar-height: 4rem;
     --table-head-bg: #F3F8FC;
     /* Scrollbar variables */
     /*
@@ -42,7 +41,6 @@
     color: whitesmoke;
 }
 
-
 #puna {
     background: linear-gradient(to right, #2F6EA9, #101E26);
     -webkit-background-clip: text;
@@ -52,11 +50,10 @@
     margin-top: 3px;
 }
 
-/* Inbox tooltip for long cell preview */
 .inbox-tooltip {
     position: fixed;
     z-index: 9999;
-    max-width: 56rem; /* approx 896px */
+    max-width: 56rem;
     max-height: 60vh;
     overflow: auto;
     background: rgba(17, 24, 39, 0.96);
@@ -133,7 +130,6 @@ h3 {
     font-family: "Inter", sans-serif !important;
 }
 
-/* Bouton ghost gris clair : fond clair et s'assombrit au hover */
 .btn-ghost-gray {
     background-color: var(--btn-ghost-gray, #e5e7eb);
     color: var(--btn-ghost-gray-text, inherit);
@@ -163,12 +159,10 @@ h3 {
     }
 }
 
-/* utility to hide elements */
 .none {
     display: none !important;
 }
 
-/* clickable copy area */
 .copy-clickable {
     cursor: pointer;
 }
@@ -177,7 +171,6 @@ h3 {
     border-radius: 2rem 2rem 0rem 0rem;
 }
 
-/* App layout helpers */
 .app-navbar {
     height: var(--navbar-height);
 }
@@ -213,28 +206,19 @@ h3 {
     margin-left: 0px !important;
 }
 
-/* Stats grid for dashboard
-   - Desktop: 12 columns
-   - Tablet: 6 columns
-   - Mobile: 2 columns
-   - 4 rows fixed at 96px each
-   - Small gap between items
- */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* mobile: 2 cols */
-    grid-template-rows: repeat(8, 96px); /* mobile/tablet: 8 rows to host 1+4+3 */
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(8, 96px);
     gap: 0.75rem;
     align-items: start;
 }
 
-/* Mobile / default behaviour: force full-width stacking in the exact order B -> A -> C */
 .stats-item--b { grid-column: 1 / -1; grid-row: 1; }
 .stats-item--a { grid-column: 1 / -1; grid-row: 2 / span 4; }
 .stats-item--c { grid-column: 1 / -1; grid-row: 6 / span 3; }
 
 @media (min-width: 768px) {
-    /* Tablet: keep 6 columns but keep stacking B/A/C full width (6 cols) */
     .stats-grid { grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(8, 96px); }
     .stats-item--b { grid-column: 1 / -1; grid-row: 1; }
     .stats-item--a { grid-column: 1 / -1; grid-row: 2 / span 4; }
@@ -242,7 +226,6 @@ h3 {
 }
 
 @media (min-width: 1024px) {
-    /* Desktop: switch back to the 12-col layout and original placements */
     .stats-grid { grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(4, 96px); }
     .stats-item--a { grid-column: span 8; grid-row: span 4; }
     .stats-item--b { grid-column: span 4; grid-row: span 1; }
