@@ -10,10 +10,6 @@
 ## TODO - Developpement (SIMPLE) :
 
 - Page show pour visualisé un éléments **Inbox**
-- Update models **User** pour mettre date de dernière connexion.
-- Update models **Site** count nombre de form existant.
-- Faire en sorte de pouvoir rediriger vers le show d'un **Site** en ciblant un **From**.
-- Ajouter de nouvelle Statistiques
 
 ## TODO - Developpement (COMPLEXE) :
 
