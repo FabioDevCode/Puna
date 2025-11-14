@@ -9,6 +9,10 @@ import { encryptObject } from '../utils/crypto.js';
 import dayjs from 'dayjs';
 
 
+export const rootRedirect = (req, res) => {
+    return res.redirect('/dashboard');
+};
+
 export const dashboard = async (req, res) => {
     try {
         const userId = req.session.user?.id;
@@ -20,11 +24,6 @@ export const dashboard = async (req, res) => {
     } catch (err) {
         res.render('dashboard', {});
     }
-};
-
-export const rootRedirect = (req, res) => {
-    // user reaches this route only if `isConnected` allowed the request
-    return res.redirect('/dashboard');
 };
 
 export const error = async(req, res) => {
@@ -69,20 +68,17 @@ export const showSite = async (req, res) => {
             throw new Error('error');
         }
 
-        // Ensure the current user owns the site
         const userId = req.session.user?.id;
         if (site.fk_id_user !== userId) {
             return res.redirect('/dashboard');
         }
 
-        // Fetch all forms attached to this site
         const formsRaw = await models.Form.findAll({
             where: { fk_id_site: siteId },
             raw: true,
             order: [['createdAt', 'ASC']]
         });
 
-        // Parse template JSON into an iterable structure for the view
         const forms = (formsRaw || []).map((f) => {
             let templateObj = {};
             try {
@@ -93,7 +89,6 @@ export const showSite = async (req, res) => {
                 templateObj = {};
             }
 
-            // Convert to an array of entries for easy iteration in Handlebars
             const template_entries = Object.keys(templateObj || {}).map((k) => ({ key: k, value: templateObj[k] }));
 
             return {
@@ -103,8 +98,33 @@ export const showSite = async (req, res) => {
             };
         });
 
-        const activeForm = forms && forms.length ? forms[0] : null;
-
+        // Determine which form should be active: allow override via query param `f` (form name)
+        // or fallback to `active_form` (form id)
+        const activeFormQueryId = req.query && req.query.active_form ? String(req.query.active_form) : null;
+        const activeFormQueryName = req.query && req.query.f ? String(req.query.f) : null;
+        let activeForm = null;
+        if (forms && forms.length) {
+            // mark each form with is_active based on query param or default to first
+            let found = false;
+            forms.forEach((f, idx) => {
+                // Priority: query by name `f` if provided, then by id `active_form`
+                if (activeFormQueryName && String(f.name) === activeFormQueryName) {
+                    f.is_active = true;
+                    activeForm = f;
+                    found = true;
+                } else if (!found && activeFormQueryId && String(f.id) === activeFormQueryId) {
+                    f.is_active = true;
+                    activeForm = f;
+                    found = true;
+                } else {
+                    f.is_active = false;
+                }
+            });
+            if (!found) {
+                forms[0].is_active = true;
+                activeForm = forms[0];
+            }
+        }
         res.render('site_show', {
             site,
             forms,
@@ -199,7 +219,7 @@ export const updateFormTemplateSave = async (req, res) => {
         form.template = JSON.stringify(templateObj);
         await form.save();
 
-        return res.redirect(`/site/${form.fk_id_site}`);
+        return res.redirect(`/site/${form.fk_id_site}?f=${form.name}`);
     } catch (err) {
         return res.redirect('/error');
     }

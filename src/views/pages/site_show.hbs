@@ -53,7 +53,7 @@
         <div class="flex items-center gap-0 w-full">
             <div role="tablist" class="tabs tabs-boxed flex flex-wrap">
                 {{#each forms}}
-                    <a role="tab" class="tab {{#if @first}}tab-active{{/if}}" data-id="{{this.id}}" data-code="{{this.code}}" data-name="{{this.name}}" data-template='{{this.template}}' data-columns='{{this.columns}}'>
+                    <a role="tab" class="tab {{#if is_active}}tab-active{{/if}}" data-id="{{this.id}}" data-code="{{this.code}}" data-name="{{this.name}}" data-template='{{this.template}}' data-columns='{{this.columns}}'>
                         {{this.name}}
                     </a>
                 {{/each}}
