@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
             xaxis: {
                 categories: hours
             },
+            // Provide the series up-front so the chart has it when rendering.
+            series: series,
             tooltip: {
                 y: { formatter: (val) => String(val) }
             }
@@ -65,12 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Apex expects series as [{ name, data: [{ x, y }, ...] }, ...]
         if (chart) {
-            chart.updateOptions({ xaxis: { categories: hours } });
-            chart.updateSeries(series);
+            chart.updateOptions({ xaxis: { categories: hours }, series: series });
         } else {
             chart = new ApexCharts(chartEl, options);
             chart.render();
-            chart.updateSeries(series);
         }
     }
 
