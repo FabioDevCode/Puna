@@ -404,7 +404,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 					// update count text to 'sur {total}'
 					const countEl = document.getElementById('count_inbox');
-					if (countEl) countEl.textContent = total ? `sur ${total}` : '';
+					// Show number of rows displayed on this page followed by total: "{affichés} sur {total}"
+					const shown = Array.isArray(pageItems) ? pageItems.length : 0;
+					if (countEl) countEl.textContent = (shown > 0 || (total && total > 0)) ? `${shown} sur ${total}` : '';
 
 					// update pagination UI if present
 					if (paginationEl) {
