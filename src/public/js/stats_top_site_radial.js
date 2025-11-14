@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const options = {
             chart: {
                 height: 'auto',
-                width: 240,
+                width: 300,
                 type: 'radialBar',
                 toolbar: { show: false }
             },

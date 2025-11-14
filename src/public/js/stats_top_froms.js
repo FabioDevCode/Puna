@@ -5,19 +5,22 @@
 
     function render(items) {
         tbody.innerHTML = '';
-        if (!items || !items.length) {
-            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-sm text-muted">Aucune donnée</td></tr>';
-            return;
-        }
-        items.forEach((it) => {
+
+        // Always render 5 rows (top 5). If not enough items, fill with '-'
+        for (let i = 0; i < 5; i++) {
+            const it = (items && items[i]) ? items[i] : null;
+            const rank = i + 1;
+            const formName = it && it.form_name ? it.form_name : '-';
+            const siteDomain = it && it.site_domain ? it.site_domain : '-';
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="align-top">${it.rank}</td>
-                <td class="align-top">${it.form_name || '—'}</td>
-                <td class="align-top">${it.site_domain || '—'}</td>
+                <td class="align-top">${rank}</td>
+                <td class="align-top">${formName}</td>
+                <td class="align-top">${siteDomain}</td>
             `;
             tbody.appendChild(tr);
-        });
+        }
     }
 
     async function load() {

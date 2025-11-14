@@ -32,7 +32,7 @@ export const getTopFroms = async (req, res) => {
               AND i.createdAt BETWEEN :start AND :end
             GROUP BY i.fk_id_form, f.name, s.domain
             ORDER BY cnt DESC
-            LIMIT 3
+            LIMIT 5
         `;
 
         const replacements = {
@@ -618,7 +618,6 @@ export const getInboxHeatmap = async (req, res) => {
         const daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
         // Hours labels: '00', '1', '2', ..., '23' so midnight is clearly represented as '00'
         const hours = Array.from({length:24}, (_,i) => (i === 0 ? '00' : String(i)));
-
         const matrix = Array.from({length:7}, () => Array.from({length:24}, () => 0));
 
         (inboxRows || []).forEach((r) => {
