@@ -2,17 +2,19 @@ import express from 'express';
 const router = express.Router();
 import * as dctl from "../controllers/default.controller.js";
 import * as authCtl from "../controllers/auth.controller.js";
-import { isConnected } from "../helpers/authHelper.js";
+import { isConnected, isConnectDash } from "../helpers/authHelper.js";
 
 
 router.get('/error', dctl.error);
-router.get('/dp-login',  dctl.dpLogin);
-router.get('/dp-first-connexion', dctl.dpFirstCo);
+router.get('/', isConnected, dctl.rootRedirect);
+
+router.get('/dp-login', isConnectDash,  dctl.dpLogin);
+router.get('/dp-first-connexion', isConnectDash, dctl.dpFirstCo);
+
 router.post('/dp-first-co', authCtl.dpFirstCoPost);
 router.post('/dp-connect', authCtl.dpConnect);
 router.get('/dp-logout', authCtl.dpLogout);
 
-router.get('/', isConnected, dctl.rootRedirect);
 
 // CONNECTED ==============================================================
 router.get('/dashboard', isConnected, dctl.dashboard);

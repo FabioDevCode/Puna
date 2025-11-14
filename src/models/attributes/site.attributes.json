@@ -6,7 +6,7 @@
 		"primaryKey": true
     },
     "domain": {
-        "type": "STRING(100)",
+        "type": "STRING",
         "allowNull": false
     },
     "control_code": {

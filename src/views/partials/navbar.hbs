@@ -1,9 +1,11 @@
-<div class="navbar app-navbar bg-base-100 gap-2 p-4">
-    <div class="flex-1 gap-2">
-        {{{ renderSlot "title" }}}
-    </div>
+<div class="navbar app-navbar bg-base-100 gap-2 px-4 flex items-center justify-center w-full">
+    <div id="navbar_content" class="gap-4">
+        <div class="flex flex-1 flex-nowrap min-w-[50px]">
+            {{{ renderSlot "title" }}}
+        </div>
 
-    <div class="md:flex gap-2 items-center">
-        {{{ renderSlot "buttons" }}}
+        <div class="flex flex-nowrap gap-2 items-center">
+            {{{ renderSlot "buttons" }}}
+        </div>
     </div>
 </div>

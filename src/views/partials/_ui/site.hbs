@@ -13,10 +13,10 @@
         }}
 --}}
 
-<a href="/site/{{id}}" id="{{id}}" domain="{{domain}}" class="dash-site col-span-2 md:col-span-6 lg:col-span-6">
-    <div class="card bg-neutral text-neutral-content shadow-lg relative p-4 px-6">
-        <div class="flex flex-col md:flex-row lg:flex-row items-start md:items-center lg:items-center justify-between gap-2 w-full">
-            <div class="text-lg font-bold">
+<a href="/site/{{id}}" id="{{id}}" domain="{{domain}}" class="dash-site col-span-2 md:col-span-6 lg:col-span-6 overflow-hidden">
+    <div class="card bg-neutral text-neutral-content shadow-lg relative p-4 px-4 md:px-6">
+        <div class="flex flex-col md:flex-row lg:flex-row items-start md:items-center lg:items-center justify-between gap-2 md:gap-4 w-full">
+            <div class="text-lg font-bold truncate ellipsis-truncate max-w-full">
                 {{fallback domain '-'}}
             </div>
             <div class="flex gap-4 text-sm items-center">

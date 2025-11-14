@@ -20,6 +20,10 @@ export const buildAttributes = (attributes) => {
 					object[prop] = { ...currentValue };
 					object[prop].type = DataTypes.STRING(250);
 					break;
+				case "STRING":
+					object[prop] = { ...currentValue };
+					object[prop].type = DataTypes.STRING(255);
+					break;
 				case "UUID":
 					object[prop] = { ...currentValue };
 					object[prop].type = DataTypes[currentValue.type];

@@ -163,6 +163,21 @@ h3 {
     display: none !important;
 }
 
+.ellipsis-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.title-max-w {
+    min-width: 50px;
+    width: 100% !important;
+    max-width: 600px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .copy-clickable {
     cursor: pointer;
 }
@@ -172,12 +187,34 @@ h3 {
 }
 
 .app-navbar {
+    position: relative;
     height: var(--navbar-height);
+    overflow: hidden;
+}
+
+#nav_main {
+    overflow: hidden;
+    position: relative;
+    width: calc(100vw - 208px);
+}
+
+@media (max-width: 768px) {
+    #nav_main {
+        width: 100%;
+    }
+}
+
+#navbar_content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    overflow-x: auto;
 }
 
 .app-main {
     min-height: calc(100vh - var(--navbar-height));
     max-height: calc(100vh - var(--navbar-height));
+    height: calc(100vh - var(--navbar-height));
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 }

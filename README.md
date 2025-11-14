@@ -14,7 +14,6 @@ ApexCharts : https://apexcharts.com/
 
 ### TODO - Developpement (SIMPLE) :
 
-- Limiter la taille des inputs de création **Site** & **From**
 - Page show pour visualisé un éléments **Inbox**
 - Update models **User** pour mettre date de dernière connexion.
 - Update models **Site** count nombre de form existant.
@@ -30,3 +29,9 @@ ApexCharts : https://apexcharts.com/
 - Faire filtre sur datalist de des élements. (persitant sauvegarde local-storage)
 
 ---
+
+## focntionnalité en Beta test
+
+- 4 site MAX
+- 2 from par site MAX
+- User unique pas d'administrateur
