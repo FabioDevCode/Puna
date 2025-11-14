@@ -22,5 +22,9 @@
         "type": "BOOLEAN",
         "allowNull": false,
         "defaultValue": false
+    },
+    "last_connection": {
+        "type": "DATE",
+		"allowNull": true
     }
 }

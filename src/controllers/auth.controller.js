@@ -39,6 +39,19 @@ export const dpConnect = (req, res) => {
         if (err || !user) {
             return res.redirect('/dp-login');
         }
+
+        try {
+            await models.User.update({
+                last_connection: new Date()
+            }, {
+                where: {
+                    id: user.id
+                }
+            });
+        } catch (e) {
+            console.error('Failed to update last_connection for user', user && user.id, e);
+        }
+
         req.session.user = {
             id: user.id,
             login: user.login,
