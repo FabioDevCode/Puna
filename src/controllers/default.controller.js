@@ -236,9 +236,25 @@ export const getFormInbox = async (req, res) => {
         const site = await models.Site.findByPk(form.fk_id_site);
         if (!site || site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
 
-        const inboxRows = await models.Inbox.findAll({ where: { fk_id_form: formId }, order: [['createdAt', 'DESC']], raw: true });
+        // Server-side pagination: accept ?limit=..&offset=..
+        const limitRaw = parseInt(req.query.limit, 10);
+        const offsetRaw = parseInt(req.query.offset, 10);
+        const allowedLimits = [10, 25, 50, 100];
+        const limit = allowedLimits.includes(limitRaw) ? limitRaw : 10;
+        const offset = !Number.isNaN(offsetRaw) && offsetRaw >= 0 ? offsetRaw : 0;
 
-        const items = (inboxRows || []).map((r) => {
+        const result = await models.Inbox.findAndCountAll({
+            where: { fk_id_form: formId },
+            order: [['createdAt', 'DESC']],
+            limit,
+            offset,
+            raw: true
+        });
+
+        const rows = result.rows || [];
+        const total = typeof result.count === 'number' ? result.count : (result.count || 0);
+
+        const items = (rows || []).map((r) => {
             let parsed = null;
             try {
                 parsed = typeof r.content === 'string' ? JSON.parse(r.content) : r.content;
@@ -252,7 +268,7 @@ export const getFormInbox = async (req, res) => {
             };
         });
 
-        return res.json({ items });
+        return res.json({ items, total });
     } catch (err) {
         return res.status(500).json({ error: 'Server error' });
     }

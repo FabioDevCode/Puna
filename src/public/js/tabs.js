@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Find all tab containers (daisyui uses .tabs)
 	const tabLists = document.querySelectorAll('.tabs');
 
+	// Table actions container (controls + pagination + select)
+	const tableActions = document.getElementById('tableActions');
+
 	// State for columns modal / current active form
 	let activeTpl = {};
 	let activeKeys = [];
@@ -252,6 +255,11 @@ document.addEventListener('DOMContentLoaded', () => {
 				const inboxHead = document.getElementById('inbox_table_head');
 				const inboxBody = document.getElementById('inbox_table_body');
 
+				// Pagination state
+				let currentPage = 1;
+				const selectLimit = document.getElementById('numLignTable');
+				const paginationEl = document.getElementById('paginationTable');
+
 				function clearInbox() {
 					if (inboxHead) inboxHead.innerHTML = '';
 					if (inboxBody) inboxBody.innerHTML = '';
@@ -259,8 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
 					const countEl = document.getElementById('count_inbox');
 					if (countEl) countEl.textContent = '';
 
-					const tableBtns = document.getElementById('tableBtns');
-					if (tableBtns) tableBtns.classList.add('none');
+					// hide the whole actions area when no items
+					if (tableActions) tableActions.classList.add('none');
 				}
 
 				// build header row based on template keys
@@ -369,41 +377,106 @@ document.addEventListener('DOMContentLoaded', () => {
 					});
 				}
 
-				// Fetch inbox
+				// Render a page using items (page slice returned by server) and total count
+				function renderTable(pageItems, keysArr, total) {
+					const limit = selectLimit ? parseInt(selectLimit.value, 10) || 10 : 10;
+					const maxPage = Math.max(1, Math.ceil((total || 0) / limit));
+					if (currentPage > maxPage) currentPage = maxPage;
+
+					// clear and build
+					if (inboxHead) inboxHead.innerHTML = '';
+					if (inboxBody) inboxBody.innerHTML = '';
+
+					buildHead(keysArr);
+					buildRows(pageItems || [], keysArr);
+
+					// update actions visibility
+					if (tableActions) tableActions.classList.remove('none');
+
+					// update count text to 'sur {total}'
+					const countEl = document.getElementById('count_inbox');
+					if (countEl) countEl.textContent = total ? `sur ${total}` : '';
+
+					// update pagination UI if present
+					if (paginationEl) {
+						const btns = Array.from(paginationEl.querySelectorAll('button'));
+						// expect: [prev, center, next]
+						if (btns[1]) btns[1].textContent = `${currentPage}`;
+						if (btns[0]) btns[0].disabled = currentPage <= 1;
+						if (btns[2]) btns[2].disabled = currentPage >= maxPage;
+					}
+				}
+
+				// Fetch inbox (server-side pagination)
 				clearInbox();
 
-				fetch(`/form/${target.dataset.id}/inbox`, { credentials: 'same-origin' })
-				.then((r) => r.json())
-				.then((data) => {
-					const items = data.items || [];
-						if(items?.length) {
-							buildHead(visibleKeys);
-							buildRows(items, visibleKeys);
-										// show table-level buttons
-							const tableBtns = document.getElementById('tableBtns');
-							if (tableBtns) tableBtns.classList.remove('none');
+				const fetchPage = (page) => {
+					const limit = selectLimit ? parseInt(selectLimit.value, 10) || 10 : 10;
+					const p = page && page > 0 ? page : 1;
+					const offset = (p - 1) * limit;
+
+					fetch(`/form/${target.dataset.id}/inbox?limit=${limit}&offset=${offset}`, { credentials: 'same-origin' })
+					.then((r) => r.json())
+					.then((data) => {
+						const items = data.items || [];
+						const total = parseInt(data.total, 10) || 0;
+						currentPage = p;
+
+						// attach select change to fetch first page
+						if (selectLimit) {
+							selectLimit.removeEventListener('change', selectLimit._listener || (() => {}));
+							selectLimit._listener = () => {
+								fetchPage(1);
+							};
+							selectLimit.addEventListener('change', selectLimit._listener);
 						}
 
-						const countEl = document.getElementById('count_inbox');
-						if (countEl) {
-							const n = items.length || 0;
-							const word = n === 1 ? 'élément' : 'éléments';
-							const result = n === 0 ? "" : `${n} ${word}`;
-							countEl.textContent = result;
+						// attach pagination buttons
+						if (paginationEl) {
+							const btns = Array.from(paginationEl.querySelectorAll('button'));
+							const prev = btns[0];
+							const pageBtn = btns[1];
+							const next = btns[2];
+
+							if (prev) {
+								prev.removeEventListener('click', prev._listener || (() => {}));
+								prev._listener = (e) => {
+									e.preventDefault();
+									if (currentPage > 1) fetchPage(currentPage - 1);
+								};
+								prev.addEventListener('click', prev._listener);
+							}
+							if (next) {
+								next.removeEventListener('click', next._listener || (() => {}));
+								next._listener = (e) => {
+									e.preventDefault();
+									const maxPage = Math.max(1, Math.ceil(total / limit));
+									if (currentPage < maxPage) fetchPage(currentPage + 1);
+								};
+								next.addEventListener('click', next._listener);
+							}
+							// initial page label
+							if (pageBtn) pageBtn.textContent = String(currentPage);
 						}
-				})
-				.catch(() => {
-					clearInbox();
-				});
+
+						// render returned page
+						renderTable(items, visibleKeys, total);
+					})
+					.catch(() => {
+						clearInbox();
+					});
+				};
+
+				// initial load
+				fetchPage(1);
 
 			} else {
 				// hide button and clear modal
 				if (btnOpenTemplate) btnOpenTemplate.classList.add('none');
 				if (modalForm) modalForm.action = '#';
 				clearModalContainers();
-				// hide table-level buttons and clear inbox table
-				const tableBtns = document.getElementById('tableBtns');
-				if (tableBtns) tableBtns.classList.add('none');
+				// hide table-level actions and clear inbox table
+				if (tableActions) tableActions.classList.add('none');
 				const inboxHead = document.getElementById('inbox_table_head');
 				const inboxBody = document.getElementById('inbox_table_body');
 				if (inboxHead) inboxHead.innerHTML = '';
@@ -427,9 +500,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (h4) h4.classList.add('opacity-25');
 			if (codeWrap) codeWrap.classList.add('opacity-25');
 			if (codeEl) codeEl.textContent = '';
-			// hide table buttons and clear inbox table when nothing is selected
-			const tableBtns = document.getElementById('tableBtns');
-			if (tableBtns) tableBtns.classList.add('none');
+				// hide table actions and clear inbox table when nothing is selected
+				if (tableActions) tableActions.classList.add('none');
 			const inboxHeadInit = document.getElementById('inbox_table_head');
 			const inboxBodyInit = document.getElementById('inbox_table_body');
 			if (inboxHeadInit) inboxHeadInit.innerHTML = '';

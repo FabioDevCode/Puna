@@ -73,16 +73,26 @@
 </div>
 
 <div class="flex flex-col items-start justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
-    <div class="w-full flex items-end justify-between gap-2 mt-2">
-        <div id="count_inbox" class="font-bold text-lg"></div>
 
-        <div id="tableBtns" class="flex gap-2 none">
-            {{!-- <div class="join">
-                <button class="join-item btn btn-sm">«</button>
-                <button class="join-item btn btn-sm">22</button>
-                <button class="join-item btn btn-sm">»</button>
-            </div> --}}
+    <div id="tableActions" class="w-full flex items-end justify-between gap-4 mt-2 none">
 
+        <div id="leftTableBtns" class="flex items-center flex-wrap gap-2">
+            <select id="numLignTable" class="select select-sm select-bordered w-max max-w-xs">
+                <option value="10" selected="">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <div id="count_inbox" class="text-sm w-max"></div>
+        </div>
+
+        <div id="paginationTable" class="join">
+            <button class="join-item btn btn-sm">«</button>
+            <button class="join-item btn btn-sm">1</button>
+            <button class="join-item btn btn-sm">»</button>
+        </div>
+
+        <div id="tableBtns" class="flex gap-2">
             <button class="btn btn-sm">
                 <i class="fa-solid fa-filter"></i>
                 <span class="hidden md:flex">
