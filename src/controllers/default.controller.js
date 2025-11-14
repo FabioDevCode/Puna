@@ -311,48 +311,44 @@ export const getInboxCounts = async (req, res) => {
     const days = [7, 30].includes(daysRaw) ? daysRaw : 7;
 
     try {
-        // compute start date (00:00 of day (days-1) ago) to include today
-        const end = new Date();
-        end.setHours(23, 59, 59, 999);
-        const start = new Date();
-        start.setHours(0, 0, 0, 0);
-        start.setDate(start.getDate() - (days - 2));
+        // Use dayjs to compute start/end (local day boundaries) and labels
+        const end = dayjs().endOf('day');
+        const start = dayjs().startOf('day').subtract(days - 1, 'day');
 
         // fetch Inbox rows linked to forms/sites owned by the user
         const inboxRows = await models.Inbox.findAll({
             where: {
                 createdAt: {
-                    [Op.gte]: start,
-                    [Op.lte]: end
+                    [Op.gte]: start.toDate(),
+                    [Op.lte]: end.toDate()
                 }
             },
+            attributes: ['id', 'createdAt'],
             include: [{
                 model: models.Form,
-                as: "form",
+                as: 'form',
                 include: [{
                     model: models.Site,
-                    as: "site",
+                    as: 'site',
                     where: { fk_id_user: userId }
                 }]
             }]
         });
 
-        // prepare labels (dates) and initialize counts to 0
+        // prepare labels (dates) and initialize counts to 0 using dayjs local dates
         const labels = [];
         const countsMap = {};
 
         for (let i = 0; i < days; i++) {
-            const d = new Date(start);
-            d.setDate(start.getDate() + i);
-            const key = d.toISOString().slice(0, 10);
+            const d = start.add(i, 'day');
+            const key = d.format('YYYY-MM-DD');
             labels.push(key);
             countsMap[key] = 0;
         }
 
-        // aggregate counts per day from fetched rows
-        inboxRows.forEach((r) => {
-            const created = new Date(r.createdAt);
-            const key = created.toISOString().slice(0, 10);
+        // aggregate counts per day from fetched rows (use same local format)
+        (inboxRows || []).forEach((r) => {
+            const key = dayjs(r.createdAt).format('YYYY-MM-DD');
             if (countsMap[key] !== undefined) countsMap[key]++;
         });
 
