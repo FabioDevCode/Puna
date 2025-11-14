@@ -15,7 +15,7 @@
     "Puna"
   ],
   "author": "Fabio RAMOS LOPES",
-  "license": "MIT",
+  "license": "AGPLv3",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "console-stamp": "^3.1.2",
