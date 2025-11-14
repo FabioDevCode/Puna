@@ -52,17 +52,14 @@
     </div>
 </div>
 
-<div class="col-span-2 md:col-span-6 lg:col-span-12 h-max">
-    {{> _ui/stats_inbox_heatmap }}
-</div>
-
-
-<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-4">
-    <div class="stat min-h-[255px]">
-        {{!-- Mettre le nouveau composant ici --}}
-    </div>
-</div>
-
 <div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-8">
     {{> _ui/stats_top_froms }}
+</div>
+
+<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-4">
+    {{> _ui/stats_top_site_radial }}
+</div>
+
+<div class="col-span-2 md:col-span-6 lg:col-span-12 h-max">
+    {{> _ui/stats_inbox_heatmap }}
 </div>

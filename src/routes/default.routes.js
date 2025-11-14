@@ -23,6 +23,7 @@ router.get('/stats/inbox-counts', isConnected, dctl.getInboxCounts);
 router.get('/stats/inbox-percentages', isConnected, dctl.getInboxPercentages);
 router.get('/stats/inbox-heatmap', isConnected, dctl.getInboxHeatmap);
 router.get('/stats/top-froms', isConnected, dctl.getTopFroms);
+router.get('/stats/top-site-forms', isConnected, dctl.getTopSiteForms);
 router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
 router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
 

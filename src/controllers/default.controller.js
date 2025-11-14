@@ -61,6 +61,65 @@ export const getTopFroms = async (req, res) => {
     }
 };
 
+export const getTopSiteForms = async (req, res) => {
+    const userId = req.session.user?.id;
+    // Fixed to 90 days per request
+    const days = 90;
+
+    try {
+        const end = dayjs().endOf('day');
+        const start = dayjs().startOf('day').subtract(days - 1, 'day');
+
+        // Find the site with most inbox rows in the period
+        const sqlTopSite = `
+            SELECT s.id AS site_id, s.domain AS site_domain, COUNT(i.id) AS total
+            FROM inbox i
+            JOIN form f ON f.id = i.fk_id_form
+            JOIN site s ON s.id = f.fk_id_site
+            WHERE s.fk_id_user = :userId
+              AND i.createdAt BETWEEN :start AND :end
+            GROUP BY s.id, s.domain
+            ORDER BY total DESC
+            LIMIT 1
+        `;
+
+        const topSiteRows = await models.sequelize.query(sqlTopSite, {
+            replacements: { userId, start: start.toDate(), end: end.toDate() },
+            type: models.Sequelize.QueryTypes.SELECT
+        });
+
+        if (!topSiteRows || !topSiteRows.length) {
+            return res.json({ site: null, labels: [], series: [] });
+        }
+
+        const topSite = topSiteRows[0];
+        const siteId = topSite.site_id;
+
+        // For that site, compute counts per form
+        const sqlPerForm = `
+            SELECT f.id AS form_id, f.name AS form_name, COUNT(i.id) AS cnt
+            FROM form f
+            LEFT JOIN inbox i ON i.fk_id_form = f.id AND i.createdAt BETWEEN :start AND :end
+            WHERE f.fk_id_site = :siteId
+            GROUP BY f.id, f.name
+            ORDER BY cnt DESC
+        `;
+
+        const perFormRows = await models.sequelize.query(sqlPerForm, {
+            replacements: { siteId, start: start.toDate(), end: end.toDate() },
+            type: models.Sequelize.QueryTypes.SELECT
+        });
+
+        const labels = (perFormRows || []).map(r => r.form_name || `form-${r.form_id}`);
+        const series = (perFormRows || []).map(r => Number(r.cnt) || 0);
+
+        return res.json({ site: { id: siteId, domain: topSite.site_domain, total: Number(topSite.total) || 0 }, labels, series });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const dashboard = async (req, res) => {
     try {
         const userId = req.session.user?.id;
