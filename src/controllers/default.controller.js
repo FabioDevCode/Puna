@@ -13,6 +13,54 @@ export const rootRedirect = (req, res) => {
     return res.redirect('/dashboard');
 };
 
+export const getTopFroms = async (req, res) => {
+    const userId = req.session.user?.id;
+    const daysRaw = parseInt(req.query.days, 10) || 7;
+    const days = [7, 30].includes(daysRaw) ? daysRaw : 7;
+
+    try {
+        const end = dayjs().endOf('day');
+        const start = dayjs().startOf('day').subtract(days - 1, 'day');
+
+        // Raw SQL for stable grouping and joins
+        const sql = `
+            SELECT i.fk_id_form AS fk_id_form, f.name AS form_name, s.domain AS site_domain, COUNT(i.id) AS cnt
+            FROM inbox i
+            JOIN form f ON f.id = i.fk_id_form
+            JOIN site s ON s.id = f.fk_id_site
+            WHERE s.fk_id_user = :userId
+              AND i.createdAt BETWEEN :start AND :end
+            GROUP BY i.fk_id_form, f.name, s.domain
+            ORDER BY cnt DESC
+            LIMIT 3
+        `;
+
+        const replacements = {
+            userId,
+            start: start.toDate(),
+            end: end.toDate()
+        };
+
+        const rows = await models.sequelize.query(sql, {
+            replacements,
+            type: models.Sequelize.QueryTypes.SELECT
+        });
+
+        // Ensure result has exactly up to 3 entries with rank
+        const result = (rows || []).map((r, idx) => ({
+            rank: idx + 1,
+            form_name: r.form_name || null,
+            site_domain: r.site_domain || null,
+            count: Number(r.cnt) || 0
+        }));
+
+        return res.json({ days, items: result });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const dashboard = async (req, res) => {
     try {
         const userId = req.session.user?.id;

@@ -1,0 +1,27 @@
+<div id="statTopFroms" class="bg-secondary-content flex flex-col gap-4 p-4 items-between justify-between stats-item stats-item--top-froms">
+
+    <div class="flex items-center justify-between w-full">
+        <div class="text-sm font-semibold select-none">Top 3 formulaires</div>
+        <select id="statTop_range" class="select select-sm select-bordered select-secondary">
+            <option value="7" selected>7 derniers jours</option>
+            <option value="30">30 derniers jours</option>
+        </select>
+    </div>
+
+    <div class="overflow-auto w-full">
+        <table class="table w-full rounded-md bg-base-100">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Formulaire</th>
+                    <th>Site</th>
+                </tr>
+            </thead>
+            <tbody id="statTop_body">
+                <tr><td colspan="3" class="text-center text-sm text-muted">Chargement…</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/js/stats_top_froms.js"></script>

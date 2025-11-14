@@ -7,7 +7,7 @@
 
 {{> _ui/stats_inbox_percentages }}
 
-<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-8">
+{{!-- <div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-8">
     <div class="stat flex items-center justify-around gap-4 h-[76px] w-full select-none">
         <div class="flex items-center gap-2">
             <div class="stat-figure text-2xl">
@@ -36,16 +36,11 @@
     </div>
 </div>
 
-
-
 <div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-4">
     <div class="stat h-[76px]">
         formulaire a reçu le plus d'éléèments sur les 7 derniers jours
     </div>
-</div>
-
-
-
+</div> --}}
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="stats-grid gap-4">
@@ -59,4 +54,15 @@
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12 h-max">
     {{> _ui/stats_inbox_heatmap }}
+</div>
+
+
+<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-4">
+    <div class="stat min-h-[255px]">
+        {{!-- Mettre le nouveau composant ici --}}
+    </div>
+</div>
+
+<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-8">
+    {{> _ui/stats_top_froms }}
 </div>
