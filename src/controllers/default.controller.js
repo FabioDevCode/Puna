@@ -360,6 +360,80 @@ export const getInboxCounts = async (req, res) => {
     }
 };
 
+export const getInboxPercentages = async (req, res) => {
+    const userId = req.session.user?.id;
+
+    try {
+        // helper to count inbox items in a date range filtered by user's sites
+        const countInRange = async (start, end) => {
+            return await models.Inbox.count({
+                where: {
+                    createdAt: {
+                        [Op.gte]: start.toDate(),
+                        [Op.lte]: end.toDate()
+                    }
+                },
+                include: [{
+                    model: models.Form,
+                    as: 'form',
+                    include: [{
+                        model: models.Site,
+                        as: 'site',
+                        where: { fk_id_user: userId }
+                    }]
+                }]
+            });
+        };
+
+        // Today vs Yesterday
+        const todayStart = dayjs().startOf('day');
+        const todayEnd = dayjs().endOf('day');
+        const yesterdayStart = dayjs().subtract(1, 'day').startOf('day');
+        const yesterdayEnd = dayjs().subtract(1, 'day').endOf('day');
+
+        const todayCount = await countInRange(todayStart, todayEnd);
+        const yesterdayCount = await countInRange(yesterdayStart, yesterdayEnd);
+
+        // Last 7 days vs previous 7 days
+        const end7 = dayjs().endOf('day');
+        const start7 = dayjs().startOf('day').subtract(6, 'day'); // inclusive 7 days window
+        const prev7Start = start7.subtract(7, 'day');
+        const prev7End = start7.subtract(1, 'day').endOf('day');
+
+        const last7Count = await countInRange(start7, end7);
+        const prev7Count = await countInRange(prev7Start, prev7End);
+
+        // Last 30 days vs previous 30 days
+        const end30 = dayjs().endOf('day');
+        const start30 = dayjs().startOf('day').subtract(29, 'day');
+        const prev30Start = start30.subtract(30, 'day');
+        const prev30End = start30.subtract(1, 'day').endOf('day');
+
+        const last30Count = await countInRange(start30, end30);
+        const prev30Count = await countInRange(prev30Start, prev30End);
+
+        const computePercent = (current, previous) => {
+            if (previous === 0) {
+                if (current === 0) return { percent: 0, trend: 'neutral' };
+                return { percent: 100, trend: 'up' };
+            }
+            const change = Math.round(((current - previous) / previous) * 100);
+            if (change > 0) return { percent: Math.abs(change), trend: 'up' };
+            if (change < 0) return { percent: Math.abs(change), trend: 'down' };
+            return { percent: 0, trend: 'neutral' };
+        };
+
+        const today = { current: todayCount, previous: yesterdayCount, ...computePercent(todayCount, yesterdayCount) };
+        const last7 = { current: last7Count, previous: prev7Count, ...computePercent(last7Count, prev7Count) };
+        const last30 = { current: last30Count, previous: prev30Count, ...computePercent(last30Count, prev30Count) };
+
+        return res.json({ today, last7, last30 });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const getInboxCountsBySite = async (req, res) => {
     const userId = req.session.user?.id;
 
@@ -487,15 +561,9 @@ export const getLastInboxEntry = async (req, res) => {
             return res.json({ date: null, time: null });
         }
 
-        const d = new Date(lastRow.createdAt);
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-
-        const date = `${day}/${month}/${year}`;
-        const time = `${hours}h${minutes}`;
+        const dt = dayjs(lastRow.createdAt);
+        const date = dt.format('YYYY-MM-DD');
+        const time = dt.format('HH:mm');
 
         return res.json({ date, time });
     } catch (err) {

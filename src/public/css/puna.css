@@ -204,6 +204,10 @@ h3 {
     }
 }
 
+.text-down {
+    color: #727375;
+}
+
 .app-main {
     min-height: calc(100vh - var(--navbar-height));
     max-height: calc(100vh - var(--navbar-height));

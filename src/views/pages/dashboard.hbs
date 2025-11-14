@@ -5,47 +5,42 @@
 {{/slot}}
 
 
-<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-6">
-    <div class="stat flex items-center justify-around gap-4 w-full select-none">
+{{> _ui/stats_inbox_percentages }}
+
+<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-8">
+    <div class="stat flex items-center justify-around gap-4 h-[68px] w-full select-none">
         <div class="flex items-center gap-2">
-            <div class="stat-figure text-3xl">
+            <div class="stat-figure text-xl">
                 <i class="{{stats.globalInbox_icon}}"></i>
             </div>
-            <div class="stat-value text-3xl">
+            <div class="stat-value text-xl">
                 {{stats.globalInbox}}
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <div class="stat-figure text-3xl">
+            <div class="stat-figure text-xl">
                 <i class="{{stats.globalForm_icon}}"></i>
             </div>
-            <div class="stat-value text-3xl">
+            <div class="stat-value text-xl">
                 {{stats.globalForm}}
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <div class="stat-figure text-3xl">
+            <div class="stat-figure text-xl">
                 <i class="{{stats.globalSite_icon}}"></i>
             </div>
-            <div class="stat-value text-3xl">
+            <div class="stat-value text-xl">
                 {{stats.globalSite}}
             </div>
         </div>
     </div>
 </div>
 
-<div class="stats h-[68px] bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-6">
-    <div class="stat">
-        new 1
-    </div>
-    <div class="stat">
-        new 2
-    </div>
-    <div class="stat">
-        new 3
-    </div>
-</div>
+<div class="stats h-max bg-secondary-content overflow-hidden col-span-2 md:col-span-6 lg:col-span-4">
 
+    formulaire a reçu le plus d'éléèments sur les 7 derniers jours
+
+</div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="stats-grid gap-4">
