@@ -22,7 +22,6 @@ router.get('/dashboard', isConnected, dctl.dashboard);
 router.get('/stats/inbox-counts', isConnected, dctl.getInboxCounts);
 router.get('/stats/inbox-percentages', isConnected, dctl.getInboxPercentages);
 router.get('/stats/inbox-heatmap', isConnected, dctl.getInboxHeatmap);
-router.post('/form/:id/columns', isConnected, dctl.updateFormColumns);
 router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
 router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
 
@@ -36,6 +35,7 @@ router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 router.post('/create-form', isConnected, dctl.createForm);
 router.post('/delete-form', isConnected, dctl.deleteForm);
 
+router.post('/form/:id/columns', isConnected, dctl.updateFormColumns);
 router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
 router.get('/form/:id/inbox', isConnected, dctl.getFormInbox);
 
