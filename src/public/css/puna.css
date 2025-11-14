@@ -204,13 +204,6 @@ h3 {
     }
 }
 
-#navbar_content {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    overflow-x: auto;
-}
-
 .app-main {
     min-height: calc(100vh - var(--navbar-height));
     max-height: calc(100vh - var(--navbar-height));
