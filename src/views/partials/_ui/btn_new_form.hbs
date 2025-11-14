@@ -17,16 +17,63 @@
 
 <dialog id="modal_create_form_{{id}}" class="modal">
     <div class="modal-box w-11/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
-        <h2 class="text-lg font-bold mb-4">Créer un nouveau formulaire</h2>
-        <form id="formCreateForm_{{id}}" action="/create-form" method="post" class="flex flex-col gap-4">
+        <h2 class="text-lg font-bold mb-2">Créer un nouveau formulaire</h2>
+        <p class="py-1 text-sm text-muted">50 caractères maximum.</p>
+
+        <form id="formCreateForm_{{id}}" action="/create-form" method="post" class="flex flex-col mt-2 gap-4">
             <input type="hidden" name="fk_id_site" value="{{id}}" />
-            <input type="text" name="name" class="input input-bordered w-full" placeholder="Ex: Contact" required />
+            <input type="text" name="name" class="input input-bordered w-full" placeholder="Contact" maxlength="50" required="" />
+            <p id="create_form_msg_{{id}}" class="text-sm text-error hidden">Un formulaire avec ce nom existe déjà.</p>
         </form>
         <div class="modal-action">
             <form method="dialog">
                 <button class="btn btn-sm">Annuler</button>
             </form>
-            <button type="submit" form="formCreateForm_{{id}}" class="btn btn-sm btn-secondary">Créer</button>
+            <button id="btnCreateForm_{{id}}" type="submit" form="formCreateForm_{{id}}" class="btn btn-sm btn-secondary">Créer</button>
         </div>
     </div>
 </dialog>
+
+<script>
+(function(){
+    try {
+        const modal = document.getElementById('modal_create_form_{{id}}');
+        const input = modal ? modal.querySelector('input[name="name"]') : document.querySelector('#modal_create_form_{{id}} input[name="name"]');
+        const submit = document.getElementById('btnCreateForm_{{id}}');
+        const msg = document.getElementById('create_form_msg_{{id}}');
+        if (!input || !submit) return;
+
+        const gatherNames = () => {
+            return Array.from(document.querySelectorAll('.tabs [data-name]')).map(el => (el.getAttribute('data-name') || '').trim());
+        };
+
+        const checkDuplicate = () => {
+            const val = (input.value || '').trim();
+            if (!val) {
+                submit.disabled = false;
+                if (msg) msg.classList.add('hidden');
+                return;
+            }
+            const names = gatherNames();
+            const exists = names.includes(val);
+            submit.disabled = !!exists;
+            if (msg) {
+                if (exists) msg.classList.remove('hidden'); else msg.classList.add('hidden');
+            }
+        };
+
+        input.addEventListener('input', checkDuplicate);
+        // run initial check in case input prefilled
+        checkDuplicate();
+
+        // observe tabs area so dynamic changes update validation
+        const tabsContainer = document.querySelector('.tabs');
+        if (tabsContainer && window.MutationObserver) {
+            const mo = new MutationObserver(() => checkDuplicate());
+            mo.observe(tabsContainer, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-name'] });
+        }
+    } catch (e) {
+        // silent
+    }
+})();
+</script>
