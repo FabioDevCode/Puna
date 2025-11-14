@@ -254,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				// Also fetch and render inbox rows for this form
 				const inboxHead = document.getElementById('inbox_table_head');
 				const inboxBody = document.getElementById('inbox_table_body');
+				const tableInboxEl = document.getElementById('tableInbox');
 
 				// Pagination state
 				let currentPage = 1;
@@ -269,6 +270,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 					// hide the whole actions area when no items
 					if (tableActions) tableActions.classList.add('none');
+					// hide table container as well
+					if (tableInboxEl) tableInboxEl.classList.add('none');
 				}
 
 				// build header row based on template keys
@@ -390,8 +393,14 @@ document.addEventListener('DOMContentLoaded', () => {
 					buildHead(keysArr);
 					buildRows(pageItems || [], keysArr);
 
-					// update actions visibility
-					if (tableActions) tableActions.classList.remove('none');
+					// update actions and table visibility only if there are items
+					if (total && total > 0) {
+						if (tableActions) tableActions.classList.remove('none');
+						if (tableInboxEl) tableInboxEl.classList.remove('none');
+					} else {
+						if (tableActions) tableActions.classList.add('none');
+						if (tableInboxEl) tableInboxEl.classList.add('none');
+					}
 
 					// update count text to 'sur {total}'
 					const countEl = document.getElementById('count_inbox');
