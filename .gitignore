@@ -9,3 +9,4 @@ src/config/database.js
 src/config/keys.json
 src/api/Puna/Puna Send.bru
 src/api/Puna/burno.json
+storage/**/**

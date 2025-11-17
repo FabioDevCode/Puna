@@ -11,9 +11,9 @@ router.get('/', isConnected, dctl.rootRedirect);
 router.get('/dp-login', isConnectDash,  dctl.dpLogin);
 router.get('/dp-first-connexion', isConnectDash, dctl.dpFirstCo);
 
+router.get('/dp-logout', authCtl.dpLogout);
 router.post('/dp-first-co', authCtl.dpFirstCoPost);
 router.post('/dp-connect', authCtl.dpConnect);
-router.get('/dp-logout', authCtl.dpLogout);
 
 
 // CONNECTED ==============================================================
@@ -28,20 +28,18 @@ router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
 router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
 
 router.get('/all-site', isConnected, dctl.allSite)
-router.post('/create-site', isConnected, dctl.createSite);
 router.get('/site/:id/token', isConnected, dctl.getSiteToken);
-router.put('/site/:id/revoke-tokens', isConnected, dctl.revokeSiteTokens);
 router.get('/site/:id', isConnected, dctl.showSite);
+router.put('/site/:id/revoke-tokens', isConnected, dctl.revokeSiteTokens);
+router.post('/create-site', isConnected, dctl.createSite);
 router.post('/delete-site/:id', isConnected, dctl.deleteSite);
 
 router.post('/create-form', isConnected, dctl.createForm);
 router.post('/delete-form', isConnected, dctl.deleteForm);
 
+router.get('/form/:id/inbox', isConnected, dctl.getFormInbox);
 router.post('/form/:id/columns', isConnected, dctl.updateFormColumns);
 router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
-router.get('/form/:id/inbox', isConnected, dctl.getFormInbox);
-
-
 
 
 export default router;

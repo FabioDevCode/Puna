@@ -20,5 +20,9 @@
     "columns": {
         "type": "LONGTEXT",
         "allowNull": true
+    },
+    "file_keys": {
+        "type": "LONGTEXT",
+        "allowNull": true
     }
 }

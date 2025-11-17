@@ -1,0 +1,29 @@
+meta {
+  name: Puna Send Multipart
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3022/api/v1/send-multipart/TN1I1PKFYS
+  body: multipartForm
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiNTUzMjQ2NzM2NDQ3NTY2YjU4MzEyZjc5NzY1MDY0NTg0ZDcxNTAyZjM5NDgzNzM1NjEzMzYyNmQ2NzM5NWE2NjUwNDc0Yzc4NTg1MjUwNDMzNDUyNjU2YjRmMzQ1YTc5NzY0ZTU3NmIzNTRhNGQ1MTc5Njg2MTUxNTUzMjU2NzM0OTc1NDI0ZDU3NmU2NTU0MzEzNjRkMzk1MTdhMmY0NjU5MzYzNTZiNjg1OTU1Nzk3MTYyNDgzODRmNjUzOTU2Njc1NzU0NjMzNjcyNGU3OTZmNTU2YzQ1NjI2Mzc0NmY1MDM4Njg1NTQ2NjM2Yjc0NTA1NjRlMzk0Njc1NDYzNyIsImlhdCI6MTc2MzQxMjQ4OH0.ghJylk4YrseoNLC62L4OFDOVxLP5K3EoE-k5kV9csfI
+  X-KEY-PUNA: puna
+}
+
+body:multipart-form {
+  telephone: 06767676767
+  mail: tete@hotmail.com
+  message: non mais ca va dis donc quest ce que tu fou
+  entreprie: MONCUL - AI
+  cv: @file(/Users/fabio/Downloads/Conception API Formulaires de Contact.pdf)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
