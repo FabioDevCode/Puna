@@ -1,15 +1,6 @@
 import models from '../../../models/index.js';
 
-/**
- * Middleware to ensure a 'template' JSON exists on the Form record and to maintain a 'columns' JSON.
- * Behavior:
- * - If no template: create entries for received keys (key -> capitalized key).
- * - If template exists: add any newly received keys (do not remove existing keys).
- * - Columns handling:
- *   - If no columns saved: initialize columns object with all template keys -> true.
- *   - If columns exist and payload contains new keys: add those keys with value true, keep existing booleans.
- * Expects req.form to be present (object with id) and req.sanitizedBody (or req.body) to contain received JSON.
- */
+
 export async function updateFormTemplate(req, res, next) {
     try {
         const formObj = req.form; // set by authApiKeyAccess middleware (raw: true)

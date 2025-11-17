@@ -4,8 +4,6 @@ export async function sendHandler(req, res) {
 	const { site, form } = req;
 
 	try {
-        console.log("sendHandler");
-
 		// Persist sanitized payload in Inbox.content as a JSON string
 		// req.sanitizedBody is provided by the sanitizeRequestBody middleware
 		const payload = req.sanitizedBody !== undefined ? req.sanitizedBody : req.body;
