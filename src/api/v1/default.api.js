@@ -10,11 +10,8 @@ import validateUpload from './middlewares/validateUpload.js';
 import inspectArchive from './middlewares/inspectArchive.js';
 import moveFilesToUploads from './middlewares/moveFilesToUploads.js';
 
-// Order: auth (check headers & attach req.site/req.form) -> sanitize body -> update template -> handler
-router.post('/send/:code', authApiKeyAccess, sanitizeRequestBody, updateFormTemplate, sendHandler);
 
-// New multipart endpoint: accepts files (one file per field), validates and stores them
-router.post('/send-multipart/:code', authApiKeyAccess, multipartUpload, validateUpload, inspectArchive, moveFilesToUploads, updateFormFileKeys, updateFormTemplate, sendHandler);
+router.post('/send/:code', authApiKeyAccess, multipartUpload, validateUpload, inspectArchive, moveFilesToUploads, updateFormFileKeys, sanitizeRequestBody, updateFormTemplate, sendHandler);
 
 
 export default router;
