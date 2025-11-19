@@ -47,12 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Clear previous active classes on anchors
         anchors.forEach(a => {
-            a.classList.remove('bg-secondary-content/25');
+            a.classList.remove('bg-neutral');
         });
 
         // Apply active classes to bestMatch anchor (background on the <a> element)
         if (bestMatch) {
-            bestMatch.classList.add('bg-secondary-content/25');
+            bestMatch.classList.add('bg-neutral');
         }
     } catch (err) {
         // silent fail
