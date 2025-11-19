@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-	// Tooltip helpers for inbox long-content preview
 	let _inboxTooltipEl = null;
 	function ensureInboxTooltip() {
 		if (_inboxTooltipEl) return _inboxTooltipEl;
@@ -29,13 +28,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		_inboxTooltipEl.classList.add('none');
 	}
 
-	// Find all tab containers (daisyui uses .tabs)
-	const tabLists = document.querySelectorAll('.tabs');
+	function pad2(n) {
+		return String(n).padStart(2, '0');
+	}
 
-	// Table actions container (controls + pagination + select)
+	function formatDateTime(value) {
+		if (!value && value !== 0) return ' - ';
+		try {
+			const d = (value instanceof Date) ? value : new Date(value);
+			if (Number.isNaN(d.getTime())) return String(value);
+			return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+		} catch (e) {
+			return String(value);
+		}
+	}
+
+	const tabLists = document.querySelectorAll('.tabs');
 	const tableActions = document.getElementById('tableActions');
 
-	// State for columns modal / current active form
 	let activeTpl = {};
 	let activeKeys = [];
 	let activeColumns = null;
@@ -49,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function openColumnsModal() {
 		if (!modalColumns) return;
-		// populate list
+
 		if (modalColumnsList) {
 			modalColumnsList.innerHTML = '';
 			if (!activeKeys.length) {
@@ -71,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 					modalColumnsList.appendChild(label);
 				});
 			}
-		}
-		try { modalColumns.showModal(); } catch (e) { /* ignore if not supported */ }
+		};
+		try { modalColumns.showModal(); } catch (e) { };
 	}
 
 	if (btnColumns) {
@@ -93,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		modalColumnsForm.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			if (!activeFormId) return;
-			// read checkboxes
+
 			const inputs = modalColumnsList ? Array.from(modalColumnsList.querySelectorAll('input[type="checkbox"][data-key]')) : [];
 			const payload = {};
 			inputs.forEach((inp) => {
@@ -111,16 +121,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				const json = await resp.json().catch(() => ({}));
 				if (!resp.ok || !json.success) throw new Error(json.error || 'Network error');
 
-				// update activeColumns and dataset on active tab
 				activeColumns = payload;
-				// find active tab element and update its data-columns attribute
+
 				const activeTab = document.querySelector('.tab.tab-active[data-id]');
 				if (activeTab) activeTab.dataset.columns = JSON.stringify(payload);
 
-				// close modal
 				try { modalColumns.close(); } catch (e) {}
 
-				// re-trigger click on active tab to rebuild table with new columns
 				if (activeTab) activeTab.click();
 			} catch (err) {
 				alert('Erreur lors de l\'enregistrement des colonnes.');
@@ -129,40 +136,33 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	tabLists.forEach((tabList) => {
-		// Delegate clicks on tabs
 		tabList.addEventListener('click', (e) => {
 			const target = e.target.closest('[role="tab"], .tab');
 			if (!target || !tabList.contains(target)) return;
 			e.preventDefault();
 
-			// Remove active state from all tabs in this list
 			const tabs = Array.from(tabList.querySelectorAll('[role="tab"], .tab'));
 			tabs.forEach((t) => {
 				t.classList.remove('tab-active');
 				t.setAttribute('aria-selected', 'false');
 			});
 
-			// Set active on clicked tab
 			target.classList.add('tab-active');
 			target.setAttribute('aria-selected', 'true');
 
-			// Compute helper values used in multiple places
 			const hasId = !!(target.dataset && target.dataset.id);
 
-			// Update the info panel fields (name, code, delete input) — panel DOM now lives in `site_show.hbs`
 			const infoPanel = document.getElementById('info_form_panel');
 			if (infoPanel) {
 				const name = target.dataset.name || 'Formulaire';
 				const code = target.dataset.code || '';
 
-				// Update title
 				const h4 = document.getElementById('info_form_name');
 				if (h4) {
 					h4.textContent = name;
 					if (hasId) h4.classList.remove('opacity-25'); else h4.classList.add('opacity-25');
 				}
 
-				// Set delete form id in modal hidden input (empty if none) and toggle delete button visibility
 				const deleteInput = document.getElementById('form_delete_id');
 				const deleteBtn = document.getElementById('btn_delete_form');
 				if (deleteInput) deleteInput.value = target.dataset.id || '';
@@ -171,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
 					else deleteBtn.classList.add('none');
 				}
 
-				// Update code and toggle opacity + copy icon visibility
 				const codeEl = document.getElementById('info_form_code');
 				const codeWrap = document.getElementById('info_form_code_wrap');
 				const copyBtn = document.getElementById('btn_copy_code');
@@ -185,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			}
 
-			// Also update the template modal/button
 			const btnOpenTemplate = document.getElementById('btn_open_template');
 			const modalForm = document.getElementById('modal_template_form');
 			const keysContainer = document.getElementById('modal_template_keys');
@@ -197,11 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 
 			if (hasId) {
-				// show button
 				if (btnOpenTemplate) btnOpenTemplate.classList.remove('none');
-				// set form action
+
 				if (modalForm) modalForm.action = `/form/${target.dataset.id}/template`;
-				// populate modal content from data-template attribute
+
 				let tpl = {};
 				try {
 					const raw = target.dataset.template || '';
@@ -212,33 +209,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 				clearModalContainers();
 				const keys = Object.keys(tpl || {});
-				// set active tpl/keys/form for columns modal
+
 				activeTpl = tpl || {};
 				activeKeys = keys;
 				activeFormId = target.dataset.id || null;
 
-				// parse saved columns if present
 				let colsObj = {};
 				try {
 					const rawc = target.dataset.columns || '';
 					if (rawc) colsObj = JSON.parse(rawc);
-				} catch (e) { colsObj = {}; }
+				} catch (e) {
+					colsObj = {};
+				}
 				activeColumns = colsObj;
 
-				// compute visible keys according to saved columns (default: show all)
 				const visibleKeys = keys.filter((k) => (colsObj && typeof colsObj[k] !== 'undefined') ? !!colsObj[k] : true);
 				if (!keys.length) {
 					if (keysContainer) keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>';
 					if (valuesContainer) valuesContainer.innerHTML = '';
 				} else {
 					keys.forEach((k) => {
-						// left: key
 						const d = document.createElement('div');
 						d.className = 'px-2 py-1 rounded h-[32px] bg-neutral-content/50 text-sm bg-base-100';
 						d.textContent = k;
 						keysContainer.appendChild(d);
 
-						// right: input
 						const wrap = document.createElement('div');
 						wrap.className = 'flex items-center gap-2';
 						const input = document.createElement('input');
@@ -251,12 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
 					});
 				}
 
-				// Also fetch and render inbox rows for this form
 				const inboxHead = document.getElementById('inbox_table_head');
 				const inboxBody = document.getElementById('inbox_table_body');
 				const tableInboxEl = document.getElementById('tableInbox');
 
-				// Pagination state
 				let currentPage = 1;
 				const selectLimit = document.getElementById('numLignTable');
 				const paginationEl = document.getElementById('paginationTable');
@@ -264,17 +257,14 @@ document.addEventListener('DOMContentLoaded', () => {
 				function clearInbox() {
 					if (inboxHead) inboxHead.innerHTML = '';
 					if (inboxBody) inboxBody.innerHTML = '';
-					// reset counter display
+
 					const countEl = document.getElementById('count_inbox');
 					if (countEl) countEl.textContent = '';
 
-					// hide the whole actions area when no items
 					if (tableActions) tableActions.classList.add('none');
-					// hide table container as well
 					if (tableInboxEl) tableInboxEl.classList.add('none');
 				}
 
-				// build header row based on template keys
 				function buildHead(keysArr) {
 					if (!inboxHead) return;
 					const tr = document.createElement('tr');
@@ -283,7 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
 					// thCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
 					// tr.appendChild(thCheck);
 
-					// Always add a Date column after the checkbox
 					const thDate = document.createElement('th');
 					thDate.textContent = 'Date';
 					tr.appendChild(thDate);
@@ -321,29 +310,21 @@ document.addEventListener('DOMContentLoaded', () => {
 						const tdDate = document.createElement('td');
 
 						if (it.createdAt) {
-							try {
-								const d = new Date(it.createdAt);
-								tdDate.textContent = d.toLocaleString();
-							} catch (e) {
-								tdDate.textContent = it.createdAt;
-							}
+							tdDate.textContent = formatDateTime(it.createdAt);
 						} else {
 							tdDate.textContent = ' - ';
 						}
 
 						tr.appendChild(tdDate);
 
-						// Helper to render a cell with optional truncation + tooltip
 						function renderCell(value) {
 							const td = document.createElement('td');
 							const str = value !== undefined && value !== null ? String(value) : '';
 							const MAX = 100;
 							if (str.length > MAX) {
-								// truncated preview
 								td.textContent = str.substring(0, MAX) + '...';
 								td.classList.add('inbox-cell-truncated');
 
-								// show tooltip box near mouse with full content
 								td.addEventListener('mouseenter', (ev) => {
 									showInboxTooltip(str, ev.pageX + 12, ev.pageY + 12);
 								});
@@ -370,11 +351,11 @@ document.addEventListener('DOMContentLoaded', () => {
 						}
 
 						const tdAct = document.createElement('th');
-						tdAct.innerHTML = `<button class="btn btn-sm btn-neutral btn-outline btn-circle noo pt-[2px]">
+						tdAct.innerHTML = `
+						<button class="btn btn-sm btn-neutral btn-outline btn-circle noo pt-[2px]">
 							<i class="fa-solid fa-ellipsis"></i>
 						</button>`;
 						tr.appendChild(tdAct);
-
 
 						inboxBody.appendChild(tr);
 					});
