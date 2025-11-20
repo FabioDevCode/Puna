@@ -3,13 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const legendEl = document.getElementById('statTopSite_legend');
     let chart = null;
 
-    if (!chartEl) return;
+    if (!chartEl) {return;}
 
     async function fetchData() {
         try {
             // Controller is fixed to 90 days
             const resp = await fetch(`/stats/top-site-forms`, { credentials: 'same-origin' });
-            if (!resp.ok) throw new Error('Network error');
+            if (!resp.ok) {throw new Error('Network error');}
             return await resp.json();
         } catch (err) {
             console.error(err);
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function render(site, labels, series) {
         if (!site) {
             chartEl.innerHTML = '<div class="text-center text-sm text-muted">Aucun site actif sur la période</div>';
-            if (legendEl) legendEl.textContent = '';
+            if (legendEl) {legendEl.textContent = '';}
             return;
         }
 
@@ -58,14 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         useSeriesColors: true,
                         offsetX: -8,
                         fontSize: '14px',
-                        formatter: function(seriesName, opts) {
+                        formatter: function (seriesName, opts) {
                             const index = opts.seriesIndex;
-                            return seriesName + ": " + series[index];
+                            return seriesName + ': ' + series[index];
                         },
                     },
                 }
             },
-            colors: ["#0075C3"],
+            colors: ['#0075C3'],
             fill: {
                 type: 'solid',
                 colors: undefined
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // site.total
-        if (legendEl) legendEl.textContent = `${site.domain}`;
+        if (legendEl) {legendEl.textContent = `${site.domain}`;}
     }
 
     async function load() {

@@ -1,14 +1,15 @@
 import express from 'express';
+import * as authCtl from '../controllers/auth.controller.js';
+import * as dctl from '../controllers/default.controller.js';
+import { isConnected, isConnectDash } from '../helpers/authHelper.js';
+
 const router = express.Router();
-import * as dctl from "../controllers/default.controller.js";
-import * as authCtl from "../controllers/auth.controller.js";
-import { isConnected, isConnectDash } from "../helpers/authHelper.js";
 
 
 router.get('/error', dctl.error);
 router.get('/', isConnected, dctl.rootRedirect);
 
-router.get('/dp-login', isConnectDash,  dctl.dpLogin);
+router.get('/dp-login', isConnectDash, dctl.dpLogin);
 router.get('/dp-first-connexion', isConnectDash, dctl.dpFirstCo);
 
 router.get('/dp-logout', authCtl.dpLogout);
@@ -27,7 +28,7 @@ router.get('/stats/top-site-forms', isConnected, dctl.getTopSiteForms);
 router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
 router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
 
-router.get('/all-site', isConnected, dctl.allSite)
+router.get('/all-site', isConnected, dctl.allSite);
 router.get('/site/:id/token', isConnected, dctl.getSiteToken);
 router.get('/site/:id', isConnected, dctl.showSite);
 router.put('/site/:id/revoke-tokens', isConnected, dctl.revokeSiteTokens);

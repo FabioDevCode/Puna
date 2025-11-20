@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import jwt from 'jsonwebtoken';
-import models from '../models/index.js';
-import { Op } from 'sequelize';
-import stringUtils from "../utils/string.js";
-import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
-import { encryptObject } from '../utils/crypto.js';
 import dayjs from 'dayjs';
+import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
+import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
+import models from '../models/index.js';
+import { encryptObject } from '../utils/crypto.js';
+import stringUtils from '../utils/string.js';
 
 
 export const rootRedirect = (req, res) => {
@@ -133,22 +133,22 @@ export const dashboard = async (req, res) => {
     }
 };
 
-export const error = async(req, res) => {
+export const error = async (req, res) => {
     res.render('error', {
         layout: false,
-    })
+    });
 };
 
 export const dpLogin = (req, res) => {
     res.render('login', {
-        layout: "login"
-    })
+        layout: 'login'
+    });
 };
 
 export const dpFirstCo = (req, res) => {
     res.render('first_co', {
-        layout: "login"
-    })
+        layout: 'login'
+    });
 };
 
 export const createSite = async (req, res) => {
@@ -169,7 +169,7 @@ export const createSite = async (req, res) => {
 export const showSite = async (req, res) => {
     const siteId = req.params.id;
     try {
-        const site = await models.Site.findByPk(siteId, {raw: true});
+        const site = await models.Site.findByPk(siteId, { raw: true });
 
         if (!site) {
             throw new Error('error');
@@ -291,11 +291,11 @@ export const deleteForm = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(form_id);
-        if (!form) return res.redirect('/dashboard');
+        if (!form) {return res.redirect('/dashboard');}
 
         // get site id and verify ownership
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) return res.redirect('/dashboard');
+        if (!site || site.fk_id_user !== userId) {return res.redirect('/dashboard');}
 
         const siteId = site.id;
         await form.destroy();
@@ -312,10 +312,10 @@ export const updateFormTemplateSave = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) return res.redirect('/dashboard');
+        if (!form) {return res.redirect('/dashboard');}
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) return res.redirect('/dashboard');
+        if (!site || site.fk_id_user !== userId) {return res.redirect('/dashboard');}
 
         // Expecting nested fields in req.body.template (e.g. template[fieldName]=New label)
         const newTemplate = req.body?.template || {};
@@ -338,10 +338,10 @@ export const getFormInbox = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) return res.status(404).json({ error: 'Form not found' });
+        if (!form) {return res.status(404).json({ error: 'Form not found' });}
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
+        if (!site || site.fk_id_user !== userId) {return res.status(403).json({ error: 'Forbidden' });}
 
         // Server-side pagination: accept ?limit=..&offset=..
         const limitRaw = parseInt(req.query.limit, 10);
@@ -386,10 +386,10 @@ export const updateFormColumns = async (req, res) => {
     const userId = req.session.user?.id;
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) return res.status(404).json({ error: 'Form not found' });
+        if (!form) {return res.status(404).json({ error: 'Form not found' });}
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
+        if (!site || site.fk_id_user !== userId) {return res.status(403).json({ error: 'Forbidden' });}
 
         // Expect JSON body { columns: { key1: true, key2: false, ... } }
         let cols = req.body && req.body.columns ? req.body.columns : null;
@@ -456,7 +456,7 @@ export const getInboxCounts = async (req, res) => {
         // aggregate counts per day from fetched rows (use same local format)
         (inboxRows || []).forEach((r) => {
             const key = dayjs(r.createdAt).format('YYYY-MM-DD');
-            if (countsMap[key] !== undefined) countsMap[key]++;
+            if (countsMap[key] !== undefined) {countsMap[key]++;}
         });
 
         const data = labels.map((l) => countsMap[l] || 0);
@@ -521,12 +521,12 @@ export const getInboxPercentages = async (req, res) => {
 
         const computePercent = (current, previous) => {
             if (previous === 0) {
-                if (current === 0) return { percent: 0, trend: 'neutral' };
+                if (current === 0) {return { percent: 0, trend: 'neutral' };}
                 return { percent: 100, trend: 'up' };
             }
             const change = Math.round(((current - previous) / previous) * 100);
-            if (change > 0) return { percent: Math.abs(change), trend: 'up' };
-            if (change < 0) return { percent: Math.abs(change), trend: 'down' };
+            if (change > 0) {return { percent: Math.abs(change), trend: 'up' };}
+            if (change < 0) {return { percent: Math.abs(change), trend: 'down' };}
             return { percent: 0, trend: 'neutral' };
         };
 
@@ -564,7 +564,7 @@ export const getInboxCountsBySite = async (req, res) => {
 
         (inboxRows || []).forEach((r) => {
             const site = r.form && r.form.site ? r.form.site : null;
-            if (!site) return;
+            if (!site) {return;}
             const key = String(site.id);
             countsMap[key] = (countsMap[key] || 0) + 1;
             // Use domain if available, otherwise a fallback label
@@ -615,10 +615,10 @@ export const getInboxHeatmap = async (req, res) => {
         });
 
         // Prepare a 7x24 matrix (Monday..Sunday, hours 00..23)
-        const daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+        const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
         // Hours labels: '00', '1', '2', ..., '23' so midnight is clearly represented as '00'
-        const hours = Array.from({length:24}, (_,i) => (i === 0 ? '00' : String(i)));
-        const matrix = Array.from({length:7}, () => Array.from({length:24}, () => 0));
+        const hours = Array.from({ length:24 }, (_, i) => (i === 0 ? '00' : String(i)));
+        const matrix = Array.from({ length:7 }, () => Array.from({ length:24 }, () => 0));
 
         (inboxRows || []).forEach((r) => {
             const created = dayjs(r.createdAt);
@@ -683,8 +683,8 @@ export const getSiteToken = async (req, res) => {
 
     try {
         const site = await models.Site.findByPk(siteId);
-        if (!site) return res.status(404).json({ error: 'Site not found' });
-        if (site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
+        if (!site) {return res.status(404).json({ error: 'Site not found' });}
+        if (site.fk_id_user !== userId) {return res.status(403).json({ error: 'Forbidden' });}
 
         // load key from env or config file
         let secret = process.env.KEY_TK;
@@ -697,7 +697,7 @@ export const getSiteToken = async (req, res) => {
             }
         }
 
-        if (!secret) return res.status(500).json({ error: 'Server key not configured' });
+        if (!secret) {return res.status(500).json({ error: 'Server key not configured' });}
 
         const payload = {
             data: encryptObject({
@@ -720,8 +720,8 @@ export const revokeSiteTokens = async (req, res) => {
 
     try {
         const site = await models.Site.findByPk(siteId);
-        if (!site) return res.status(404).json({ error: 'Site not found' });
-        if (site.fk_id_user !== userId) return res.status(403).json({ error: 'Forbidden' });
+        if (!site) {return res.status(404).json({ error: 'Site not found' });}
+        if (site.fk_id_user !== userId) {return res.status(403).json({ error: 'Forbidden' });}
 
         const newCode = stringUtils.generateCode(16);
         site.control_code = newCode;

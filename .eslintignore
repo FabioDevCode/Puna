@@ -1,0 +1,11 @@
+# Handlebars templates
+*.hbs
+
+# Dependencies
+node_modules/
+
+# Minified files
+*.min.js
+
+# External libraries
+src/public/plugins/

@@ -1,12 +1,12 @@
-import models from "../models/index.js";
+import models from '../models/index.js';
 
-export const initAdminUSer = async() => {
+export const initAdminUSer = async () => {
     try {
         const count = await models.User.count();
-        if(count === 0) {
+        if (count === 0) {
             await models.User.create({
-                email: "",
-                login: "admin",
+                email: '',
+                login: 'admin',
                 enabled: false
             });
         }

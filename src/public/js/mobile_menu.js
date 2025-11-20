@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const mobileNav = document.querySelector('#mobile_menu');
-        if (!mobileNav) return;
+        if (!mobileNav) {return;}
 
         const anchors = Array.from(mobileNav.querySelectorAll('a[href]'));
-        if (!anchors.length) return;
+        if (!anchors.length) {return;}
 
         const activePathRaw = window.location.pathname || '/';
         const activePath = activePathRaw.replace(/\/+$|\/$/, '') || '/';
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         anchors.forEach(a => {
             const href = a.getAttribute('href');
-            if (!href) return;
+            if (!href) {return;}
             // resolve relative urls
             let url;
             try {

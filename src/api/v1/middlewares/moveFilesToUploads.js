@@ -1,11 +1,11 @@
+import fs from 'fs/promises';
 import path from 'path';
 import { finalPathFor, sanitizeFileName, moveFile, removeFile } from '../../../helpers/upload_utils.js';
-import fs from 'fs/promises';
 
 export default async function moveFilesToUploads(req, res, next) {
     try {
         const files = req.files || [];
-        if (!Array.isArray(files) || files.length === 0) return next();
+        if (!Array.isArray(files) || files.length === 0) {return next();}
 
         const moved = [];
         for (const f of files) {
