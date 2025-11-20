@@ -44,16 +44,16 @@ export default async function inspectArchive(req, res, next) {
                         for (const ex of EXECUTABLE_EXTS) {
                             if (lower.endsWith(ex)) {
                                 await zip.close();
-                                await fs.unlink(f.path).catch(() => {});
+                                await fs.unlink(f.path).catch((e) => {console.error(e);});
                                 return res.status(400).json({ error: 'Archive contains executable files and is rejected' });
                             }
                         }
                     }
                     await zip.close();
                 } catch (err) {
-                    try { await zip.close(); } catch (e) {}
+                    try { await zip.close(); } catch (e) {console.error(e);}
                     // if zip cannot be read safely, reject
-                    await fs.unlink(f.path).catch(() => {});
+                    await fs.unlink(f.path).catch((e) => {console.error(e);});
                     return res.status(400).json({ error: 'Archive could not be inspected and is rejected' });
                 }
             }
@@ -63,7 +63,7 @@ export default async function inspectArchive(req, res, next) {
     } catch (err) {
         const files = req.files || [];
         for (const toDel of files) {
-            try { await fs.unlink(toDel.path); } catch (e) {}
+            try { await fs.unlink(toDel.path); } catch (e) {console.error(e);}
         }
         return res.status(500).json({ error: 'Archive inspection failed' });
     }

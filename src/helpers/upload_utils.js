@@ -24,5 +24,5 @@ export async function moveFile(src, dest) {
 }
 
 export async function removeFile(p) {
-    try { await fs.unlink(p); } catch (e) {}
+    try { await fs.unlink(p); } catch (e) {console.error(e);}
 }

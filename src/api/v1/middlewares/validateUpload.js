@@ -24,14 +24,14 @@ export default async function validateUpload(req, res, next) {
             if (seen[f.fieldname] > 1) {
                 // remove all uploaded files
                 for (const toDel of files) {
-                    try { await fs.unlink(toDel.path); } catch (e) {}
+                    try { await fs.unlink(toDel.path); } catch (e) {console.error(e);}
                 }
                 return res.status(400).json({ error: 'One file per field allowed' });
             }
 
             const nameExt = extFromName(f.originalname);
             if (!ALLOWED.includes(nameExt)) {
-                await fs.unlink(f.path).catch(() => {});
+                await fs.unlink(f.path).catch((e) => {console.error(e);});
                 return res.status(400).json({ error: `Extension not allowed: ${nameExt}` });
             }
 
@@ -42,7 +42,7 @@ export default async function validateUpload(req, res, next) {
                 // allow some flexibility for certain types (e.g., csv may be text)
                 if (detectedExt !== nameExt) {
                     // treat mismatch as rejection
-                    await fs.unlink(f.path).catch(() => {});
+                    await fs.unlink(f.path).catch((e) => {console.error(e);});
                     return res.status(400).json({ error: `File content does not match extension for ${f.fieldname}` });
                 }
             }
@@ -53,7 +53,7 @@ export default async function validateUpload(req, res, next) {
         // try cleanup
         const files = req.files || [];
         for (const toDel of files) {
-            try { await fs.unlink(toDel.path); } catch (e) {}
+            try { await fs.unlink(toDel.path); } catch (e) {console.error(e);}
         }
         return res.status(500).json({ error: 'Upload validation failed' });
     }

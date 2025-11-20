@@ -213,7 +213,7 @@ export const showSite = async (req, res) => {
         if (forms && forms.length) {
             // mark each form with is_active based on query param or default to first
             let found = false;
-            forms.forEach((f, idx) => {
+            forms.forEach((f, _) => {
                 // Priority: query by name `f` if provided, then by id `active_form`
                 if (activeFormQueryName && String(f.name) === activeFormQueryName) {
                     f.is_active = true;

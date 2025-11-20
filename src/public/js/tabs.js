@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
-        try { modalColumns.showModal(); } catch (e) { }
+        try { modalColumns.showModal(); } catch (e) {console.error(e);}
     }
 
     if (btnColumns) {
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalColumnsCancel) {
         modalColumnsCancel.addEventListener('click', (e) => {
             e.preventDefault();
-            try { modalColumns.close(); } catch (e) {}
+            try { modalColumns.close(); } catch (e) {console.error(e);}
         });
     }
 
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const activeTab = document.querySelector('.tab.tab-active[data-id]');
                 if (activeTab) {activeTab.dataset.columns = JSON.stringify(payload);}
 
-                try { modalColumns.close(); } catch (e) {}
+                try { modalColumns.close(); } catch (e) {console.error(e);}
 
                 if (activeTab) {activeTab.click();}
             } catch (err) {
@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 copyBtn.innerHTML = '<i class="fas fa-check"></i> Code copié';
                 setTimeout(() => { copyBtn.innerHTML = old; }, 1200);
             } catch (err) {
-                // ignore copy errors silently
+                console.error(err);
             }
         });
     }

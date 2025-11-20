@@ -1,7 +1,7 @@
 import models from '../../../models/index.js';
 
 export async function sendHandler(req, res) {
-    const { site, form } = req;
+    const { form } = req;
 
     try {
         // Persist sanitized payload in Inbox.content as a JSON string

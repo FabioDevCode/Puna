@@ -35,7 +35,7 @@ export const dpFirstCoPost = async (req, res) => {
 };
 
 export const dpConnect = (req, res) => {
-    passport.authenticate('local', async (err, user, info) => {
+    passport.authenticate('local', async (err, user, _) => {
         if (err || !user) {
             return res.redirect('/dp-login');
         }
