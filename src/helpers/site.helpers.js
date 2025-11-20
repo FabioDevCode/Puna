@@ -17,7 +17,7 @@ export async function getSitesWithCounts(userId) {
             raw: true
         });
 
-        if(forms?.length) {
+        if (forms?.length) {
             formCount = forms.length;
             const formIds = forms.map(f => f.id);
             inboxCount = await models.Inbox.count({
@@ -45,11 +45,11 @@ export function getGlobalStats(sitesWithCounts) {
 
     const tinyStats = {
         globalInbox,
-        globalInbox_icon: "fas fa-inbox",
+        globalInbox_icon: 'fas fa-inbox',
         globalForm,
-        globalForm_icon: "fas fa-file-alt",
+        globalForm_icon: 'fas fa-file-alt',
         globalSite,
-        globalSite_icon: "fas fa-globe"
+        globalSite_icon: 'fas fa-globe'
     };
 
     return tinyStats;

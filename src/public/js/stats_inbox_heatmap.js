@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchData(days) {
         try {
             const resp = await fetch(`/stats/inbox-heatmap?days=${days}`, { credentials: 'same-origin' });
-            if (!resp.ok) throw new Error('Network error');
+            if (!resp.ok) {throw new Error('Network error');}
             return await resp.json();
         } catch (err) {
             console.error(err);
