@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "node --env-file=.env --watch server.js",
-    "start": "node --env-file=.env server.js"
+    "start": "node --env-file=.env server.js",
+    "lint": "eslint . --fix"
   },
   "keywords": [
     "Puna"
@@ -44,7 +45,7 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
-    "eslint": "^9.39.1",
+    "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.32.0"
   }
 }

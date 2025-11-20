@@ -1,0 +1,83 @@
+{
+    "env": {
+        "node": true,
+        "es2022": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 2022,
+        "sourceType": "module"
+    },
+    "extends": [
+        "eslint:recommended"
+    ],
+    "plugins": [
+        "import"
+    ],
+    "rules": {
+        "indent": ["error", 4, {
+            "SwitchCase": 1
+        }],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "single", {
+            "avoidEscape": true,
+            "allowTemplateLiterals": true
+        }],
+        "semi": ["error", "always"],
+        "no-unused-vars": ["error", {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_"
+        }],
+        "no-console": "off",
+        "comma-dangle": ["error", "only-multiline"],
+        "no-trailing-spaces": "error",
+        "eol-last": ["error", "always"],
+        "object-curly-spacing": ["error", "always"],
+        "array-bracket-spacing": ["error", "never"],
+        "space-before-function-paren": ["error", {
+            "anonymous": "always",
+            "named": "never",
+            "asyncArrow": "always"
+        }],
+        "keyword-spacing": ["error", {
+            "before": true,
+            "after": true
+        }],
+        "space-infix-ops": "error",
+        "comma-spacing": ["error", {
+            "before": false,
+            "after": true
+        }],
+        "brace-style": ["error", "1tbs", {
+            "allowSingleLine": true
+        }],
+        "curly": ["error", "all"],
+        "no-multi-spaces": "error",
+        "import/order": ["error", {
+            "groups": [
+                "builtin",
+                "external",
+                "internal",
+                "parent",
+                "sibling",
+                "index"
+            ],
+            "pathGroups": [
+                {
+                    "pattern": "node:**",
+                    "group": "builtin",
+                    "position": "before"
+                }
+            ],
+            "pathGroupsExcludedImportTypes": ["builtin"],
+            "newlines-between": "never",
+            "alphabetize": {
+                "order": "asc",
+                "caseInsensitive": true
+            }
+        }],
+        "import/newline-after-import": ["error", {
+            "count": 1
+        }],
+        "import/no-duplicates": "error"
+    }
+}
