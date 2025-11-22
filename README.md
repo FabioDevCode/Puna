@@ -18,6 +18,7 @@ Vous êtes libre de l’utiliser, le modifier et le redistribuer,
 ## TODO - Developpement (SIMPLE) :
 
 - Page show pour visualisé un éléments **Inbox**
+- Faire la suppression
 
 ## TODO - Developpement (COMPLEXE) :
 
