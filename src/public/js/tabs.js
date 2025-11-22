@@ -387,37 +387,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 function renderTable(pageItems, keysArr, total) {
                     const limit = selectLimit ? parseInt(selectLimit.value, 10) || 10 : 10;
                     const maxPage = Math.max(1, Math.ceil((total || 0) / limit));
-                    if (currentPage > maxPage) {currentPage = maxPage;}
+                    if (currentPage > maxPage) { currentPage = maxPage; }
 
                     // clear and build
-                    if (inboxHead) {inboxHead.innerHTML = '';}
-                    if (inboxBody) {inboxBody.innerHTML = '';}
+                    if (inboxHead) { inboxHead.innerHTML = ''; }
+                    if (inboxBody) { inboxBody.innerHTML = ''; }
 
                     buildHead(keysArr);
-                    buildRows(pageItems || [], keysArr);
 
-                    // update actions and table visibility only if there are items
-                    if (total && total > 0) {
-                        if (tableActions) {tableActions.classList.remove('none');}
-                        if (tableInboxEl) {tableInboxEl.classList.remove('none');}
+                    const items = Array.isArray(pageItems) ? pageItems : [];
+
+                    if (items.length > 0) {
+                        buildRows(items, keysArr);
                     } else {
-                        if (tableActions) {tableActions.classList.add('none');}
-                        if (tableInboxEl) {tableInboxEl.classList.add('none');}
+                        // no rows: show an empty state row but keep table visible when filters are active
+                        const columnsCount = ((keysArr && keysArr.length) ? keysArr.length : 1) + 2; // date + data cols + actions
+                        const trEmpty = document.createElement('tr');
+                        const tdEmpty = document.createElement('td');
+                        tdEmpty.colSpan = columnsCount;
+                        tdEmpty.className = 'text-sm text-center text-muted py-4';
+                        tdEmpty.textContent = 'Aucun résultat';
+                        trEmpty.appendChild(tdEmpty);
+                        if (inboxBody) { inboxBody.appendChild(trEmpty); }
                     }
 
-                    // update count text to 'sur {total}'
+                    // If there's a filter active we must keep the table and actions visible even with zero results
+                    const hasFilters = currentFilters && Object.keys(currentFilters).length > 0;
+                    if ((total && total > 0) || hasFilters) {
+                        if (tableActions) { tableActions.classList.remove('none'); }
+                        if (tableInboxEl) { tableInboxEl.classList.remove('none'); }
+                    } else {
+                        if (tableActions) { tableActions.classList.add('none'); }
+                        if (tableInboxEl) { tableInboxEl.classList.add('none'); }
+                    }
+
+                    // update count text to 'affichés sur total'
                     const countEl = document.getElementById('count_inbox');
-                    // Show number of rows displayed on this page followed by total: "{affichés} sur {total}"
-                    const shown = Array.isArray(pageItems) ? pageItems.length : 0;
-                    if (countEl) {countEl.textContent = (shown > 0 || (total && total > 0)) ? `${shown} sur ${total}` : '';}
+                    const shown = items.length;
+                    if (countEl) { countEl.textContent = `${shown} sur ${total || 0}`; }
 
                     // update pagination UI if present
                     if (paginationEl) {
                         const btns = Array.from(paginationEl.querySelectorAll('button'));
                         // expect: [prev, center, next]
-                        if (btns[1]) {btns[1].textContent = `${currentPage}`;}
-                        if (btns[0]) {btns[0].disabled = currentPage <= 1;}
-                        if (btns[2]) {btns[2].disabled = currentPage >= maxPage;}
+                        if (btns[1]) { btns[1].textContent = `${currentPage}`; }
+                        if (btns[0]) { btns[0].disabled = currentPage <= 1; }
+                        if (btns[2]) { btns[2].disabled = currentPage >= maxPage; }
                     }
                 }
 
