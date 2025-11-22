@@ -22,8 +22,6 @@ Vous êtes libre de l’utiliser, le modifier et le redistribuer,
 ## TODO - Developpement (COMPLEXE) :
 
 - Layout Administration + tout le paramétrage possible (création et gestion user etc...)
-- Pré-paramétré le template du formulaire. (checkbox à mettre) + (template stricte)
-- Faire filtre sur datalist de des élements. (persitant sauvegarde local-storage)
 
 ---
 
