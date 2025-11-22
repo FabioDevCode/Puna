@@ -1,3 +1,13 @@
+    /**
+     * Réinitialise les filtres et l'état visuel du bouton Filtre
+     */
+    function resetFiltersUI() {
+        tabState.filters = {};
+        const btnFilter = document.getElementById('filtreTableBtn');
+        if (btnFilter && btnFilter.classList) {
+            btnFilter.classList.remove('btn-success');
+        }
+    }
 /**
  * TooltipManager - Manages a single tooltip element for displaying truncated text
  */
@@ -132,6 +142,17 @@ document.addEventListener('DOMContentLoaded', () => {
         visibleKeys: [],
         filters: {}
     };
+
+    /**
+     * Réinitialise les filtres et l'état visuel du bouton Filtre
+     */
+    function resetFiltersUI() {
+        tabState.filters = {};
+        const btnFilter = document.getElementById('filtreTableBtn');
+        if (btnFilter && btnFilter.classList) {
+            btnFilter.classList.remove('btn-success');
+        }
+    }
 
     const tabLists = document.querySelectorAll('.tabs');
     const tableActions = document.getElementById('tableActions');
@@ -297,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = e.target.closest('[role="tab"], .tab');
             if (!target || !tabList.contains(target)) {return;}
             e.preventDefault();
+            resetFiltersUI();
 
             const tabs = Array.from(tabList.querySelectorAll('[role="tab"], .tab'));
             tabs.forEach((t) => {
