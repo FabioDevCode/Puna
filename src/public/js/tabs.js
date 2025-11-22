@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
 
                             // Action column
-                            const tdAction = document.createElement('th');
+                            const tdAction = document.createElement('td');
                             tdAction.innerHTML = `
                             <button class="btn btn-sm btn-neutral btn-outline btn-circle noo pt-[2px]">
                                 <i class="fa-solid fa-ellipsis"></i>
@@ -670,41 +670,42 @@ document.addEventListener('DOMContentLoaded', () => {
                      * @param {number} total - Total number of items
                      */
                     setupEventListeners(limit, total) {
-                        // Limit select change listener
-                        if (this.selectLimit) {
-                            this.selectLimit.removeEventListener('change', this.selectLimit._listener || (() => {}));
-                            this.selectLimit._listener = () => {
+                        // Limit select change listener - only set once
+                        if (this.selectLimit && !this.selectLimit.dataset.listenerAttached) {
+                            this.selectLimit.addEventListener('change', () => {
                                 this.fetchPage(1);
-                            };
-                            this.selectLimit.addEventListener('change', this.selectLimit._listener);
+                            });
+                            this.selectLimit.dataset.listenerAttached = 'true';
                         }
 
-                        // Pagination button listeners
+                        // Pagination button listeners - re-create handlers each time
                         if (this.paginationElement) {
                             const buttons = Array.from(this.paginationElement.querySelectorAll('button'));
                             const [prevBtn, pageBtn, nextBtn] = buttons;
 
                             if (prevBtn) {
-                                prevBtn.removeEventListener('click', prevBtn._listener || (() => {}));
-                                prevBtn._listener = (e) => {
+                                // Remove old listener if exists and add new one
+                                const newPrevBtn = prevBtn.cloneNode(true);
+                                prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+                                newPrevBtn.addEventListener('click', (e) => {
                                     e.preventDefault();
                                     if (this.currentPage > 1) {
                                         this.fetchPage(this.currentPage - 1);
                                     }
-                                };
-                                prevBtn.addEventListener('click', prevBtn._listener);
+                                });
                             }
 
                             if (nextBtn) {
-                                nextBtn.removeEventListener('click', nextBtn._listener || (() => {}));
-                                nextBtn._listener = (e) => {
+                                // Remove old listener if exists and add new one
+                                const newNextBtn = nextBtn.cloneNode(true);
+                                nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+                                newNextBtn.addEventListener('click', (e) => {
                                     e.preventDefault();
                                     const maxPage = Math.max(1, Math.ceil(total / limit));
                                     if (this.currentPage < maxPage) {
                                         this.fetchPage(this.currentPage + 1);
                                     }
-                                };
-                                nextBtn.addEventListener('click', nextBtn._listener);
+                                });
                             }
 
                             if (pageBtn) {
@@ -742,40 +743,36 @@ document.addEventListener('DOMContentLoaded', () => {
                      * Sets up event listeners for filter modal
                      */
                     initializeEventListeners() {
-                        if (this.btnFilter) {
-                            this.btnFilter.removeEventListener('click', this.btnFilter._listener || (() => {}));
-                            this.btnFilter._listener = (ev) => {
+                        if (this.btnFilter && !this.btnFilter.dataset.listenerAttached) {
+                            this.btnFilter.addEventListener('click', (ev) => {
                                 ev.preventDefault();
                                 this.open();
-                            };
-                            this.btnFilter.addEventListener('click', this.btnFilter._listener);
+                            });
+                            this.btnFilter.dataset.listenerAttached = 'true';
                         }
 
-                        if (this.cancelBtn) {
-                            this.cancelBtn.removeEventListener('click', this.cancelBtn._listener || (() => {}));
-                            this.cancelBtn._listener = (ev) => {
+                        if (this.cancelBtn && !this.cancelBtn.dataset.listenerAttached) {
+                            this.cancelBtn.addEventListener('click', (ev) => {
                                 ev.preventDefault();
                                 this.cancelAndReset();
-                            };
-                            this.cancelBtn.addEventListener('click', this.cancelBtn._listener);
+                            });
+                            this.cancelBtn.dataset.listenerAttached = 'true';
                         }
 
-                        if (this.clearBtn) {
-                            this.clearBtn.removeEventListener('click', this.clearBtn._listener || (() => {}));
-                            this.clearBtn._listener = (ev) => {
+                        if (this.clearBtn && !this.clearBtn.dataset.listenerAttached) {
+                            this.clearBtn.addEventListener('click', (ev) => {
                                 ev.preventDefault();
                                 this.clearInputs();
-                            };
-                            this.clearBtn.addEventListener('click', this.clearBtn._listener);
+                            });
+                            this.clearBtn.dataset.listenerAttached = 'true';
                         }
 
-                        if (this.form) {
-                            this.form.removeEventListener('submit', this.form._listener || (() => {}));
-                            this.form._listener = (ev) => {
+                        if (this.form && !this.form.dataset.listenerAttached) {
+                            this.form.addEventListener('submit', (ev) => {
                                 ev.preventDefault();
                                 this.apply();
-                            };
-                            this.form.addEventListener('submit', this.form._listener);
+                            });
+                            this.form.dataset.listenerAttached = 'true';
                         }
                     }
 
@@ -790,6 +787,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             this.valuesContainer.innerHTML = '';
                         }
 
+                        // Store snapshot of visible keys for use in filter creation
+                        // This ensures we filter on the currently visible columns
                         tabState.visibleKeys = (this.visibleKeys || []).slice();
 
                         if (!tabState.visibleKeys || !tabState.visibleKeys.length) {
