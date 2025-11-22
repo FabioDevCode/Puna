@@ -375,7 +375,7 @@ export const getFormInbox = async (req, res) => {
                     }
                     if (conditions.length) {
                         const Op = Sequelize.Op;
-                        whereClause = { [Op.and]: [ { fk_id_form: formId }, ...conditions ] };
+                        whereClause = { [Op.and]: [{ fk_id_form: formId }, ...conditions] };
                     }
                 }
             }
