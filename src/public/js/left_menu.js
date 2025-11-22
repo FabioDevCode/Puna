@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const asideNav = document.querySelector('aside nav');
-        if (!asideNav) return;
+        if (!asideNav) {return;}
 
         const anchors = Array.from(asideNav.querySelectorAll('a[href]'));
-        if (!anchors.length) return;
+        if (!anchors.length) {return;}
 
         const activePathRaw = window.location.pathname || '/';
         const activePath = activePathRaw.replace(/\/+$|\/$/, '') || '/';
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         anchors.forEach(a => {
             const href = a.getAttribute('href');
-            if (!href) return;
+            if (!href) {return;}
             // resolve relative urls
             let url;
             try {

@@ -1,11 +1,11 @@
-(function(){
+(function (){
     const el = document.getElementById('statC_chart');
-    if (!el) return;
+    if (!el) {return;}
 
     async function loadData() {
         try {
             const resp = await fetch('/stats/inbox-by-site', { credentials: 'same-origin' });
-            if (!resp.ok) return;
+            if (!resp.ok) {return;}
             const json = await resp.json();
             const labels = json.labels || [];
             const data = json.data || [];
@@ -41,7 +41,7 @@
                 },
                 tooltip: {
                     y: {
-                        formatter: function(val){
+                        formatter: function (val){
                             return val;
                         }
                     }

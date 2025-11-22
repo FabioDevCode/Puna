@@ -13,14 +13,14 @@ export const dpFirstCoPost = async (req, res) => {
         });
         if (!user) {
             return res.render('first_co', {
-                layout: "login",
-                error: "Login inconnu."
+                layout: 'login',
+                error: 'Login inconnu.'
             });
         }
         if (password !== confirm_password) {
             return res.render('first_co', {
-                layout: "login",
-                error: "Les mots de passe ne correspondent pas."
+                layout: 'login',
+                error: 'Les mots de passe ne correspondent pas.'
             });
         }
         const hash = await bcrypt.hash(password, 10);
@@ -28,14 +28,14 @@ export const dpFirstCoPost = async (req, res) => {
         return res.redirect('/dp-login');
     } catch (err) {
         return res.render('first_co', {
-            layout: "login",
-            error: "Erreur lors de la mise à jour du mot de passe."
+            layout: 'login',
+            error: 'Erreur lors de la mise à jour du mot de passe.'
         });
     }
 };
 
 export const dpConnect = (req, res) => {
-    passport.authenticate('local', async (err, user, info) => {
+    passport.authenticate('local', async (err, user, _) => {
         if (err || !user) {
             return res.redirect('/dp-login');
         }

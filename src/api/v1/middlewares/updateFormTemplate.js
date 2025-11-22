@@ -4,29 +4,29 @@ import models from '../../../models/index.js';
 export async function updateFormTemplate(req, res, next) {
     try {
         const formObj = req.form; // set by authApiKeyAccess middleware (raw: true)
-        if (!formObj || !formObj.id) return next();
+        if (!formObj || !formObj.id) {return next();}
 
         const formId = formObj.id;
 
         // obtain a model instance so we can update
         const form = await models.Form.findByPk(formId);
-        if (!form) return next();
+        if (!form) {return next();}
 
         const payload = req.sanitizedBody !== undefined ? req.sanitizedBody : req.body;
 
         // Only operate on plain objects
-        if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return next();
+        if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {return next();}
 
         // Extract top-level keys from received payload
         const receivedKeys = Object.keys(payload);
-        if (receivedKeys.length === 0) return next();
+        if (receivedKeys.length === 0) {return next();}
 
         // Load existing template
         let templateObj = {};
         if (form.template) {
             try {
                 templateObj = JSON.parse(form.template);
-                if (!templateObj || typeof templateObj !== 'object') templateObj = {};
+                if (!templateObj || typeof templateObj !== 'object') {templateObj = {};}
             } catch (err) {
                 templateObj = {};
             }
@@ -37,7 +37,7 @@ export async function updateFormTemplate(req, res, next) {
         if (form.columns) {
             try {
                 columnsObj = JSON.parse(form.columns);
-                if (!columnsObj || typeof columnsObj !== 'object') columnsObj = {};
+                if (!columnsObj || typeof columnsObj !== 'object') {columnsObj = {};}
             } catch (err) {
                 columnsObj = {};
             }

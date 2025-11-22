@@ -1,7 +1,7 @@
-(function(){
+(function (){
     const select = document.getElementById('statTop_range');
     const tbody = document.getElementById('statTop_body');
-    if (!select || !tbody) return;
+    if (!select || !tbody) {return;}
 
     function render(items) {
         tbody.innerHTML = '';
