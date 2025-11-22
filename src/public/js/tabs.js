@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     let _inboxTooltipEl = null;
+
     function ensureInboxTooltip() {
         if (_inboxTooltipEl) {return _inboxTooltipEl;}
         _inboxTooltipEl = document.createElement('div');
@@ -75,6 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalColumnsForm = document.getElementById('modal_columns_form');
     const modalColumnsCancel = document.getElementById('modal_columns_cancel');
 
+    function resetFilter() {
+        currentFilters = {};
+        btnFilter.classList.remove('btn-info');
+    }
+
     function openColumnsModal() {
         if (!modalColumns) {return;}
 
@@ -106,6 +112,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnColumns) {
         btnColumns.addEventListener('click', (e) => {
             e.preventDefault();
+
+            if (currentFilters && Object.keys(currentFilters).length) {
+                currentFilters = {};
+                // clear any visual state on filter button
+                if (btnFilter && btnFilter.classList) {
+                    btnFilter.classList.remove('btn-info');
+                }
+            }
+
+            // also clear modal inputs if modal exists
+            const modalFilterValues = document.getElementById('modal_filter_values');
+            if (modalFilterValues) {
+                const inputs = Array.from(modalFilterValues.querySelectorAll('input, select, textarea'));
+                inputs.forEach((inp) => {
+                    if (inp.type === 'checkbox' || inp.type === 'radio') {
+                        inp.checked = false;
+                    } else {
+                        inp.value = '';
+                    }
+                });
+            }
+
             openColumnsModal();
         });
     }
@@ -158,6 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = e.target.closest('[role="tab"], .tab');
             if (!target || !tabList.contains(target)) {return;}
             e.preventDefault();
+
+            resetFilter();
 
             const tabs = Array.from(tabList.querySelectorAll('[role="tab"], .tab'));
             tabs.forEach((t) => {
@@ -450,10 +480,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             url += `&filters=${encodeURIComponent(JSON.stringify(currentFilters))}`;
                         }
                     } catch (e) { /* ignore */ }
+
                     // anti-cache
                     url += `&_=${Date.now()}`;
-
-                    try { if (console && typeof console.debug === 'function') { console.debug('Fetching inbox', url, currentFilters); } } catch (e) { /* ignore */ }
 
                     fetch(url, { credentials: 'same-origin' })
                         .then((r) => r.json())
