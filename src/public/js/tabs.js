@@ -37,7 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const d = (value instanceof Date) ? value : new Date(value);
             if (Number.isNaN(d.getTime())) {return String(value);}
-            return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+            return `
+                <div class="flex flex-wrap gap-1">
+                    <p class="w-max">${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}&nbsp;</p>
+                    <p class="w-max">${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}</p>
+                </div>
+            `;
         } catch (e) {
             return String(value);
         }
@@ -321,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const tdDate = document.createElement('td');
 
                         if (it.createdAt) {
-                            tdDate.textContent = formatDateTime(it.createdAt);
+                            tdDate.innerHTML = formatDateTime(it.createdAt);
                         } else {
                             tdDate.textContent = ' - ';
                         }
@@ -331,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         function renderCell(value) {
                             const td = document.createElement('td');
                             const str = value !== undefined && value !== null ? String(value) : '';
-                            const MAX = 100;
+                            const MAX = 80;
                             if (str.length > MAX) {
                                 td.textContent = str.substring(0, MAX) + '...';
                                 td.classList.add('inbox-cell-truncated');
@@ -363,9 +368,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         const tdAct = document.createElement('th');
                         tdAct.innerHTML = `
-						<button class="btn btn-sm btn-neutral btn-outline btn-circle noo pt-[2px]">
-							<i class="fa-solid fa-ellipsis"></i>
-						</button>`;
+                        <div class="flex gap-2 w-max">
+                            <button class="btn btn-sm btn-outline btn-circle noo pt-[2px]">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-error btn-outline btn-circle noo pt-[2px]">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                        `;
                         tr.appendChild(tdAct);
 
                         inboxBody.appendChild(tr);
@@ -605,7 +616,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 vals.forEach((inp) => { inp.value = ''; });
                             } catch (e) { /* ignore */ }
                             currentFilters = {};
-                            if (btnFilter) { btnFilter.classList.remove('btn-success'); btnFilter.classList.remove('btn-warning'); }
+                            if (btnFilter) {
+                                btnFilter.classList.remove('btn-info');
+                                btnFilter.classList.remove('btn-warning');
+                            }
                             try { modalFilter.close(); } catch (e) { try { modalFilter.classList.add('none'); } catch (err) { /* ignore */ } }
                             try { fetchPage(1); } catch (e) { /* ignore */ }
                         };
@@ -652,7 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             try {
                                 if (btnFilter) {
                                     if (currentFilters && Object.keys(currentFilters).length) {
-                                        btnFilter.classList.add('btn-success');
+                                        btnFilter.classList.add('btn-info');
                                         btnFilter.classList.remove('btn-warning');
                                     } else {
                                         btnFilter.classList.remove('btn-success');
