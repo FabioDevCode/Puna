@@ -1,152 +1,296 @@
-document.addEventListener('DOMContentLoaded', () => {
-    let _inboxTooltipEl = null;
-    function ensureInboxTooltip() {
-        if (_inboxTooltipEl) {return _inboxTooltipEl;}
-        _inboxTooltipEl = document.createElement('div');
-        _inboxTooltipEl.id = 'inbox-tooltip';
-        _inboxTooltipEl.className = 'inbox-tooltip none';
-        document.body.appendChild(_inboxTooltipEl);
-        return _inboxTooltipEl;
+/**
+ * TooltipManager - Manages a single tooltip element for displaying truncated text
+ */
+class TooltipManager {
+    constructor() {
+        this.tooltipElement = null;
     }
 
-    function showInboxTooltip(text, x, y) {
-        const el = ensureInboxTooltip();
+    /**
+     * Ensures tooltip element exists and returns it
+     * @returns {HTMLElement} The tooltip element
+     */
+    ensureElement() {
+        if (this.tooltipElement) {
+            return this.tooltipElement;
+        }
+        this.tooltipElement = document.createElement('div');
+        this.tooltipElement.id = 'inbox-tooltip';
+        this.tooltipElement.className = 'inbox-tooltip none';
+        document.body.appendChild(this.tooltipElement);
+        return this.tooltipElement;
+    }
+
+    /**
+     * Shows tooltip at specified coordinates
+     * @param {string} text - Text to display
+     * @param {number} x - X coordinate
+     * @param {number} y - Y coordinate
+     */
+    show(text, x, y) {
+        const el = this.ensureElement();
         el.textContent = text;
         el.style.left = `${x}px`;
         el.style.top = `${y}px`;
         el.classList.remove('none');
     }
 
-    function moveInboxTooltip(x, y) {
-        const el = ensureInboxTooltip();
+    /**
+     * Moves tooltip to new coordinates
+     * @param {number} x - X coordinate
+     * @param {number} y - Y coordinate
+     */
+    move(x, y) {
+        const el = this.ensureElement();
         el.style.left = `${x}px`;
         el.style.top = `${y}px`;
     }
 
-    function hideInboxTooltip() {
-        if (!_inboxTooltipEl) {return;}
-        _inboxTooltipEl.classList.add('none');
+    /**
+     * Hides the tooltip
+     */
+    hide() {
+        if (!this.tooltipElement) {
+            return;
+        }
+        this.tooltipElement.classList.add('none');
     }
+}
 
-    function pad2(n) {
+/**
+ * DateFormatter - Utility class for date formatting
+ */
+class DateFormatter {
+    /**
+     * Pads number with leading zero if needed
+     * @param {number} n - Number to pad
+     * @returns {string} Padded string
+     */
+    static pad2(n) {
         return String(n).padStart(2, '0');
     }
 
-    function formatDateTime(value) {
-        if (!value && value !== 0) {return ' - ';}
+    /**
+     * Formats a date/time value as YYYY-MM-DD HH:MM:SS
+     * @param {Date|string|number} value - Value to format
+     * @returns {string} Formatted date string or fallback
+     */
+    static formatDateTime(value) {
+        if (!value && value !== 0) {
+            return ' - ';
+        }
         try {
             const d = (value instanceof Date) ? value : new Date(value);
-            if (Number.isNaN(d.getTime())) {return String(value);}
-            return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+            if (Number.isNaN(d.getTime())) {
+                return String(value);
+            }
+            const year = d.getFullYear();
+            const month = this.pad2(d.getMonth() + 1);
+            const day = this.pad2(d.getDate());
+            const hours = this.pad2(d.getHours());
+            const minutes = this.pad2(d.getMinutes());
+            const seconds = this.pad2(d.getSeconds());
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         } catch (e) {
             return String(value);
         }
     }
 
-    // Format a date value as YYYY-MM-DD for the date input
-    function formatDateYYYYMMDD(value) {
-        if (!value && value !== 0) { return ''; }
+    /**
+     * Formats a date value as YYYY-MM-DD for date inputs
+     * @param {Date|string|number} value - Value to format
+     * @returns {string} Formatted date string or empty string
+     */
+    static formatDateYYYYMMDD(value) {
+        if (!value && value !== 0) {
+            return '';
+        }
         try {
             const d = (value instanceof Date) ? value : new Date(value);
-            if (Number.isNaN(d.getTime())) { return String(value); }
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        } catch (e) { return String(value); }
+            if (Number.isNaN(d.getTime())) {
+                return String(value);
+            }
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        } catch (e) {
+            return String(value);
+        }
     }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tooltipManager = new TooltipManager();
+
+    // State management for active tab data
+    const tabState = {
+        template: {},
+        keys: [],
+        columns: null,
+        formId: null,
+        visibleKeys: [],
+        filters: {}
+    };
 
     const tabLists = document.querySelectorAll('.tabs');
     const tableActions = document.getElementById('tableActions');
 
-    let activeTpl = {};
-    let activeKeys = [];
-    let activeColumns = null;
-    let activeFormId = null;
-    let currentVisibleKeys = [];
-    let currentFilters = {};
+    /**
+     * ColumnsModal - Manages column visibility modal
+     */
+    class ColumnsModal {
+        constructor() {
+            this.btnColumns = document.getElementById('btn_columns');
+            this.modal = document.getElementById('modal_columns');
+            this.columnsList = document.getElementById('modal_columns_list');
+            this.form = document.getElementById('modal_columns_form');
+            this.cancelBtn = document.getElementById('modal_columns_cancel');
+            this.btnFilter = document.getElementById('filtreTableBtn');
 
-    const btnColumns = document.getElementById('btn_columns');
-    const btnFilter = document.getElementById('filtreTableBtn');
-    const modalColumns = document.getElementById('modal_columns');
-    const modalColumnsList = document.getElementById('modal_columns_list');
-    const modalColumnsForm = document.getElementById('modal_columns_form');
-    const modalColumnsCancel = document.getElementById('modal_columns_cancel');
+            this.initializeEventListeners();
+        }
 
-    function openColumnsModal() {
-        if (!modalColumns) {return;}
+        /**
+         * Sets up event listeners for modal interactions
+         */
+        initializeEventListeners() {
+            if (this.btnColumns) {
+                this.btnColumns.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.open();
+                });
+            }
 
-        if (modalColumnsList) {
-            modalColumnsList.innerHTML = '';
-            if (!activeKeys.length) {
-                modalColumnsList.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour ce formulaire.</p>';
-            } else {
-                activeKeys.forEach((k) => {
-                    const label = document.createElement('label');
-                    label.className = 'flex items-center gap-2 p-2 rounded bg-base-100';
-                    const chk = document.createElement('input');
-                    chk.type = 'checkbox';
-                    chk.name = `col_${k}`;
-                    chk.dataset.key = k;
-                    chk.checked = activeColumns ? !!activeColumns[k] : true;
-                    chk.className = 'checkbox checkbox-secondary';
-                    const span = document.createElement('span');
-                    span.textContent = activeTpl[k] || k;
-                    label.appendChild(chk);
-                    label.appendChild(span);
-                    modalColumnsList.appendChild(label);
+            if (this.cancelBtn) {
+                this.cancelBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.close();
+                });
+            }
+
+            if (this.form) {
+                this.form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.save();
                 });
             }
         }
-        try { modalColumns.showModal(); } catch (e) {console.error(e);}
-    }
 
-    if (btnColumns) {
-        btnColumns.addEventListener('click', (e) => {
-            e.preventDefault();
-            openColumnsModal();
-        });
-    }
+        /**
+         * Opens the columns modal and populates it with available columns
+         */
+        open() {
+            if (!this.modal || !this.columnsList) {
+                return;
+            }
 
-    if (modalColumnsCancel) {
-        modalColumnsCancel.addEventListener('click', (e) => {
-            e.preventDefault();
-            try { modalColumns.close(); } catch (e) {console.error(e);}
-        });
-    }
+            this.columnsList.innerHTML = '';
 
-    if (modalColumnsForm) {
-        modalColumnsForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!activeFormId) {return;}
+            if (!tabState.keys.length) {
+                this.columnsList.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour ce formulaire.</p>';
+            } else {
+                tabState.keys.forEach((key) => {
+                    const label = this.createColumnCheckbox(key);
+                    this.columnsList.appendChild(label);
+                });
+            }
 
-            const inputs = modalColumnsList ? Array.from(modalColumnsList.querySelectorAll('input[type="checkbox"][data-key]')) : [];
+            try {
+                this.modal.showModal();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        /**
+         * Creates a checkbox element for a column
+         * @param {string} key - Column key
+         * @returns {HTMLElement} Label element containing checkbox
+         */
+        createColumnCheckbox(key) {
+            const label = document.createElement('label');
+            label.className = 'flex items-center gap-2 p-2 rounded bg-base-100';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = `col_${key}`;
+            checkbox.dataset.key = key;
+            checkbox.checked = tabState.columns ? !!tabState.columns[key] : true;
+            checkbox.className = 'checkbox checkbox-secondary';
+
+            const span = document.createElement('span');
+            span.textContent = tabState.template[key] || key;
+
+            label.appendChild(checkbox);
+            label.appendChild(span);
+
+            return label;
+        }
+
+        /**
+         * Saves column visibility preferences
+         */
+        async save() {
+            if (!tabState.formId) {
+                return;
+            }
+
+            const inputs = this.columnsList ? Array.from(this.columnsList.querySelectorAll('input[type="checkbox"][data-key]')) : [];
             const payload = {};
-            inputs.forEach((inp) => {
-                const k = inp.dataset.key;
-                payload[k] = !!inp.checked;
+
+            inputs.forEach((input) => {
+                const key = input.dataset.key;
+                payload[key] = !!input.checked;
             });
 
             try {
-                const resp = await fetch(`/form/${activeFormId}/columns`, {
+                const response = await fetch(`/form/${tabState.formId}/columns`, {
                     method: 'POST',
                     credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ columns: payload })
                 });
-                const json = await resp.json().catch(() => ({}));
-                if (!resp.ok || !json.success) {throw new Error(json.error || 'Network error');}
 
-                activeColumns = payload;
+                const json = await response.json().catch(() => ({}));
+
+                if (!response.ok || !json.success) {
+                    throw new Error(json.error || 'Network error');
+                }
+
+                tabState.columns = payload;
 
                 const activeTab = document.querySelector('.tab.tab-active[data-id]');
-                if (activeTab) {activeTab.dataset.columns = JSON.stringify(payload);}
+                if (activeTab) {
+                    activeTab.dataset.columns = JSON.stringify(payload);
+                }
 
-                try { modalColumns.close(); } catch (e) {console.error(e);}
+                this.close();
 
-                if (activeTab) {activeTab.click();}
+                if (activeTab) {
+                    activeTab.click();
+                }
             } catch (err) {
                 alert('Erreur lors de l\'enregistrement des colonnes.');
             }
-        });
+        }
+
+        /**
+         * Closes the columns modal
+         */
+        close() {
+            if (!this.modal) {
+                return;
+            }
+            try {
+                this.modal.close();
+            } catch (e) {
+                console.error(e);
+            }
+        }
     }
+
+    const columnsModal = new ColumnsModal();
 
     tabLists.forEach((tabList) => {
         tabList.addEventListener('click', (e) => {
@@ -221,18 +365,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearModalContainers();
                 const keys = Object.keys(tpl || {});
 
-                activeTpl = tpl || {};
-                activeKeys = keys;
-                activeFormId = target.dataset.id || null;
+                // Update global tab state
+                tabState.template = tpl || {};
+                tabState.keys = keys;
+                tabState.formId = target.dataset.id || null;
 
                 let colsObj = {};
                 try {
                     const rawc = target.dataset.columns || '';
-                    if (rawc) {colsObj = JSON.parse(rawc);}
+                    if (rawc) {
+                        colsObj = JSON.parse(rawc);
+                    }
                 } catch (e) {
                     colsObj = {};
                 }
-                activeColumns = colsObj;
+                tabState.columns = colsObj;
 
                 const visibleKeys = keys.filter((k) => (colsObj && typeof colsObj[k] !== 'undefined') ? !!colsObj[k] : true);
                 if (!keys.length) {
@@ -257,415 +404,635 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
-                const inboxHead = document.getElementById('inbox_table_head');
-                const inboxBody = document.getElementById('inbox_table_body');
-                const tableInboxEl = document.getElementById('tableInbox');
+                /**
+                 * InboxTable - Manages inbox table rendering and pagination
+                 */
+                class InboxTable {
+                    constructor(formId, visibleKeys) {
+                        this.formId = formId;
+                        this.visibleKeys = visibleKeys;
+                        this.currentPage = 1;
+                        this.MAX_CELL_LENGTH = 100;
 
-                let currentPage = 1;
-                const selectLimit = document.getElementById('numLignTable');
-                const paginationEl = document.getElementById('paginationTable');
-
-                function clearInbox() {
-                    if (inboxHead) {inboxHead.innerHTML = '';}
-                    if (inboxBody) {inboxBody.innerHTML = '';}
-
-                    const countEl = document.getElementById('count_inbox');
-                    if (countEl) {countEl.textContent = '';}
-
-                    if (tableActions) {tableActions.classList.add('none');}
-                    if (tableInboxEl) {tableInboxEl.classList.add('none');}
-                }
-
-                function buildHead(keysArr) {
-                    if (!inboxHead) {return;}
-                    const tr = document.createElement('tr');
-
-                    // const thCheck = document.createElement('th');
-                    // thCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
-                    // tr.appendChild(thCheck);
-
-                    const thDate = document.createElement('th');
-                    thDate.textContent = 'Date';
-                    tr.appendChild(thDate);
-
-                    if (!keysArr.length) {
-                        const th = document.createElement('th');
-                        th.textContent = 'Données';
-                        tr.appendChild(th);
-                    } else {
-                        keysArr.forEach((k) => {
-                            const th = document.createElement('th');
-                            th.textContent = tpl[k] || k;
-                            tr.appendChild(th);
-                        });
+                        // DOM elements
+                        this.headElement = document.getElementById('inbox_table_head');
+                        this.bodyElement = document.getElementById('inbox_table_body');
+                        this.tableElement = document.getElementById('tableInbox');
+                        this.selectLimit = document.getElementById('numLignTable');
+                        this.paginationElement = document.getElementById('paginationTable');
                     }
 
-                    const thAction = document.createElement('th');
-                    tr.appendChild(thAction);
+                    /**
+                     * Clears the inbox table and hides it
+                     */
+                    clear() {
+                        if (this.headElement) {
+                            this.headElement.innerHTML = '';
+                        }
+                        if (this.bodyElement) {
+                            this.bodyElement.innerHTML = '';
+                        }
 
-                    inboxHead.appendChild(tr);
-                }
+                        const countEl = document.getElementById('count_inbox');
+                        if (countEl) {
+                            countEl.textContent = '';
+                        }
 
-                function buildRows(items, keysArr) {
-                    if (!inboxBody) {return;}
-                    items.forEach((it) => {
+                        if (tableActions) {
+                            tableActions.classList.add('none');
+                        }
+                        if (this.tableElement) {
+                            this.tableElement.classList.add('none');
+                        }
+                    }
+
+                    /**
+                     * Builds table header with column names
+                     * @param {string[]} keysArr - Array of column keys
+                     */
+                    buildHead(keysArr) {
+                        if (!this.headElement) {
+                            return;
+                        }
+
                         const tr = document.createElement('tr');
-                        tr.dataset.id = it.id;
 
-                        // const tdCheck = document.createElement('th');
-                        // tdCheck.innerHTML = '<label><input type="checkbox" class="checkbox" /></label>';
-                        // tr.appendChild(tdCheck);
-
-                        const content = it.content || {};
                         // Date column
-                        const tdDate = document.createElement('td');
+                        const thDate = document.createElement('th');
+                        thDate.textContent = 'Date';
+                        tr.appendChild(thDate);
 
-                        if (it.createdAt) {
-                            tdDate.textContent = formatDateTime(it.createdAt);
-                        } else {
-                            tdDate.textContent = ' - ';
-                        }
-
-                        tr.appendChild(tdDate);
-
-                        function renderCell(value) {
-                            const td = document.createElement('td');
-                            const str = value !== undefined && value !== null ? String(value) : '';
-                            const MAX = 100;
-                            if (str.length > MAX) {
-                                td.textContent = str.substring(0, MAX) + '...';
-                                td.classList.add('inbox-cell-truncated');
-
-                                td.addEventListener('mouseenter', (ev) => {
-                                    showInboxTooltip(str, ev.pageX + 12, ev.pageY + 12);
-                                });
-                                td.addEventListener('mousemove', (ev) => {
-                                    moveInboxTooltip(ev.pageX + 12, ev.pageY + 12);
-                                });
-                                td.addEventListener('mouseleave', () => {
-                                    hideInboxTooltip();
-                                });
-                            } else {
-                                td.textContent = str;
-                            }
-                            return td;
-                        }
-
+                        // Data columns
                         if (!keysArr.length) {
-                            const td = renderCell(JSON.stringify(content));
-                            tr.appendChild(td);
+                            const th = document.createElement('th');
+                            th.textContent = 'Données';
+                            tr.appendChild(th);
                         } else {
-                            keysArr.forEach((k) => {
-                                const td = renderCell(content[k]);
-                                tr.appendChild(td);
+                            keysArr.forEach((key) => {
+                                const th = document.createElement('th');
+                                th.textContent = tabState.template[key] || key;
+                                tr.appendChild(th);
                             });
                         }
 
-                        const tdAct = document.createElement('th');
-                        tdAct.innerHTML = `
-						<button class="btn btn-sm btn-neutral btn-outline btn-circle noo pt-[2px]">
-							<i class="fa-solid fa-ellipsis"></i>
-						</button>`;
-                        tr.appendChild(tdAct);
+                        // Action column
+                        const thAction = document.createElement('th');
+                        tr.appendChild(thAction);
 
-                        inboxBody.appendChild(tr);
-                    });
-                }
-
-                // Render a page using items (page slice returned by server) and total count
-                function renderTable(pageItems, keysArr, total) {
-                    const limit = selectLimit ? parseInt(selectLimit.value, 10) || 10 : 10;
-                    const maxPage = Math.max(1, Math.ceil((total || 0) / limit));
-                    if (currentPage > maxPage) {currentPage = maxPage;}
-
-                    // clear and build
-                    if (inboxHead) {inboxHead.innerHTML = '';}
-                    if (inboxBody) {inboxBody.innerHTML = '';}
-
-                    buildHead(keysArr);
-                    buildRows(pageItems || [], keysArr);
-
-                    // update actions and table visibility only if there are items
-                    if (total && total > 0) {
-                        if (tableActions) {tableActions.classList.remove('none');}
-                        if (tableInboxEl) {tableInboxEl.classList.remove('none');}
-                    } else {
-                        if (tableActions) {tableActions.classList.add('none');}
-                        if (tableInboxEl) {tableInboxEl.classList.add('none');}
+                        this.headElement.appendChild(tr);
                     }
 
-                    // update count text to 'sur {total}'
-                    const countEl = document.getElementById('count_inbox');
-                    // Show number of rows displayed on this page followed by total: "{affichés} sur {total}"
-                    const shown = Array.isArray(pageItems) ? pageItems.length : 0;
-                    if (countEl) {countEl.textContent = (shown > 0 || (total && total > 0)) ? `${shown} sur ${total}` : '';}
+                    /**
+                     * Renders a table cell with truncation support
+                     * @param {*} value - Cell value
+                     * @returns {HTMLElement} Table cell element
+                     */
+                    renderCell(value) {
+                        const td = document.createElement('td');
+                        const str = value !== undefined && value !== null ? String(value) : '';
 
-                    // update pagination UI if present
-                    if (paginationEl) {
-                        const btns = Array.from(paginationEl.querySelectorAll('button'));
-                        // expect: [prev, center, next]
-                        if (btns[1]) {btns[1].textContent = `${currentPage}`;}
-                        if (btns[0]) {btns[0].disabled = currentPage <= 1;}
-                        if (btns[2]) {btns[2].disabled = currentPage >= maxPage;}
-                    }
-                }
+                        if (str.length > this.MAX_CELL_LENGTH) {
+                            td.textContent = str.substring(0, this.MAX_CELL_LENGTH) + '...';
+                            td.classList.add('inbox-cell-truncated');
 
-                // Fetch inbox (server-side pagination)
-                clearInbox();
-
-                const fetchPage = (page) => {
-                    const limit = selectLimit ? parseInt(selectLimit.value, 10) || 10 : 10;
-                    const p = page && page > 0 ? page : 1;
-                    const offset = (p - 1) * limit;
-                    // build url and include filters if any
-                    let url = `/form/${target.dataset.id}/inbox?limit=${limit}&offset=${offset}`;
-                    try {
-                        if (currentFilters && Object.keys(currentFilters).length) {
-                            url += `&filters=${encodeURIComponent(JSON.stringify(currentFilters))}`;
+                            td.addEventListener('mouseenter', (ev) => {
+                                tooltipManager.show(str, ev.pageX + 12, ev.pageY + 12);
+                            });
+                            td.addEventListener('mousemove', (ev) => {
+                                tooltipManager.move(ev.pageX + 12, ev.pageY + 12);
+                            });
+                            td.addEventListener('mouseleave', () => {
+                                tooltipManager.hide();
+                            });
+                        } else {
+                            td.textContent = str;
                         }
-                    } catch (e) { /* ignore */ }
-                    // anti-cache
-                    url += `&_=${Date.now()}`;
 
-                    try { if (console && typeof console.debug === 'function') { console.debug('Fetching inbox', url, currentFilters); } } catch (e) { /* ignore */ }
+                        return td;
+                    }
 
-                    fetch(url, { credentials: 'same-origin' })
-                        .then((r) => r.json())
-                        .then((data) => {
-                            const items = data.items || [];
-                            const total = parseInt(data.total, 10) || 0;
-                            currentPage = p;
+                    /**
+                     * Builds table rows from items
+                     * @param {Array} items - Array of inbox items
+                     * @param {string[]} keysArr - Array of column keys
+                     */
+                    buildRows(items, keysArr) {
+                        if (!this.bodyElement) {
+                            return;
+                        }
 
-                            // attach select change to fetch first page
-                            if (selectLimit) {
-                                selectLimit.removeEventListener('change', selectLimit._listener || (() => {}));
-                                selectLimit._listener = () => {
-                                    fetchPage(1);
-                                };
-                                selectLimit.addEventListener('change', selectLimit._listener);
-                            }
+                        items.forEach((item) => {
+                            const tr = document.createElement('tr');
+                            tr.dataset.id = item.id;
 
-                            // attach pagination buttons
-                            if (paginationEl) {
-                                const btns = Array.from(paginationEl.querySelectorAll('button'));
-                                const prev = btns[0];
-                                const pageBtn = btns[1];
-                                const next = btns[2];
+                            // Date column
+                            const tdDate = document.createElement('td');
+                            tdDate.textContent = item.createdAt ? DateFormatter.formatDateTime(item.createdAt) : ' - ';
+                            tr.appendChild(tdDate);
 
-                                if (prev) {
-                                    prev.removeEventListener('click', prev._listener || (() => {}));
-                                    prev._listener = (e) => {
-                                        e.preventDefault();
-                                        if (currentPage > 1) {fetchPage(currentPage - 1);}
-                                    };
-                                    prev.addEventListener('click', prev._listener);
-                                }
-                                if (next) {
-                                    next.removeEventListener('click', next._listener || (() => {}));
-                                    next._listener = (e) => {
-                                        e.preventDefault();
-                                        const maxPage = Math.max(1, Math.ceil(total / limit));
-                                        if (currentPage < maxPage) {fetchPage(currentPage + 1);}
-                                    };
-                                    next.addEventListener('click', next._listener);
-                                }
-                                // initial page label
-                                if (pageBtn) {pageBtn.textContent = String(currentPage);}
-                            }
+                            const content = item.content || {};
 
-                            // render returned page
-                            renderTable(items, visibleKeys, total);
-                        })
-                        .catch(() => {
-                            clearInbox();
-                        });
-                };
-
-                // initial load
-                fetchPage(1);
-
-                // =====================
-                // Filter modal logic
-                // =====================
-                try {
-                    const modalFilter = document.getElementById('modal_filter');
-                    const modalFilterForm = document.getElementById('modal_filter_form');
-                    const modalFilterKeys = document.getElementById('modal_filter_keys');
-                    const modalFilterValues = document.getElementById('modal_filter_values');
-                    const modalFilterCancel = document.getElementById('modal_filter_cancel');
-                    const modalFilterClear = document.getElementById('modal_filter_clear');
-
-                    if (btnFilter) {
-                        btnFilter.removeEventListener('click', btnFilter._listener || (() => {}));
-                        btnFilter._listener = (ev) => {
-                            ev.preventDefault();
-                            if (modalFilterKeys) { modalFilterKeys.innerHTML = ''; }
-                            if (modalFilterValues) { modalFilterValues.innerHTML = ''; }
-
-                            // prepare visible keys snapshot
-                            currentVisibleKeys = (visibleKeys || []).slice();
-
-                            if (!currentVisibleKeys || !currentVisibleKeys.length) {
-                                if (modalFilterKeys) { modalFilterKeys.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour filtrer.</p>'; }
+                            // Data columns
+                            if (!keysArr.length) {
+                                const td = this.renderCell(JSON.stringify(content));
+                                tr.appendChild(td);
                             } else {
-                                // Date label left (disabled input) and date input right
-                                if (modalFilterKeys) {
-                                    const leftDateWrap = document.createElement('div');
-                                    leftDateWrap.className = '';
-                                    const leftDateInput = document.createElement('input');
-                                    leftDateInput.type = 'text';
-                                    leftDateInput.disabled = true;
-                                    leftDateInput.value = 'Date';
-                                    leftDateInput.className = 'input input-bordered w-full input-sm bg-base-100';
-                                    leftDateWrap.appendChild(leftDateInput);
-                                    modalFilterKeys.appendChild(leftDateWrap);
-                                }
-                                if (modalFilterValues) {
-                                    const rightDateWrap = document.createElement('div');
-                                    rightDateWrap.className = '';
-                                    const dateInput = document.createElement('input');
-                                    dateInput.type = 'text';
-                                    dateInput.placeholder = 'YYYY-MM-DD';
-                                    dateInput.pattern = '^\\d{4}-\\d{2}-\\d{2}$';
-                                    dateInput.title = 'Format attendu : YYYY-MM-DD';
-                                    dateInput.id = 'modal_filter_date';
-                                    dateInput.dataset.key = 'createdAt';
-                                    dateInput.name = 'filter[createdAt]';
-                                    dateInput.className = 'input input-bordered w-full input-sm';
-                                    if (currentFilters && currentFilters.createdAt) { dateInput.value = formatDateYYYYMMDD(currentFilters.createdAt); }
-                                    rightDateWrap.appendChild(dateInput);
-                                    modalFilterValues.appendChild(rightDateWrap);
-                                }
-
-                                // keys as disabled inputs and corresponding filter inputs
-                                currentVisibleKeys.forEach((k) => {
-                                    if (modalFilterKeys) {
-                                        const leftWrap = document.createElement('div');
-                                        leftWrap.className = '';
-                                        const leftInput = document.createElement('input');
-                                        leftInput.type = 'text';
-                                        leftInput.disabled = true;
-                                        leftInput.className = 'input input-bordered w-full input-sm bg-base-100';
-                                        leftInput.value = activeTpl[k] || k;
-                                        leftWrap.appendChild(leftInput);
-                                        modalFilterKeys.appendChild(leftWrap);
-                                    }
-                                    if (modalFilterValues) {
-                                        const rightWrap = document.createElement('div');
-                                        rightWrap.className = '';
-                                        const input = document.createElement('input');
-                                        input.type = 'text';
-                                        input.dataset.key = k;
-                                        input.name = `filter[${k}]`;
-                                        input.className = 'input input-bordered w-full input-sm';
-                                        if (currentFilters && typeof currentFilters[k] !== 'undefined') { input.value = currentFilters[k]; }
-                                        rightWrap.appendChild(input);
-                                        modalFilterValues.appendChild(rightWrap);
-                                    }
+                                keysArr.forEach((key) => {
+                                    const td = this.renderCell(content[key]);
+                                    tr.appendChild(td);
                                 });
-
-                                // sync scroll between columns
-                                try {
-                                    modalFilterKeys.style.overflow = 'auto';
-                                    modalFilterKeys.style.maxHeight = '320px';
-                                    modalFilterValues.style.overflow = 'auto';
-                                    modalFilterValues.style.maxHeight = '320px';
-                                    let syncing = false;
-                                    modalFilterKeys.addEventListener('scroll', () => {
-                                        if (syncing) { return; }
-                                        syncing = true;
-                                        modalFilterValues.scrollTop = modalFilterKeys.scrollTop;
-                                        requestAnimationFrame(() => { syncing = false; });
-                                    });
-                                    modalFilterValues.addEventListener('scroll', () => {
-                                        if (syncing) { return; }
-                                        syncing = true;
-                                        modalFilterKeys.scrollTop = modalFilterValues.scrollTop;
-                                        requestAnimationFrame(() => { syncing = false; });
-                                    });
-                                } catch (e) { /* ignore */ }
                             }
 
-                            try { modalFilter.showModal(); } catch (e) { try { modalFilter.classList.remove('none'); } catch (err) { /* ignore */ } }
-                        };
-                        btnFilter.addEventListener('click', btnFilter._listener);
+                            // Action column
+                            const tdAction = document.createElement('th');
+                            tdAction.innerHTML = `
+                            <button class="btn btn-sm btn-neutral btn-outline btn-circle noo pt-[2px]">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </button>`;
+                            tr.appendChild(tdAction);
+
+                            this.bodyElement.appendChild(tr);
+                        });
                     }
 
-                    // Cancel: clear inputs, reset filters and reload
-                    if (modalFilterCancel) {
-                        modalFilterCancel.removeEventListener('click', modalFilterCancel._listener || (() => {}));
-                        modalFilterCancel._listener = (ev) => {
-                            ev.preventDefault();
-                            try {
-                                const d = document.getElementById('modal_filter_date');
-                                if (d) { d.value = ''; }
-                            } catch (e) { /* ignore */ }
-                            try {
-                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
-                                vals.forEach((inp) => { inp.value = ''; });
-                            } catch (e) { /* ignore */ }
-                            currentFilters = {};
-                            if (btnFilter) { btnFilter.classList.remove('btn-success'); btnFilter.classList.remove('btn-warning'); }
-                            try { modalFilter.close(); } catch (e) { try { modalFilter.classList.add('none'); } catch (err) { /* ignore */ } }
-                            try { fetchPage(1); } catch (e) { /* ignore */ }
-                        };
-                        modalFilterCancel.addEventListener('click', modalFilterCancel._listener);
+                    /**
+                     * Renders the complete table with pagination
+                     * @param {Array} pageItems - Items to display on current page
+                     * @param {string[]} keysArr - Array of column keys
+                     * @param {number} total - Total number of items
+                     */
+                    render(pageItems, keysArr, total) {
+                        const limit = this.selectLimit ? parseInt(this.selectLimit.value, 10) || 10 : 10;
+                        const maxPage = Math.max(1, Math.ceil((total || 0) / limit));
+
+                        if (this.currentPage > maxPage) {
+                            this.currentPage = maxPage;
+                        }
+
+                        // Clear and rebuild table
+                        if (this.headElement) {
+                            this.headElement.innerHTML = '';
+                        }
+                        if (this.bodyElement) {
+                            this.bodyElement.innerHTML = '';
+                        }
+
+                        this.buildHead(keysArr);
+                        this.buildRows(pageItems || [], keysArr);
+
+                        // Update table visibility
+                        if (total && total > 0) {
+                            if (tableActions) {
+                                tableActions.classList.remove('none');
+                            }
+                            if (this.tableElement) {
+                                this.tableElement.classList.remove('none');
+                            }
+                        } else {
+                            if (tableActions) {
+                                tableActions.classList.add('none');
+                            }
+                            if (this.tableElement) {
+                                this.tableElement.classList.add('none');
+                            }
+                        }
+
+                        // Update count display
+                        const countEl = document.getElementById('count_inbox');
+                        const shown = Array.isArray(pageItems) ? pageItems.length : 0;
+                        if (countEl) {
+                            countEl.textContent = (shown > 0 || (total && total > 0)) ? `${shown} sur ${total}` : '';
+                        }
+
+                        // Update pagination controls
+                        if (this.paginationElement) {
+                            const buttons = Array.from(this.paginationElement.querySelectorAll('button'));
+                            if (buttons[1]) {
+                                buttons[1].textContent = `${this.currentPage}`;
+                            }
+                            if (buttons[0]) {
+                                buttons[0].disabled = this.currentPage <= 1;
+                            }
+                            if (buttons[2]) {
+                                buttons[2].disabled = this.currentPage >= maxPage;
+                            }
+                        }
+                    }
+                    /**
+                     * Fetches and displays a specific page of inbox data
+                     * @param {number} page - Page number to fetch
+                     */
+                    fetchPage(page) {
+                        const limit = this.selectLimit ? parseInt(this.selectLimit.value, 10) || 10 : 10;
+                        const pageNumber = page && page > 0 ? page : 1;
+                        const offset = (pageNumber - 1) * limit;
+
+                        // Build URL with filters
+                        let url = `/form/${this.formId}/inbox?limit=${limit}&offset=${offset}`;
+
+                        try {
+                            if (tabState.filters && Object.keys(tabState.filters).length) {
+                                url += `&filters=${encodeURIComponent(JSON.stringify(tabState.filters))}`;
+                            }
+                        } catch (e) {
+                            // Ignore JSON errors
+                        }
+
+                        // Add cache-busting parameter
+                        url += `&_=${Date.now()}`;
+
+                        try {
+                            if (console && typeof console.debug === 'function') {
+                                console.debug('Fetching inbox', url, tabState.filters);
+                            }
+                        } catch (e) {
+                            // Ignore console errors
+                        }
+
+                        fetch(url, { credentials: 'same-origin' })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                const items = data.items || [];
+                                const total = parseInt(data.total, 10) || 0;
+                                this.currentPage = pageNumber;
+
+                                this.setupEventListeners(limit, total);
+                                this.render(items, this.visibleKeys, total);
+                            })
+                            .catch(() => {
+                                this.clear();
+                            });
                     }
 
-                    // Clear button: empty inputs but keep modal open
-                    if (modalFilterClear) {
-                        modalFilterClear.removeEventListener('click', modalFilterClear._listener || (() => {}));
-                        modalFilterClear._listener = (ev) => {
-                            ev.preventDefault();
-                            try {
-                                const d = document.getElementById('modal_filter_date');
-                                if (d) { d.value = ''; }
-                            } catch (e) { /* ignore */ }
-                            try {
-                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
-                                vals.forEach((inp) => { inp.value = ''; });
-                            } catch (e) { /* ignore */ }
-                        };
-                        modalFilterClear.addEventListener('click', modalFilterClear._listener);
-                    }
+                    /**
+                     * Sets up pagination and limit change event listeners
+                     * @param {number} limit - Current page size limit
+                     * @param {number} total - Total number of items
+                     */
+                    setupEventListeners(limit, total) {
+                        // Limit select change listener
+                        if (this.selectLimit) {
+                            this.selectLimit.removeEventListener('change', this.selectLimit._listener || (() => {}));
+                            this.selectLimit._listener = () => {
+                                this.fetchPage(1);
+                            };
+                            this.selectLimit.addEventListener('change', this.selectLimit._listener);
+                        }
 
-                    // Apply (form submit)
-                    if (modalFilterForm) {
-                        modalFilterForm.removeEventListener('submit', modalFilterForm._listener || (() => {}));
-                        modalFilterForm._listener = (ev) => {
-                            ev.preventDefault();
-                            const filters = {};
-                            try {
-                                const d = document.getElementById('modal_filter_date');
-                                if (d && d.value) { filters.createdAt = d.value; }
-                            } catch (e) { /* ignore */ }
-                            try {
-                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
-                                vals.forEach((inp) => {
-                                    const k = inp.dataset.key;
-                                    if (!k) { return; }
-                                    const v = inp.value ? String(inp.value).trim() : '';
-                                    if (v !== '') { filters[k] = v; }
-                                });
-                            } catch (e) { /* ignore */ }
-                            currentFilters = filters;
-                            try {
-                                if (btnFilter) {
-                                    if (currentFilters && Object.keys(currentFilters).length) {
-                                        btnFilter.classList.add('btn-success');
-                                        btnFilter.classList.remove('btn-warning');
-                                    } else {
-                                        btnFilter.classList.remove('btn-success');
-                                        btnFilter.classList.remove('btn-warning');
+                        // Pagination button listeners
+                        if (this.paginationElement) {
+                            const buttons = Array.from(this.paginationElement.querySelectorAll('button'));
+                            const [prevBtn, pageBtn, nextBtn] = buttons;
+
+                            if (prevBtn) {
+                                prevBtn.removeEventListener('click', prevBtn._listener || (() => {}));
+                                prevBtn._listener = (e) => {
+                                    e.preventDefault();
+                                    if (this.currentPage > 1) {
+                                        this.fetchPage(this.currentPage - 1);
                                     }
-                                }
-                            } catch (e) { /* ignore */ }
-                            try { modalFilter.close(); } catch (e) { modalFilter.classList.add('none'); }
-                            fetchPage(1);
-                        };
-                        modalFilterForm.addEventListener('submit', modalFilterForm._listener);
+                                };
+                                prevBtn.addEventListener('click', prevBtn._listener);
+                            }
+
+                            if (nextBtn) {
+                                nextBtn.removeEventListener('click', nextBtn._listener || (() => {}));
+                                nextBtn._listener = (e) => {
+                                    e.preventDefault();
+                                    const maxPage = Math.max(1, Math.ceil(total / limit));
+                                    if (this.currentPage < maxPage) {
+                                        this.fetchPage(this.currentPage + 1);
+                                    }
+                                };
+                                nextBtn.addEventListener('click', nextBtn._listener);
+                            }
+
+                            if (pageBtn) {
+                                pageBtn.textContent = String(this.currentPage);
+                            }
+                        }
                     }
-                } catch (e) { /* ignore missing DOM */ }
+                }
+
+                // Initialize and load inbox table
+                const inboxTable = new InboxTable(target.dataset.id, visibleKeys);
+                inboxTable.clear();
+                inboxTable.fetchPage(1);
+
+                /**
+                 * FilterModal - Manages filter modal and filtering logic
+                 */
+                class FilterModal {
+                    constructor(btnFilter, visibleKeys, inboxTable) {
+                        this.btnFilter = btnFilter;
+                        this.visibleKeys = visibleKeys;
+                        this.inboxTable = inboxTable;
+
+                        this.modal = document.getElementById('modal_filter');
+                        this.form = document.getElementById('modal_filter_form');
+                        this.keysContainer = document.getElementById('modal_filter_keys');
+                        this.valuesContainer = document.getElementById('modal_filter_values');
+                        this.cancelBtn = document.getElementById('modal_filter_cancel');
+                        this.clearBtn = document.getElementById('modal_filter_clear');
+
+                        this.initializeEventListeners();
+                    }
+
+                    /**
+                     * Sets up event listeners for filter modal
+                     */
+                    initializeEventListeners() {
+                        if (this.btnFilter) {
+                            this.btnFilter.removeEventListener('click', this.btnFilter._listener || (() => {}));
+                            this.btnFilter._listener = (ev) => {
+                                ev.preventDefault();
+                                this.open();
+                            };
+                            this.btnFilter.addEventListener('click', this.btnFilter._listener);
+                        }
+
+                        if (this.cancelBtn) {
+                            this.cancelBtn.removeEventListener('click', this.cancelBtn._listener || (() => {}));
+                            this.cancelBtn._listener = (ev) => {
+                                ev.preventDefault();
+                                this.cancelAndReset();
+                            };
+                            this.cancelBtn.addEventListener('click', this.cancelBtn._listener);
+                        }
+
+                        if (this.clearBtn) {
+                            this.clearBtn.removeEventListener('click', this.clearBtn._listener || (() => {}));
+                            this.clearBtn._listener = (ev) => {
+                                ev.preventDefault();
+                                this.clearInputs();
+                            };
+                            this.clearBtn.addEventListener('click', this.clearBtn._listener);
+                        }
+
+                        if (this.form) {
+                            this.form.removeEventListener('submit', this.form._listener || (() => {}));
+                            this.form._listener = (ev) => {
+                                ev.preventDefault();
+                                this.apply();
+                            };
+                            this.form.addEventListener('submit', this.form._listener);
+                        }
+                    }
+
+                    /**
+                     * Opens the filter modal and populates filter fields
+                     */
+                    open() {
+                        if (this.keysContainer) {
+                            this.keysContainer.innerHTML = '';
+                        }
+                        if (this.valuesContainer) {
+                            this.valuesContainer.innerHTML = '';
+                        }
+
+                        tabState.visibleKeys = (this.visibleKeys || []).slice();
+
+                        if (!tabState.visibleKeys || !tabState.visibleKeys.length) {
+                            if (this.keysContainer) {
+                                this.keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour filtrer.</p>';
+                            }
+                        } else {
+                            this.createDateFilter();
+                            this.createColumnFilters();
+                            this.setupScrollSync();
+                        }
+
+                        try {
+                            this.modal.showModal();
+                        } catch (e) {
+                            try {
+                                this.modal.classList.remove('none');
+                            } catch (err) {
+                                // Ignore errors
+                            }
+                        }
+                    }
+
+                    /**
+                     * Creates date filter input fields
+                     */
+                    createDateFilter() {
+                        if (this.keysContainer) {
+                            const leftDateWrap = document.createElement('div');
+                            leftDateWrap.className = '';
+                            const leftDateInput = document.createElement('input');
+                            leftDateInput.type = 'text';
+                            leftDateInput.disabled = true;
+                            leftDateInput.value = 'Date';
+                            leftDateInput.className = 'input input-bordered w-full input-sm bg-base-100';
+                            leftDateWrap.appendChild(leftDateInput);
+                            this.keysContainer.appendChild(leftDateWrap);
+                        }
+
+                        if (this.valuesContainer) {
+                            const rightDateWrap = document.createElement('div');
+                            rightDateWrap.className = '';
+                            const dateInput = document.createElement('input');
+                            dateInput.type = 'text';
+                            dateInput.placeholder = 'YYYY-MM-DD';
+                            dateInput.pattern = '^\\d{4}-\\d{2}-\\d{2}$';
+                            dateInput.title = 'Format attendu : YYYY-MM-DD';
+                            dateInput.id = 'modal_filter_date';
+                            dateInput.dataset.key = 'createdAt';
+                            dateInput.name = 'filter[createdAt]';
+                            dateInput.className = 'input input-bordered w-full input-sm';
+                            if (tabState.filters && tabState.filters.createdAt) {
+                                dateInput.value = DateFormatter.formatDateYYYYMMDD(tabState.filters.createdAt);
+                            }
+                            rightDateWrap.appendChild(dateInput);
+                            this.valuesContainer.appendChild(rightDateWrap);
+                        }
+                    }
+
+                    /**
+                     * Creates filter inputs for each visible column
+                     */
+                    createColumnFilters() {
+                        tabState.visibleKeys.forEach((key) => {
+                            if (this.keysContainer) {
+                                const leftWrap = document.createElement('div');
+                                leftWrap.className = '';
+                                const leftInput = document.createElement('input');
+                                leftInput.type = 'text';
+                                leftInput.disabled = true;
+                                leftInput.className = 'input input-bordered w-full input-sm bg-base-100';
+                                leftInput.value = tabState.template[key] || key;
+                                leftWrap.appendChild(leftInput);
+                                this.keysContainer.appendChild(leftWrap);
+                            }
+
+                            if (this.valuesContainer) {
+                                const rightWrap = document.createElement('div');
+                                rightWrap.className = '';
+                                const input = document.createElement('input');
+                                input.type = 'text';
+                                input.dataset.key = key;
+                                input.name = `filter[${key}]`;
+                                input.className = 'input input-bordered w-full input-sm';
+                                if (tabState.filters && typeof tabState.filters[key] !== 'undefined') {
+                                    input.value = tabState.filters[key];
+                                }
+                                rightWrap.appendChild(input);
+                                this.valuesContainer.appendChild(rightWrap);
+                            }
+                        });
+                    }
+
+                    /**
+                     * Synchronizes scroll between keys and values columns
+                     */
+                    setupScrollSync() {
+                        try {
+                            this.keysContainer.style.overflow = 'auto';
+                            this.keysContainer.style.maxHeight = '320px';
+                            this.valuesContainer.style.overflow = 'auto';
+                            this.valuesContainer.style.maxHeight = '320px';
+
+                            let syncing = false;
+
+                            this.keysContainer.addEventListener('scroll', () => {
+                                if (syncing) {
+                                    return;
+                                }
+                                syncing = true;
+                                this.valuesContainer.scrollTop = this.keysContainer.scrollTop;
+                                requestAnimationFrame(() => {
+                                    syncing = false;
+                                });
+                            });
+
+                            this.valuesContainer.addEventListener('scroll', () => {
+                                if (syncing) {
+                                    return;
+                                }
+                                syncing = true;
+                                this.keysContainer.scrollTop = this.valuesContainer.scrollTop;
+                                requestAnimationFrame(() => {
+                                    syncing = false;
+                                });
+                            });
+                        } catch (e) {
+                            // Ignore scroll sync errors
+                        }
+                    }
+
+                    /**
+                     * Clears all filter inputs
+                     */
+                    clearInputs() {
+                        try {
+                            const dateInput = document.getElementById('modal_filter_date');
+                            if (dateInput) {
+                                dateInput.value = '';
+                            }
+                        } catch (e) {
+                            // Ignore errors
+                        }
+
+                        try {
+                            const inputs = this.valuesContainer ? Array.from(this.valuesContainer.querySelectorAll('input[data-key]')) : [];
+                            inputs.forEach((input) => {
+                                input.value = '';
+                            });
+                        } catch (e) {
+                            // Ignore errors
+                        }
+                    }
+
+                    /**
+                     * Cancels filtering, resets filters and reloads data
+                     */
+                    cancelAndReset() {
+                        this.clearInputs();
+                        tabState.filters = {};
+
+                        if (this.btnFilter) {
+                            this.btnFilter.classList.remove('btn-success');
+                            this.btnFilter.classList.remove('btn-warning');
+                        }
+
+                        try {
+                            this.modal.close();
+                        } catch (e) {
+                            try {
+                                this.modal.classList.add('none');
+                            } catch (err) {
+                                // Ignore errors
+                            }
+                        }
+
+                        try {
+                            this.inboxTable.fetchPage(1);
+                        } catch (e) {
+                            // Ignore errors
+                        }
+                    }
+
+                    /**
+                     * Applies filters and reloads data
+                     */
+                    apply() {
+                        const filters = {};
+
+                        try {
+                            const dateInput = document.getElementById('modal_filter_date');
+                            if (dateInput && dateInput.value) {
+                                filters.createdAt = dateInput.value;
+                            }
+                        } catch (e) {
+                            // Ignore errors
+                        }
+
+                        try {
+                            const inputs = this.valuesContainer ? Array.from(this.valuesContainer.querySelectorAll('input[data-key]')) : [];
+                            inputs.forEach((input) => {
+                                const key = input.dataset.key;
+                                if (!key) {
+                                    return;
+                                }
+                                const value = input.value ? String(input.value).trim() : '';
+                                if (value !== '') {
+                                    filters[key] = value;
+                                }
+                            });
+                        } catch (e) {
+                            // Ignore errors
+                        }
+
+                        tabState.filters = filters;
+
+                        try {
+                            if (this.btnFilter) {
+                                if (tabState.filters && Object.keys(tabState.filters).length) {
+                                    this.btnFilter.classList.add('btn-success');
+                                    this.btnFilter.classList.remove('btn-warning');
+                                } else {
+                                    this.btnFilter.classList.remove('btn-success');
+                                    this.btnFilter.classList.remove('btn-warning');
+                                }
+                            }
+                        } catch (e) {
+                            // Ignore errors
+                        }
+
+                        try {
+                            this.modal.close();
+                        } catch (e) {
+                            this.modal.classList.add('none');
+                        }
+
+                        this.inboxTable.fetchPage(1);
+                    }
+                }
+
+                // Initialize filter modal
+                const btnFilter = columnsModal.btnFilter;
+                const _filterModal = new FilterModal(btnFilter, visibleKeys, inboxTable);
 
             } else {
                 // hide button and clear modal
