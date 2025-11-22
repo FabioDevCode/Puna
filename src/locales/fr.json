@@ -1,16 +1,39 @@
 {
+    "btn": {
+        "apply": "Appliquer",
+        "cancel": "Annuler",
+        "clear": "Vider",
+        "create": "Créer",
+        "new": "Nouveau"
+    },
     "error": {
         "404_message": "Cette page a peut-être pris des vacances…",
         "404_title": "Erreur 404 – Page disparue !",
         "return_to_home": "Retour à l'accueil"
     },
+    "filter": {
+        "description": "Saisissez des valeurs pour filtrer les colonnes affichées (conditions cumulatives AND).",
+        "title": "Filtrer les entrées"
+    },
+    "form": {
+        "code_label": "CODE :",
+        "copy_code": "Copier le code",
+        "copy_token": "Copier un token",
+        "label": "Formulaire"
+    },
     "menu": {
         "administration": "Administration",
         "dashboard": "Dashboard",
-        "logout":"Se déconnecter",
-        "website":"Site web"
+        "logout": "Se déconnecter",
+        "website": "Site web"
     },
     "misc": {
         "beta_version": "beta-0.0.1"
+    },
+    "site": {
+        "create_help": "253 caractères maximum.",
+        "create_title": "Créer un nouveau site",
+        "domain_placeholder": "Nom de domaine",
+        "exists_error": "Un site avec ce domaine existe déjà."
     }
 }

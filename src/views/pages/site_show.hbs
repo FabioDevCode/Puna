@@ -24,17 +24,18 @@
 <div class="flex items-start flex-wrap justify-between gap-6 h-max col-span-2 md:col-span-6 lg:col-span-12">
     <div class="flex flex-wrap gap-2 col-span-2 md:col-span-3 lg:col-span-6">
         <div id="info_form_panel" class="w-full min-h-[72px] flex flex-col items-start justify-start gap-1 col-span-2 md:col-span-3 lg:col-span-6">
-            <div class="w-full min-h-[36px] flex items-center justify-start gap-3">
-                <h4 class="text-2xl font-bold mt-1 opacity-25" id="info_form_name">
+            <div class="w-full min-h-[36px] flex items-center justify-start gap-1">
+                <h4 class="text-2xl font-bold opacity-25" id="info_form_name">
                     Formulaire
                 </h4>
-
+                <div class="divider divider-horizontal mx-0 py-3"></div>
                 {{> _ui/delete_form }}
             </div>
 
-            <div class="flex min-h-[36px] jutify-center items-center gap-2 opacity-25" id="info_form_code_wrap">
-                <strong class="mt-1 select-none">CODE :</strong>
-                <p id="info_form_code" class="mt-1"></p>
+            <div id="info_form_code_wrap" class="flex min-h-[36px] jutify-center items-center gap-1 opacity-25">
+                <strong class="select-none">CODE :</strong>
+                <p id="info_form_code"></p>
+                <div class="divider divider-horizontal mx-0 py-3"></div>
                 <button id="btn_copy_code" class="btn btn-sm btn-outline none">
                     <i class="fa-solid fa-clone"></i>
                     <span class="hidden md:flex">
@@ -83,12 +84,12 @@
                 <option value="50">50</option>
                 <option value="100">100</option>
             </select>
-            <div id="count_inbox" class="text-sm w-max"></div>
+            <div id="count_inbox" class="text-sm w-[92px]"></div>
         </div>
 
         <div id="paginationTable" class="join">
             <button class="join-item btn btn-sm">«</button>
-            <button class="join-item btn btn-sm">1</button>
+            <button class="join-item btn btn-sm w-[34px] no-activate">1</button>
             <button class="join-item btn btn-sm">»</button>
         </div>
 

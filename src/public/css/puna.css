@@ -159,6 +159,24 @@ h3 {
     }
 }
 
+.no-activate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0px;
+}
+
+.no-activate,
+.no-activate:hover {
+    cursor: initial;
+    background-color: #E7E8E7 !important;
+}
+
+.no-activate:active {
+    transform: scale(1) !important;
+}
+
 .bg-neutral {
     color: whitesmoke;
 }

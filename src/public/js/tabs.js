@@ -81,16 +81,13 @@ class DateFormatter {
         }
         try {
             const d = (value instanceof Date) ? value : new Date(value);
-            if (Number.isNaN(d.getTime())) {
-                return String(value);
-            }
-            const year = d.getFullYear();
-            const month = this.pad2(d.getMonth() + 1);
-            const day = this.pad2(d.getDate());
-            const hours = this.pad2(d.getHours());
-            const minutes = this.pad2(d.getMinutes());
-            const seconds = this.pad2(d.getSeconds());
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            if (Number.isNaN(d.getTime())) {return String(value);}
+            return `
+                <div class="flex flex-wrap gap-1">
+                    <p class="w-max">${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}&nbsp;</p>
+                    <p class="w-max">${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}</p>
+                </div>
+            `;
         } catch (e) {
             return String(value);
         }
@@ -297,6 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = e.target.closest('[role="tab"], .tab');
             if (!target || !tabList.contains(target)) {return;}
             e.preventDefault();
+
+            resetFilter();
 
             const tabs = Array.from(tabList.querySelectorAll('[role="tab"], .tab'));
             tabs.forEach((t) => {
