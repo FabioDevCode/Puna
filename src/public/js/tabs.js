@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // Date label left (disabled input) and date input right
                                 if (modalFilterKeys) {
                                     const leftDateWrap = document.createElement('div');
-                                    leftDateWrap.className = 'py-1';
+                                    leftDateWrap.className = '';
                                     const leftDateInput = document.createElement('input');
                                     leftDateInput.type = 'text';
                                     leftDateInput.disabled = true;
@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                                 if (modalFilterValues) {
                                     const rightDateWrap = document.createElement('div');
-                                    rightDateWrap.className = 'py-1';
+                                    rightDateWrap.className = '';
                                     const dateInput = document.createElement('input');
                                     dateInput.type = 'text';
                                     dateInput.placeholder = 'YYYY-MM-DD';
@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 currentVisibleKeys.forEach((k) => {
                                     if (modalFilterKeys) {
                                         const leftWrap = document.createElement('div');
-                                        leftWrap.className = 'py-1';
+                                        leftWrap.className = '';
                                         const leftInput = document.createElement('input');
                                         leftInput.type = 'text';
                                         leftInput.disabled = true;
@@ -552,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     }
                                     if (modalFilterValues) {
                                         const rightWrap = document.createElement('div');
-                                        rightWrap.className = 'py-1';
+                                        rightWrap.className = '';
                                         const input = document.createElement('input');
                                         input.type = 'text';
                                         input.dataset.key = k;

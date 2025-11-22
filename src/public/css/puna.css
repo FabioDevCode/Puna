@@ -295,3 +295,8 @@ h3 {
 #statTopTable {
     border-radius: 10px;
 }
+
+#modal_filter_keys input {
+    color: #686868;
+    text-align: right;
+}
