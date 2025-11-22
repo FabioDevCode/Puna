@@ -11,7 +11,8 @@
         "eslint:recommended"
     ],
     "plugins": [
-        "import"
+        "import",
+        "jsonc"
     ],
     "rules": {
         "indent": ["error", 4, {
@@ -95,6 +96,32 @@
                 "import/order": "off",
                 "import/newline-after-import": "off",
                 "no-inner-declarations": "off"
+            }
+        },
+        {
+            "files": ["package.json", "package-lock.json"],
+            "parser": "jsonc-eslint-parser",
+            "plugins": ["jsonc"],
+            "rules": {
+                "jsonc/sort-keys": "off",
+                "jsonc/indent": ["error", "tab"]
+            }
+        },
+        {
+            "files": ["*.json", "**/*.json"],
+            "excludedFiles": ["package.json", "package-lock.json"],
+            "parser": "jsonc-eslint-parser",
+            "plugins": ["jsonc"],
+            "rules": {
+                "jsonc/sort-keys": [
+                    "error",
+                    "asc",
+                    {
+                        "caseSensitive": false,
+                        "natural": true
+                    }
+                ],
+                "jsonc/indent": ["error", 4]
             }
         }
     ]

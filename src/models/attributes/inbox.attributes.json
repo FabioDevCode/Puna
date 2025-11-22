@@ -1,12 +1,12 @@
 {
-    "id": {
-        "type": "UUID",
-		"allowNull": false,
-		"unique": true,
-		"primaryKey": true
-    },
     "content": {
-        "type": "LONGTEXT",
-        "allowNull": false
+        "allowNull": false,
+        "type": "LONGTEXT"
+    },
+    "id": {
+        "allowNull": false,
+        "primaryKey": true,
+        "type": "UUID",
+        "unique": true
     }
 }

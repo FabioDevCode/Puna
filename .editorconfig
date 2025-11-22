@@ -1,0 +1,18 @@
+root = true
+
+[*.{js,mjs,cjs,ts,jsx,tsx,json,hbs}]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+[*.json]
+indent_style = tab
+indent_size = 4
+
+[package.json]
+indent_style = tab
+tab_width = 4
+
+[package-lock.json]
+indent_style = tab
+tab_width = 4

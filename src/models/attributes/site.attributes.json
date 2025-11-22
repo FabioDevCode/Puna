@@ -1,16 +1,16 @@
 {
-    "id": {
-        "type": "UUID",
-		"allowNull": false,
-		"unique": true,
-		"primaryKey": true
+    "control_code": {
+        "allowNull": false,
+        "type": "STRING(100)"
     },
     "domain": {
-        "type": "STRING",
-        "allowNull": false
+        "allowNull": false,
+        "type": "STRING"
     },
-    "control_code": {
-        "type": "STRING(100)",
-        "allowNull": false
+    "id": {
+        "allowNull": false,
+        "primaryKey": true,
+        "type": "UUID",
+        "unique": true
     }
 }

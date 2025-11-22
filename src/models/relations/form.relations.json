@@ -1,8 +1,8 @@
 [
     {
-		"relation": "belongsTo",
-		"target": "site",
-		"foreignKey": "fk_id_site",
-		"as": "site"
-	}
+        "as": "site",
+        "foreignKey": "fk_id_site",
+        "relation": "belongsTo",
+        "target": "site"
+    }
 ]
