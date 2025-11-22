@@ -1,0 +1,28 @@
+<dialog id="modal_filter" class="modal">
+    <form method="dialog" id="modal_filter_form" class="modal-box w-11/12 max-w-3xl">
+        <h3 class="font-bold text-lg">Filtrer les entrées</h3>
+        <p class="py-2 text-sm text-muted">Saisissez des valeurs pour filtrer les colonnes affichées (conditions cumulatives AND).</p>
+
+
+
+        <div id="modal_filter_body" class="grid grid-cols-2 gap-4 mt-4">
+            <div class="col-span-2">
+                <div class="max-h-64 overflow-auto grid grid-cols-2 gap-4">
+
+                    <div id="modal_filter_keys" class="space-y-2 py-2 px-2">
+                        <!-- left column: keys (populated by JS). Date label injected by JS -->
+                    </div>
+                    <div id="modal_filter_values" class="space-y-2 py-2 px-2">
+                        <!-- right column: inputs (populated by JS). Date input injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-action mt-4">
+            <button id="modal_filter_cancel" class="btn btn-sm">Annuler</button>
+            <button id="modal_filter_clear" type="button" class="btn btn-sm btn-error">Vider</button>
+            <button id="modal_filter_apply" type="submit" class="btn btn-sm btn-success">Appliquer</button>
+        </div>
+    </form>
+</dialog>

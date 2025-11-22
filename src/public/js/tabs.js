@@ -43,6 +43,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Format a date value as YYYY-MM-DD for the date input
+    function formatDateYYYYMMDD(value) {
+        if (!value && value !== 0) { return ''; }
+        try {
+            const d = (value instanceof Date) ? value : new Date(value);
+            if (Number.isNaN(d.getTime())) { return String(value); }
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        } catch (e) { return String(value); }
+    }
+
     const tabLists = document.querySelectorAll('.tabs');
     const tableActions = document.getElementById('tableActions');
 
@@ -50,8 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeKeys = [];
     let activeColumns = null;
     let activeFormId = null;
+    let currentVisibleKeys = [];
+    let currentFilters = {};
 
     const btnColumns = document.getElementById('btn_columns');
+    const btnFilter = document.getElementById('filtreTableBtn');
     const modalColumns = document.getElementById('modal_columns');
     const modalColumnsList = document.getElementById('modal_columns_list');
     const modalColumnsForm = document.getElementById('modal_columns_form');
@@ -404,8 +417,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const limit = selectLimit ? parseInt(selectLimit.value, 10) || 10 : 10;
                     const p = page && page > 0 ? page : 1;
                     const offset = (p - 1) * limit;
+                    // build url and include filters if any
+                    let url = `/form/${target.dataset.id}/inbox?limit=${limit}&offset=${offset}`;
+                    try {
+                        if (currentFilters && Object.keys(currentFilters).length) {
+                            url += `&filters=${encodeURIComponent(JSON.stringify(currentFilters))}`;
+                        }
+                    } catch (e) { /* ignore */ }
+                    // anti-cache
+                    url += `&_=${Date.now()}`;
 
-                    fetch(`/form/${target.dataset.id}/inbox?limit=${limit}&offset=${offset}`, { credentials: 'same-origin' })
+                    try { if (console && typeof console.debug === 'function') { console.debug('Fetching inbox', url, currentFilters); } } catch (e) { /* ignore */ }
+
+                    fetch(url, { credentials: 'same-origin' })
                         .then((r) => r.json())
                         .then((data) => {
                             const items = data.items || [];
@@ -459,6 +483,189 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // initial load
                 fetchPage(1);
+
+                // =====================
+                // Filter modal logic
+                // =====================
+                try {
+                    const modalFilter = document.getElementById('modal_filter');
+                    const modalFilterForm = document.getElementById('modal_filter_form');
+                    const modalFilterKeys = document.getElementById('modal_filter_keys');
+                    const modalFilterValues = document.getElementById('modal_filter_values');
+                    const modalFilterCancel = document.getElementById('modal_filter_cancel');
+                    const modalFilterClear = document.getElementById('modal_filter_clear');
+
+                    if (btnFilter) {
+                        btnFilter.removeEventListener('click', btnFilter._listener || (() => {}));
+                        btnFilter._listener = (ev) => {
+                            ev.preventDefault();
+                            if (modalFilterKeys) { modalFilterKeys.innerHTML = ''; }
+                            if (modalFilterValues) { modalFilterValues.innerHTML = ''; }
+
+                            // prepare visible keys snapshot
+                            currentVisibleKeys = (visibleKeys || []).slice();
+
+                            if (!currentVisibleKeys || !currentVisibleKeys.length) {
+                                if (modalFilterKeys) { modalFilterKeys.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour filtrer.</p>'; }
+                            } else {
+                                // Date label left (disabled input) and date input right
+                                if (modalFilterKeys) {
+                                    const leftDateWrap = document.createElement('div');
+                                    leftDateWrap.className = 'py-1';
+                                    const leftDateInput = document.createElement('input');
+                                    leftDateInput.type = 'text';
+                                    leftDateInput.disabled = true;
+                                    leftDateInput.value = 'Date';
+                                    leftDateInput.className = 'input input-bordered w-full input-sm bg-base-100';
+                                    leftDateWrap.appendChild(leftDateInput);
+                                    modalFilterKeys.appendChild(leftDateWrap);
+                                }
+                                if (modalFilterValues) {
+                                    const rightDateWrap = document.createElement('div');
+                                    rightDateWrap.className = 'py-1';
+                                    const dateInput = document.createElement('input');
+                                    dateInput.type = 'text';
+                                    dateInput.placeholder = 'YYYY-MM-DD';
+                                    dateInput.pattern = '^\\d{4}-\\d{2}-\\d{2}$';
+                                    dateInput.title = 'Format attendu : YYYY-MM-DD';
+                                    dateInput.id = 'modal_filter_date';
+                                    dateInput.dataset.key = 'createdAt';
+                                    dateInput.name = 'filter[createdAt]';
+                                    dateInput.className = 'input input-bordered w-full input-sm';
+                                    if (currentFilters && currentFilters.createdAt) { dateInput.value = formatDateYYYYMMDD(currentFilters.createdAt); }
+                                    rightDateWrap.appendChild(dateInput);
+                                    modalFilterValues.appendChild(rightDateWrap);
+                                }
+
+                                // keys as disabled inputs and corresponding filter inputs
+                                currentVisibleKeys.forEach((k) => {
+                                    if (modalFilterKeys) {
+                                        const leftWrap = document.createElement('div');
+                                        leftWrap.className = 'py-1';
+                                        const leftInput = document.createElement('input');
+                                        leftInput.type = 'text';
+                                        leftInput.disabled = true;
+                                        leftInput.className = 'input input-bordered w-full input-sm bg-base-100';
+                                        leftInput.value = activeTpl[k] || k;
+                                        leftWrap.appendChild(leftInput);
+                                        modalFilterKeys.appendChild(leftWrap);
+                                    }
+                                    if (modalFilterValues) {
+                                        const rightWrap = document.createElement('div');
+                                        rightWrap.className = 'py-1';
+                                        const input = document.createElement('input');
+                                        input.type = 'text';
+                                        input.dataset.key = k;
+                                        input.name = `filter[${k}]`;
+                                        input.className = 'input input-bordered w-full input-sm';
+                                        if (currentFilters && typeof currentFilters[k] !== 'undefined') { input.value = currentFilters[k]; }
+                                        rightWrap.appendChild(input);
+                                        modalFilterValues.appendChild(rightWrap);
+                                    }
+                                });
+
+                                // sync scroll between columns
+                                try {
+                                    modalFilterKeys.style.overflow = 'auto';
+                                    modalFilterKeys.style.maxHeight = '320px';
+                                    modalFilterValues.style.overflow = 'auto';
+                                    modalFilterValues.style.maxHeight = '320px';
+                                    let syncing = false;
+                                    modalFilterKeys.addEventListener('scroll', () => {
+                                        if (syncing) { return; }
+                                        syncing = true;
+                                        modalFilterValues.scrollTop = modalFilterKeys.scrollTop;
+                                        requestAnimationFrame(() => { syncing = false; });
+                                    });
+                                    modalFilterValues.addEventListener('scroll', () => {
+                                        if (syncing) { return; }
+                                        syncing = true;
+                                        modalFilterKeys.scrollTop = modalFilterValues.scrollTop;
+                                        requestAnimationFrame(() => { syncing = false; });
+                                    });
+                                } catch (e) { /* ignore */ }
+                            }
+
+                            try { modalFilter.showModal(); } catch (e) { try { modalFilter.classList.remove('none'); } catch (err) { /* ignore */ } }
+                        };
+                        btnFilter.addEventListener('click', btnFilter._listener);
+                    }
+
+                    // Cancel: clear inputs, reset filters and reload
+                    if (modalFilterCancel) {
+                        modalFilterCancel.removeEventListener('click', modalFilterCancel._listener || (() => {}));
+                        modalFilterCancel._listener = (ev) => {
+                            ev.preventDefault();
+                            try {
+                                const d = document.getElementById('modal_filter_date');
+                                if (d) { d.value = ''; }
+                            } catch (e) { /* ignore */ }
+                            try {
+                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
+                                vals.forEach((inp) => { inp.value = ''; });
+                            } catch (e) { /* ignore */ }
+                            currentFilters = {};
+                            if (btnFilter) { btnFilter.classList.remove('btn-success'); btnFilter.classList.remove('btn-warning'); }
+                            try { modalFilter.close(); } catch (e) { try { modalFilter.classList.add('none'); } catch (err) { /* ignore */ } }
+                            try { fetchPage(1); } catch (e) { /* ignore */ }
+                        };
+                        modalFilterCancel.addEventListener('click', modalFilterCancel._listener);
+                    }
+
+                    // Clear button: empty inputs but keep modal open
+                    if (modalFilterClear) {
+                        modalFilterClear.removeEventListener('click', modalFilterClear._listener || (() => {}));
+                        modalFilterClear._listener = (ev) => {
+                            ev.preventDefault();
+                            try {
+                                const d = document.getElementById('modal_filter_date');
+                                if (d) { d.value = ''; }
+                            } catch (e) { /* ignore */ }
+                            try {
+                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
+                                vals.forEach((inp) => { inp.value = ''; });
+                            } catch (e) { /* ignore */ }
+                        };
+                        modalFilterClear.addEventListener('click', modalFilterClear._listener);
+                    }
+
+                    // Apply (form submit)
+                    if (modalFilterForm) {
+                        modalFilterForm.removeEventListener('submit', modalFilterForm._listener || (() => {}));
+                        modalFilterForm._listener = (ev) => {
+                            ev.preventDefault();
+                            const filters = {};
+                            try {
+                                const d = document.getElementById('modal_filter_date');
+                                if (d && d.value) { filters.createdAt = d.value; }
+                            } catch (e) { /* ignore */ }
+                            try {
+                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
+                                vals.forEach((inp) => {
+                                    const k = inp.dataset.key;
+                                    if (!k) { return; }
+                                    const v = inp.value ? String(inp.value).trim() : '';
+                                    if (v !== '') { filters[k] = v; }
+                                });
+                            } catch (e) { /* ignore */ }
+                            currentFilters = filters;
+                            try {
+                                if (btnFilter) {
+                                    if (currentFilters && Object.keys(currentFilters).length) {
+                                        btnFilter.classList.add('btn-success');
+                                        btnFilter.classList.remove('btn-warning');
+                                    } else {
+                                        btnFilter.classList.remove('btn-success');
+                                        btnFilter.classList.remove('btn-warning');
+                                    }
+                                }
+                            } catch (e) { /* ignore */ }
+                            try { modalFilter.close(); } catch (e) { modalFilter.classList.add('none'); }
+                            fetchPage(1);
+                        };
+                        modalFilterForm.addEventListener('submit', modalFilterForm._listener);
+                    }
+                } catch (e) { /* ignore missing DOM */ }
 
             } else {
                 // hide button and clear modal

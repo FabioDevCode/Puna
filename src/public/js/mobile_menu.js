@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let bestMatch = null;
         let bestScore = -1;
 
-        console.log(anchors);
-
         anchors.forEach(a => {
             const href = a.getAttribute('href');
             if (!href) {return;}
@@ -51,8 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         anchors.forEach(a => {
             a.classList.remove('active_mm');
         });
-
-        console.log(bestMatch);
 
         // Apply active classes to bestMatch anchor (background on the <a> element)
         if (bestMatch) {

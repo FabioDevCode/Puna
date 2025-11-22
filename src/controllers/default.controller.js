@@ -350,8 +350,42 @@ export const getFormInbox = async (req, res) => {
         const limit = allowedLimits.includes(limitRaw) ? limitRaw : 10;
         const offset = !Number.isNaN(offsetRaw) && offsetRaw >= 0 ? offsetRaw : 0;
 
+        // support JSON filters passed as query param 'filters' (JSON encoded object)
+        let whereClause = { fk_id_form: formId };
+        try {
+            if (req.query && req.query.filters) {
+                const parsed = JSON.parse(req.query.filters);
+                if (parsed && typeof parsed === 'object' && Object.keys(parsed).length) {
+                    const conditions = [];
+                    const Sequelize = models.Sequelize;
+                    for (const [k, v] of Object.entries(parsed)) {
+                        if (v === null || typeof v === 'undefined' || String(v).trim() === '') {continue;}
+                        if (k === 'createdAt') {
+                            // filter by date (YYYY-MM-DD) on createdAt using DATE(createdAt) = 'YYYY-MM-DD'
+                            conditions.push(Sequelize.where(Sequelize.fn('DATE', Sequelize.col('createdAt')), String(v)));
+                        } else {
+                            // contains match on JSON stringified field
+                            const Op = Sequelize.Op;
+                            const expr = Sequelize.where(
+                                Sequelize.fn('JSON_UNQUOTE', Sequelize.fn('JSON_EXTRACT', Sequelize.col('content'), Sequelize.literal(`'$.${k}'`))),
+                                { [Op.like]: `%${String(v)}%` }
+                            );
+                            conditions.push(expr);
+                        }
+                    }
+                    if (conditions.length) {
+                        const Op = Sequelize.Op;
+                        whereClause = { [Op.and]: [ { fk_id_form: formId }, ...conditions ] };
+                    }
+                }
+            }
+        } catch (e) {
+            // ignore malformed filters and fallback to no filter
+            whereClause = { fk_id_form: formId };
+        }
+
         const result = await models.Inbox.findAndCountAll({
-            where: { fk_id_form: formId },
+            where: whereClause,
             order: [['createdAt', 'DESC']],
             limit,
             offset,

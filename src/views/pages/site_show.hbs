@@ -46,6 +46,7 @@
     </div>
 
     {{> _ui/form_template_modal }}
+    {{> _ui/form_filter_modal }}
 </div>
 
 <div class="flex items-start items-center justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
@@ -92,7 +93,7 @@
         </div>
 
         <div id="tableBtns" class="flex gap-2">
-            <button class="btn btn-sm">
+            <button id="filtreTableBtn" class="btn btn-sm">
                 <i class="fa-solid fa-filter"></i>
                 <span class="hidden md:flex">
                     Filtre
