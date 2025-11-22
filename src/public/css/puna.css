@@ -291,3 +291,7 @@ h3 {
     height: 100%;
 }
 
+#tableTopContainer,
+#statTopTable {
+    border-radius: 10px;
+}

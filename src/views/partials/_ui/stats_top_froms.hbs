@@ -1,4 +1,4 @@
-<div id="statTopFroms" class="bg-secondary-content h-[350px] flex flex-col gap-4 p-4 items-between justify-between stats-item stats-item--top-froms">
+<div id="statTopFroms" class="bg-secondary-content h-full w-full flex flex-col gap-4 p-4 justify-between stats-item flex-1">
     <div class="flex items-center justify-between w-full">
         <div class="text-sm font-semibold select-none">Top 5 formulaires</div>
         <select id="statTop_range" class="select select-sm select-bordered select-secondary">
@@ -7,8 +7,8 @@
         </select>
     </div>
 
-    <div class="overflow-auto w-full">
-        <table class="table w-full rounded-md bg-base-100">
+    <div id="tableTopContainer" class="overflow-x-auto w-full border border-base-200">
+        <table id="statTopTable" class="table w-full table-pin-cols bg-base-100">
             <thead>
                 <tr>
                     <th>#</th>
