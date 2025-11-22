@@ -79,10 +79,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderChart(resp.hours || [], resp.series || []);
     }
 
-    load(30);
+    // Load default: 7 derniers jours
+    load(7);
 
     range.addEventListener('change', (e) => {
-        const val = parseInt(e.target.value, 10) || 30;
+        const val = parseInt(e.target.value, 10) || 7;
         load(val);
     });
 });

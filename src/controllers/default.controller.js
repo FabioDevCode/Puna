@@ -620,8 +620,8 @@ export const getInboxCountsBySite = async (req, res) => {
 
 export const getInboxHeatmap = async (req, res) => {
     const userId = req.session.user?.id;
-    const daysRaw = parseInt(req.query.days, 10) || 30;
-    const days = [30, 90, 180].includes(daysRaw) ? daysRaw : 30;
+    const daysRaw = parseInt(req.query.days, 10) || 7;
+    const days = [7, 30, 90, 180].includes(daysRaw) ? daysRaw : 7;
 
     try {
         const end = new Date();
