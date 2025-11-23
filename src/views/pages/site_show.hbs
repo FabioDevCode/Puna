@@ -1,29 +1,30 @@
 {{#slot "title"}}
-    <h3 class="font-inter truncate ellipsis-truncate title-max-w">
-        {{site.domain}}
-    </h3>
+<h3 class="font-inter truncate ellipsis-truncate title-max-w">
+    {{site.domain}}
+</h3>
 {{/slot}}
 
 {{#slot "buttons"}}
-    <button id="btn_copy_token" class="btn btn-sm btn-outline" data-site-id="{{site.id}}">
-        <i class="fa-solid fa-clone"></i>
-        <span class="hidden md:flex">
-            Copier un token
-        </span>
-    </button>
+<button id="btn_copy_token" class="btn btn-sm btn-outline" data-site-id="{{site.id}}">
+    <i class="fa-solid fa-clone"></i>
+    <span class="hidden md:flex">
+        Copier un token
+    </span>
+</button>
 
-    {{> _ui/btn_revoke_tokens id=site.id }}
+{{> _ui/btn_revoke_tokens id=site.id }}
 
-    {{> _ui/delete_site
-        id=site.id
-        domain=site.domain
-    }}
+{{> _ui/delete_site
+id=site.id
+domain=site.domain
+}}
 {{/slot}}
 
 
 <div class="flex items-start flex-wrap justify-between gap-6 h-max col-span-2 md:col-span-6 lg:col-span-12">
     <div class="flex flex-wrap gap-2 col-span-2 md:col-span-3 lg:col-span-6">
-        <div id="info_form_panel" class="w-full min-h-[72px] flex flex-col items-start justify-start gap-1 col-span-2 md:col-span-3 lg:col-span-6">
+        <div id="info_form_panel"
+            class="w-full min-h-[72px] flex flex-col items-start justify-start gap-1 col-span-2 md:col-span-3 lg:col-span-6">
             <div class="w-full min-h-[36px] flex items-center justify-start gap-1">
                 <h4 class="text-2xl font-bold opacity-25" id="info_form_name">
                     Formulaire
@@ -48,29 +49,33 @@
 
     {{> _ui/form_template_modal }}
     {{> _ui/form_filter_modal }}
+
+    {{> _ui/modal_delete_inbox }}
 </div>
 
-<div class="flex items-start items-center justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
+<div
+    class="flex items-start items-center justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
     {{#if forms}}
-        <div class="flex items-center gap-0 w-full">
-            <div role="tablist" class="tabs tabs-boxed flex flex-wrap">
-                {{#each forms}}
-                    <a role="tab" class="tab {{#if is_active}}tab-active{{/if}}" data-id="{{this.id}}" data-code="{{this.code}}" data-name="{{this.name}}" data-template='{{this.template}}' data-columns='{{this.columns}}'>
-                        {{this.name}}
-                    </a>
-                {{/each}}
-            </div>
-            <div class="divider divider-horizontal mx-0 py-3"></div>
-            {{> _ui/btn_new_form
-                id=site.id
-            }}
+    <div class="flex items-center gap-0 w-full">
+        <div role="tablist" class="tabs tabs-boxed flex flex-wrap">
+            {{#each forms}}
+            <a role="tab" class="tab {{#if is_active}}tab-active{{/if}}" data-id="{{this.id}}" data-code="{{this.code}}"
+                data-name="{{this.name}}" data-template='{{this.template}}' data-columns='{{this.columns}}'>
+                {{this.name}}
+            </a>
+            {{/each}}
         </div>
+        <div class="divider divider-horizontal mx-0 py-3"></div>
+        {{> _ui/btn_new_form
+        id=site.id
+        }}
+    </div>
     {{else}}
-        <div class="col-12 flex justify-center items-center gap-2">
-            {{> _ui/btn_new_form
-                id=site.id
-            }}
-        </div>
+    <div class="col-12 flex justify-center items-center gap-2">
+        {{> _ui/btn_new_form
+        id=site.id
+        }}
+    </div>
     {{/if}}
 </div>
 

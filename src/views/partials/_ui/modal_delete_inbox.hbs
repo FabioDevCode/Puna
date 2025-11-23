@@ -1,0 +1,18 @@
+<!-- Modal de suppression d'inbox -->
+<dialog id="modal_delete_inbox" class="modal">
+    <div class="modal-box w-11/12 md:w-6/12 lg:w-5/12">
+        <h3 class="font-bold text-lg">Confirmer la suppression</h3>
+        <p class="py-4">Êtes-vous sûr de vouloir supprimer cette entrée inbox ? Cette action est irréversible.</p>
+
+        <form id="formDeleteInbox" action="" method="post" class="hidden">
+            <input type="hidden" name="inbox_id" id="inbox_delete_id" value="" />
+        </form>
+
+        <div class="modal-action mt-2">
+            <form method="dialog">
+                <button class="btn btn-sm">Annuler</button>
+            </form>
+            <button type="submit" form="formDeleteInbox" class="btn btn-sm btn-error">Supprimer</button>
+        </div>
+    </div>
+</dialog>

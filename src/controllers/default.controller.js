@@ -954,6 +954,57 @@ export const showInbox = async (req, res) => {
     }
 };
 
+export const deleteInbox = async (req, res) => {
+    const inboxId = req.params.id;
+    const userId = req.session.user?.id;
+
+    try {
+        const inbox = await models.Inbox.findByPk(inboxId, {
+            include: [{
+                model: models.Form,
+                as: 'form',
+                include: [{
+                    model: models.Site,
+                    as: 'site',
+                    where: { fk_id_user: userId }
+                }]
+            }]
+        });
+
+        if (!inbox) {
+            return res.redirect('/dashboard');
+        }
+
+        const form = inbox.form;
+        const site = form?.site;
+
+        if (!site) {
+            return res.redirect('/dashboard');
+        }
+
+        const siteId = site.id;
+        const formName = form.name;
+
+        // Delete the inbox entry
+        await inbox.destroy();
+
+        // Check if redirect should go to site page or stay on current page
+        const redirectType = req.query.redirect || 'site';
+
+        if (redirectType === 'site') {
+            // Get formName from query if provided
+            const queryFormName = req.query.formName || formName;
+            return res.redirect(`/site/${siteId}?f=${encodeURIComponent(queryFormName)}`);
+        } else {
+            // Default redirect to site page
+            return res.redirect(`/site/${siteId}?f=${encodeURIComponent(formName)}`);
+        }
+    } catch (err) {
+        console.error(err);
+        return res.redirect('/dashboard');
+    }
+};
+
 export const allSite = async (req, res) => {
     try {
         const userId = req.session.user?.id;

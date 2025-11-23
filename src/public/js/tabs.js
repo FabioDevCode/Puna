@@ -400,14 +400,34 @@ document.addEventListener('DOMContentLoaded', () => {
                         tdAct.innerHTML = `
                         <div class="flex gap-2 w-max">
                             <a href="/inbox/${it.id}" class="btn btn-sm btn-outline btn-circle noo pt-[2px]">
-                                <i class="fa-solid fa-eye"></i>
+                                <i class="fa-regular fa-eye"></i>
                             </a>
-                            <button class="btn btn-sm btn-error btn-outline btn-circle noo pt-[2px]">
-                                <i class="fa-solid fa-trash-can"></i>
+                            <button class="btn btn-sm btn-error btn-outline btn-circle noo pt-[2px] btn-delete-inbox" data-inbox-id="${it.id}" data-form-name="${target.dataset.name || ''}">
+                                <i class="fa-regular fa-trash-can"></i>
                             </button>
                         </div>
                         `;
                         tr.appendChild(tdAct);
+
+                        // Add event listener for delete button
+                        const deleteBtn = tdAct.querySelector('.btn-delete-inbox');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                const inboxId = deleteBtn.dataset.inboxId;
+                                const formName = deleteBtn.dataset.formName;
+
+                                const modal = document.getElementById('modal_delete_inbox');
+                                const form = document.getElementById('formDeleteInbox');
+                                const input = document.getElementById('inbox_delete_id');
+
+                                if (modal && form && input) {
+                                    input.value = inboxId;
+                                    form.action = `/inbox/${inboxId}/delete?redirect=site&formName=${encodeURIComponent(formName)}`;
+                                    try { modal.showModal(); } catch (err) { console.error(err); }
+                                }
+                            });
+                        }
 
                         inboxBody.appendChild(tr);
                     });

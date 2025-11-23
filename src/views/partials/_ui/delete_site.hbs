@@ -1,16 +1,17 @@
 {{!--
-    Name: delete_site
-    Parameters:
-    - id: STRING
-    - domain: STRING
-    Usage:
-        {{> _ui/delete_site
-            id=1
-            domain="puna.fr"
-        }}
+Name: delete_site
+Parameters:
+- id: STRING
+- domain: STRING
+Usage:
+{{> _ui/delete_site
+id=1
+domain="puna.fr"
+}}
 --}}
 
-<button class="btn btn-sm btn-error" onclick="document.getElementById('delete_site_modal_{{id}}').showModal()">
+<button class="btn btn-sm btn-error btn-outline"
+	onclick="document.getElementById('delete_site_modal_{{id}}').showModal()">
 	<i class="far fa-trash-alt"></i>
 	<span class="hidden md:flex">
 		Supprimer ce site
@@ -24,33 +25,35 @@
 		</h2>
 		<p class="mb-2">Pour supprimer ce site, veuillez saisir <b>{{domain}}</b>&nbsp;:</p>
 		<form id="formDeleteSite_{{id}}" action="/delete-site/{{id}}" method="post" class="flex flex-col gap-4">
-			<input id="confirm_domain_{{id}}" type="text" name="confirm_domain" class="input input-bordered w-full" placeholder="{{domain}}" required />
+			<input id="confirm_domain_{{id}}" type="text" name="confirm_domain" class="input input-bordered w-full"
+				placeholder="{{domain}}" required />
 		</form>
 		<div class="modal-action">
 			<form method="dialog">
 				<button class="btn btn-sm">Annuler</button>
 			</form>
-			<button id="btnConfirmDelete_{{id}}" class="btn btn-sm btn-error" type="submit" form="formDeleteSite_{{id}}" disabled="">Confirmer la suppression</button>
+			<button id="btnConfirmDelete_{{id}}" class="btn btn-sm btn-error" type="submit" form="formDeleteSite_{{id}}"
+				disabled="">Confirmer la suppression</button>
 		</div>
 	</div>
 </dialog>
 
 <script>
-(function() {
-	try {
-		const input = document.getElementById('confirm_domain_{{id}}');
-		const btn = document.getElementById('btnConfirmDelete_{{id}}');
-		const domain = '{{domain}}';
-		if (!input || !btn) return;
-		btn.disabled = true;
-		input.addEventListener('input', function (e) {
-			const v = (e.target.value || '').trim();
-			if (v === domain) {
-				btn.disabled = false;
-			} else {
-				btn.disabled = true;
-			}
-		});
-	} catch (err) {}
-})();
+	(function () {
+		try {
+			const input = document.getElementById('confirm_domain_{{id}}');
+			const btn = document.getElementById('btnConfirmDelete_{{id}}');
+			const domain = '{{domain}}';
+			if (!input || !btn) return;
+			btn.disabled = true;
+			input.addEventListener('input', function (e) {
+				const v = (e.target.value || '').trim();
+				if (v === domain) {
+					btn.disabled = false;
+				} else {
+					btn.disabled = true;
+				}
+			});
+		} catch (err) { }
+	})();
 </script>
