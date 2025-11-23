@@ -405,10 +405,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const tdAct = document.createElement('th');
                         tdAct.innerHTML = `
                         <div class="flex gap-2 w-max">
-                            <a href="/inbox/${it.id}" class="btn btn-sm btn-outline btn-circle pt-[2px]">
+                            <a href="/inbox/${it.id}" class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
                                 <i class="fa-regular fa-eye"></i>
                             </a>
-                            <button class="btn btn-sm btn-error btn-outline btn-circle pt-[2px] btn-delete-inbox" data-inbox-id="${it.id}" data-form-name="${target.dataset.name || ''}">
+                            <button class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px] btn-delete-inbox" data-inbox-id="${it.id}" data-form-name="${target.dataset.name || ''}">
                                 <i class="fa-regular fa-trash-can"></i>
                             </button>
                         </div>

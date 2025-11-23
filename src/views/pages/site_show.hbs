@@ -18,6 +18,33 @@
 id=site.id
 domain=site.domain
 }}
+
+<div class="dropdown dropdown-end none">
+    <div tabindex="0" role="button" class="btn btn-sm btn-outline btn-secondary">
+        <i class="fa-solid fa-caret-down"></i>
+    </div>
+    <ul tabindex="0"
+        class="dropdown-content menu bg-base-100 text-secondary rounded-box z-[999] w-max p-2 mt-8 border border-secondary shadow-lg">
+        <li>
+            <a class="hover:bg-secondary hover:text-secondary-content">
+                <i class="fa-solid fa-file-zipper"></i>
+                Extraire toutes les données
+            </a>
+        </li>
+        <li>
+            <a class="hover:bg-secondary hover:text-secondary-content">
+                <i class="fa-solid fa-file-zipper"></i>
+                Extraire tous les documents
+            </a>
+        </li>
+        <li>
+            <a class="hover:bg-secondary hover:text-secondary-content">
+                <i class="fa-solid fa-file-zipper"></i>
+                Extraire données + documents
+            </a>
+        </li>
+    </ul>
+</div>
 {{/slot}}
 
 <!-- Modales -->
