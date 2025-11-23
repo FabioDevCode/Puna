@@ -1210,6 +1210,155 @@ export const downloadInboxZip = async (req, res) => {
     }
 };
 
+export const exportFormToExcel = async (req, res) => {
+    const formId = req.params.id;
+    const userId = req.session.user?.id;
+
+    try {
+        // Verify form exists and user has access
+        const form = await models.Form.findByPk(formId, {
+            include: [{
+                model: models.Site,
+                as: 'site',
+                where: { fk_id_user: userId }
+            }]
+        });
+
+        if (!form) {
+            return res.status(404).json({ error: 'Form not found' });
+        }
+
+        const site = form.site;
+        if (!site) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        // Get all inbox entries for this form
+        const inboxEntries = await models.Inbox.findAll({
+            where: { fk_id_form: formId },
+            order: [['createdAt', 'DESC']],
+            raw: true
+        });
+
+        // Parse template to get column headers
+        let templateObj = {};
+        try {
+            if (form.template) {
+                templateObj = typeof form.template === 'string' ? JSON.parse(form.template) : form.template;
+            }
+        } catch (e) {
+            templateObj = {};
+        }
+
+        // Get file_keys to exclude them
+        let fileKeys = [];
+        try {
+            if (form.file_keys) {
+                const parsed = typeof form.file_keys === 'string' ? JSON.parse(form.file_keys) : form.file_keys;
+                if (Array.isArray(parsed)) {
+                    fileKeys = parsed;
+                }
+            }
+        } catch (e) {
+            fileKeys = [];
+        }
+
+        // Import exceljs
+        const ExcelJS = (await import('exceljs')).default;
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Données');
+
+        // Prepare headers
+        const headers = ['Date de réception'];
+        const dataKeys = [];
+
+        // Get all unique keys from inbox content (excluding file fields)
+        const allKeys = new Set();
+        inboxEntries.forEach(entry => {
+            try {
+                const content = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
+                Object.keys(content || {}).forEach(key => {
+                    if (!fileKeys.includes(key)) {
+                        allKeys.add(key);
+                    }
+                });
+            } catch (e) {
+                // Skip malformed content
+            }
+        });
+
+        // Add headers with template labels
+        allKeys.forEach(key => {
+            const label = templateObj[key] || key;
+            headers.push(label);
+            dataKeys.push(key);
+        });
+
+        // Set headers row
+        worksheet.addRow(headers);
+
+        // Style headers (bold)
+        const headerRow = worksheet.getRow(1);
+        headerRow.font = { bold: true };
+        headerRow.alignment = { vertical: 'middle', horizontal: 'left' };
+
+        // Add data rows
+        inboxEntries.forEach(entry => {
+            const row = [];
+
+            // Add reception date
+            const formattedDate = dayjs(entry.createdAt).format('YYYY-MM-DD HH:mm:ss');
+            row.push(formattedDate);
+
+            // Parse content
+            let content = {};
+            try {
+                content = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
+            } catch (e) {
+                content = {};
+            }
+
+            // Add data columns
+            dataKeys.forEach(key => {
+                const value = content[key];
+                row.push(value !== undefined && value !== null ? String(value) : '');
+            });
+
+            worksheet.addRow(row);
+        });
+
+        // Auto-size columns
+        worksheet.columns.forEach(column => {
+            let maxLength = 0;
+            column.eachCell({ includeEmpty: true }, cell => {
+                const columnLength = cell.value ? String(cell.value).length : 10;
+                if (columnLength > maxLength) {
+                    maxLength = columnLength;
+                }
+            });
+            column.width = Math.min(maxLength + 2, 50); // Max width 50
+        });
+
+        // Generate filename
+        const sanitizedFormName = form.name.replace(/[^a-zA-Z0-9]/g, '_');
+        const filename = `export_${sanitizedFormName}_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.xlsx`;
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+        // Stream the workbook directly to response
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (err) {
+        console.error('exportFormToExcel error:', err);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Server error' });
+        }
+    }
+};
+
 export const allSite = async (req, res) => {
     try {
         const userId = req.session.user?.id;
