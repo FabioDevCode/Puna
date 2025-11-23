@@ -211,6 +211,10 @@ h3 {
     border-top: 4px solid #1F2937 !important;
 }
 
+.dash-site div {
+    transition: all 200ms ease-in-out !important;
+}
+
 .none {
     display: none !important;
 }

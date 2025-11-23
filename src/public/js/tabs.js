@@ -202,14 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const infoPanel = document.getElementById('info_form_panel');
             if (infoPanel) {
-                const name = target.dataset.name || 'Formulaire';
                 const code = target.dataset.code || '';
-
-                const h4 = document.getElementById('info_form_name');
-                if (h4) {
-                    h4.textContent = name;
-                    if (hasId) { h4.classList.remove('opacity-25'); } else { h4.classList.add('opacity-25'); }
-                }
 
                 const deleteInput = document.getElementById('form_delete_id');
                 const deleteBtn = document.getElementById('btn_delete_form');
@@ -782,12 +775,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // no active form tab selected on load -> ensure panel is in empty state
             const deleteBtn = document.getElementById('btn_delete_form');
             const copyBtn = document.getElementById('btn_copy_code');
-            const h4 = document.getElementById('info_form_name');
             const codeWrap = document.getElementById('info_form_code_wrap');
             const codeEl = document.getElementById('info_form_code');
             if (deleteBtn) { deleteBtn.classList.add('none'); }
             if (copyBtn) { copyBtn.classList.add('none'); }
-            if (h4) { h4.classList.add('opacity-25'); }
             if (codeWrap) { codeWrap.classList.add('opacity-25'); }
             if (codeEl) { codeEl.textContent = ''; }
             // hide table actions and clear inbox table when nothing is selected
