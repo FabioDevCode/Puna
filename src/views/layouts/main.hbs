@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" data-theme="fantasy">
+
 <head>
     {{> head}}
     <script src="/js/tabs.js"></script>
@@ -7,13 +8,14 @@
     <script src="/js/token.js"></script>
     <script src="/js/revoke_tokens.js"></script>
 </head>
+
 <body>
     <div class="flex h-screen overflow-hidden w-full min-w-[320px]">
         {{> left_menu}}
         {{> mobile_menu }}
         <div id="nav_main" class="flex flex-col h-full w-full">
             {{> navbar}}
-            <main class="p-4 bg-secondary-content/25 rounded-4xl app-main pb-[116px] md:pb-4">
+            <main class="p-4 bg-secondary-content rounded-4xl app-main pb-[116px] md:pb-4">
                 <div class="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-4">
                     {{{body}}}
                 </div>
@@ -21,4 +23,5 @@
         </div>
     </div>
 </body>
+
 </html>
