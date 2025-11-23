@@ -39,10 +39,12 @@ router.post('/create-form', isConnected, dctl.createForm);
 router.post('/delete-form', isConnected, dctl.deleteForm);
 
 router.get('/form/:id/inbox', isConnected, dctl.getFormInbox);
-router.get('/inbox/:id', isConnected, dctl.showInbox);
-router.post('/inbox/:id/delete', isConnected, dctl.deleteInbox);
 router.post('/form/:id/columns', isConnected, dctl.updateFormColumns);
 router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
+
+router.get('/inbox/:id', isConnected, dctl.showInbox);
+router.post('/inbox/:id/delete', isConnected, dctl.deleteInbox);
+router.get('/inbox/:inboxId/download/:filename', isConnected, dctl.downloadFile);
 
 
 export default router;

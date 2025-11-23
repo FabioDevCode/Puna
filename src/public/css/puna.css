@@ -384,6 +384,10 @@ h3 {
     text-align: right;
 }
 
+.card-title {
+    margin-bottom: 4px;
+}
+
 /* Amélioration visuelle des tabs */
 .tabs-boxed .tab {
     transition: all 0.2s ease;

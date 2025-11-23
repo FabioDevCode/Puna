@@ -1006,6 +1006,100 @@ export const deleteInbox = async (req, res) => {
     }
 };
 
+export const downloadFile = async (req, res) => {
+    const { inboxId, filename } = req.params;
+    const userId = req.session.user?.id;
+
+    try {
+        // Verify inbox exists and user has access
+        const inbox = await models.Inbox.findByPk(inboxId, {
+            include: [{
+                model: models.Form,
+                as: 'form',
+                include: [{
+                    model: models.Site,
+                    as: 'site',
+                    where: { fk_id_user: userId }
+                }]
+            }]
+        });
+
+        if (!inbox) {
+            return res.status(404).json({ error: 'Inbox entry not found' });
+        }
+
+        const form = inbox.form;
+        const site = form?.site;
+
+        if (!site) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        // Parse content to verify file exists in this inbox
+        let contentObj = {};
+        try {
+            contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
+        } catch (e) {
+            contentObj = {};
+        }
+
+        // Get file_keys from form
+        let fileKeys = [];
+        try {
+            if (form.file_keys) {
+                const parsed = typeof form.file_keys === 'string' ? JSON.parse(form.file_keys) : form.file_keys;
+                if (Array.isArray(parsed)) {
+                    fileKeys = parsed;
+                }
+            }
+        } catch (e) {
+            fileKeys = [];
+        }
+
+        // Check if the filename exists in any of the file fields
+        let fileFound = false;
+        for (const key of fileKeys) {
+            const value = contentObj[key];
+            if (value) {
+                const filenames = Array.isArray(value) ? value : [value];
+                if (filenames.includes(filename)) {
+                    fileFound = true;
+                    break;
+                }
+            }
+        }
+
+        if (!fileFound) {
+            return res.status(404).json({ error: 'File not found in this inbox entry' });
+        }
+
+        // Construct file path using the helper
+        const { finalPathFor } = await import('../helpers/upload_utils.js');
+        const { path: filePath } = finalPathFor(site, form, filename);
+
+        // Check if file exists on disk
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: 'File not found on server' });
+        }
+
+        // Get original filename (remove timestamp prefix)
+        const originalFilename = filename.split('_').slice(1).join('_');
+
+        // Send file for download
+        res.download(filePath, originalFilename, (err) => {
+            if (err) {
+                console.error('Download error:', err);
+                if (!res.headersSent) {
+                    res.status(500).json({ error: 'Error downloading file' });
+                }
+            }
+        });
+    } catch (err) {
+        console.error('downloadFile error:', err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+};
+
 export const allSite = async (req, res) => {
     try {
         const userId = req.session.user?.id;
