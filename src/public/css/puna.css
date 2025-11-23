@@ -96,7 +96,7 @@ body {
 
 main {
     overflow: auto;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     min-height: max-content;
     border: 2px solid #DBEAF7;
 }
@@ -119,9 +119,9 @@ h3 {
     font-weight: 800 !important;
 }
 
-.btn:not(.navbar .btn) {
+/* .btn:not(.navbar .btn) {
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-}
+} */
 
 .btn-error.btn-outline:hover {
     color: whitesmoke;

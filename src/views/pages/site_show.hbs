@@ -31,12 +31,12 @@ domain=site.domain
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body" id="info_form_panel">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="flex-1">
+                <div class="flex flex-col w-auto min-w-[160px]">
                     <h2 class="card-title text-2xl mb-2">
                         <span id="info_form_name" class="opacity-25">Formulaire</span>
                     </h2>
                     <div id="info_form_code_wrap" class="flex items-center gap-2 opacity-25">
-                        <span class="text-sm text-muted select-none">Code :</span>
+                        <span class="te160pxxt-sm text-muted select-none">Code&nbsp;:</span>
                         <code id="info_form_code" class="text-sm font-mono bg-base-200 px-2 py-1 rounded"></code>
                         <button id="btn_copy_code" class="btn btn-sm btn-outline none">
                             <i class="fa-solid fa-clone"></i>
@@ -46,7 +46,7 @@ domain=site.domain
                         </button>
                     </div>
                 </div>
-                <div class="flex items-start h-full gap-2">
+                <div class="flex justify-end items-start h-full gap-2">
                     {{> _ui/delete_form }}
                     {{> _ui/form_template_modal }}
                 </div>
