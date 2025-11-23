@@ -380,3 +380,18 @@ h3 {
     color: #686868;
     text-align: right;
 }
+
+/* Amélioration visuelle des tabs */
+.tabs-boxed .tab {
+    transition: all 0.2s ease;
+}
+
+/* Animation smooth pour les cards */
+.card {
+    transition: box-shadow 0.2s ease;
+}
+
+/* Style pour le code */
+#info_form_code {
+    letter-spacing: 0.5px;
+}

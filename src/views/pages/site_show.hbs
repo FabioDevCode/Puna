@@ -27,6 +27,7 @@ domain=site.domain
 <!-- Contenu principal -->
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12">
     <!-- Card: Informations du formulaire sélectionné -->
+    {{#if forms}}
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body" id="info_form_panel">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -35,20 +36,25 @@ domain=site.domain
                         <span id="info_form_name" class="opacity-25">Formulaire</span>
                     </h2>
                     <div id="info_form_code_wrap" class="flex items-center gap-2 opacity-25">
-                        <span class="text-sm text-muted">Code :</span>
+                        <span class="text-sm text-muted select-none">Code :</span>
                         <code id="info_form_code" class="text-sm font-mono bg-base-200 px-2 py-1 rounded"></code>
-                        <button id="btn_copy_code" class="btn btn-xs btn-outline none">
+                        <button id="btn_copy_code" class="btn btn-sm btn-outline none">
                             <i class="fa-solid fa-clone"></i>
+                            <span class="hidden md:flex">
+                                Copier le code
+                            </span>
                         </button>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-start h-full gap-2">
                     {{> _ui/delete_form }}
                     {{> _ui/form_template_modal }}
                 </div>
             </div>
         </div>
     </div>
+    {{/if}}
+
 
     <!-- Card: Gestion des formulaires -->
     <div class="card bg-base-100 shadow-xl">
@@ -65,14 +71,15 @@ domain=site.domain
                     </a>
                     {{/each}}
                 </div>
-                <div class="divider divider-horizontal mx-2 h-8 hidden md:flex"></div>
                 {{> _ui/btn_new_form id=site.id }}
             </div>
             {{else}}
             <div class="flex flex-col items-center justify-center py-8 gap-4">
                 <div class="text-center">
-                    <i class="fa-solid fa-inbox text-4xl text-base-300 mb-2"></i>
-                    <p class="text-sm text-muted">Aucun formulaire créé pour ce site</p>
+                    <i class="fa-solid fa-file-alt text-5xl text-base-300 mb-2"></i>
+                    <p class="text-sm text-muted">
+                        Aucun formulaire créé pour ce site
+                    </p>
                 </div>
                 {{> _ui/btn_new_form id=site.id }}
             </div>
@@ -80,6 +87,7 @@ domain=site.domain
         </div>
     </div>
 
+    {{#if forms}}
     <!-- Card: Table des entrées Inbox -->
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
@@ -129,35 +137,14 @@ domain=site.domain
             </div>
 
             <!-- Message quand aucun formulaire n'est sélectionné (visible par défaut via JS) -->
-            <div id="no_form_selected" class="flex flex-col items-center justify-center py-12 gap-4">
-                <i class="fa-solid fa-table text-5xl text-base-300"></i>
-                <p class="text-sm text-muted text-center">
-                    Sélectionnez un formulaire pour voir les entrées
+            <div id="no_form_selected"
+                class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4">
+                <i class="fa-solid fa-table text-5xl text-neutral-content"></i>
+                <p class="text-sm text-neutral text-center select-none">
+                    Aucune entrée reçu pour ce formualire
                 </p>
             </div>
         </div>
     </div>
-
+    {{/if}}
 </div>
-
-<style>
-    /* Amélioration visuelle des tabs */
-    .tabs-boxed .tab {
-        transition: all 0.2s ease;
-    }
-
-    /* Animation smooth pour les cards */
-    .card {
-        transition: box-shadow 0.2s ease;
-    }
-
-    /* Amélioration du divider horizontal */
-    .divider-horizontal {
-        opacity: 0.3;
-    }
-
-    /* Style pour le code */
-    #info_form_code {
-        letter-spacing: 0.5px;
-    }
-</style>

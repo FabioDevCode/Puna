@@ -230,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            const btnDeleteForm = document.getElementById('btn_delete_form');
             const btnOpenTemplate = document.getElementById('btn_open_template');
             const modalForm = document.getElementById('modal_template_form');
             const keysContainer = document.getElementById('modal_template_keys');
@@ -242,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (hasId) {
                 if (btnOpenTemplate) { btnOpenTemplate.classList.remove('none'); }
+                if (btnDeleteForm) { btnDeleteForm.classList.remove('none'); }
 
                 if (modalForm) { modalForm.action = `/form/${target.dataset.id}/template`; }
 
@@ -756,6 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // hide button and clear modal
                 if (btnOpenTemplate) { btnOpenTemplate.classList.add('none'); }
+                if (btnDeleteForm) { btnDeleteForm.classList.add('none'); }
                 if (modalForm) { modalForm.action = '#'; }
                 clearModalContainers();
                 // hide table-level actions and clear inbox table
