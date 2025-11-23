@@ -20,100 +20,145 @@ domain=site.domain
 }}
 {{/slot}}
 
+<!-- Modales -->
+{{> _ui/form_template_modal }}
+{{> _ui/form_filter_modal }}
+{{> _ui/modal_delete_inbox }}
 
-<div class="flex items-start flex-wrap justify-between gap-6 h-max col-span-2 md:col-span-6 lg:col-span-12">
-    <div class="flex flex-wrap gap-2 col-span-2 md:col-span-3 lg:col-span-6">
-        <div id="info_form_panel"
-            class="w-full min-h-[72px] flex flex-col items-start justify-start gap-1 col-span-2 md:col-span-3 lg:col-span-6">
-            <div class="w-full min-h-[36px] flex items-center justify-start gap-1">
-                <h4 class="text-2xl font-bold opacity-25" id="info_form_name">
-                    Formulaire
-                </h4>
-                <div class="divider divider-horizontal mx-0 py-3"></div>
-                {{> _ui/delete_form }}
+<!-- Contenu principal -->
+<div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12">
+
+    <!-- Card: Informations du formulaire sélectionné -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex-1">
+                    <h2 class="card-title text-2xl mb-2">
+                        <span id="info_form_name" class="opacity-25">Formulaire</span>
+                    </h2>
+                    <div id="info_form_code_wrap" class="flex items-center gap-2 opacity-25">
+                        <span class="text-sm text-muted">Code :</span>
+                        <code id="info_form_code" class="text-sm font-mono bg-base-200 px-2 py-1 rounded"></code>
+                        <button id="btn_copy_code" class="btn btn-xs btn-outline none">
+                            <i class="fa-solid fa-clone"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    {{> _ui/delete_form }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card: Gestion des formulaires -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title mb-3">Formulaires</h2>
+            {{#if forms}}
+            <div class="flex flex-wrap items-center gap-2">
+                <div role="tablist" class="tabs tabs-boxed flex flex-wrap flex-1">
+                    {{#each forms}}
+                    <a role="tab" class="tab {{#if is_active}}tab-active{{/if}}" data-id="{{this.id}}"
+                        data-code="{{this.code}}" data-name="{{this.name}}" data-template='{{this.template}}'
+                        data-columns='{{this.columns}}'>
+                        {{this.name}}
+                    </a>
+                    {{/each}}
+                </div>
+                <div class="divider divider-horizontal mx-2 h-8 hidden md:flex"></div>
+                {{> _ui/btn_new_form id=site.id }}
+            </div>
+            {{else}}
+            <div class="flex flex-col items-center justify-center py-8 gap-4">
+                <div class="text-center">
+                    <i class="fa-solid fa-inbox text-4xl text-base-300 mb-2"></i>
+                    <p class="text-sm text-muted">Aucun formulaire créé pour ce site</p>
+                </div>
+                {{> _ui/btn_new_form id=site.id }}
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <!-- Card: Table des entrées Inbox -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <!-- Actions de la table (masquée par défaut) -->
+            <div id="tableActions" class="none">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                    <h2 class="card-title">Entrées reçues</h2>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <!-- Sélecteur de nombre de lignes et compteur -->
+                        <div class="flex items-center gap-2">
+                            <select id="numLignTable" class="select select-sm select-bordered w-max">
+                                <option value="10" selected="">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <div id="count_inbox" class="text-sm min-w-[80px]"></div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div id="paginationTable" class="join">
+                            <button class="join-item btn btn-sm">«</button>
+                            <button class="join-item btn btn-sm w-[34px] no-activate">1</button>
+                            <button class="join-item btn btn-sm">»</button>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="divider divider-horizontal mx-2 h-8 hidden md:flex"></div>
+                        <div class="flex gap-2">
+                            <button id="filtreTableBtn" class="btn btn-sm">
+                                <i class="fa-solid fa-filter"></i>
+                                <span class="hidden md:flex">Filtre</span>
+                            </button>
+                            {{> _ui/form_columns_modal }}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div id="info_form_code_wrap" class="flex min-h-[36px] jutify-center items-center gap-1 opacity-25">
-                <strong class="select-none">CODE :</strong>
-                <p id="info_form_code"></p>
-                <div class="divider divider-horizontal mx-0 py-3"></div>
-                <button id="btn_copy_code" class="btn btn-sm btn-outline none">
-                    <i class="fa-solid fa-clone"></i>
-                    <span class="hidden md:flex">
-                        Copier le code
-                    </span>
-                </button>
+            <!-- Table (masquée par défaut) -->
+            <div id="tableInbox" class="overflow-x-auto w-full none">
+                <table class="table w-full table-pin-cols">
+                    <thead id="inbox_table_head" class="text-[14px] bg-base-200"></thead>
+                    <tbody id="inbox_table_body"></tbody>
+                </table>
+            </div>
+
+            <!-- Message quand aucun formulaire n'est sélectionné (visible par défaut via JS) -->
+            <div id="no_form_selected" class="flex flex-col items-center justify-center py-12 gap-4">
+                <i class="fa-solid fa-table text-5xl text-base-300"></i>
+                <p class="text-sm text-muted text-center">
+                    Sélectionnez un formulaire pour voir les entrées
+                </p>
             </div>
         </div>
     </div>
 
-    {{> _ui/form_template_modal }}
-    {{> _ui/form_filter_modal }}
-
-    {{> _ui/modal_delete_inbox }}
 </div>
 
-<div
-    class="flex items-start items-center justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
-    {{#if forms}}
-    <div class="flex items-center gap-0 w-full">
-        <div role="tablist" class="tabs tabs-boxed flex flex-wrap">
-            {{#each forms}}
-            <a role="tab" class="tab {{#if is_active}}tab-active{{/if}}" data-id="{{this.id}}" data-code="{{this.code}}"
-                data-name="{{this.name}}" data-template='{{this.template}}' data-columns='{{this.columns}}'>
-                {{this.name}}
-            </a>
-            {{/each}}
-        </div>
-        <div class="divider divider-horizontal mx-0 py-3"></div>
-        {{> _ui/btn_new_form
-        id=site.id
-        }}
-    </div>
-    {{else}}
-    <div class="col-12 flex justify-center items-center gap-2">
-        {{> _ui/btn_new_form
-        id=site.id
-        }}
-    </div>
-    {{/if}}
-</div>
+<style>
+    /* Amélioration visuelle des tabs */
+    .tabs-boxed .tab {
+        transition: all 0.2s ease;
+    }
 
-<div class="flex flex-col items-start justify-cneter gap-4 mt-6 md:mt-0 h-max col-span-2 md:col-span-6 lg:col-span-12">
+    /* Animation smooth pour les cards */
+    .card {
+        transition: box-shadow 0.2s ease;
+    }
 
-    <div id="tableActions" class="w-full flex items-end justify-between gap-4 mt-2 none">
-        <div id="leftTableBtns" class="flex items-center flex-wrap gap-2">
-            <select id="numLignTable" class="select select-sm select-bordered w-max max-w-xs">
-                <option value="10" selected="">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-            <div id="count_inbox" class="text-sm w-[92px]"></div>
-        </div>
+    /* Amélioration du divider horizontal */
+    .divider-horizontal {
+        opacity: 0.3;
+    }
 
-        <div id="paginationTable" class="join">
-            <button class="join-item btn btn-sm">«</button>
-            <button class="join-item btn btn-sm w-[34px] no-activate">1</button>
-            <button class="join-item btn btn-sm">»</button>
-        </div>
-
-        <div id="tableBtns" class="flex gap-2">
-            <button id="filtreTableBtn" class="btn btn-sm">
-                <i class="fa-solid fa-filter"></i>
-                <span class="hidden md:flex">
-                    Filtre
-                </span>
-            </button>
-
-            {{> _ui/form_columns_modal }}
-        </div>
-    </div>
-
-    <div id="tableInbox" class="overflow-x-auto w-full border border-base-200 none">
-        <table class="table w-full table-pin-cols bg-base-100">
-            <thead id="inbox_table_head" class="text-[14px]"></thead>
-            <tbody id="inbox_table_body"></tbody>
-        </table>
-    </div>
-</div>
+    /* Style pour le code */
+    #info_form_code {
+        letter-spacing: 0.5px;
+    }
+</style>

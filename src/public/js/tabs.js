@@ -309,6 +309,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (tableActions) { tableActions.classList.add('none'); }
                     if (tableInboxEl) { tableInboxEl.classList.add('none'); }
+
+                    // Show 'no form selected' message
+                    const noFormMsg = document.getElementById('no_form_selected');
+                    if (noFormMsg) { noFormMsg.classList.remove('none'); }
                 }
 
                 function buildHead(keysArr) {
@@ -463,12 +467,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // If there's a filter active we must keep the table and actions visible even with zero results
                     const hasFilters = currentFilters && Object.keys(currentFilters).length > 0;
+                    const noFormMsg = document.getElementById('no_form_selected');
+
                     if ((total && total > 0) || hasFilters) {
                         if (tableActions) { tableActions.classList.remove('none'); }
                         if (tableInboxEl) { tableInboxEl.classList.remove('none'); }
+                        if (noFormMsg) { noFormMsg.classList.add('none'); }
                     } else {
                         if (tableActions) { tableActions.classList.add('none'); }
                         if (tableInboxEl) { tableInboxEl.classList.add('none'); }
+                        if (noFormMsg) { noFormMsg.classList.remove('none'); }
                     }
 
                     // update count text to 'affichés sur total'
@@ -754,8 +762,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tableActions) { tableActions.classList.add('none'); }
                 const inboxHead = document.getElementById('inbox_table_head');
                 const inboxBody = document.getElementById('inbox_table_body');
+                const tableInboxEl = document.getElementById('tableInbox');
+                const noFormMsg = document.getElementById('no_form_selected');
                 if (inboxHead) { inboxHead.innerHTML = ''; }
                 if (inboxBody) { inboxBody.innerHTML = ''; }
+                if (tableInboxEl) { tableInboxEl.classList.add('none'); }
+                if (noFormMsg) { noFormMsg.classList.remove('none'); }
             }
         });
 
@@ -779,8 +791,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tableActions) { tableActions.classList.add('none'); }
             const inboxHeadInit = document.getElementById('inbox_table_head');
             const inboxBodyInit = document.getElementById('inbox_table_body');
+            const tableInboxInit = document.getElementById('tableInbox');
+            const noFormMsgInit = document.getElementById('no_form_selected');
             if (inboxHeadInit) { inboxHeadInit.innerHTML = ''; }
             if (inboxBodyInit) { inboxBodyInit.innerHTML = ''; }
+            if (tableInboxInit) { tableInboxInit.classList.add('none'); }
+            if (noFormMsgInit) { noFormMsgInit.classList.remove('none'); }
         }
     });
 
