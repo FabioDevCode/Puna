@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let _inboxTooltipEl = null;
 
     function ensureInboxTooltip() {
-        if (_inboxTooltipEl) {return _inboxTooltipEl;}
+        if (_inboxTooltipEl) { return _inboxTooltipEl; }
         _inboxTooltipEl = document.createElement('div');
         _inboxTooltipEl.id = 'inbox-tooltip';
         _inboxTooltipEl.className = 'inbox-tooltip none';
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function hideInboxTooltip() {
-        if (!_inboxTooltipEl) {return;}
+        if (!_inboxTooltipEl) { return; }
         _inboxTooltipEl.classList.add('none');
     }
 
@@ -34,10 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatDateTime(value) {
-        if (!value && value !== 0) {return ' - ';}
+        if (!value && value !== 0) { return ' - '; }
         try {
             const d = (value instanceof Date) ? value : new Date(value);
-            if (Number.isNaN(d.getTime())) {return String(value);}
+            if (Number.isNaN(d.getTime())) { return String(value); }
             return `
                 <div class="flex flex-wrap gap-1">
                     <p class="w-max">${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}&nbsp;</p>
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openColumnsModal() {
-        if (!modalColumns) {return;}
+        if (!modalColumns) { return; }
 
         if (modalColumnsList) {
             modalColumnsList.innerHTML = '';
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
-        try { modalColumns.showModal(); } catch (e) {console.error(e);}
+        try { modalColumns.showModal(); } catch (e) { console.error(e); }
     }
 
     if (btnColumns) {
@@ -141,14 +141,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalColumnsCancel) {
         modalColumnsCancel.addEventListener('click', (e) => {
             e.preventDefault();
-            try { modalColumns.close(); } catch (e) {console.error(e);}
+            try { modalColumns.close(); } catch (e) { console.error(e); }
         });
     }
 
     if (modalColumnsForm) {
         modalColumnsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!activeFormId) {return;}
+            if (!activeFormId) { return; }
 
             const inputs = modalColumnsList ? Array.from(modalColumnsList.querySelectorAll('input[type="checkbox"][data-key]')) : [];
             const payload = {};
@@ -165,16 +165,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ columns: payload })
                 });
                 const json = await resp.json().catch(() => ({}));
-                if (!resp.ok || !json.success) {throw new Error(json.error || 'Network error');}
+                if (!resp.ok || !json.success) { throw new Error(json.error || 'Network error'); }
 
                 activeColumns = payload;
 
                 const activeTab = document.querySelector('.tab.tab-active[data-id]');
-                if (activeTab) {activeTab.dataset.columns = JSON.stringify(payload);}
+                if (activeTab) { activeTab.dataset.columns = JSON.stringify(payload); }
 
-                try { modalColumns.close(); } catch (e) {console.error(e);}
+                try { modalColumns.close(); } catch (e) { console.error(e); }
 
-                if (activeTab) {activeTab.click();}
+                if (activeTab) { activeTab.click(); }
             } catch (err) {
                 alert('Erreur lors de l\'enregistrement des colonnes.');
             }
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tabLists.forEach((tabList) => {
         tabList.addEventListener('click', (e) => {
             const target = e.target.closest('[role="tab"], .tab');
-            if (!target || !tabList.contains(target)) {return;}
+            if (!target || !tabList.contains(target)) { return; }
             e.preventDefault();
 
             resetFilter();
@@ -208,25 +208,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 const h4 = document.getElementById('info_form_name');
                 if (h4) {
                     h4.textContent = name;
-                    if (hasId) {h4.classList.remove('opacity-25');} else {h4.classList.add('opacity-25');}
+                    if (hasId) { h4.classList.remove('opacity-25'); } else { h4.classList.add('opacity-25'); }
                 }
 
                 const deleteInput = document.getElementById('form_delete_id');
                 const deleteBtn = document.getElementById('btn_delete_form');
-                if (deleteInput) {deleteInput.value = target.dataset.id || '';}
+                if (deleteInput) { deleteInput.value = target.dataset.id || ''; }
                 if (deleteBtn) {
-                    if (hasId) {deleteBtn.classList.remove('none');} else {deleteBtn.classList.add('none');}
+                    if (hasId) { deleteBtn.classList.remove('none'); } else { deleteBtn.classList.add('none'); }
                 }
 
                 const codeEl = document.getElementById('info_form_code');
                 const codeWrap = document.getElementById('info_form_code_wrap');
                 const copyBtn = document.getElementById('btn_copy_code');
-                if (codeEl) {codeEl.textContent = code;}
+                if (codeEl) { codeEl.textContent = code; }
                 if (codeWrap) {
-                    if (hasId) {codeWrap.classList.remove('opacity-25');} else {codeWrap.classList.add('opacity-25');}
+                    if (hasId) { codeWrap.classList.remove('opacity-25'); } else { codeWrap.classList.add('opacity-25'); }
                 }
                 if (copyBtn) {
-                    if (hasId) {copyBtn.classList.remove('none');} else {copyBtn.classList.add('none');}
+                    if (hasId) { copyBtn.classList.remove('none'); } else { copyBtn.classList.add('none'); }
                 }
             }
 
@@ -236,19 +236,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const valuesContainer = document.getElementById('modal_template_values');
 
             function clearModalContainers() {
-                if (keysContainer) {keysContainer.innerHTML = '';}
-                if (valuesContainer) {valuesContainer.innerHTML = '';}
+                if (keysContainer) { keysContainer.innerHTML = ''; }
+                if (valuesContainer) { valuesContainer.innerHTML = ''; }
             }
 
             if (hasId) {
-                if (btnOpenTemplate) {btnOpenTemplate.classList.remove('none');}
+                if (btnOpenTemplate) { btnOpenTemplate.classList.remove('none'); }
 
-                if (modalForm) {modalForm.action = `/form/${target.dataset.id}/template`;}
+                if (modalForm) { modalForm.action = `/form/${target.dataset.id}/template`; }
 
                 let tpl = {};
                 try {
                     const raw = target.dataset.template || '';
-                    if (raw) {tpl = JSON.parse(raw);}
+                    if (raw) { tpl = JSON.parse(raw); }
                 } catch (e) {
                     tpl = {};
                 }
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let colsObj = {};
                 try {
                     const rawc = target.dataset.columns || '';
-                    if (rawc) {colsObj = JSON.parse(rawc);}
+                    if (rawc) { colsObj = JSON.parse(rawc); }
                 } catch (e) {
                     colsObj = {};
                 }
@@ -271,8 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const visibleKeys = keys.filter((k) => (colsObj && typeof colsObj[k] !== 'undefined') ? !!colsObj[k] : true);
                 if (!keys.length) {
-                    if (keysContainer) {keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>';}
-                    if (valuesContainer) {valuesContainer.innerHTML = '';}
+                    if (keysContainer) { keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>'; }
+                    if (valuesContainer) { valuesContainer.innerHTML = ''; }
                 } else {
                     keys.forEach((k) => {
                         const d = document.createElement('div');
@@ -301,18 +301,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const paginationEl = document.getElementById('paginationTable');
 
                 function clearInbox() {
-                    if (inboxHead) {inboxHead.innerHTML = '';}
-                    if (inboxBody) {inboxBody.innerHTML = '';}
+                    if (inboxHead) { inboxHead.innerHTML = ''; }
+                    if (inboxBody) { inboxBody.innerHTML = ''; }
 
                     const countEl = document.getElementById('count_inbox');
-                    if (countEl) {countEl.textContent = '';}
+                    if (countEl) { countEl.textContent = ''; }
 
-                    if (tableActions) {tableActions.classList.add('none');}
-                    if (tableInboxEl) {tableInboxEl.classList.add('none');}
+                    if (tableActions) { tableActions.classList.add('none'); }
+                    if (tableInboxEl) { tableInboxEl.classList.add('none'); }
                 }
 
                 function buildHead(keysArr) {
-                    if (!inboxHead) {return;}
+                    if (!inboxHead) { return; }
                     const tr = document.createElement('tr');
 
                     // const thCheck = document.createElement('th');
@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 function buildRows(items, keysArr) {
-                    if (!inboxBody) {return;}
+                    if (!inboxBody) { return; }
                     items.forEach((it) => {
                         const tr = document.createElement('tr');
                         tr.dataset.id = it.id;
@@ -399,9 +399,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const tdAct = document.createElement('th');
                         tdAct.innerHTML = `
                         <div class="flex gap-2 w-max">
-                            <button class="btn btn-sm btn-outline btn-circle noo pt-[2px]">
+                            <a href="/inbox/${it.id}" class="btn btn-sm btn-outline btn-circle noo pt-[2px]">
                                 <i class="fa-solid fa-eye"></i>
-                            </button>
+                            </a>
                             <button class="btn btn-sm btn-error btn-outline btn-circle noo pt-[2px]">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
@@ -493,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             // attach select change to fetch first page
                             if (selectLimit) {
-                                selectLimit.removeEventListener('change', selectLimit._listener || (() => {}));
+                                selectLimit.removeEventListener('change', selectLimit._listener || (() => { }));
                                 selectLimit._listener = () => {
                                     fetchPage(1);
                                 };
@@ -508,24 +508,24 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const next = btns[2];
 
                                 if (prev) {
-                                    prev.removeEventListener('click', prev._listener || (() => {}));
+                                    prev.removeEventListener('click', prev._listener || (() => { }));
                                     prev._listener = (e) => {
                                         e.preventDefault();
-                                        if (currentPage > 1) {fetchPage(currentPage - 1);}
+                                        if (currentPage > 1) { fetchPage(currentPage - 1); }
                                     };
                                     prev.addEventListener('click', prev._listener);
                                 }
                                 if (next) {
-                                    next.removeEventListener('click', next._listener || (() => {}));
+                                    next.removeEventListener('click', next._listener || (() => { }));
                                     next._listener = (e) => {
                                         e.preventDefault();
                                         const maxPage = Math.max(1, Math.ceil(total / limit));
-                                        if (currentPage < maxPage) {fetchPage(currentPage + 1);}
+                                        if (currentPage < maxPage) { fetchPage(currentPage + 1); }
                                     };
                                     next.addEventListener('click', next._listener);
                                 }
                                 // initial page label
-                                if (pageBtn) {pageBtn.textContent = String(currentPage);}
+                                if (pageBtn) { pageBtn.textContent = String(currentPage); }
                             }
 
                             // render returned page
@@ -551,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const modalFilterClear = document.getElementById('modal_filter_clear');
 
                     if (btnFilter) {
-                        btnFilter.removeEventListener('click', btnFilter._listener || (() => {}));
+                        btnFilter.removeEventListener('click', btnFilter._listener || (() => { }));
                         btnFilter._listener = (ev) => {
                             ev.preventDefault();
                             if (modalFilterKeys) { modalFilterKeys.innerHTML = ''; }
@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Cancel: clear inputs, reset filters and reload
                     if (modalFilterCancel) {
-                        modalFilterCancel.removeEventListener('click', modalFilterCancel._listener || (() => {}));
+                        modalFilterCancel.removeEventListener('click', modalFilterCancel._listener || (() => { }));
                         modalFilterCancel._listener = (ev) => {
                             ev.preventDefault();
                             try {
@@ -672,7 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Clear button: empty inputs but keep modal open
                     if (modalFilterClear) {
-                        modalFilterClear.removeEventListener('click', modalFilterClear._listener || (() => {}));
+                        modalFilterClear.removeEventListener('click', modalFilterClear._listener || (() => { }));
                         modalFilterClear._listener = (ev) => {
                             ev.preventDefault();
                             try {
@@ -689,7 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Apply (form submit)
                     if (modalFilterForm) {
-                        modalFilterForm.removeEventListener('submit', modalFilterForm._listener || (() => {}));
+                        modalFilterForm.removeEventListener('submit', modalFilterForm._listener || (() => { }));
                         modalFilterForm._listener = (ev) => {
                             ev.preventDefault();
                             const filters = {};
@@ -727,15 +727,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } else {
                 // hide button and clear modal
-                if (btnOpenTemplate) {btnOpenTemplate.classList.add('none');}
-                if (modalForm) {modalForm.action = '#';}
+                if (btnOpenTemplate) { btnOpenTemplate.classList.add('none'); }
+                if (modalForm) { modalForm.action = '#'; }
                 clearModalContainers();
                 // hide table-level actions and clear inbox table
-                if (tableActions) {tableActions.classList.add('none');}
+                if (tableActions) { tableActions.classList.add('none'); }
                 const inboxHead = document.getElementById('inbox_table_head');
                 const inboxBody = document.getElementById('inbox_table_body');
-                if (inboxHead) {inboxHead.innerHTML = '';}
-                if (inboxBody) {inboxBody.innerHTML = '';}
+                if (inboxHead) { inboxHead.innerHTML = ''; }
+                if (inboxBody) { inboxBody.innerHTML = ''; }
             }
         });
 
@@ -750,17 +750,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const h4 = document.getElementById('info_form_name');
             const codeWrap = document.getElementById('info_form_code_wrap');
             const codeEl = document.getElementById('info_form_code');
-            if (deleteBtn) {deleteBtn.classList.add('none');}
-            if (copyBtn) {copyBtn.classList.add('none');}
-            if (h4) {h4.classList.add('opacity-25');}
-            if (codeWrap) {codeWrap.classList.add('opacity-25');}
-            if (codeEl) {codeEl.textContent = '';}
+            if (deleteBtn) { deleteBtn.classList.add('none'); }
+            if (copyBtn) { copyBtn.classList.add('none'); }
+            if (h4) { h4.classList.add('opacity-25'); }
+            if (codeWrap) { codeWrap.classList.add('opacity-25'); }
+            if (codeEl) { codeEl.textContent = ''; }
             // hide table actions and clear inbox table when nothing is selected
-            if (tableActions) {tableActions.classList.add('none');}
+            if (tableActions) { tableActions.classList.add('none'); }
             const inboxHeadInit = document.getElementById('inbox_table_head');
             const inboxBodyInit = document.getElementById('inbox_table_body');
-            if (inboxHeadInit) {inboxHeadInit.innerHTML = '';}
-            if (inboxBodyInit) {inboxBodyInit.innerHTML = '';}
+            if (inboxHeadInit) { inboxHeadInit.innerHTML = ''; }
+            if (inboxBodyInit) { inboxBodyInit.innerHTML = ''; }
         }
     });
 
@@ -770,9 +770,9 @@ document.addEventListener('DOMContentLoaded', () => {
         copyBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const codeEl = document.getElementById('info_form_code');
-            if (!codeEl) {return;}
+            if (!codeEl) { return; }
             const text = codeEl.textContent.trim();
-            if (!text) {return;}
+            if (!text) { return; }
 
             try {
                 await navigator.clipboard.writeText(text);

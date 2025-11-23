@@ -1,0 +1,81 @@
+{{#slot "title"}}
+<h3 class="font-inter truncate ellipsis-truncate title-max-w">
+    Inbox #{{inbox.id}}
+</h3>
+{{/slot}}
+
+{{#slot "buttons"}}
+<a href="/site/{{site.id}}?f={{form.name}}" class="btn btn-sm btn-outline">
+    <i class="fa-solid fa-arrow-left"></i>
+    <span class="hidden md:flex">
+        Retour
+    </span>
+</a>
+{{/slot}}
+
+<div class="flex flex-col gap-6 col-span-2 md:col-span-6 lg:col-span-12">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Informations générales</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-muted">ID</p>
+                    <p class="font-semibold">{{inbox.id}}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-muted">Date de création</p>
+                    <p class="font-semibold">{{formattedDate}}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-muted">Site</p>
+                    <p class="font-semibold">{{site.domain}}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-muted">Formulaire</p>
+                    <p class="font-semibold">{{form.name}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Données du formulaire</h2>
+            {{#if contentEntries}}
+            <div class="overflow-x-auto">
+                <table class="table w-full">
+                    <thead>
+                        <tr>
+                            <th>Champ</th>
+                            <th>Valeur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each contentEntries}}
+                        <tr>
+                            <td class="font-semibold">{{this.label}}</td>
+                            <td>
+                                <div class="whitespace-pre-wrap break-words">{{this.value}}</div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{else}}
+            <p class="text-sm text-muted">Aucune donnée disponible</p>
+            {{/if}}
+        </div>
+    </div>
+
+    {{#if rawContent}}
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Données brutes (JSON)</h2>
+            <div class="mockup-code">
+                <pre><code>{{rawContent}}</code></pre>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+</div>
