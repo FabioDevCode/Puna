@@ -17,8 +17,10 @@ Vous êtes libre de l’utiliser, le modifier et le redistribuer,
 
 ## TODO - Developpement (SIMPLE) :
 
-- Page show pour visualisé un éléments **Inbox**
-- Faire la suppression
+- Ajouter plugin flatpickr pour les dates
+- Ajouter plugin inputmask
+- Mettre de placeholders
+- i18n faire toutes les trads.
 
 ## TODO - Developpement (COMPLEXE) :
 
