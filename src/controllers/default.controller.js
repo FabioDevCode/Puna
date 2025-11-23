@@ -920,6 +920,7 @@ export const showInbox = async (req, res) => {
                         template: template[key],
                         label,
                         filename,
+                        original_filename: filename.split("_").slice(1).join("_"),
                         ...typeInfo
                     });
                 });

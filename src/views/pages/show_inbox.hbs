@@ -1,7 +1,6 @@
 {{#slot "title"}}
 <h3 class="font-inter truncate ellipsis-truncate title-max-w">
-    Inbox
-    {{!-- #{{inbox.id}} --}}
+    #{{inbox.id}}
 </h3>
 {{/slot}}
 
@@ -23,31 +22,29 @@
 
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12 overflow-hidden">
     <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
+        <div class="card-body p-4 overflow-hidden">
             <h2 class="card-title">Informations générales</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <p class="text-sm text-muted">ID</p>
-                    <p class="font-semibold">{{inbox.id}}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-muted">Date de réception</p>
-                    <p class="font-semibold">{{formattedDate}}</p>
-                </div>
+            <div id="{{inbox.id}}" class="flex flex-wrap items-center gap-4">
                 <div>
                     <p class="text-sm text-muted">Site</p>
                     <p class="font-semibold">{{site.domain}}</p>
                 </div>
+                <div class="divider divider-horizontal mx-0"></div>
                 <div>
                     <p class="text-sm text-muted">Formulaire</p>
                     <p class="font-semibold">{{form.name}}</p>
+                </div>
+                <div class="divider divider-horizontal mx-0"></div>
+                <div>
+                    <p class="text-sm text-muted">Date de réception</p>
+                    <p class="font-semibold">{{formattedDate}}</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
+        <div class="card-body p-4 overflow-hidden">
             <h2 class="card-title">Données du formulaire</h2>
             {{#if contentEntries}}
             <div class="overflow-x-auto">
@@ -78,7 +75,7 @@
 
     {{#if fileEntries}}
     <div class="card bg-base-100 shadow-xl select-none">
-        <div class="card-body">
+        <div class="card-body p-4 overflow-hidden">
             <h2 class="card-title">Documents</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {{#each fileEntries}}
@@ -96,7 +93,7 @@
                             </span>
                         </div>
                         <p class="text-sm font-medium text-base-content truncate" title="{{this.filename}}">
-                            {{this.filename}}
+                            {{this.original_filename}}
                         </p>
                         <p class="text-xs text-muted mt-1">
                             Champ : {{this.template}}
