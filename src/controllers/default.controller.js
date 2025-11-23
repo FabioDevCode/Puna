@@ -813,28 +813,140 @@ export const showInbox = async (req, res) => {
             templateObj = {};
         }
 
-        // Prepare content entries with labels from template
-        const contentEntries = Object.keys(contentObj || {}).map((key) => ({
-            key,
-            label: templateObj[key] || key,
-            value: contentObj[key] !== undefined && contentObj[key] !== null ? String(contentObj[key]) : '-'
-        }));
+        // Get file_keys from form
+        let fileKeys = [];
+        try {
+            if (form.file_keys) {
+                const parsed = typeof form.file_keys === 'string' ? JSON.parse(form.file_keys) : form.file_keys;
+                if (Array.isArray(parsed)) {
+                    fileKeys = parsed;
+                }
+            }
+        } catch (e) {
+            fileKeys = [];
+        }
+
+        // Helper function to determine file type color and icon
+        const getFileTypeInfo = (filename) => {
+            if (!filename) return { color: 'neutral', icon: 'fa-file', label: 'Fichier' };
+
+            const ext = filename.toLowerCase().split('.').pop();
+            // Images - Purple
+            if (['png', 'jpg', 'jpeg', 'webp'].includes(ext)) {
+                return {
+                    color: 'white',
+                    bg_color: '#b0a010',
+                    icon: 'fa-solid fa-file-image',
+                    label: ext.toUpperCase()
+                };
+            }
+
+            if (['xls', 'xlsx'].includes(ext)) {
+                return {
+                    color: 'white',
+                    bg_color: '#186E3F',
+                    icon: 'fa-solid fa-file-excel',
+                    label: ext.toUpperCase()
+                };
+            }
+
+            if (['csv'].includes(ext)) {
+                return {
+                    color: 'white',
+                    bg_color: '#077D3E',
+                    icon: 'fa-solid fa-file-csv',
+                    label: ext.toUpperCase()
+                };
+            }
+
+            if (ext === 'pdf') {
+                return {
+                    color: 'white',
+                    bg_color: '#AA0101',
+                    icon: 'fa-solid fa-file-pdf',
+                    label: 'PDF'
+                };
+            }
+
+            if (['doc', 'docx'].includes(ext)) {
+                return {
+                    color: 'white',
+                    bg_color: '#2A5893',
+                    icon: 'fa-solid fa-file-word',
+                    label: ext.toUpperCase()
+                };
+            }
+
+            if (['odt'].includes(ext)) {
+                return {
+                    color: 'white',
+                    bg_color: '#4A90E2',
+                    icon: 'fa-solid fa-file-lines',
+                    label: ext.toUpperCase()
+                };
+            }
+
+            if (['txt'].includes(ext)) {
+                return {
+                    color: 'white',
+                    bg_color: '#444444',
+                    icon: 'fa-solid fa-file-lines',
+                    label: ext.toUpperCase()
+                };
+            }
+
+            return {
+                color: 'white',
+                bg_color: '#1F2937',
+                icon: 'fa-solid fa-file',
+                label: ext.toUpperCase()
+            };
+        };
+
+        const template = JSON.parse(JSON.parse(JSON.stringify(form)).template);
+        // Extract files from content
+        const fileEntries = [];
+        for (const key of fileKeys) {
+            const value = contentObj[key];
+            if (value) {
+                const label = templateObj[key] || key;
+                // value can be a single filename or array of filenames
+                const filenames = Array.isArray(value) ? value : [value];
+
+                filenames.forEach((filename) => {
+                    const typeInfo = getFileTypeInfo(filename);
+                    fileEntries.push({
+                        key,
+                        template: template[key],
+                        label,
+                        filename,
+                        ...typeInfo
+                    });
+                });
+            }
+        }
+
+        // Prepare content entries with labels from template (excluding files)
+        const contentEntries = Object.keys(contentObj || {})
+            .filter(key => !fileKeys.includes(key)) // Exclude file fields
+            .map((key) => ({
+                key,
+                label: templateObj[key] || key,
+                value: contentObj[key] !== undefined && contentObj[key] !== null ? String(contentObj[key]) : '-'
+            }));
 
         // Format date
         const formattedDate = inbox.createdAt
             ? dayjs(inbox.createdAt).format('DD/MM/YYYY HH:mm:ss')
             : '-';
 
-        // Raw JSON
-        const rawContent = JSON.stringify(contentObj, null, 2);
-
         res.render('show_inbox', {
             inbox: inbox.toJSON(),
             form: form.toJSON(),
             site: site.toJSON(),
             contentEntries,
-            formattedDate,
-            rawContent
+            fileEntries,
+            formattedDate
         });
     } catch (err) {
         console.error(err);
