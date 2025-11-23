@@ -18,6 +18,8 @@
     */
 }
 
+
+
 * {
     scrollbar-width: thin;
     scrollbar-color: rgb(32, 42, 55, .6) rgb(255, 255, 255, .2);
@@ -96,6 +98,7 @@ main {
     overflow: auto;
     overflow-x: hidden;
     min-height: max-content;
+    border: 2px solid #DBEAF7;
 }
 
 h1,

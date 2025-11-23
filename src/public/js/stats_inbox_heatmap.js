@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchData(days) {
         try {
             const resp = await fetch(`/stats/inbox-heatmap?days=${days}`, { credentials: 'same-origin' });
-            if (!resp.ok) {throw new Error('Network error');}
+            if (!resp.ok) { throw new Error('Network error'); }
             return await resp.json();
         } catch (err) {
             console.error(err);
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         colorStops: [
                             {
                                 offset: 0,
-                                color: '#F3F8FC'
+                                color: '#ecececff'
                             },
                             {
                                 offset: 100,
@@ -44,6 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         ]
                     }
+                }
+            },
+            grid: {
+                row: {
+                    colors: ['#0175C3'], // ← fond de la zone du heatmap
+                    opacity: 1
                 }
             },
             states: {
