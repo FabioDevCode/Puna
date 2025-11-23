@@ -1100,6 +1100,116 @@ export const downloadFile = async (req, res) => {
     }
 };
 
+export const downloadInboxZip = async (req, res) => {
+    const { inboxId } = req.params;
+    const userId = req.session.user?.id;
+
+    try {
+        // Verify inbox exists and user has access
+        const inbox = await models.Inbox.findByPk(inboxId, {
+            include: [{
+                model: models.Form,
+                as: 'form',
+                include: [{
+                    model: models.Site,
+                    as: 'site',
+                    where: { fk_id_user: userId }
+                }]
+            }]
+        });
+
+        if (!inbox) {
+            return res.status(404).json({ error: 'Inbox entry not found' });
+        }
+
+        const form = inbox.form;
+        const site = form?.site;
+
+        if (!site) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        // Parse content to get all files
+        let contentObj = {};
+        try {
+            contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
+        } catch (e) {
+            contentObj = {};
+        }
+
+        // Get file_keys from form
+        let fileKeys = [];
+        try {
+            if (form.file_keys) {
+                const parsed = typeof form.file_keys === 'string' ? JSON.parse(form.file_keys) : form.file_keys;
+                if (Array.isArray(parsed)) {
+                    fileKeys = parsed;
+                }
+            }
+        } catch (e) {
+            fileKeys = [];
+        }
+
+        // Collect all files
+        const allFiles = [];
+        const { finalPathFor } = await import('../helpers/upload_utils.js');
+
+        for (const key of fileKeys) {
+            const value = contentObj[key];
+            if (value) {
+                const filenames = Array.isArray(value) ? value : [value];
+                for (const filename of filenames) {
+                    const { path: filePath } = finalPathFor(site, form, filename);
+                    if (fs.existsSync(filePath)) {
+                        const originalFilename = filename.split('_').slice(1).join('_');
+                        allFiles.push({ path: filePath, name: originalFilename });
+                    }
+                }
+            }
+        }
+
+        // Check if there are files to zip
+        if (allFiles.length === 0) {
+            return res.status(404).json({ error: 'No files found to download' });
+        }
+
+        // Create ZIP using archiver
+        const archiver = (await import('archiver')).default;
+        const archive = archiver('zip', {
+            zlib: { level: 9 } // Maximum compression
+        });
+
+        // Set response headers
+        const zipFilename = `inbox_${inboxId}_documents.zip`;
+        res.attachment(zipFilename);
+        res.setHeader('Content-Type', 'application/zip');
+
+        // Handle archiver errors
+        archive.on('error', (err) => {
+            console.error('Archive error:', err);
+            if (!res.headersSent) {
+                res.status(500).json({ error: 'Error creating archive' });
+            }
+        });
+
+        // Pipe archive to response
+        archive.pipe(res);
+
+        // Add files to archive
+        for (const file of allFiles) {
+            archive.file(file.path, { name: file.name });
+        }
+
+        // Finalize the archive
+        await archive.finalize();
+    } catch (err) {
+        console.error('downloadInboxZip error:', err);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Server error' });
+        }
+    }
+};
+
 export const allSite = async (req, res) => {
     try {
         const userId = req.session.user?.id;

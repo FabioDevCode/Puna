@@ -45,6 +45,7 @@ router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
 router.get('/inbox/:id', isConnected, dctl.showInbox);
 router.post('/inbox/:id/delete', isConnected, dctl.deleteInbox);
 router.get('/inbox/:inboxId/download/:filename', isConnected, dctl.downloadFile);
+router.get('/inbox/:inboxId/download-zip', isConnected, dctl.downloadInboxZip);
 
 
 export default router;

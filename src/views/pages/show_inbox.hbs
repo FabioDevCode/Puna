@@ -76,9 +76,15 @@
     {{#if fileEntries}}
     <div class="card bg-base-100 shadow-xl select-none">
         <div class="card-body p-4 overflow-hidden">
-            <h2 class="card-title">
-                Documents reçus
-            </h2>
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="card-title">
+                    Documents reçus
+                </h2>
+                <button id="btn_download_zip" class="btn btn-sm btn-neutral">
+                    <i class="fa-solid fa-file-zipper"></i>
+                    <span class="hidden md:inline">Télécharger tout</span>
+                </button>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {{#each fileEntries}}
                 <a href="/inbox/{{../inbox.id}}/download/{{this.filename}}"
@@ -114,3 +120,56 @@ inbox_id=inbox.id
 form_name=form.name
 site_id=site.id
 }}
+
+<!-- Modal de téléchargement ZIP -->
+<dialog id="modal_downloading_zip" class="modal">
+    <div class="modal-box w-11/12 md:w-4/12 lg:w-3/12 text-center">
+        <h3 class="font-bold text-lg mb-4">Préparation du téléchargement</h3>
+        <div class="flex justify-center mb-4">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+        <p class="text-sm text-muted">
+            Veuillez patienter pendant la création de l'archive ZIP...
+        </p>
+    </div>
+</dialog>
+
+<script>
+    (function () {
+        try {
+            const btnDownloadZip = document.getElementById('btn_download_zip');
+            const modal = document.getElementById('modal_downloading_zip');
+
+            if (btnDownloadZip && modal) {
+                btnDownloadZip.addEventListener('click', async (e) => {
+                    e.preventDefault();
+
+                    // Show loading modal
+                    try {
+                        modal.showModal();
+                    } catch (err) {
+                        console.error('Error showing modal:', err);
+                    }
+
+                    // Create a hidden iframe to trigger download
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = '/inbox/{{inbox.id}}/download-zip';
+                    document.body.appendChild(iframe);
+
+                    // Close modal after a delay (the download should have started)
+                    setTimeout(() => {
+                        try {
+                            modal.close();
+                            document.body.removeChild(iframe);
+                        } catch (err) {
+                            console.error('Error closing modal:', err);
+                        }
+                    }, 2000);
+                });
+            }
+        } catch (e) {
+            console.error('Script error:', e);
+        }
+    })();
+</script>
