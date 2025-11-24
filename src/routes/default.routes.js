@@ -33,6 +33,7 @@ router.get('/admin', isConnected, dctl.admin);
 router.get('/admin/users', isConnected, dctl.adminUsers);
 router.get('/admin/users/list', isConnected, dctl.adminUsersList);
 router.get('/admin/users/export-excel', isConnected, dctl.adminUsersExportExcel);
+router.post('/admin/users/create', isConnected, dctl.adminCreateUser);
 
 router.get('/all-site', isConnected, dctl.allSite);
 router.get('/site/:id/token', isConnected, dctl.getSiteToken);

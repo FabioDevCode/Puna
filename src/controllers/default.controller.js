@@ -152,8 +152,19 @@ export const admin = async (req, res) => {
  */
 export const adminUsers = async (req, res) => {
     try {
+        const userId = req.session.user?.id;
+
+        // Récupérer les sites de l'utilisateur connecté (pour l'assignation)
+        // Si super_admin, peut-être tous les sites ? Pour l'instant restons sur les sites du user.
+        const sites = await models.Site.findAll({
+            where: { fk_id_user: userId },
+            attributes: ['id', 'domain'],
+            order: [['domain', 'ASC']]
+        });
+
         res.render('admin_users', {
-            layout: 'administration'
+            layout: 'administration',
+            sites: sites.map(s => s.toJSON())
         });
     } catch (err) {
         console.error('adminUsers error:', err);
@@ -290,6 +301,64 @@ export const adminUsersExportExcel = async (req, res) => {
     } catch (err) {
         console.error('adminUsersExportExcel error:', err);
         res.status(500).json({ error: 'Erreur lors de l\'export' });
+    }
+};
+
+/**
+ * Création d'un utilisateur
+ */
+export const adminCreateUser = async (req, res) => {
+    try {
+        const { login, email, role, sites } = req.body;
+        const creatorId = req.session.user?.id;
+
+        // Validation basique
+        if (!login || !email || !role) {
+            // TODO: Ajouter flash message pour erreur
+            return res.redirect('/admin/users');
+        }
+
+        // Vérifier si l'utilisateur existe déjà
+        const existingUser = await models.User.findOne({
+            where: {
+                [Op.or]: [{ email }, { login }]
+            }
+        });
+
+        if (existingUser) {
+            return res.redirect('/admin/users');
+        }
+
+        // Créer l'utilisateur
+        const newUser = await models.User.create({
+            login,
+            email,
+            role,
+            created_by: creatorId,
+            enabled: false
+        });
+
+        // Assigner les sites
+        if (sites) {
+            // Si sites est une string (un seul site sélectionné), on le met dans un tableau
+            const sitesArray = Array.isArray(sites) ? sites : [sites];
+
+            const siteUserEntries = sitesArray.map(siteId => ({
+                fk_id_site: siteId,
+                fk_id_user: newUser.id
+            }));
+
+            if (siteUserEntries.length > 0) {
+                await models.SiteUser.bulkCreate(siteUserEntries);
+            }
+        }
+
+        // TODO: Flash message "Utilisateur créé avec succès"
+        res.redirect('/admin/users');
+
+    } catch (err) {
+        console.error('adminCreateUser error:', err);
+        res.redirect('/admin/users');
     }
 };
 
