@@ -13,7 +13,8 @@
             <li>
                 <a href="/dashboard"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                    <i class="fas fa-chart-pie"></i>
+                    {{!-- <i class="fas fa-chart-pie"></i> --}}
+                    <i class="fa-solid fa-chart-line"></i>
                     Dashboard
                 </a>
             </li>
@@ -25,11 +26,6 @@
                     Site web
                 </a>
             </li>
-        </ul>
-    </nav>
-
-    <div class="mt-auto text-sm text-neutral">
-        <ul class="menu p-2 gap-[1px] rounded-lg">
             <li>
                 <a href="/admin"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
@@ -37,10 +33,16 @@
                     Administration
                 </a>
             </li>
+        </ul>
+    </nav>
+
+    <div class="mt-auto text-sm text-neutral">
+        <ul class="menu p-2 gap-[1px] rounded-lg">
             <li>
                 <a href="/dp-logout"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                    <i class="fas fa-sign-out-alt"></i>
+                    {{!-- <i class="fas fa-sign-out-alt"></i> --}}
+                    <i class="fa-solid fa-door-open"></i>
                     Se déconnecter
                 </a>
             </li>

@@ -15,23 +15,31 @@
             <li>
                 <a href="/admin"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                    <i class="fa-solid fa-gauge"></i>
+                    {{!-- <i class="fa-solid fa-gauge"></i> --}}
+                    <i class="fa-solid fa-chart-bar"></i>
                     Vue d'ensemble
                 </a>
             </li>
             <li>
                 <a href="/admin/users"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                    {{!-- <i class="fa-solid fa-users"></i> --}}
-                    <i class="fa-solid fa-user-group"></i>
+                    <i class="fa-solid fa-users"></i>
                     Utilisateurs
                 </a>
             </li>
             <li>
                 <a href="/admin/settings"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                    <i class="fa-solid fa-cog"></i>
+                    {{!-- <i class="fa-solid fa-cog"></i> --}}
+                    <i class="fa-solid fa-gears"></i>
                     Paramètres
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard"
+                    class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Retour
                 </a>
             </li>
         </ul>
@@ -40,13 +48,6 @@
     <!-- Bas du menu -->
     <div class="mt-auto text-sm text-neutral">
         <ul class="menu p-2 gap-[1px] rounded-lg">
-            <li>
-                <a href="/dashboard"
-                    class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    Retour
-                </a>
-            </li>
             <li>
                 <a href="/dp-logout"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">

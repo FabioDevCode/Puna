@@ -342,7 +342,6 @@ export const adminCreateUser = async (req, res) => {
         if (sites) {
             // Si sites est une string (un seul site sélectionné), on le met dans un tableau
             const sitesArray = Array.isArray(sites) ? sites : [sites];
-
             const siteUserEntries = sitesArray.map(siteId => ({
                 fk_id_site: siteId,
                 fk_id_user: newUser.id

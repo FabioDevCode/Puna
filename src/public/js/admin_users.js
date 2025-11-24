@@ -37,8 +37,44 @@ document.addEventListener('DOMContentLoaded', () => {
         // Setup recherche
         setupSearch();
 
+        // Setup recherche sites (modal)
+        setupSiteSearch();
+
         // Chargement initial
         loadUsers();
+    }
+
+    function setupSiteSearch() {
+        const input = document.getElementById('siteSearchInput');
+        const container = document.getElementById('sitesListContainer');
+        const noResult = document.getElementById('noSiteFound');
+
+        if (!input || !container) return;
+
+        input.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const labels = container.querySelectorAll('label');
+            let visibleCount = 0;
+
+            labels.forEach(label => {
+                const text = label.querySelector('.label-text').textContent.toLowerCase();
+                if (text.includes(term)) {
+                    label.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    label.classList.add('hidden');
+                }
+            });
+
+            // Afficher message si aucun résultat
+            if (noResult) {
+                if (visibleCount === 0 && labels.length > 0) {
+                    noResult.classList.remove('hidden');
+                } else {
+                    noResult.classList.add('hidden');
+                }
+            }
+        });
     }
 
     function setupSearch() {
