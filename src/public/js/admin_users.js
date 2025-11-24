@@ -116,23 +116,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         users.forEach(user => {
             const tr = document.createElement('tr');
-            tr.className = 'hover';
+            // tr.className = 'hover';
 
             // Badge rôle
             let roleBadge = '';
             switch (user.role) {
-                case 'super_admin': roleBadge = '<span class="badge badge-error badge-sm text-white">Super Admin</span>'; break;
-                case 'owner': roleBadge = '<span class="badge badge-warning badge-sm">Owner</span>'; break;
-                case 'editor': roleBadge = '<span class="badge badge-info badge-sm text-white">Editor</span>'; break;
-                case 'viewer': roleBadge = '<span class="badge badge-ghost badge-sm">Viewer</span>'; break;
-                case 'beta': roleBadge = '<span class="badge badge-secondary badge-sm text-white">Beta</span>'; break;
-                default: roleBadge = '<span class="badge badge-ghost badge-sm">N/A</span>';
+                case 'super_admin':
+                    roleBadge = '<span class="badge badge-outline badge_super_admin badge-sm">Super Admin</span>';
+                    break;
+                case 'owner':
+                    roleBadge = '<span class="badge badge-outline badge_owner badge-sm">Owner</span>';
+                    break;
+                case 'editor':
+                    roleBadge = '<span class="badge badge-outline badge_editor badge-sm">Editor</span>';
+                    break;
+                case 'viewer':
+                    roleBadge = '<span class="badge badge-outline badge_viewer badge-sm">Viewer</span>';
+                    break;
+                case 'beta':
+                    roleBadge = '<span class="badge badge-outline badge_beta badge-sm">Beta</span>';
+                    break;
+                default:
+                    roleBadge = '<span class="badge badge-outline badge-ghost badge-sm">N/A</span>';
             }
 
             // Statut activé
             const statusIcon = user.enabled
-                ? '<span class="badge badge-success w-[28px] badge-sm text-white" title="Activé"></span>'
-                : '<span class="badge badge-error w-[28px] badge-sm text-white" title="Désactivé"></span>';
+                ? '<span class="badge badge-success w-[20px] mt-2 badge-md" title="Activé"></span>'
+                : '<span class="badge badge-error w-[20px] mt-2 badge-md" title="Désactivé"></span>';
 
             tr.innerHTML = `
                 <td class="font-medium">${user.email}</td>
@@ -144,15 +155,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="text-sm">${user.createdAt}</td>
                 <td class="text-right">
                     <div class="flex justify-end items-center gap-2 w-full">
-                        <button class="btn btn-sm btn-outline btn-warning w-[38.25px] h-[32px] pt-[2px]">
+                        <button class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline btn-accent w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-pen-to-square"></i>
                         </button>
                         <button class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-trash-can"></i>
                         </button>
                     </div>
-
-
                 </td>
             `;
             fragment.appendChild(tr);
@@ -168,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update compteur
         const start = state.total === 0 ? 0 : state.offset + 1;
         const end = Math.min(state.offset + state.limit, state.total);
-        elements.countLabel.textContent = `${start}-${end} sur ${state.total}`;
+        elements.countLabel.textContent = `${end} sur ${state.total}`;
 
         // Update boutons
         elements.currentBtn.textContent = currentPage;

@@ -5,7 +5,7 @@
 <!-- Card: Liste des utilisateurs -->
 <div class="h-full col-span-2 md:col-span-6 lg:col-span-12">
     <div class="card h-full bg-base-100 shadow-xl">
-        <div id="userContainer" class="card-body p-4 overflow-hidden">
+        <div id="userContainer" class="card-body h-full p-4 overflow-hidden">
             <!-- Actions de la table -->
             <div id="tableActions">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
@@ -29,11 +29,11 @@
 
                     <div class="flex flex-wrap justify-end items-center gap-2">
                         <!-- Boutons d'action -->
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 none">
                             <button id="exportExcelBtn"
                                 class="btn btn-sm bg-green-700 text-white border-green-700 hover:bg-green-800 hover:text-white hover:border-green-700 transition-colors">
                                 <i class="fa-solid fa-file-excel"></i>
-                                <span class="hidden md:flex">Exporter Excel</span>
+                                <span class="hidden md:flex">Exporter un Excel</span>
                             </button>
                         </div>
 

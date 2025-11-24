@@ -131,6 +131,11 @@ h3 {
     background-color: #ffffff;
 }
 
+.btn-outline.btn-accent:hover,
+.btn-outline.btn-accent:focus {
+    color: whitesmoke;
+}
+
 .badge {
     border: 0px solid transparent;
 }
@@ -138,6 +143,31 @@ h3 {
 .badge-xs {
     height: .75rem;
     width: .75rem;
+}
+
+.badge_super_admin {
+    background-color: #101E26;
+    color: white;
+}
+
+.badge_owner {
+    background-color: #2F6EA9;
+    color: whitesmoke;
+}
+
+.badge_editor {
+    background-color: #CFE3F5;
+    color: #0075C3;
+}
+
+.badge_viewer {
+    background-color: #E3CEE4;
+    color: #6E0075;
+}
+
+.badge_beta {
+    background-color: #FFBE00;
+    color: rgb(30, 30, 30);
 }
 
 .font-bebas {
@@ -280,7 +310,13 @@ h3 {
     height: auto;
 }
 
-#tableUsers,
+#tableUsers {
+    max-height: calc(100vh - var(--navbar-height) - 8rem);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+}
+
 #tableInbox {
     max-height: calc(100vh - var(--navbar-height) - 15rem);
     overflow: auto;
