@@ -35,7 +35,7 @@ export const buildAttributes = (attributes) => {
                     break;
                 case 'ENUM':
                     object[prop] = { ...currentValue };
-                    object[prop].type = DataTypes.ENUM(currentValue.values);
+                    object[prop].type = DataTypes.ENUM(...currentValue.values);
                     break;
                 default:
                     object[prop] = { ...currentValue };

@@ -34,10 +34,11 @@ Vous êtes libre de l’utiliser, le modifier et le redistribuer,
 - 2 from par site MAX
 - User unique pas d'administrateur
 
-#### User type profile
 
-- unique (l'utilisateur n'est pas admin et ne vois que ces prore site 1 seul compte unique)
-- unique_limited (Pour version d'essai "Beta" avec limit de site et de form)
-- admin (1 seul user créer lors de l'installation Vois c'est propre site ainsi que ce de tout les utilisateurs de l'application)
-- lecteur (Utilisateur a qui on affecte des "site", afin qu'il ai un visu sur les données, ne peux faire aucune action de suppression ou de création)
-- sub_admin (Tout comme l'admin mais ne peux pas touché au user admin)
+## Roles
+
+- super_admin (peux tout faire)
+- owner (peux faire tout sauf supprimer l'utilisateur owner et super_admin) peux créer d'autre user
+- editor (accède au site du owner et peux créer des form)
+- viewer (accède en visuel seulement)
+- beta (comme owner mes avec des limites)

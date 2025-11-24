@@ -1,1 +1,20 @@
-[]
+[
+    {
+        "as": "creator",
+        "foreignKey": "created_by",
+        "relation": "belongsTo",
+        "target": "User"
+    },
+    {
+        "as": "createdUsers",
+        "foreignKey": "created_by",
+        "relation": "hasMany",
+        "target": "User"
+    },
+    {
+        "as": "siteAssignments",
+        "foreignKey": "fk_id_user",
+        "relation": "hasMany",
+        "target": "SiteUser"
+    }
+]

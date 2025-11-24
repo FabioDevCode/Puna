@@ -3,6 +3,12 @@
         "as": "user",
         "foreignKey": "fk_id_user",
         "relation": "belongsTo",
-        "target": "user"
+        "target": "User"
+    },
+    {
+        "as": "assignedUsers",
+        "foreignKey": "fk_id_site",
+        "relation": "hasMany",
+        "target": "SiteUser"
     }
 ]

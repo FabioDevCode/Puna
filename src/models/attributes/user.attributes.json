@@ -26,5 +26,22 @@
     "password": {
         "allowNull": true,
         "type": "STRING"
+    },
+    "role": {
+        "allowNull": true,
+        "defaultValue": null,
+        "type": "ENUM",
+        "values": [
+            "super_admin",
+            "owner",
+            "editor",
+            "viewer",
+            "beta"
+        ]
+    },
+    "created_by": {
+        "allowNull": true,
+        "defaultValue": null,
+        "type": "UUID"
     }
 }

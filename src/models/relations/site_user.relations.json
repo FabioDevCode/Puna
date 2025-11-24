@@ -1,0 +1,14 @@
+[
+    {
+        "as": "site",
+        "foreignKey": "fk_id_site",
+        "relation": "belongsTo",
+        "target": "Site"
+    },
+    {
+        "as": "user",
+        "foreignKey": "fk_id_user",
+        "relation": "belongsTo",
+        "target": "User"
+    }
+]
