@@ -5,12 +5,15 @@
 	"main": "server.js",
 	"type": "module",
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=20"
 	},
 	"scripts": {
 		"dev": "node --env-file=.env --watch server.js",
 		"start": "node --env-file=.env server.js",
-		"lint": "eslint . --fix"
+		"lint": "eslint . --fix",
+		"migrate": "node --env-file=.env migrations/run_migration.js",
+		"migrate:simple": "node --env-file=.env migrations/run_migration_simple.js",
+		"migrate:status": "node --env-file=.env migrations/check_migration_status.js"
 	},
 	"keywords": [
 		"Puna"

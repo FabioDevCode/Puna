@@ -11,3 +11,5 @@ src/api/Puna/Puna Send.bru
 src/api/Puna/burno.json
 storage/**/**
 storage/
+migrations/**/**
+migrations/
