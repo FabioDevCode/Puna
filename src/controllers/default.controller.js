@@ -1162,7 +1162,10 @@ export const downloadInboxZip = async (req, res) => {
                     const { path: filePath } = finalPathFor(site, form, filename);
                     if (fs.existsSync(filePath)) {
                         const originalFilename = filename.split('_').slice(1).join('_');
-                        allFiles.push({ path: filePath, name: originalFilename });
+                        allFiles.push({
+                            path: filePath,
+                            name: originalFilename
+                        });
                     }
                 }
             }
@@ -1272,15 +1275,13 @@ export const exportFormToExcel = async (req, res) => {
         const headers = ['Date de réception'];
         const dataKeys = [];
 
-        // Get all unique keys from inbox content (excluding file fields)
+        // Get all unique keys from inbox content (INCLUDING file fields now)
         const allKeys = new Set();
         inboxEntries.forEach(entry => {
             try {
                 const content = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
                 Object.keys(content || {}).forEach(key => {
-                    if (!fileKeys.includes(key)) {
-                        allKeys.add(key);
-                    }
+                    allKeys.add(key);
                 });
             } catch (e) {
                 // Skip malformed content
@@ -1321,7 +1322,23 @@ export const exportFormToExcel = async (req, res) => {
             // Add data columns
             dataKeys.forEach(key => {
                 const value = content[key];
-                row.push(value !== undefined && value !== null ? String(value) : '');
+
+                // Check if this is a file field
+                if (fileKeys.includes(key)) {
+                    // For file fields, display the filename(s)
+                    if (Array.isArray(value)) {
+                        // Multiple files: join with line break
+                        row.push(value.join('\n'));
+                    } else if (value) {
+                        // Single file
+                        row.push(String(value));
+                    } else {
+                        row.push('');
+                    }
+                } else {
+                    // Regular field
+                    row.push(value !== undefined && value !== null ? String(value) : '');
+                }
             });
 
             worksheet.addRow(row);

@@ -123,6 +123,10 @@ h3 {
     font-weight: 800 !important;
 }
 
+.btn-neutral {
+    color: whitesmoke;
+}
+
 .btn-outline {
     background-color: #ffffff;
 }

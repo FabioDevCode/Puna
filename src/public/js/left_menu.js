@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const asideNav = document.querySelector('aside nav');
-        if (!asideNav) {return;}
+        if (!asideNav) { return; }
 
         const anchors = Array.from(asideNav.querySelectorAll('a[href]'));
-        if (!anchors.length) {return;}
+        if (!anchors.length) { return; }
 
         const activePathRaw = window.location.pathname || '/';
         const activePath = activePathRaw.replace(/\/+$|\/$/, '') || '/';
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         anchors.forEach(a => {
             const href = a.getAttribute('href');
-            if (!href) {return;}
+            if (!href) { return; }
             // resolve relative urls
             let url;
             try {
@@ -47,12 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Clear previous active classes on anchors
         anchors.forEach(a => {
-            a.classList.remove('bg-neutral');
+            a.classList.remove('bg-secondary-content');
         });
 
         // Apply active classes to bestMatch anchor (background on the <a> element)
         if (bestMatch) {
-            bestMatch.classList.add('bg-neutral');
+            bestMatch.classList.add('bg-secondary-content');
         }
     } catch (err) {
         // silent fail
