@@ -280,6 +280,7 @@ h3 {
     height: auto;
 }
 
+#tableUsers,
 #tableInbox {
     max-height: calc(100vh - var(--navbar-height) - 15rem);
     overflow: auto;
@@ -287,6 +288,7 @@ h3 {
     border-radius: 10px;
 }
 
+#tableUsers table thead,
 #tableInbox table thead {
     background: var(--table-head-bg);
     overflow: hidden;

@@ -28,6 +28,12 @@ router.get('/stats/top-site-forms', isConnected, dctl.getTopSiteForms);
 router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
 router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
 
+// Administration
+router.get('/admin', isConnected, dctl.admin);
+router.get('/admin/users', isConnected, dctl.adminUsers);
+router.get('/admin/users/list', isConnected, dctl.adminUsersList);
+router.get('/admin/users/export-excel', isConnected, dctl.adminUsersExportExcel);
+
 router.get('/all-site', isConnected, dctl.allSite);
 router.get('/site/:id/token', isConnected, dctl.getSiteToken);
 router.get('/site/:id', isConnected, dctl.showSite);

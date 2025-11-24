@@ -133,6 +133,166 @@ export const dashboard = async (req, res) => {
     }
 };
 
+/**
+ * Page d'administration
+ */
+export const admin = async (req, res) => {
+    try {
+        res.render('admin', {
+            layout: 'administration'
+        });
+    } catch (err) {
+        console.error('admin error:', err);
+        res.redirect('/dashboard');
+    }
+};
+
+/**
+ * Page de gestion des utilisateurs
+ */
+export const adminUsers = async (req, res) => {
+    try {
+        res.render('admin_users', {
+            layout: 'administration'
+        });
+    } catch (err) {
+        console.error('adminUsers error:', err);
+        res.redirect('/admin');
+    }
+};
+
+/**
+ * API - Liste des utilisateurs avec pagination
+ */
+export const adminUsersList = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = parseInt(req.query.offset) || 0;
+        const search = req.query.search || '';
+
+        // Construire les conditions de recherche
+        const whereConditions = {};
+        if (search) {
+            whereConditions[Op.or] = [
+                { email: { [Op.like]: `%${search}%` } },
+                { login: { [Op.like]: `%${search}%` } }
+            ];
+        }
+
+        // Récupérer les utilisateurs avec pagination
+        const { count, rows: users } = await models.User.findAndCountAll({
+            where: whereConditions,
+            limit,
+            offset,
+            order: [['createdAt', 'DESC']],
+            include: [{
+                model: models.User,
+                as: 'creator',
+                attributes: ['id', 'login', 'email']
+            }],
+            attributes: ['id', 'email', 'login', 'role', 'enabled', 'last_connection', 'createdAt', 'created_by']
+        });
+
+        // Formater les données
+        const formattedUsers = users.map(user => ({
+            id: user.id,
+            email: user.email,
+            login: user.login,
+            role: user.role || 'N/A',
+            created_by: user.creator ? user.creator.login : 'N/A',
+            enabled: user.enabled,
+            last_connection: user.last_connection ? dayjs(user.last_connection).format('DD/MM/YYYY HH:mm') : 'Jamais',
+            createdAt: dayjs(user.createdAt).format('DD/MM/YYYY HH:mm')
+        }));
+
+        res.json({
+            users: formattedUsers,
+            total: count,
+            limit,
+            offset
+        });
+
+    } catch (err) {
+        console.error('adminUsersList error:', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
+/**
+ * Export Excel des utilisateurs
+ */
+export const adminUsersExportExcel = async (req, res) => {
+    try {
+        const search = req.query.search || '';
+
+        // Construire les conditions de recherche
+        const whereConditions = {};
+        if (search) {
+            whereConditions[Op.or] = [
+                { email: { [Op.like]: `%${search}%` } },
+                { login: { [Op.like]: `%${search}%` } }
+            ];
+        }
+
+        // Récupérer tous les utilisateurs
+        const users = await models.User.findAll({
+            where: whereConditions,
+            order: [['createdAt', 'DESC']],
+            include: [{
+                model: models.User,
+                as: 'creator',
+                attributes: ['login']
+            }]
+        });
+
+        // Créer le workbook Excel
+        const ExcelJS = (await import('exceljs')).default;
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Utilisateurs');
+
+        // Définir les colonnes
+        worksheet.columns = [
+            { header: 'Email', key: 'email', width: 30 },
+            { header: 'Login', key: 'login', width: 20 },
+            { header: 'Rôle', key: 'role', width: 15 },
+            { header: 'Créé par', key: 'created_by', width: 20 },
+            { header: 'Activé', key: 'enabled', width: 10 },
+            { header: 'Dernière connexion', key: 'last_connection', width: 20 },
+            { header: 'Créé le', key: 'createdAt', width: 20 }
+        ];
+
+        // Style des en-têtes
+        worksheet.getRow(1).font = { bold: true };
+        worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'left' };
+
+        // Ajouter les données
+        users.forEach(user => {
+            worksheet.addRow({
+                email: user.email || '',
+                login: user.login || '',
+                role: user.role || 'N/A',
+                created_by: user.creator ? user.creator.login : 'N/A',
+                enabled: user.enabled ? 'Oui' : 'Non',
+                last_connection: user.last_connection ? dayjs(user.last_connection).format('DD/MM/YYYY HH:mm') : 'Jamais',
+                createdAt: dayjs(user.createdAt).format('DD/MM/YYYY HH:mm')
+            });
+        });
+
+        // Générer le fichier
+        const fileName = `utilisateurs_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.xlsx`;
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (err) {
+        console.error('adminUsersExportExcel error:', err);
+        res.status(500).json({ error: 'Erreur lors de l\'export' });
+    }
+};
+
 export const error = async (req, res) => {
     res.render('error', {
         layout: false,

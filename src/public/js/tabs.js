@@ -335,6 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     const thAction = document.createElement('th');
+                    thAction.innerHTML = "Actions"
                     tr.appendChild(thAction);
 
                     inboxHead.appendChild(tr);
@@ -396,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
 
                         const tdAct = document.createElement('th');
+                        tdAct.classList.add('text-right');
                         tdAct.innerHTML = `
                         <div class="flex gap-2 w-max">
                             <a href="/inbox/${it.id}" class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">

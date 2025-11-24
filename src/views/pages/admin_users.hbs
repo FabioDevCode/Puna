@@ -1,0 +1,96 @@
+{{#slot "title"}}
+<h3 class="font-inter">Utilisateurs</h3>
+{{/slot}}
+
+<!-- Card: Liste des utilisateurs -->
+<div class="h-full col-span-2 md:col-span-6 lg:col-span-12">
+    <div class="card h-full bg-base-100 shadow-xl">
+        <div id="userContainer" class="card-body p-4 overflow-hidden">
+            <!-- Actions de la table -->
+            <div id="tableActions">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div class="flex items-center gap-2">
+                        <!-- Sélecteur de nombre de lignes et compteur -->
+                        <select id="numLignTable" class="select select-sm select-bordered w-max">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <div id="count_users" class="text-sm min-w-[102px] select-none"></div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div id="paginationTable" class="join">
+                        <button id="prevPage" class="join-item btn btn-sm">«</button>
+                        <button id="currentPage" class="join-item btn btn-sm w-[34px] no-activate">1</button>
+                        <button id="nextPage" class="join-item btn btn-sm">»</button>
+                    </div>
+
+                    <div class="flex flex-wrap justify-end items-center gap-2">
+                        <!-- Boutons d'action -->
+                        <div class="flex gap-2">
+                            <button id="exportExcelBtn"
+                                class="btn btn-sm bg-green-700 text-white border-green-700 hover:bg-green-800 hover:text-white hover:border-green-700 transition-colors">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span class="hidden md:flex">Exporter Excel</span>
+                            </button>
+                        </div>
+
+                        <!-- Recherche -->
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Rechercher..."
+                                class="input input-sm input-bordered w-full md:w-64 pr-8">
+                            <button id="clearSearch"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-content hover:text-neutral hidden">
+                                <i class="fa-solid fa-times"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div id="tableUsers" class="overflow-x-auto w-full">
+                <table class="table w-full table-pin-cols">
+                    <thead id="users_table_head" class="text-[14px] bg-base-200">
+                        <tr>
+                            <th>Email</th>
+                            <th>Login</th>
+                            <th>Rôle</th>
+                            <th>Créé par</th>
+                            <th>Activé</th>
+                            <th>Dernière connexion</th>
+                            <th>Créé le</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users_table_body">
+                        <!-- Rempli par JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Message de chargement -->
+            <div id="loading_users"
+                class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4">
+                <i class="fa-solid fa-spinner fa-spin text-5xl text-neutral-content"></i>
+                <p class="text-sm text-neutral text-center select-none">
+                    Chargement des utilisateurs...
+                </p>
+            </div>
+
+            <!-- Message quand aucun utilisateur -->
+            <div id="no_users"
+                class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4 none">
+                <i class="fa-solid fa-users text-5xl text-neutral-content"></i>
+                <p class="text-sm text-neutral text-center select-none">
+                    Aucun utilisateur trouvé
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/admin_users.js"></script>
