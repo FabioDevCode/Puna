@@ -85,7 +85,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {{#each fileEntries}}
                 <div
-                    class="download-card relative flex items-center gap-3 p-4 rounded-lg border border-base-300 bg-base-200 hover:bg-base-300 hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+                    class="download-card relative flex items-center gap-3 p-4 rounded-lg border border-neutral-content bg-neutral-content/30 hover:shadow-md transition-all duration-200 group">
                     <div class="flex-shrink-0">
                         <div class="w-12 h-12 rounded-lg bg-[{{this.bg_color}}] flex items-center justify-center">
                             <i class="{{this.icon}} text-3xl text-{{this.color}}"></i>
@@ -105,21 +105,13 @@
                         </p>
                     </div>
 
+
                     <!-- Download button (visible on hover) -->
                     <a href="/inbox/{{../inbox.id}}/download/{{this.filename}}" data-download-link
-                        class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn btn-xs btn-neutral gap-1 pointer-events-auto z-10">
+                        class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn btn-xs btn-neutral gap-1 pointer-events-auto z-10 shadow-md">
                         <i class="fa-solid fa-download text-xs"></i>
                         <span>Télécharger</span>
                     </a>
-
-                    <!-- Download indicator (hidden by default, shown on click) -->
-                    <div
-                        class="download-indicator absolute inset-0 bg-success/20 rounded-lg flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-                        <div
-                            class="bg-success text-white rounded-full aspect-square w-10 h-10 flex items-center justify-center shadow-lg transform scale-0 transition-transform duration-300">
-                            <i class="fa-solid fa-download text-xl"></i>
-                        </div>
-                    </div>
                 </div>
                 {{/each}}
             </div>
