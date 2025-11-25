@@ -48,13 +48,25 @@
                         </div>
 
                         <!-- Recherche -->
-                        <div class="relative">
-                            <input type="text" id="searchInput" placeholder="Rechercher..."
-                                class="input input-sm input-bordered w-full md:w-64 pr-8">
-                            <button id="clearSearch"
-                                class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-content hover:text-neutral hidden">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
+                        <div class="flex gap-2">
+                            <!-- Sélecteur de champ -->
+                            <select id="searchFieldSelect" class="select select-sm select-bordered w-max">
+                                <option value="auto" selected>Auto</option>
+                                <option value="login">Login</option>
+                                <option value="email">Email</option>
+                                <option value="role">Rôle</option>
+                                <option value="created_by">Créé par</option>
+                            </select>
+
+                            <!-- Input de recherche -->
+                            <div class="relative">
+                                <input type="text" id="searchInput" placeholder="Rechercher..."
+                                    class="input input-sm input-bordered w-full md:w-64 pr-8">
+                                <button id="clearSearch"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-content hover:text-neutral hidden">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
                         </div>
 
                     </div>
@@ -66,12 +78,12 @@
                 <table class="table w-full table-pin-cols">
                     <thead id="users_table_head" class="text-[14px] bg-base-200">
                         <tr>
-                            <th>Email</th>
                             <th>Login</th>
-                            <th>Rôle</th>
-                            <th>Créé par</th>
                             <th>Activé</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
                             <th>Dernière connexion</th>
+                            <th>Créé par</th>
                             <th>Créé le</th>
                             <th class="text-right">Actions</th>
                         </tr>

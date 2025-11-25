@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         offset: 0,
         total: 0,
         search: '',
+        searchField: 'auto', // Nouveau: champ de recherche sélectionné
         isLoading: false
     };
 
@@ -21,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBtn: document.getElementById('currentPage'),
         exportBtn: document.getElementById('exportExcelBtn'),
         searchInput: document.getElementById('searchInput'),
-        clearSearchBtn: document.getElementById('clearSearch')
+        clearSearchBtn: document.getElementById('clearSearch'),
+        searchFieldSelect: document.getElementById('searchFieldSelect') // Nouveau
     };
 
     // Initialisation
@@ -33,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.prevBtn.addEventListener('click', () => handlePageChange(-1));
         elements.nextBtn.addEventListener('click', () => handlePageChange(1));
         elements.exportBtn.addEventListener('click', handleExport);
+
+        // Event listener pour le sélecteur de champ
+        elements.searchFieldSelect.addEventListener('change', handleSearchFieldChange);
 
         // Setup recherche
         setupSearch();
@@ -118,7 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams({
                 limit: state.limit,
                 offset: state.offset,
-                search: state.search
+                search: state.search,
+                searchField: state.searchField
             });
 
             const response = await fetch(`/admin/users/list?${params}`);
@@ -181,13 +187,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? '<span class="badge badge-success w-[20px] mt-2 badge-md" title="Activé"></span>'
                 : '<span class="badge badge-error w-[20px] mt-2 badge-md" title="Désactivé"></span>';
 
+            // Classes conditionnelles pour "Créé par" et "Dernière connexion"
+            const createdByClass = user.created_by === 'N/A' ? 'text-sm text-neutral-content' : 'text-sm';
+            const lastConnectionClass = user.last_connection === 'N/A' ? 'text-sm text-neutral-content' : 'text-sm';
+
             tr.innerHTML = `
-                <td class="font-medium">${user.email}</td>
                 <td>${user.login}</td>
-                <td>${roleBadge}</td>
-                <td class="text-sm text-neutral-content">${user.created_by}</td>
                 <td class="text-left">${statusIcon}</td>
-                <td class="text-sm">${user.last_connection}</td>
+                <td class="font-medium">${user.email}</td>
+                <td>${roleBadge}</td>
+                <td class="${lastConnectionClass}">${user.last_connection}</td>
+                <td class="${createdByClass}">${user.created_by}</td>
                 <td class="text-sm">${user.createdAt}</td>
                 <td class="text-right">
                     <div class="flex justify-end items-center gap-2 w-full">
@@ -238,6 +248,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const newOffset = state.offset + (direction * state.limit);
         if (newOffset >= 0 && newOffset < state.total) {
             state.offset = newOffset;
+            loadUsers();
+        }
+    }
+
+    function handleSearchFieldChange(e) {
+        state.searchField = e.target.value;
+        if (state.search) {
+            // Si on a déjà une recherche, on recharge
+            state.offset = 0;
             loadUsers();
         }
     }

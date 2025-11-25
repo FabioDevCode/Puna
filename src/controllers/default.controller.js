@@ -180,14 +180,28 @@ export const adminUsersList = async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const offset = parseInt(req.query.offset) || 0;
         const search = req.query.search || '';
+        const searchField = req.query.searchField || 'auto';
 
         // Construire les conditions de recherche
         const whereConditions = {};
         if (search) {
-            whereConditions[Op.or] = [
-                { email: { [Op.like]: `%${search}%` } },
-                { login: { [Op.like]: `%${search}%` } }
-            ];
+            if (searchField === 'auto') {
+                // Recherche globale sur email et login
+                whereConditions[Op.or] = [
+                    { email: { [Op.like]: `%${search}%` } },
+                    { login: { [Op.like]: `%${search}%` } }
+                ];
+            } else if (searchField === 'role') {
+                // Recherche sur le rôle
+                whereConditions.role = { [Op.like]: `%${search}%` };
+            } else if (searchField === 'login') {
+                // Recherche sur login
+                whereConditions.login = { [Op.like]: `%${search}%` };
+            } else if (searchField === 'email') {
+                // Recherche sur email
+                whereConditions.email = { [Op.like]: `%${search}%` };
+            }
+            // Note: created_by nécessite une jointure, on le gère différemment
         }
 
         // Récupérer les utilisateurs avec pagination
@@ -199,7 +213,13 @@ export const adminUsersList = async (req, res) => {
             include: [{
                 model: models.User,
                 as: 'creator',
-                attributes: ['id', 'login', 'email']
+                attributes: ['id', 'login', 'email'],
+                // Si recherche sur created_by, filtrer ici
+                ...(searchField === 'created_by' && search ? {
+                    where: {
+                        login: { [Op.like]: `%${search}%` }
+                    }
+                } : {})
             }],
             attributes: ['id', 'email', 'login', 'role', 'enabled', 'last_connection', 'createdAt', 'created_by']
         });
@@ -212,8 +232,8 @@ export const adminUsersList = async (req, res) => {
             role: user.role || 'N/A',
             created_by: user.creator ? user.creator.login : 'N/A',
             enabled: user.enabled,
-            last_connection: user.last_connection ? dayjs(user.last_connection).format('DD/MM/YYYY HH:mm') : 'Jamais',
-            createdAt: dayjs(user.createdAt).format('DD/MM/YYYY HH:mm')
+            last_connection: user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
+            createdAt: dayjs(user.createdAt).format('YYYY-MM-DD HH:mm')
         }));
 
         res.json({
