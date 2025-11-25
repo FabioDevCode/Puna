@@ -310,15 +310,19 @@ h3 {
     height: auto;
 }
 
+#userContainer {
+    height: calc(100vh - var(--navbar-height) - 36px);
+}
+
 #tableUsers {
-    max-height: calc(100vh - var(--navbar-height) - 8rem);
+    height: calc(100vh - var(--navbar-height) - 32px - 80px);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: 10px;
 }
 
 #tableInbox {
-    max-height: calc(100vh - var(--navbar-height) - 15rem);
+    max-height: calc(100vh - var(--navbar-height) - 12px - 32px - 80px);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: 10px;
