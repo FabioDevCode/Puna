@@ -103,6 +103,7 @@ main {
     overflow-x: hidden !important;
     min-height: max-content;
     border: 2px solid #DBEAF7;
+    border-bottom: 0px solid transparent;
 }
 
 h1,

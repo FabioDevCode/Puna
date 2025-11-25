@@ -26,6 +26,7 @@ Vous êtes libre de l’utiliser, le modifier et le redistribuer,
 
 - Layout Administration + tout le paramétrage possible (création et gestion user etc...)
 - Limit le nombre de caractère reçu pour une clé. (3000/4000 caractères max)
+- En plus de "enabled" sur usager prévoir un Enum pour un "Status"
 
 ---
 

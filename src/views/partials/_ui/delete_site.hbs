@@ -20,15 +20,15 @@ domain="puna.fr"
 
 <dialog id="delete_site_modal_{{id}}" class="modal">
 	<div class="modal-box w-12/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
-		<h2 class="text-lg font-bold mb-4 text-error">
+		<h2 class="text-lg font-bold mb-2 text-error">
 			Confirmer la suppression du site
 		</h2>
 		<p class="mb-2">Pour supprimer ce site, veuillez saisir <b>{{domain}}</b>&nbsp;:</p>
 		<form id="formDeleteSite_{{id}}" action="/delete-site/{{id}}" method="post" class="flex flex-col gap-4">
-			<input id="confirm_domain_{{id}}" type="text" name="confirm_domain" class="input input-bordered w-full"
-				placeholder="{{domain}}" required />
+			<input id="confirm_domain_{{id}}" type="text" name="confirm_domain"
+				class="input input-sm input-bordered w-full" placeholder="{{domain}}" required />
 		</form>
-		<div class="modal-action">
+		<div class="modal-action mt-4">
 			<form method="dialog">
 				<button class="btn btn-sm">Annuler</button>
 			</form>

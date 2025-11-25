@@ -35,12 +35,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // prefix match (avoid matching root '/'
+            // prefix match (avoid matching root '/')
+            // Match if the active path starts with the link path followed by '/'
             if (linkPath !== '/' && activePath.startsWith(linkPath + '/')) {
                 const score = linkPath.length;
                 if (score > bestScore) {
                     bestScore = score;
                     bestMatch = a;
+                }
+                return;
+            }
+
+            // NEW: Match by first segment
+            // e.g., /site/all matches /site/123/view, /inbox/456/view, etc.
+            const linkSegments = linkPath.split('/').filter(s => s);
+            const activeSegments = activePath.split('/').filter(s => s);
+
+            if (linkSegments.length > 0 && activeSegments.length > 0) {
+                // If first segment matches (e.g., both start with /site, /inbox, /admin)
+                if (linkSegments[0] === activeSegments[0]) {
+                    // Give it a score based on first segment match
+                    const score = linkSegments[0].length;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = a;
+                    }
                 }
             }
         });
@@ -50,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             a.classList.remove('bg-secondary-content');
         });
 
-        // Apply active classes to bestMatch anchor (background on the <a> element)
+        // Apply active classes to bestMatch anchor
         if (bestMatch) {
             bestMatch.classList.add('bg-secondary-content');
         }

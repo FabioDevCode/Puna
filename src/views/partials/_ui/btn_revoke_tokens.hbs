@@ -1,9 +1,9 @@
 {{!--
-    Name: btn_revoke_tokens
-    Parameters:
-    - id: STRING (site id)
-    Usage:
-        {{> _ui/btn_revoke_tokens id=site.id }}
+Name: btn_revoke_tokens
+Parameters:
+- id: STRING (site id)
+Usage:
+{{> _ui/btn_revoke_tokens id=site.id }}
 --}}
 
 <label id="btn_revoke_tokens_opener_{{id}}" for="revoke_tokens_modal_{{id}}" class="btn btn-sm btn-outline btn-primary">
@@ -20,7 +20,7 @@
             Cette action est définitive.
         </p>
 
-        <div class="modal-action">
+        <div class="modal-action mt-1">
             <label for="revoke_tokens_modal_{{id}}" class="btn btn-sm">
                 Annuler
             </label>

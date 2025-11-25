@@ -596,6 +596,21 @@ export const adminUpdateUser = async (req, res) => {
     }
 };
 
+/**
+ * Page de paramètres de l'administration
+ */
+export const adminSettings = async (req, res) => {
+    try {
+        res.render('admin_settings', {
+            layout: 'administration'
+        });
+
+    } catch (err) {
+        console.error('adminSettings error:', err);
+        res.redirect('/admin');
+    }
+};
+
 export const error = async (req, res) => {
     res.render('error', {
         layout: false,
@@ -623,7 +638,7 @@ export const createSite = async (req, res) => {
             fk_id_user: userId,
             control_code: stringUtils.generateCode(16)
         });
-        return res.redirect(`/site/${site.id}`);
+        return res.redirect(`/site/${site.id}/view`);
     } catch (err) {
         return res.redirect('/error');
     }
@@ -718,9 +733,9 @@ export const deleteSite = async (req, res) => {
         if (site.domain === confirm_domain.trim()) {
             await models.Form.destroy({ where: { fk_id_site: siteId } });
             await site.destroy();
-            return res.redirect('/all-site');
+            return res.redirect('/site/all');
         } else {
-            return res.redirect(`/site/${siteId}`);
+            return res.redirect(`/site/${siteId}/view`);
         }
     } catch (err) {
         return res.redirect('/dashboard');
@@ -742,7 +757,7 @@ export const createForm = async (req, res) => {
 
         await models.Form.create({ name, fk_id_site, code });
 
-        return res.redirect(`/site/${fk_id_site}`);
+        return res.redirect(`/site/${fk_id_site}/view`);
     } catch (err) {
         return res.redirect('/error');
     }
@@ -763,7 +778,7 @@ export const deleteForm = async (req, res) => {
         const siteId = site.id;
         await form.destroy();
 
-        return res.redirect(`/site/${siteId}`);
+        return res.redirect(`/site/${siteId}/view`);
     } catch (err) {
         return res.redirect('/error');
     }
@@ -789,7 +804,7 @@ export const updateFormTemplateSave = async (req, res) => {
         form.template = JSON.stringify(templateObj);
         await form.save();
 
-        return res.redirect(`/site/${form.fk_id_site}?f=${form.name}`);
+        return res.redirect(`/site/${form.fk_id_site}/view?f=${form.name}`);
     } catch (err) {
         return res.redirect('/error');
     }
@@ -1458,10 +1473,10 @@ export const deleteInbox = async (req, res) => {
         if (redirectType === 'site') {
             // Get formName from query if provided
             const queryFormName = req.query.formName || formName;
-            return res.redirect(`/site/${siteId}?f=${encodeURIComponent(queryFormName)}`);
+            return res.redirect(`/site/${siteId}/view?f=${encodeURIComponent(queryFormName)}`);
         } else {
             // Default redirect to site page
-            return res.redirect(`/site/${siteId}?f=${encodeURIComponent(formName)}`);
+            return res.redirect(`/site/${siteId}/view?f=${encodeURIComponent(formName)}`);
         }
     } catch (err) {
         console.error(err);

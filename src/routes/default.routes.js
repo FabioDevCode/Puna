@@ -16,7 +16,6 @@ router.get('/dp-logout', authCtl.dpLogout);
 router.post('/dp-first-co', authCtl.dpFirstCoPost);
 router.post('/dp-connect', authCtl.dpConnect);
 
-
 // CONNECTED ==============================================================
 router.get('/dashboard', isConnected, dctl.dashboard);
 
@@ -38,10 +37,11 @@ router.post('/admin/users/delete', isConnected, dctl.adminDeleteUser);
 router.get('/admin/users/:id/view', isConnected, dctl.adminViewUser);
 router.get('/admin/users/:id/edit', isConnected, dctl.adminEditUser);
 router.post('/admin/users/:id/update', isConnected, dctl.adminUpdateUser);
+router.get('/admin/settings', isConnected, dctl.adminSettings);
 
-router.get('/all-site', isConnected, dctl.allSite);
+router.get('/site/all', isConnected, dctl.allSite);
 router.get('/site/:id/token', isConnected, dctl.getSiteToken);
-router.get('/site/:id', isConnected, dctl.showSite);
+router.get('/site/:id/view', isConnected, dctl.showSite);
 router.put('/site/:id/revoke-tokens', isConnected, dctl.revokeSiteTokens);
 router.post('/create-site', isConnected, dctl.createSite);
 router.post('/delete-site/:id', isConnected, dctl.deleteSite);
@@ -54,7 +54,7 @@ router.post('/form/:id/columns', isConnected, dctl.updateFormColumns);
 router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
 router.get('/form/:id/export-excel', isConnected, dctl.exportFormToExcel);
 
-router.get('/inbox/:id', isConnected, dctl.showInbox);
+router.get('/inbox/:id/view', isConnected, dctl.showInbox);
 router.post('/inbox/:id/delete', isConnected, dctl.deleteInbox);
 router.get('/inbox/:inboxId/download/:filename', isConnected, dctl.downloadFile);
 router.get('/inbox/:inboxId/download-zip', isConnected, dctl.downloadInboxZip);
