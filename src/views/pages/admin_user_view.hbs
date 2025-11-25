@@ -1,0 +1,130 @@
+{{#slot "title"}}
+<div class="flex items-center gap-4">
+    <a href="/admin/users" class="btn btn-sm btn-ghost">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <h3 class="font-inter">Détails utilisateur</h3>
+</div>
+{{/slot}}
+
+{{#slot "buttons"}}
+<a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-accent gap-2">
+    <i class="fa-solid fa-pen-to-square"></i>
+    Modifier
+</a>
+{{/slot}}
+
+<!-- Card: Détails utilisateur -->
+<div class="col-span-2 md:col-span-6 lg:col-span-12">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl mb-4">
+                <i class="fa-solid fa-user text-primary mr-2"></i>
+                {{user.login}}
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Login -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Login</span>
+                    </label>
+                    <div class="text-lg">{{user.login}}</div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Email</span>
+                    </label>
+                    <div class="text-lg">{{user.email}}</div>
+                </div>
+
+                <!-- Rôle -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Rôle</span>
+                    </label>
+                    <div>
+                        {{#if user.role}}
+                        <span class="badge badge-outline">{{user.role}}</span>
+                        {{else}}
+                        <span class="text-neutral-content">N/A</span>
+                        {{/if}}
+                    </div>
+                </div>
+
+                <!-- Activé -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Activé</span>
+                    </label>
+                    <div>
+                        {{#if user.enabled}}
+                        <span class="badge badge-success">Oui</span>
+                        {{else}}
+                        <span class="badge badge-error">Non</span>
+                        {{/if}}
+                    </div>
+                </div>
+
+                <!-- Dernière connexion -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Dernière connexion</span>
+                    </label>
+                    <div class="{{#unless user.last_connection}}text-neutral-content{{/unless}}">
+                        {{#if user.last_connection}}
+                        {{user.last_connection}}
+                        {{else}}
+                        N/A
+                        {{/if}}
+                    </div>
+                </div>
+
+                <!-- Créé par -->
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Créé par</span>
+                    </label>
+                    <div class="{{#unless user.creator}}text-neutral-content{{/unless}}">
+                        {{#if user.creator}}
+                        {{user.creator.login}}
+                        {{else}}
+                        N/A
+                        {{/if}}
+                    </div>
+                </div>
+
+                <!-- Créé le -->
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label">
+                        <span class="label-text font-semibold">Créé le</span>
+                    </label>
+                    <div>{{user.createdAt}}</div>
+                </div>
+
+                <!-- Sites assignés -->
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label">
+                        <span class="label-text font-semibold">Sites assignés</span>
+                    </label>
+                    <div class="flex flex-wrap gap-2">
+                        {{#if user.siteassignments}}
+                        {{#each user.siteassignments}}
+                        <span class="badge badge-lg badge-outline">
+                            <i class="fa-solid fa-globe mr-2"></i>
+                            {{this.site.domain}}
+                        </span>
+                        {{else}}
+                        <span class="text-neutral-content">Aucun site assigné</span>
+                        {{/each}}
+                        {{else}}
+                        <span class="text-neutral-content">Aucun site assigné</span>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

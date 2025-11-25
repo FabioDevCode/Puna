@@ -1,0 +1,187 @@
+{{#slot "title"}}
+<div class="flex items-center gap-4">
+    <a href="/admin/users" class="btn btn-sm btn-ghost">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <h3 class="font-inter">Modifier utilisateur</h3>
+</div>
+{{/slot}}
+
+<!-- Card: Édition utilisateur -->
+<div class="col-span-2 md:col-span-6 lg:col-span-12">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl mb-4">
+                <i class="fa-solid fa-user-edit text-accent mr-2"></i>
+                {{user.login}}
+            </h2>
+
+            <form action="/admin/users/{{user.id}}/update" method="POST" class="flex flex-col gap-6">
+                <input type="hidden" name="clear_password" id="clear_password_field" value="false">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Login -->
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Login <span class="text-error">*</span></span>
+                        </label>
+                        <input type="text" name="login" value="{{user.login}}"
+                            class="input input-sm input-bordered w-full" required>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Email <span class="text-error">*</span></span>
+                        </label>
+                        <input type="email" name="email" value="{{user.email}}"
+                            class="input input-sm input-bordered w-full" required>
+                    </div>
+
+                    <!-- Rôle -->
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Rôle <span class="text-error">*</span></span>
+                        </label>
+                        <select name="role" id="roleSelect" class="select select-sm select-bordered w-full" required>
+                            <option value="viewer">Viewer (Lecture seule)</option>
+                            <option value="editor">Editor (Peut modifier)</option>
+                            <option value="owner">Owner (Propriétaire)</option>
+                            <option value="beta">Beta Tester</option>
+                            <option value="super_admin">Super Admin</option>
+                        </select>
+                        <script>
+                            document.getElementById('roleSelect').value = '{{user.role}}';
+                        </script>
+                    </div>
+
+                    <!-- Activé (Bouton pour désactiver) -->
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Statut</span>
+                        </label>
+                        <div class="flex items-center gap-3">
+                            {{#if user.enabled}}
+                            <span class="badge badge-success">Activé</span>
+                            <button type="button" id="disableUserBtn" class="btn btn-sm btn-error btn-outline">
+                                <i class="fa-solid fa-ban"></i>
+                                Désactiver
+                            </button>
+                            {{else}}
+                            <span class="badge badge-error">Désactivé</span>
+                            {{/if}}
+                        </div>
+                    </div>
+
+                    <!-- Mot de passe (visuel) -->
+                    <div class="form-control w-full md:col-span-2">
+                        <label class="label">
+                            <span class="label-text font-semibold">Mot de passe</span>
+                            <span class="label-text-alt text-warning">Vider le mot de passe désactivera
+                                l'utilisateur</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="password" id="passwordDisplay" value="••••••••••"
+                                class="input input-sm input-bordered flex-1" disabled>
+                            <button type="button" id="clearPasswordBtn" class="btn btn-sm btn-warning btn-outline">
+                                <i class="fa-solid fa-trash"></i>
+                                Vider le mot de passe
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CHAMPS NON MODIFIABLES -->
+
+                    <!-- Dernière connexion (non modifiable) -->
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Dernière connexion</span>
+                        </label>
+                        <div class="text-sm {{#unless user.last_connection}}text-neutral-content{{/unless}}">
+                            {{#if user.last_connection}}
+                            {{user.last_connection}}
+                            {{else}}
+                            N/A
+                            {{/if}}
+                        </div>
+                    </div>
+
+                    <!-- Créé par (non modifiable) -->
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-semibold">Créé par</span>
+                        </label>
+                        <div class="text-sm {{#unless user.creator}}text-neutral-content{{/unless}}">
+                            {{#if user.creator}}
+                            {{user.creator.login}}
+                            {{else}}
+                            N/A
+                            {{/if}}
+                        </div>
+                    </div>
+
+                    <!-- Créé le (non modifiable) -->
+                    <div class="form-control w-full md:col-span-2">
+                        <label class="label">
+                            <span class="label-text font-semibold">Créé le</span>
+                        </label>
+                        <div class="text-sm">{{user.createdAt}}</div>
+                    </div>
+
+                    <!-- Sites assignés -->
+                    <div class="form-control w-full md:col-span-2">
+                        <label class="label">
+                            <span class="label-text font-semibold">Sites assignés</span>
+                        </label>
+
+                        <!-- Recherche de sites -->
+                        <div class="relative mb-2">
+                            <input type="text" id="siteSearchInput" placeholder="Filtrer les sites..."
+                                class="input input-sm input-bordered w-full pl-8">
+                            <i
+                                class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-content text-xs"></i>
+                        </div>
+
+                        <!-- Liste des sites (Checkboxes) -->
+                        <div id="sitesListContainer"
+                            class="border border-base-300 rounded-lg h-48 overflow-y-auto bg-base-100 p-1">
+                            {{#each sites}}
+                            <label
+                                class="cursor-pointer label hover:bg-base-200 rounded-md px-3 py-2 transition-colors justify-start gap-3">
+                                <input type="checkbox" name="sites" value="{{this.id}}"
+                                    class="checkbox checkbox-sm checkbox-secondary rounded-md site-checkbox" {{#if
+                                    this.isAssigned}}checked{{/if}} />
+                                <span class="label-text flex-1 truncate" title="{{this.domain}}">{{this.domain}}</span>
+                            </label>
+                            {{else}}
+                            <div class="text-center text-neutral text-sm p-8 flex flex-col items-center gap-2">
+                                <i class="fa-solid fa-globe text-2xl opacity-20"></i>
+                                <span>Aucun site disponible</span>
+                            </div>
+                            {{/each}}
+
+                            <!-- Message aucun résultat recherche -->
+                            <div id="noSiteFound" class="hidden text-center text-neutral text-sm p-4">
+                                Aucun site ne correspond à votre recherche
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex justify-end gap-2 mt-4">
+                    <a href="/admin/users" class="btn btn-sm">
+                        <i class="fa-solid fa-times"></i>
+                        Annuler
+                    </a>
+                    <button type="submit" class="btn btn-sm btn-accent">
+                        <i class="fa-solid fa-save"></i>
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/admin_user_edit.js"></script>

@@ -7,6 +7,7 @@ import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
 import models from '../models/index.js';
 import { encryptObject } from '../utils/crypto.js';
 import stringUtils from '../utils/string.js';
+import bcrypt from 'bcrypt';
 
 
 export const rootRedirect = (req, res) => {
@@ -378,6 +379,206 @@ export const adminCreateUser = async (req, res) => {
     } catch (err) {
         console.error('adminCreateUser error:', err);
         res.redirect('/admin/users');
+    }
+};
+
+/**
+ * Suppression d'un utilisateur
+ */
+export const adminDeleteUser = async (req, res) => {
+    try {
+        const { user_id, password } = req.body;
+        const currentUserId = req.session.user?.id;
+
+        // Validation basique
+        if (!user_id || !password) {
+            return res.redirect('/admin/users');
+        }
+
+        // Vérifier le mot de passe de l'utilisateur connecté
+        const currentUser = await models.User.findByPk(currentUserId);
+        if (!currentUser) {
+            return res.redirect('/admin/users');
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, currentUser.password);
+        if (!isPasswordValid) {
+            // TODO: Flash message "Mot de passe incorrect"
+            return res.redirect('/admin/users');
+        }
+
+        // Supprimer les associations dans SiteUser
+        await models.SiteUser.destroy({
+            where: { fk_id_user: user_id }
+        });
+
+        // Supprimer l'utilisateur
+        await models.User.destroy({
+            where: { id: user_id }
+        });
+
+        // TODO: Flash message "Utilisateur supprimé avec succès"
+        res.redirect('/admin/users');
+
+    } catch (err) {
+        console.error('adminDeleteUser error:', err);
+        res.redirect('/admin/users');
+    }
+};
+
+/**
+ * Affichage d'un utilisateur (lecture seule)
+ */
+export const adminViewUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        const user = await models.User.findByPk(userId, {
+            include: [
+                {
+                    model: models.User,
+                    as: 'creator',
+                    attributes: ['login']
+                },
+                {
+                    model: models.SiteUser,
+                    as: 'siteassignments',
+                    include: [{
+                        model: models.Site,
+                        as: 'site',
+                        attributes: ['id', 'domain']
+                    }]
+                }
+            ]
+        });
+
+        if (!user) {
+            return res.redirect('/admin/users');
+        }
+
+        res.render('admin_user_view', {
+            layout: 'administration',
+            user: user.toJSON()
+        });
+
+    } catch (err) {
+        console.error('adminViewUser error:', err);
+        res.redirect('/admin/users');
+    }
+};
+
+/**
+ * Page d'édition d'un utilisateur
+ */
+export const adminEditUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const currentUserId = req.session.user?.id;
+
+        const user = await models.User.findByPk(userId, {
+            include: [
+                {
+                    model: models.User,
+                    as: 'creator',
+                    attributes: ['login']
+                },
+                {
+                    model: models.SiteUser,
+                    as: 'siteassignments',
+                    include: [{
+                        model: models.Site,
+                        as: 'site',
+                        attributes: ['id', 'domain']
+                    }]
+                }
+            ]
+        });
+
+        if (!user) {
+            return res.redirect('/admin/users');
+        }
+
+        // Récupérer tous les sites disponibles
+        const sites = await models.Site.findAll({
+            where: { fk_id_user: currentUserId },
+            attributes: ['id', 'domain'],
+            order: [['domain', 'ASC']]
+        });
+
+        // Marquer les sites assignés
+        const assignedSiteIds = user.siteassignments?.map(sa => sa.site.id) || [];
+        const sitesWithAssignment = sites.map(s => ({
+            ...s.toJSON(),
+            isAssigned: assignedSiteIds.includes(s.id)
+        }));
+
+        res.render('admin_user_edit', {
+            layout: 'administration',
+            user: user.toJSON(),
+            sites: sitesWithAssignment
+        });
+
+    } catch (err) {
+        console.error('adminEditUser error:', err);
+        res.redirect('/admin/users');
+    }
+};
+
+/**
+ * Mise à jour d'un utilisateur
+ */
+export const adminUpdateUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { login, email, role, sites, clear_password } = req.body;
+
+        // Validation basique
+        if (!login || !email || !role) {
+            return res.redirect(`/admin/users/${userId}/edit`);
+        }
+
+        const updateData = {
+            login,
+            email,
+            role
+        };
+
+        // Si le mot de passe est vidé, désactiver l'utilisateur
+        if (clear_password === 'true') {
+            updateData.password = null;
+            updateData.enabled = false;
+        }
+
+        // Mettre à jour l'utilisateur
+        await models.User.update(updateData, {
+            where: { id: userId }
+        });
+
+        // Gérer les sites assignés
+        // D'abord supprimer toutes les assignations existantes
+        await models.SiteUser.destroy({
+            where: { fk_id_user: userId }
+        });
+
+        // Puis recréer les assignations si des sites sont sélectionnés
+        if (sites) {
+            const sitesArray = Array.isArray(sites) ? sites : [sites];
+            const siteUserEntries = sitesArray.map(siteId => ({
+                fk_id_site: siteId,
+                fk_id_user: userId
+            }));
+
+            if (siteUserEntries.length > 0) {
+                await models.SiteUser.bulkCreate(siteUserEntries);
+            }
+        }
+
+        // TODO: Flash message "Utilisateur mis à jour avec succès"
+        res.redirect('/admin/users');
+
+    } catch (err) {
+        console.error('adminUpdateUser error:', err);
+        res.redirect(`/admin/users/${req.params.id}/edit`);
     }
 };
 

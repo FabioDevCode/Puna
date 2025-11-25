@@ -45,8 +45,42 @@ document.addEventListener('DOMContentLoaded', () => {
         // Setup recherche sites (modal)
         setupSiteSearch();
 
+        // Setup modal de suppression
+        setupDeleteModal();
+
         // Chargement initial
         loadUsers();
+    }
+
+    function setupDeleteModal() {
+        const modal = document.getElementById('modal_delete_user');
+        const form = document.getElementById('formDeleteUser');
+        const passwordInput = document.getElementById('delete_user_password');
+        const confirmBtn = document.getElementById('confirmDeleteUserBtn');
+        const userIdInput = document.getElementById('user_delete_id');
+        const userLoginSpan = document.getElementById('delete_user_login');
+
+        if (!modal || !passwordInput || !confirmBtn) return;
+
+        // Activer/désactiver le bouton selon le mot de passe
+        passwordInput.addEventListener('input', (e) => {
+            confirmBtn.disabled = e.target.value.trim() === '';
+        });
+
+        // Reset lors de la fermeture
+        modal.addEventListener('close', () => {
+            passwordInput.value = '';
+            confirmBtn.disabled = true;
+            form.reset();
+        });
+
+        // Fonction globale pour ouvrir la modal (appelée depuis les boutons)
+        window.openDeleteUserModal = (userId, userLogin) => {
+            userIdInput.value = userId;
+            userLoginSpan.textContent = userLogin;
+            form.action = '/admin/users/delete';
+            modal.showModal();
+        };
     }
 
     function setupSiteSearch() {
@@ -201,13 +235,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="text-sm">${user.createdAt}</td>
                 <td class="text-right">
                     <div class="flex justify-end items-center gap-2 w-full">
-                        <button class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
+                        <button onclick="window.location.href='/admin/users/${user.id}/view'" class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline btn-accent w-[38.25px] h-[32px] pt-[2px]">
+                        <button onclick="window.location.href='/admin/users/${user.id}/edit'" class="btn btn-sm btn-outline btn-accent w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-pen-to-square"></i>
                         </button>
-                        <button class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px]">
+                        <button onclick="openDeleteUserModal('${user.id}', '${user.login}')" class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-trash-can"></i>
                         </button>
                     </div>

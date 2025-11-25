@@ -34,6 +34,10 @@ router.get('/admin/users', isConnected, dctl.adminUsers);
 router.get('/admin/users/list', isConnected, dctl.adminUsersList);
 router.get('/admin/users/export-excel', isConnected, dctl.adminUsersExportExcel);
 router.post('/admin/users/create', isConnected, dctl.adminCreateUser);
+router.post('/admin/users/delete', isConnected, dctl.adminDeleteUser);
+router.get('/admin/users/:id/view', isConnected, dctl.adminViewUser);
+router.get('/admin/users/:id/edit', isConnected, dctl.adminEditUser);
+router.post('/admin/users/:id/update', isConnected, dctl.adminUpdateUser);
 
 router.get('/all-site', isConnected, dctl.allSite);
 router.get('/site/:id/token', isConnected, dctl.getSiteToken);
