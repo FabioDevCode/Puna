@@ -1,6 +1,6 @@
 {{#slot "title"}}
 <div class="flex items-center gap-4">
-    <a href="/admin/users" class="btn btn-sm btn-ghost">
+    <a href="/admin/users" class="btn btn-outline btn-sm">
         <i class="fa-solid fa-arrow-left"></i>
     </a>
     <h3 class="font-inter">Modifier utilisateur</h3>
@@ -12,7 +12,7 @@
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <h2 class="card-title text-2xl mb-4">
-                <i class="fa-solid fa-user-edit text-accent mr-2"></i>
+                <i class="fa-solid fa-user-edit text-neutral mr-2"></i>
                 {{user.login}}
             </h2>
 
@@ -48,7 +48,6 @@
                             <option value="editor">Editor (Peut modifier)</option>
                             <option value="owner">Owner (Propriétaire)</option>
                             <option value="beta">Beta Tester</option>
-                            <option value="super_admin">Super Admin</option>
                         </select>
                         <script>
                             document.getElementById('roleSelect').value = '{{user.role}}';
@@ -68,7 +67,7 @@
                                 Désactiver
                             </button>
                             {{else}}
-                            <span class="badge badge-error">Désactivé</span>
+                            <span class="badge badge-error mt-1">Désactivé</span>
                             {{/if}}
                         </div>
                     </div>
@@ -77,13 +76,13 @@
                     <div class="form-control w-full md:col-span-2">
                         <label class="label">
                             <span class="label-text font-semibold">Mot de passe</span>
-                            <span class="label-text-alt text-warning">Vider le mot de passe désactivera
+                            <span class="label-text-alt text-primary">Vider le mot de passe désactivera
                                 l'utilisateur</span>
                         </label>
                         <div class="flex gap-2">
                             <input type="password" id="passwordDisplay" value="••••••••••"
                                 class="input input-sm input-bordered flex-1" disabled>
-                            <button type="button" id="clearPasswordBtn" class="btn btn-sm btn-warning btn-outline">
+                            <button type="button" id="clearPasswordBtn" class="btn btn-sm btn-primary btn-outline">
                                 <i class="fa-solid fa-trash"></i>
                                 Vider le mot de passe
                             </button>
@@ -97,13 +96,10 @@
                         <label class="label">
                             <span class="label-text font-semibold">Dernière connexion</span>
                         </label>
-                        <div class="text-sm {{#unless user.last_connection}}text-neutral-content{{/unless}}">
-                            {{#if user.last_connection}}
-                            {{user.last_connection}}
-                            {{else}}
-                            N/A
-                            {{/if}}
-                        </div>
+                        <input type="text"
+                            value="{{#if user.last_connection}}{{user.last_connection}}{{else}}N/A{{/if}}"
+                            class="input input-sm input-bordered w-full {{#unless user.last_connection}}text-neutral-content{{/unless}}"
+                            disabled>
                     </div>
 
                     <!-- Créé par (non modifiable) -->
@@ -111,13 +107,9 @@
                         <label class="label">
                             <span class="label-text font-semibold">Créé par</span>
                         </label>
-                        <div class="text-sm {{#unless user.creator}}text-neutral-content{{/unless}}">
-                            {{#if user.creator}}
-                            {{user.creator.login}}
-                            {{else}}
-                            N/A
-                            {{/if}}
-                        </div>
+                        <input type="text" value="{{#if user.creator}}{{user.creator.login}}{{else}}N/A{{/if}}"
+                            class="input input-sm input-bordered w-full {{#unless user.creator}}text-neutral-content{{/unless}}"
+                            disabled>
                     </div>
 
                     <!-- Créé le (non modifiable) -->
@@ -125,7 +117,8 @@
                         <label class="label">
                             <span class="label-text font-semibold">Créé le</span>
                         </label>
-                        <div class="text-sm">{{user.createdAt}}</div>
+                        <input type="text" value="{{user.createdAt}}" class="input input-sm input-bordered w-full"
+                            disabled>
                     </div>
 
                     <!-- Sites assignés -->
@@ -149,7 +142,7 @@
                             <label
                                 class="cursor-pointer label hover:bg-base-200 rounded-md px-3 py-2 transition-colors justify-start gap-3">
                                 <input type="checkbox" name="sites" value="{{this.id}}"
-                                    class="checkbox checkbox-sm checkbox-secondary rounded-md site-checkbox" {{#if
+                                    class="checkbox checkbox-sm checkbox-neutral rounded-md site-checkbox" {{#if
                                     this.isAssigned}}checked{{/if}} />
                                 <span class="label-text flex-1 truncate" title="{{this.domain}}">{{this.domain}}</span>
                             </label>
@@ -171,10 +164,9 @@
                 <!-- Actions -->
                 <div class="flex justify-end gap-2 mt-4">
                     <a href="/admin/users" class="btn btn-sm">
-                        <i class="fa-solid fa-times"></i>
                         Annuler
                     </a>
-                    <button type="submit" class="btn btn-sm btn-accent">
+                    <button type="submit" class="btn btn-sm btn-secondary">
                         <i class="fa-solid fa-save"></i>
                         Enregistrer
                     </button>

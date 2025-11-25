@@ -1,16 +1,16 @@
 {{#slot "title"}}
-<h3 class="font-inter truncate ellipsis-truncate title-max-w">
-    #{{inbox.id}}
-</h3>
+<div class="flex items-center gap-4">
+    <a href="/site/{{site.id}}?f={{form.name}}" class="btn btn-sm btn-outline">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <h3 class="font-inter truncate ellipsis-truncate title-max-w">
+        #{{inbox.id}}
+    </h3>
+</div>
 {{/slot}}
 
 {{#slot "buttons"}}
-<a href="/site/{{site.id}}?f={{form.name}}" class="btn btn-sm btn-outline">
-    <i class="fa-solid fa-arrow-left"></i>
-    <span class="hidden md:flex">
-        Retour
-    </span>
-</a>
+
 
 <button class="btn btn-sm btn-error btn-outline" id="btn_delete_inbox_show">
     <i class="fa-regular fa-trash-can"></i>

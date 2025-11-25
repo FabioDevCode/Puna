@@ -456,9 +456,16 @@ export const adminViewUser = async (req, res) => {
             return res.redirect('/admin/users');
         }
 
+        // Formater les données pour l'affichage
+        const userData = user.toJSON();
+        userData.last_connection = userData.last_connection
+            ? dayjs(userData.last_connection).format('YYYY-MM-DD HH:mm')
+            : null;
+        userData.createdAt = dayjs(userData.createdAt).format('YYYY-MM-DD HH:mm');
+
         res.render('admin_user_view', {
             layout: 'administration',
-            user: user.toJSON()
+            user: userData
         });
 
     } catch (err) {
@@ -512,9 +519,16 @@ export const adminEditUser = async (req, res) => {
             isAssigned: assignedSiteIds.includes(s.id)
         }));
 
+        // Formater les données pour l'affichage
+        const userData = user.toJSON();
+        userData.last_connection = userData.last_connection
+            ? dayjs(userData.last_connection).format('YYYY-MM-DD HH:mm')
+            : null;
+        userData.createdAt = dayjs(userData.createdAt).format('YYYY-MM-DD HH:mm');
+
         res.render('admin_user_edit', {
             layout: 'administration',
-            user: user.toJSON(),
+            user: userData,
             sites: sitesWithAssignment
         });
 

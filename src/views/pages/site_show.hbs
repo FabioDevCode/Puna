@@ -1,7 +1,12 @@
 {{#slot "title"}}
-<h3 class="font-inter truncate ellipsis-truncate title-max-w">
-    {{site.domain}}
-</h3>
+<div class="flex items-center gap-4">
+    <a href="/all-site" class="btn btn-sm btn-outline">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <h3 class="font-inter truncate ellipsis-truncate title-max-w">
+        {{site.domain}}
+    </h3>
+</div>
 {{/slot}}
 
 {{#slot "buttons"}}
