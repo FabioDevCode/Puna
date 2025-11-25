@@ -1,34 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let _inboxTooltipEl = null;
-
-    function ensureInboxTooltip() {
-        if (_inboxTooltipEl) { return _inboxTooltipEl; }
-        _inboxTooltipEl = document.createElement('div');
-        _inboxTooltipEl.id = 'inbox-tooltip';
-        _inboxTooltipEl.className = 'inbox-tooltip none';
-        document.body.appendChild(_inboxTooltipEl);
-        return _inboxTooltipEl;
-    }
-
-    function showInboxTooltip(text, x, y) {
-        const el = ensureInboxTooltip();
-        el.textContent = text;
-        el.style.left = `${x}px`;
-        el.style.top = `${y}px`;
-        el.classList.remove('none');
-    }
-
-    function moveInboxTooltip(x, y) {
-        const el = ensureInboxTooltip();
-        el.style.left = `${x}px`;
-        el.style.top = `${y}px`;
-    }
-
-    function hideInboxTooltip() {
-        if (!_inboxTooltipEl) { return; }
-        _inboxTooltipEl.classList.add('none');
-    }
-
     function pad2(n) {
         return String(n).padStart(2, '0');
     }
@@ -369,17 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             const MAX = 80;
                             if (str.length > MAX) {
                                 td.textContent = str.substring(0, MAX) + '...';
-                                td.classList.add('inbox-cell-truncated');
-
-                                td.addEventListener('mouseenter', (ev) => {
-                                    showInboxTooltip(str, ev.pageX + 12, ev.pageY + 12);
-                                });
-                                td.addEventListener('mousemove', (ev) => {
-                                    moveInboxTooltip(ev.pageX + 12, ev.pageY + 12);
-                                });
-                                td.addEventListener('mouseleave', () => {
-                                    hideInboxTooltip();
-                                });
                             } else {
                                 td.textContent = str;
                             }

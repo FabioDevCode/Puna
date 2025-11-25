@@ -148,11 +148,23 @@ domain=site.domain
                     <div class="flex flex-wrap justify-between items-center gap-2">
                         <!-- Boutons d'action -->
                         <div class="flex gap-2">
-                            <button id="exportExcelBtn"
-                                class="btn btn-sm bg-green-700 text-white border-green-700 hover:bg-green-800 hover:text-white hover:border-green-700 transition-colors">
-                                <i class="fa-solid fa-file-excel"></i>
-                                <span class="hidden md:flex">Exporter un Excel</span>
-                            </button>
+                            <!-- Dropdown Export -->
+                            <div class="dropdown dropdown-end">
+                                <div tabindex="0" role="button" class="btn btn-sm">
+                                    <i class="fa-solid fa-caret-down"></i>
+                                </div>
+                                <ul tabindex="0"
+                                    class="dropdown-content menu bg-base-100 rounded-box z-[100] w-52 p-2 mt-2 shadow-xl border border-base-300">
+                                    <li>
+                                        <button id="exportExcelBtn"
+                                            class="flex items-center gap-2 text-base-100 bg-green-700 hover:bg-green-700">
+                                            <i class="fa-solid fa-file-excel"></i>
+                                            Exporter un Excel
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+
                             <button id="filtreTableBtn" class="btn btn-sm">
                                 <i class="fa-solid fa-filter"></i>
                                 <span class="hidden md:flex">Filtre</span>
