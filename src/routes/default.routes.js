@@ -1,63 +1,68 @@
 import express from 'express';
+import * as adminCtl from '../controllers/admin.controller.js';
 import * as authCtl from '../controllers/auth.controller.js';
-import * as dctl from '../controllers/default.controller.js';
+import * as dashboardCtl from '../controllers/dashboard.controller.js';
+import * as exportCtl from '../controllers/export.controller.js';
+import * as formCtl from '../controllers/form.controller.js';
+import * as inboxCtl from '../controllers/inbox.controller.js';
+import * as siteCtl from '../controllers/site.controller.js';
 import { isConnected, isConnectDash } from '../helpers/authHelper.js';
 
 const router = express.Router();
 
 
-router.get('/error', dctl.error);
-router.get('/', isConnected, dctl.rootRedirect);
+router.get('/error', dashboardCtl.error);
+router.get('/', isConnected, dashboardCtl.rootRedirect);
 
-router.get('/dp-login', isConnectDash, dctl.dpLogin);
-router.get('/dp-first-connexion', isConnectDash, dctl.dpFirstCo);
+router.get('/dp-login', isConnectDash, dashboardCtl.dpLogin);
+router.get('/dp-first-connexion', isConnectDash, dashboardCtl.dpFirstCo);
 
 router.get('/dp-logout', authCtl.dpLogout);
 router.post('/dp-first-co', authCtl.dpFirstCoPost);
 router.post('/dp-connect', authCtl.dpConnect);
 
 // CONNECTED ==============================================================
-router.get('/dashboard', isConnected, dctl.dashboard);
+router.get('/dashboard', isConnected, dashboardCtl.dashboard);
 
-router.get('/stats/inbox-counts', isConnected, dctl.getInboxCounts);
-router.get('/stats/inbox-percentages', isConnected, dctl.getInboxPercentages);
-router.get('/stats/inbox-heatmap', isConnected, dctl.getInboxHeatmap);
-router.get('/stats/top-froms', isConnected, dctl.getTopFroms);
-router.get('/stats/top-site-forms', isConnected, dctl.getTopSiteForms);
-router.get('/stats/inbox-by-site', isConnected, dctl.getInboxCountsBySite);
-router.get('/stats/last-inbox', isConnected, dctl.getLastInboxEntry);
+router.get('/stats/inbox-counts', isConnected, dashboardCtl.getInboxCounts);
+router.get('/stats/inbox-percentages', isConnected, dashboardCtl.getInboxPercentages);
+router.get('/stats/inbox-heatmap', isConnected, dashboardCtl.getInboxHeatmap);
+router.get('/stats/top-froms', isConnected, dashboardCtl.getTopFroms);
+router.get('/stats/top-site-forms', isConnected, dashboardCtl.getTopSiteForms);
+router.get('/stats/inbox-by-site', isConnected, dashboardCtl.getInboxCountsBySite);
+router.get('/stats/last-inbox', isConnected, dashboardCtl.getLastInboxEntry);
 
 // Administration
-router.get('/admin', isConnected, dctl.admin);
-router.get('/admin/users', isConnected, dctl.adminUsers);
-router.get('/admin/users/list', isConnected, dctl.adminUsersList);
-router.get('/admin/users/export-excel', isConnected, dctl.adminUsersExportExcel);
-router.post('/admin/users/create', isConnected, dctl.adminCreateUser);
-router.post('/admin/users/delete', isConnected, dctl.adminDeleteUser);
-router.get('/admin/users/:id/view', isConnected, dctl.adminViewUser);
-router.get('/admin/users/:id/edit', isConnected, dctl.adminEditUser);
-router.post('/admin/users/:id/update', isConnected, dctl.adminUpdateUser);
-router.get('/admin/settings', isConnected, dctl.adminSettings);
+router.get('/admin', isConnected, adminCtl.admin);
+router.get('/admin/users', isConnected, adminCtl.adminUsers);
+router.get('/admin/users/list', isConnected, adminCtl.adminUsersList);
+router.get('/admin/users/export-excel', isConnected, adminCtl.adminUsersExportExcel);
+router.post('/admin/users/create', isConnected, adminCtl.adminCreateUser);
+router.post('/admin/users/delete', isConnected, adminCtl.adminDeleteUser);
+router.get('/admin/users/:id/view', isConnected, adminCtl.adminViewUser);
+router.get('/admin/users/:id/edit', isConnected, adminCtl.adminEditUser);
+router.post('/admin/users/:id/update', isConnected, adminCtl.adminUpdateUser);
+router.get('/admin/settings', isConnected, adminCtl.adminSettings);
 
-router.get('/site/all', isConnected, dctl.allSite);
-router.get('/site/:id/token', isConnected, dctl.getSiteToken);
-router.get('/site/:id/view', isConnected, dctl.showSite);
-router.put('/site/:id/revoke-tokens', isConnected, dctl.revokeSiteTokens);
-router.post('/create-site', isConnected, dctl.createSite);
-router.post('/delete-site/:id', isConnected, dctl.deleteSite);
+router.get('/site/all', isConnected, dashboardCtl.allSite);
+router.get('/site/:id/token', isConnected, siteCtl.getSiteToken);
+router.get('/site/:id/view', isConnected, siteCtl.showSite);
+router.put('/site/:id/revoke-tokens', isConnected, siteCtl.revokeSiteTokens);
+router.post('/create-site', isConnected, siteCtl.createSite);
+router.post('/delete-site/:id', isConnected, siteCtl.deleteSite);
 
-router.post('/create-form', isConnected, dctl.createForm);
-router.post('/delete-form', isConnected, dctl.deleteForm);
+router.post('/create-form', isConnected, formCtl.createForm);
+router.post('/delete-form', isConnected, formCtl.deleteForm);
 
-router.get('/form/:id/inbox', isConnected, dctl.getFormInbox);
-router.post('/form/:id/columns', isConnected, dctl.updateFormColumns);
-router.post('/form/:id/template', isConnected, dctl.updateFormTemplateSave);
-router.get('/form/:id/export-excel', isConnected, dctl.exportFormToExcel);
+router.get('/form/:id/inbox', isConnected, formCtl.getFormInbox);
+router.post('/form/:id/columns', isConnected, formCtl.updateFormColumns);
+router.post('/form/:id/template', isConnected, formCtl.updateFormTemplateSave);
+router.get('/form/:id/export-excel', isConnected, exportCtl.exportFormToExcel);
 
-router.get('/inbox/:id/view', isConnected, dctl.showInbox);
-router.post('/inbox/:id/delete', isConnected, dctl.deleteInbox);
-router.get('/inbox/:inboxId/download/:filename', isConnected, dctl.downloadFile);
-router.get('/inbox/:inboxId/download-zip', isConnected, dctl.downloadInboxZip);
+router.get('/inbox/:id/view', isConnected, inboxCtl.showInbox);
+router.post('/inbox/:id/delete', isConnected, inboxCtl.deleteInbox);
+router.get('/inbox/:inboxId/download/:filename', isConnected, inboxCtl.downloadFile);
+router.get('/inbox/:inboxId/download-zip', isConnected, exportCtl.downloadInboxZip);
 
 
 export default router;
