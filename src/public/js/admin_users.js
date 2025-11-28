@@ -198,22 +198,22 @@ document.addEventListener('DOMContentLoaded', () => {
             let roleBadge = '';
             switch (user.role) {
                 case 'super_admin':
-                    roleBadge = '<span class="badge badge-outline badge_super_admin badge-sm">Super Admin</span>';
+                    roleBadge = '<span class="badge badge-outline badge_role badge_super_admin badge-sm">Super Admin</span>';
                     break;
                 case 'owner':
-                    roleBadge = '<span class="badge badge-outline badge_owner badge-sm">Owner</span>';
+                    roleBadge = '<span class="badge badge-outline badge_role badge_owner badge-sm">Owner</span>';
                     break;
                 case 'editor':
-                    roleBadge = '<span class="badge badge-outline badge_editor badge-sm">Editor</span>';
+                    roleBadge = '<span class="badge badge-outline badge_role badge_editor badge-sm">Editor</span>';
                     break;
                 case 'viewer':
-                    roleBadge = '<span class="badge badge-outline badge_viewer badge-sm">Viewer</span>';
+                    roleBadge = '<span class="badge badge-outline badge_role badge_viewer badge-sm">Viewer</span>';
                     break;
                 case 'beta':
-                    roleBadge = '<span class="badge badge-outline badge_beta badge-sm">Beta</span>';
+                    roleBadge = '<span class="badge badge-outline badge_role badge_beta badge-sm">Beta</span>';
                     break;
                 default:
-                    roleBadge = '<span class="badge badge-outline badge-ghost badge-sm">N/A</span>';
+                    roleBadge = '<span class="badge badge-outline badge_role badge-ghost badge-sm">N/A</span>';
             }
 
             // Statut activé

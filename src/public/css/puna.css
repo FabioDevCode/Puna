@@ -137,6 +137,12 @@ h3 {
     color: whitesmoke;
 }
 
+.btn-secondary,
+.btn-primary:hover,
+.btn-info:hover {
+    color: whitesmoke !important;
+}
+
 .badge {
     border: 0px solid transparent;
 }
@@ -144,6 +150,10 @@ h3 {
 .badge-xs {
     height: .75rem;
     width: .75rem;
+}
+
+.badge_role {
+    border-radius: 2px;
 }
 
 .badge_super_admin {
@@ -171,6 +181,52 @@ h3 {
     color: rgb(30, 30, 30);
 }
 
+/* Style de base pour tous les badges */
+[class^="badge_s_"] {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    color: #fff;
+}
+
+/* PENDING – Jaune / Ambre */
+.badge_s_pending {
+    background-color: #FBBF24;
+    color: #78350F;
+}
+
+/* ACTIVE – Vert */
+.badge_s_active {
+    background-color: #10B981;
+    color: #064E3B;
+}
+
+/* INACTIVE – Gris */
+.badge_s_inactive {
+    background-color: #9CA3AF;
+    color: #1F2937;
+}
+
+/* SUSPENDED – Orange foncé */
+.badge_s_suspended {
+    background-color: #F97316;
+    color: #7C2D12;
+}
+
+/* BANNED – Rouge */
+.badge_s_banned {
+    background-color: #EF4444;
+    color: #7F1D1D;
+}
+
+/* DELETED – Gris sombre */
+.badge_s_deleted {
+    background-color: #6B7280;
+    color: #111827;
+}
+
 .font-bebas {
     font-family: "Bebas Neue", sans-serif !important;
 }
@@ -194,7 +250,7 @@ h3 {
 .tabs-boxed .tab {
     border-radius: 4px !important;
     font-weight: 600;
-     transition: all 0.25s ease;
+    transition: all 0.25s ease;
 }
 
 .tabs-boxed :is(.tab-active, [aria-selected=true]):not(.tab-disabled):not([disabled]),
