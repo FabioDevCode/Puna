@@ -9,7 +9,8 @@ export const initAdminUSer = async () => {
                 login: 'admin',
                 role: 'super_admin',
                 status: 'pending',
-                enabled: false
+                enabled: false,
+                created_by: null
             });
         }
     } catch (err) {

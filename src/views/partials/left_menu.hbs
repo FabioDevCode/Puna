@@ -32,10 +32,18 @@
             <li>
                 <a href="/admin"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    <i class="fa-solid fa-sliders"></i>
                     Administration
                 </a>
             </li>
+            {{#if user}}
+            <li>
+                <a>
+                    <i class="fa-regular fa-user"></i>
+                    {{user.login}}
+                </a>
+            </li>
+            {{/if}}
             <li>
                 <a href="/dp-logout"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">

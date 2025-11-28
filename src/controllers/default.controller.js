@@ -222,7 +222,7 @@ export const adminUsersList = async (req, res) => {
                     }
                 } : {})
             }],
-            attributes: ['id', 'email', 'login', 'role', 'enabled', 'last_connection', 'createdAt', 'created_by']
+            attributes: ['id', 'email', 'login', 'role', 'status', 'last_connection', 'createdAt', 'created_by']
         });
 
         // Formater les données
@@ -231,10 +231,10 @@ export const adminUsersList = async (req, res) => {
             email: user.email,
             login: user.login,
             role: user.role || 'N/A',
+            status: user.status || 'pending',
             created_by: user.creator ? user.creator.login : 'N/A',
-            enabled: user.enabled,
             last_connection: user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
-            createdAt: dayjs(user.createdAt).format('YYYY-MM-DD HH:mm')
+            createdAt: dayjs(user.createdAt).format('YYYY-MM-DD')
         }));
 
         res.json({
@@ -356,7 +356,7 @@ export const adminCreateUser = async (req, res) => {
             email,
             role,
             created_by: creatorId,
-            enabled: false
+            status: 'pending'
         });
 
         // Assigner les sites
@@ -1306,7 +1306,7 @@ export const showInbox = async (req, res) => {
 
         // Helper function to determine file type color and icon
         const getFileTypeInfo = (filename) => {
-            if (!filename) {return { color: 'neutral', icon: 'fa-file', label: 'Fichier' };}
+            if (!filename) { return { color: 'neutral', icon: 'fa-file', label: 'Fichier' }; }
 
             const ext = filename.toLowerCase().split('.').pop();
             // Images - Purple
@@ -1866,4 +1866,3 @@ export const allSite = async (req, res) => {
         res.render('site_list', {});
     }
 };
-

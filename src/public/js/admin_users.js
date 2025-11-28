@@ -216,10 +216,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     roleBadge = '<span class="badge badge-outline badge_role badge-ghost badge-sm">N/A</span>';
             }
 
-            // Statut activé
-            const statusIcon = user.enabled
-                ? '<span class="badge badge-success w-[20px] mt-2 badge-md" title="Activé"></span>'
-                : '<span class="badge badge-error w-[20px] mt-2 badge-md" title="Désactivé"></span>';
+            // Badge statut
+            let statusBadge = '';
+            const statusLabel = user.status || 'N/A';
+            switch (user.status) {
+                case 'pending':
+                    statusBadge = `<span class="badge_s_pending">${statusLabel}</span>`;
+                    break;
+                case 'active':
+                    statusBadge = `<span class="badge_s_active">${statusLabel}</span>`;
+                    break;
+                case 'inactive':
+                    statusBadge = `<span class="badge_s_inactive">${statusLabel}</span>`;
+                    break;
+                case 'suspended':
+                    statusBadge = `<span class="badge_s_suspended">${statusLabel}</span>`;
+                    break;
+                case 'banned':
+                    statusBadge = `<span class="badge_s_banned">${statusLabel}</span>`;
+                    break;
+                case 'deleted':
+                    statusBadge = `<span class="badge_s_deleted">${statusLabel}</span>`;
+                    break;
+                default:
+                    statusBadge = `<span class="badge_s_inactive">${statusLabel}</span>`;
+            }
 
             // Classes conditionnelles pour "Créé par" et "Dernière connexion"
             const createdByClass = user.created_by === 'N/A' ? 'text-sm text-neutral-content' : 'text-sm';
@@ -227,10 +248,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tr.innerHTML = `
                 <td>${user.login}</td>
-                <td class="text-left">${statusIcon}</td>
+                <td class="text-left">${statusBadge}</td>
                 <td class="font-medium">${user.email}</td>
-                <td>${roleBadge}</td>
                 <td class="${lastConnectionClass}">${user.last_connection}</td>
+                <td>${roleBadge}</td>
                 <td class="${createdByClass}">${user.created_by}</td>
                 <td class="text-sm">${user.createdAt}</td>
                 <td class="text-right">

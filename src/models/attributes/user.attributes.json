@@ -3,11 +3,6 @@
         "allowNull": true,
         "type": "STRING"
     },
-    "enabled": {
-        "allowNull": false,
-        "defaultValue": false,
-        "type": "BOOLEAN"
-    },
     "id": {
         "allowNull": false,
         "primaryKey": true,

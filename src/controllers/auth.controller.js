@@ -8,7 +8,7 @@ export const dpFirstCoPost = async (req, res) => {
         const user = await models.User.findOne({
             where: {
                 login,
-                enabled: false
+                status: 'pending'
             }
         });
         if (!user) {
@@ -24,7 +24,10 @@ export const dpFirstCoPost = async (req, res) => {
             });
         }
         const hash = await bcrypt.hash(password, 10);
-        await user.update({ password: hash, enabled: true });
+        await user.update({
+            password: hash,
+            status: 'active'
+        });
         return res.redirect('/dp-login');
     } catch (err) {
         return res.render('first_co', {

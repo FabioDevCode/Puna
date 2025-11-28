@@ -13,10 +13,25 @@ export function initializePassport() {
             },
             async (req, login, password, done) => {
                 try {
-                    const user = await models.User.findOne({ where: { login, enabled: true } });
-                    if (!user) {return done(null, false, { message: 'Utilisateur non trouvé ou non activé' });}
+                    const user = await models.User.findOne({
+                        where: {
+                            login,
+                            status: 'active'
+                        }
+                    });
+
+                    if (!user) {
+                        return done(null, false, {
+                            message: 'Utilisateur non trouvé ou non activé'
+                        });
+                    }
                     const isValid = await bcrypt.compare(password, user.password);
-                    if (!isValid) {return done(null, false, { message: 'Mot de passe incorrect' });}
+
+                    if (!isValid) {
+                        return done(null, false, {
+                            message: 'Mot de passe incorrect'
+                        });
+                    }
                     return done(null, user);
                 } catch (err) {
                     return done(err);

@@ -45,13 +45,13 @@ const morgan_config = {
     skip: (req) => {
         if (
             req.url === '/' ||
-			req.url.includes('/css') ||
-			req.url.includes('/img') ||
-			req.url.includes('/js') ||
-			req.url.includes('/plugins') ||
-			req.url.includes('/devtools') ||
-			req.url.includes('/favicon.ico') ||
-			req.url.includes('/.well-known/appspecific/com.chrome.devtools.json')
+            req.url.includes('/css') ||
+            req.url.includes('/img') ||
+            req.url.includes('/js') ||
+            req.url.includes('/plugins') ||
+            req.url.includes('/devtools') ||
+            req.url.includes('/favicon.ico') ||
+            req.url.includes('/.well-known/appspecific/com.chrome.devtools.json')
         ) {
             return true;
         }
@@ -111,6 +111,13 @@ app.use(
 initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Middleware pour rendre les données de session disponibles dans toutes les vues
+app.use((req, res, next) => {
+    res.locals.session = req.session;
+    res.locals.user = req.session?.user || null;
+    next();
+});
 
 const hbs = create({
     defaultLayout: 'main',

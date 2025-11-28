@@ -46,6 +46,14 @@
                     Retour
                 </a>
             </li>
+            {{#if user}}
+            <li>
+                <a>
+                    <i class="fa-regular fa-user"></i>
+                    {{user.login}}
+                </a>
+            </li>
+            {{/if}}
             <li>
                 <a href="/dp-logout"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">

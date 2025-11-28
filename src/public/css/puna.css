@@ -157,26 +157,31 @@ h3 {
 }
 
 .badge_super_admin {
+    text-wrap: nowrap;
     background-color: #101E26;
     color: white;
 }
 
 .badge_owner {
+    text-wrap: nowrap;
     background-color: #2F6EA9;
     color: whitesmoke;
 }
 
 .badge_editor {
+    text-wrap: nowrap;
     background-color: #CFE3F5;
     color: #0075C3;
 }
 
 .badge_viewer {
+    text-wrap: nowrap;
     background-color: #E3CEE4;
     color: #6E0075;
 }
 
 .badge_beta {
+    text-wrap: nowrap;
     background-color: #FFBE00;
     color: rgb(30, 30, 30);
 }
@@ -184,10 +189,10 @@ h3 {
 /* Style de base pour tous les badges */
 [class^="badge_s_"] {
     display: inline-block;
-    padding: 4px 8px;
-    font-size: 0.85rem;
+    padding: 0px 8px;
+    font-size: 0.75rem;
     font-weight: 600;
-    border-radius: 6px;
+    border-radius: 4px;
     color: #fff;
 }
 
