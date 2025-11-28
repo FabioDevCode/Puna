@@ -12,15 +12,19 @@ export const downloadInboxZip = async (req, res) => {
     try {
         // Verify inbox exists and user has access
         const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!inbox) {
@@ -69,7 +73,7 @@ export const downloadInboxZip = async (req, res) => {
                         const originalFilename = filename.split('_').slice(1).join('_');
                         allFiles.push({
                             path: filePath,
-                            name: originalFilename
+                            name: originalFilename,
                         });
                     }
                 }
@@ -84,7 +88,7 @@ export const downloadInboxZip = async (req, res) => {
         // Create ZIP using archiver
         const archiver = (await import('archiver')).default;
         const archive = archiver('zip', {
-            zlib: { level: 9 } // Maximum compression
+            zlib: { level: 9 }, // Maximum compression
         });
 
         // Set response headers
@@ -128,11 +132,13 @@ export const exportFormToExcel = async (req, res) => {
     try {
         // Verify form exists and user has access
         const form = await models.Form.findByPk(formId, {
-            include: [{
-                model: models.Site,
-                as: 'site',
-                where: { fk_id_user: userId }
-            }]
+            include: [
+                {
+                    model: models.Site,
+                    as: 'site',
+                    where: { fk_id_user: userId },
+                },
+            ],
         });
 
         if (!form) {
@@ -148,7 +154,7 @@ export const exportFormToExcel = async (req, res) => {
         const inboxEntries = await models.Inbox.findAll({
             where: { fk_id_form: formId },
             order: [['createdAt', 'DESC']],
-            raw: true
+            raw: true,
         });
 
         // Parse template to get column headers
@@ -163,14 +169,14 @@ export const exportFormToExcel = async (req, res) => {
 
         // Get all unique keys from all entries
         const allKeys = new Set();
-        inboxEntries.forEach(entry => {
+        inboxEntries.forEach((entry) => {
             let contentObj = {};
             try {
                 contentObj = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
             } catch (e) {
                 contentObj = {};
             }
-            Object.keys(contentObj).forEach(key => allKeys.add(key));
+            Object.keys(contentObj).forEach((key) => allKeys.add(key));
         });
 
         const keysArray = Array.from(allKeys);
@@ -183,15 +189,15 @@ export const exportFormToExcel = async (req, res) => {
         // Define columns
         const columns = [
             { header: 'ID', key: 'id', width: 10 },
-            { header: 'Date de création', key: 'createdAt', width: 20 }
+            { header: 'Date de création', key: 'createdAt', width: 20 },
         ];
 
-        keysArray.forEach(key => {
+        keysArray.forEach((key) => {
             const label = templateObj[key] || key;
             columns.push({
                 header: label,
                 key: key,
-                width: 20
+                width: 20,
             });
         });
 
@@ -202,7 +208,7 @@ export const exportFormToExcel = async (req, res) => {
         worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
 
         // Add data rows
-        inboxEntries.forEach(entry => {
+        inboxEntries.forEach((entry) => {
             let contentObj = {};
             try {
                 contentObj = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
@@ -212,10 +218,10 @@ export const exportFormToExcel = async (req, res) => {
 
             const row = {
                 id: entry.id,
-                createdAt: dayjs(entry.createdAt).format('YYYY-MM-DD HH:mm:ss')
+                createdAt: dayjs(entry.createdAt).format('YYYY-MM-DD HH:mm:ss'),
             };
 
-            keysArray.forEach(key => {
+            keysArray.forEach((key) => {
                 row[key] = contentObj[key] || '';
             });
 
@@ -233,7 +239,6 @@ export const exportFormToExcel = async (req, res) => {
         // Write to response
         await workbook.xlsx.write(res);
         res.end();
-
     } catch (err) {
         console.error('exportFormToExcel error:', err);
         if (!res.headersSent) {

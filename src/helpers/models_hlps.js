@@ -1,7 +1,6 @@
 import { DataTypes, Sequelize } from 'sequelize';
 import stringUtils from '../utils/string.js';
 
-
 export const buildAttributes = (attributes) => {
     const object = {};
     for (const prop in attributes) {

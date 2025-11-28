@@ -1,64 +1,68 @@
-(function (){
+(function () {
     const el = document.getElementById('statC_chart');
-    if (!el) {return;}
+    if (!el) {
+        return;
+    }
 
     async function loadData() {
         try {
             const resp = await fetch('/stats/inbox-by-site', { credentials: 'same-origin' });
-            if (!resp.ok) {return;}
+            if (!resp.ok) {
+                return;
+            }
             const json = await resp.json();
             const labels = json.labels || [];
             const data = json.data || [];
 
             const options = {
                 chart: {
-                    type: 'donut'
+                    type: 'donut',
                 },
                 labels: labels,
                 series: data,
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
                 },
                 stroke: {
                     show: true,
                     width: 2,
-                    colors: '#CFE4F5'
+                    colors: '#CFE4F5',
                 },
                 theme: {
                     monochrome: {
                         enabled: true,
                         color: '#0075C3',
                         shadeTo: 'light',
-                        shadeIntensity: 0.5
+                        shadeIntensity: 0.5,
                     },
                 },
                 plotOptions: {
                     pie: {
                         donut: {
-                            size: '56%'
-                        }
-                    }
+                            size: '56%',
+                        },
+                    },
                 },
                 tooltip: {
                     y: {
-                        formatter: function (val){
+                        formatter: function (val) {
                             return val;
-                        }
-                    }
+                        },
+                    },
                 },
                 responsive: [
                     {
                         breakpoint: 640,
                         options: {
                             chart: {
-                                width: 300
+                                width: 300,
                             },
                             legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                ]
+                                position: 'bottom',
+                            },
+                        },
+                    },
+                ],
             };
 
             if (window.statCChart) {

@@ -6,7 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchData(days) {
         try {
             const resp = await fetch(`/stats/inbox-counts?days=${days}`, { credentials: 'same-origin' });
-            if (!resp.ok) {throw new Error('Network error');}
+            if (!resp.ok) {
+                throw new Error('Network error');
+            }
             return await resp.json();
         } catch (err) {
             console.error(err);
@@ -20,24 +22,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 type: 'line',
                 height: 344,
                 toolbar: {
-                    show: false
+                    show: false,
                 },
                 zoom: {
-                    enabled: false
-                }
+                    enabled: false,
+                },
             },
             colors: ['#0075C3'],
             series: [
                 {
                     name: '',
-                    data: series
-                }
+                    data: series,
+                },
             ],
             xaxis: {
                 categories: labels,
                 axisBorder: {
                     show: false,
-                }
+                },
             },
             stroke: { curve: 'smooth' },
             markers: { size: 5 },
@@ -48,9 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             tooltip: {
                 x: {
-                    format: 'yyyy-MM-dd'
-                }
-            }
+                    format: 'yyyy-MM-dd',
+                },
+            },
         };
 
         if (chart) {

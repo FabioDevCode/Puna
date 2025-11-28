@@ -32,17 +32,25 @@ export async function authApiKeyAccess(req, res, next) {
 
         const siteId = payload.id;
         const controlCode = payload.control_code;
-        if (!siteId || !controlCode) {return res.status(401).json({ error: 'Invalid token' });}
+        if (!siteId || !controlCode) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
 
         const site = await models.Site.findOne({ where: { id: siteId, control_code: controlCode }, raw: true });
-        if (!site) {return res.status(403).json({ error: 'Site not found' });}
+        if (!site) {
+            return res.status(403).json({ error: 'Site not found' });
+        }
 
         // 3) Verify params.code corresponds to a Form with same fk_id_site
         const formCode = req.params.code;
-        if (!formCode) {return res.status(400).json({ error: 'Missing form code' });}
+        if (!formCode) {
+            return res.status(400).json({ error: 'Missing form code' });
+        }
 
         const form = await models.Form.findOne({ where: { code: formCode, fk_id_site: siteId }, raw: true });
-        if (!form) {return res.status(404).json({ error: 'Form not found' });}
+        if (!form) {
+            return res.status(404).json({ error: 'Form not found' });
+        }
 
         req.site = site;
         req.form = form;
@@ -52,4 +60,3 @@ export async function authApiKeyAccess(req, res, next) {
         return res.status(500).json({ error: err.message });
     }
 }
-

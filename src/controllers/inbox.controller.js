@@ -12,15 +12,19 @@ export const showInbox = async (req, res) => {
 
     try {
         const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!inbox) {
@@ -67,7 +71,9 @@ export const showInbox = async (req, res) => {
 
         // Helper function to determine file type color and icon
         const getFileTypeInfo = (filename) => {
-            if (!filename) { return { color: 'neutral', icon: 'fa-file', label: 'Fichier' }; }
+            if (!filename) {
+                return { color: 'neutral', icon: 'fa-file', label: 'Fichier' };
+            }
 
             const ext = filename.toLowerCase().split('.').pop();
             // Images - Purple
@@ -76,7 +82,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#b0a010',
                     icon: 'fa-solid fa-file-image',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -85,7 +91,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#186E3F',
                     icon: 'fa-solid fa-file-excel',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -94,7 +100,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#077D3E',
                     icon: 'fa-solid fa-file-csv',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -103,7 +109,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#AA0101',
                     icon: 'fa-solid fa-file-pdf',
-                    label: 'PDF'
+                    label: 'PDF',
                 };
             }
 
@@ -112,7 +118,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#2A5893',
                     icon: 'fa-solid fa-file-word',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -121,7 +127,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#4A90E2',
                     icon: 'fa-solid fa-file-lines',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -130,7 +136,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#444444',
                     icon: 'fa-solid fa-file-lines',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -138,7 +144,7 @@ export const showInbox = async (req, res) => {
                 color: 'white',
                 bg_color: '#1F2937',
                 icon: 'fa-solid fa-file',
-                label: ext.toUpperCase()
+                label: ext.toUpperCase(),
             };
         };
 
@@ -160,7 +166,7 @@ export const showInbox = async (req, res) => {
                         label,
                         filename,
                         original_filename: filename.split('_').slice(1).join('_'),
-                        ...typeInfo
+                        ...typeInfo,
                     });
                 });
             }
@@ -168,17 +174,15 @@ export const showInbox = async (req, res) => {
 
         // Prepare content entries with labels from template (excluding files)
         const contentEntries = Object.keys(contentObj || {})
-            .filter(key => !fileKeys.includes(key)) // Exclude file fields
+            .filter((key) => !fileKeys.includes(key)) // Exclude file fields
             .map((key) => ({
                 key,
                 label: templateObj[key] || key,
-                value: contentObj[key] !== undefined && contentObj[key] !== null ? String(contentObj[key]) : '-'
+                value: contentObj[key] !== undefined && contentObj[key] !== null ? String(contentObj[key]) : '-',
             }));
 
         // Format date
-        const formattedDate = inbox.createdAt
-            ? dayjs(inbox.createdAt).format('YYYY-MM-DD HH:mm:ss')
-            : '-';
+        const formattedDate = inbox.createdAt ? dayjs(inbox.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-';
 
         res.render('inbox/show', {
             inbox: inbox.toJSON(),
@@ -186,7 +190,7 @@ export const showInbox = async (req, res) => {
             site: site.toJSON(),
             contentEntries,
             fileEntries,
-            formattedDate
+            formattedDate,
         });
     } catch (err) {
         console.error(err);
@@ -203,15 +207,19 @@ export const deleteInbox = async (req, res) => {
 
     try {
         const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!inbox) {
@@ -244,7 +252,7 @@ export const deleteInbox = async (req, res) => {
             contentObj = {};
         }
 
-        fileKeys.forEach(key => {
+        fileKeys.forEach((key) => {
             const filename = contentObj[key];
             if (filename) {
                 const filePath = path.join(uploadsDir, filename);
@@ -273,15 +281,19 @@ export const downloadFile = async (req, res) => {
     try {
         // Verify inbox exists and user has access
         const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!inbox) {

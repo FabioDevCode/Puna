@@ -1,10 +1,4 @@
 {
-    "id": {
-        "allowNull": false,
-        "autoIncrement": true,
-        "primaryKey": true,
-        "type": "INTEGER"
-    },
     "fk_id_site": {
         "allowNull": false,
         "type": "UUID"
@@ -12,5 +6,11 @@
     "fk_id_user": {
         "allowNull": false,
         "type": "UUID"
+    },
+    "id": {
+        "allowNull": false,
+        "autoIncrement": true,
+        "primaryKey": true,
+        "type": "INTEGER"
     }
 }

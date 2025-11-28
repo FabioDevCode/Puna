@@ -9,7 +9,7 @@ import models from '../models/index.js';
 export const admin = async (req, res) => {
     try {
         res.render('admin/index', {
-            layout: 'admin'
+            layout: 'admin',
         });
     } catch (err) {
         console.error('admin error:', err);
@@ -28,12 +28,12 @@ export const adminUsers = async (req, res) => {
         const sites = await models.Site.findAll({
             where: { fk_id_user: userId },
             attributes: ['id', 'domain'],
-            order: [['domain', 'ASC']]
+            order: [['domain', 'ASC']],
         });
 
         res.render('admin/users/list', {
             layout: 'admin',
-            sites: sites.map(s => s.toJSON())
+            sites: sites.map((s) => s.toJSON()),
         });
     } catch (err) {
         console.error('adminUsers error:', err);
@@ -69,22 +69,26 @@ export const adminUsersList = async (req, res) => {
             limit,
             offset,
             order: [['createdAt', 'DESC']],
-            include: [{
-                model: models.User,
-                as: 'creator',
-                attributes: ['id', 'login', 'email'],
-                required: false,
-                ...(searchField === 'created_by' && search ? {
-                    where: {
-                        login: { [Op.like]: `%${search}%` }
-                    }
-                } : {})
-            }],
-            attributes: ['id', 'email', 'login', 'role', 'status', 'last_connection', 'createdAt', 'created_by']
+            include: [
+                {
+                    model: models.User,
+                    as: 'creator',
+                    attributes: ['id', 'login', 'email'],
+                    required: false,
+                    ...(searchField === 'created_by' && search
+                        ? {
+                              where: {
+                                  login: { [Op.like]: `%${search}%` },
+                              },
+                          }
+                        : {}),
+                },
+            ],
+            attributes: ['id', 'email', 'login', 'role', 'status', 'last_connection', 'createdAt', 'created_by'],
         });
 
         // Formater les données
-        const formattedUsers = users.map(user => ({
+        const formattedUsers = users.map((user) => ({
             id: user.id,
             email: user.email,
             login: user.login,
@@ -92,16 +96,15 @@ export const adminUsersList = async (req, res) => {
             status: user.status || 'pending',
             created_by: user.creator ? user.creator.login : 'N/A',
             last_connection: user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
-            createdAt: dayjs(user.createdAt).format('YYYY-MM-DD')
+            createdAt: dayjs(user.createdAt).format('YYYY-MM-DD'),
         }));
 
         res.json({
             users: formattedUsers,
             total: count,
             limit,
-            offset
+            offset,
         });
-
     } catch (err) {
         console.error('adminUsersList error:', err);
         res.status(500).json({ error: 'Erreur serveur' });
@@ -118,21 +121,20 @@ export const adminUsersExportExcel = async (req, res) => {
         // Construire les conditions de recherche
         const whereConditions = {};
         if (search) {
-            whereConditions[Op.or] = [
-                { email: { [Op.like]: `%${search}%` } },
-                { login: { [Op.like]: `%${search}%` } }
-            ];
+            whereConditions[Op.or] = [{ email: { [Op.like]: `%${search}%` } }, { login: { [Op.like]: `%${search}%` } }];
         }
 
         // Récupérer tous les utilisateurs
         const users = await models.User.findAll({
             where: whereConditions,
             order: [['createdAt', 'DESC']],
-            include: [{
-                model: models.User,
-                as: 'creator',
-                attributes: ['login']
-            }]
+            include: [
+                {
+                    model: models.User,
+                    as: 'creator',
+                    attributes: ['login'],
+                },
+            ],
         });
 
         // Créer le workbook Excel
@@ -148,7 +150,7 @@ export const adminUsersExportExcel = async (req, res) => {
             { header: 'Créé par', key: 'created_by', width: 20 },
             { header: 'Activé', key: 'enabled', width: 10 },
             { header: 'Dernière connexion', key: 'last_connection', width: 20 },
-            { header: 'Créé le', key: 'createdAt', width: 20 }
+            { header: 'Créé le', key: 'createdAt', width: 20 },
         ];
 
         // Style des en-têtes
@@ -156,7 +158,7 @@ export const adminUsersExportExcel = async (req, res) => {
         worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'left' };
 
         // Ajouter les données
-        users.forEach(user => {
+        users.forEach((user) => {
             worksheet.addRow({
                 email: user.email,
                 login: user.login,
@@ -164,7 +166,7 @@ export const adminUsersExportExcel = async (req, res) => {
                 created_by: user.creator ? user.creator.login : 'N/A',
                 enabled: user.enabled ? 'Oui' : 'Non',
                 last_connection: user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
-                createdAt: dayjs(user.createdAt).format('YYYY-MM-DD HH:mm')
+                createdAt: dayjs(user.createdAt).format('YYYY-MM-DD HH:mm'),
             });
         });
 
@@ -176,10 +178,9 @@ export const adminUsersExportExcel = async (req, res) => {
 
         await workbook.xlsx.write(res);
         res.end();
-
     } catch (err) {
         console.error('adminUsersExportExcel error:', err);
-        res.status(500).json({ error: 'Erreur lors de l\'export' });
+        res.status(500).json({ error: "Erreur lors de l'export" });
     }
 };
 
@@ -199,8 +200,8 @@ export const adminCreateUser = async (req, res) => {
         // Vérifier si l'utilisateur existe déjà
         const existingUser = await models.User.findOne({
             where: {
-                [Op.or]: [{ email }, { login }]
-            }
+                [Op.or]: [{ email }, { login }],
+            },
         });
 
         if (existingUser) {
@@ -213,21 +214,20 @@ export const adminCreateUser = async (req, res) => {
             email,
             role,
             created_by: creatorId,
-            status: 'pending'
+            status: 'pending',
         });
 
         // Assigner les sites
         if (sites) {
             const siteIds = Array.isArray(sites) ? sites : [sites];
-            const siteAssignments = siteIds.map(siteId => ({
+            const siteAssignments = siteIds.map((siteId) => ({
                 fk_id_user: newUser.id,
-                fk_id_site: parseInt(siteId, 10)
+                fk_id_site: parseInt(siteId, 10),
             }));
             await models.SiteUser.bulkCreate(siteAssignments);
         }
 
         res.redirect('/admin/users');
-
     } catch (err) {
         console.error('adminCreateUser error:', err);
         res.redirect('/admin/users');
@@ -261,16 +261,15 @@ export const adminDeleteUser = async (req, res) => {
 
         // Supprimer les associations dans SiteUser
         await models.SiteUser.destroy({
-            where: { fk_id_user: user_id }
+            where: { fk_id_user: user_id },
         });
 
         // Supprimer l'utilisateur
         await models.User.destroy({
-            where: { id: user_id }
+            where: { id: user_id },
         });
 
         res.redirect('/admin/users');
-
     } catch (err) {
         console.error('adminDeleteUser error:', err);
         res.redirect('/admin/users');
@@ -289,18 +288,20 @@ export const adminViewUser = async (req, res) => {
                 {
                     model: models.User,
                     as: 'creator',
-                    attributes: ['login']
+                    attributes: ['login'],
                 },
                 {
                     model: models.SiteUser,
                     as: 'siteassignments',
-                    include: [{
-                        model: models.Site,
-                        as: 'site',
-                        attributes: ['id', 'domain']
-                    }]
-                }
-            ]
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            attributes: ['id', 'domain'],
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!user) {
@@ -316,9 +317,8 @@ export const adminViewUser = async (req, res) => {
 
         res.render('admin/users/view', {
             layout: 'admin',
-            user: userData
+            user: userData,
         });
-
     } catch (err) {
         console.error('adminViewUser error:', err);
         res.redirect('/admin/users');
@@ -338,18 +338,20 @@ export const adminEditUser = async (req, res) => {
                 {
                     model: models.User,
                     as: 'creator',
-                    attributes: ['login']
+                    attributes: ['login'],
                 },
                 {
                     model: models.SiteUser,
                     as: 'siteassignments',
-                    include: [{
-                        model: models.Site,
-                        as: 'site',
-                        attributes: ['id', 'domain']
-                    }]
-                }
-            ]
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            attributes: ['id', 'domain'],
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!user) {
@@ -360,14 +362,14 @@ export const adminEditUser = async (req, res) => {
         const sites = await models.Site.findAll({
             where: { fk_id_user: currentUserId },
             attributes: ['id', 'domain'],
-            order: [['domain', 'ASC']]
+            order: [['domain', 'ASC']],
         });
 
         // Marquer les sites assignés
-        const assignedSiteIds = user.siteassignments?.map(sa => sa.site.id) || [];
-        const sitesWithAssignment = sites.map(s => ({
+        const assignedSiteIds = user.siteassignments?.map((sa) => sa.site.id) || [];
+        const sitesWithAssignment = sites.map((s) => ({
             ...s.toJSON(),
-            isAssigned: assignedSiteIds.includes(s.id)
+            isAssigned: assignedSiteIds.includes(s.id),
         }));
 
         // Formater les données pour l'affichage
@@ -380,9 +382,8 @@ export const adminEditUser = async (req, res) => {
         res.render('admin/users/edit', {
             layout: 'admin',
             user: userData,
-            sites: sitesWithAssignment
+            sites: sitesWithAssignment,
         });
-
     } catch (err) {
         console.error('adminEditUser error:', err);
         res.redirect('/admin/users');
@@ -405,7 +406,7 @@ export const adminUpdateUser = async (req, res) => {
         const updateData = {
             login,
             email,
-            role
+            role,
         };
 
         // Si le mot de passe est vidé, désactiver l'utilisateur
@@ -416,27 +417,26 @@ export const adminUpdateUser = async (req, res) => {
 
         // Mettre à jour l'utilisateur
         await models.User.update(updateData, {
-            where: { id: userId }
+            where: { id: userId },
         });
 
         // Gérer les sites assignés
         // D'abord supprimer toutes les assignations existantes
         await models.SiteUser.destroy({
-            where: { fk_id_user: userId }
+            where: { fk_id_user: userId },
         });
 
         // Puis recréer les assignations si des sites sont sélectionnés
         if (sites) {
             const siteIds = Array.isArray(sites) ? sites : [sites];
-            const siteAssignments = siteIds.map(siteId => ({
+            const siteAssignments = siteIds.map((siteId) => ({
                 fk_id_user: parseInt(userId, 10),
-                fk_id_site: parseInt(siteId, 10)
+                fk_id_site: parseInt(siteId, 10),
             }));
             await models.SiteUser.bulkCreate(siteAssignments);
         }
 
         res.redirect('/admin/users');
-
     } catch (err) {
         console.error('adminUpdateUser error:', err);
         res.redirect(`/admin/users/${req.params.id}/edit`);
@@ -449,9 +449,8 @@ export const adminUpdateUser = async (req, res) => {
 export const adminSettings = async (req, res) => {
     try {
         res.render('admin/settings', {
-            layout: 'admin'
+            layout: 'admin',
         });
-
     } catch (err) {
         console.error('adminSettings error:', err);
         res.redirect('/admin');

@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roleSelect.addEventListener('change', (e) => {
             if (e.target.value !== initialRole) {
                 // Désélectionner tous les sites
-                siteCheckboxes.forEach(checkbox => {
+                siteCheckboxes.forEach((checkbox) => {
                     checkbox.checked = false;
                 });
 
@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const container = sitesListContainer.parentElement;
                 const notice = document.createElement('div');
                 notice.className = 'alert alert-info alert-sm mt-2';
-                notice.innerHTML = '<i class="fa-solid fa-info-circle mr-2"></i>Les sites ont été désélectionnés suite au changement de rôle';
+                notice.innerHTML =
+                    '<i class="fa-solid fa-info-circle mr-2"></i>Les sites ont été désélectionnés suite au changement de rôle';
                 container.appendChild(notice);
 
                 setTimeout(() => notice.remove(), 3000);
@@ -35,7 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Vider le mot de passe
     if (clearPasswordBtn) {
         clearPasswordBtn.addEventListener('click', () => {
-            if (confirm('Êtes-vous sûr de vouloir vider le mot de passe ? Cela désactivera automatiquement l\'utilisateur.')) {
+            if (
+                confirm(
+                    "Êtes-vous sûr de vouloir vider le mot de passe ? Cela désactivera automatiquement l'utilisateur."
+                )
+            ) {
                 passwordDisplay.value = '';
                 clearPasswordField.value = 'true';
 
@@ -49,7 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const form = clearPasswordBtn.closest('form');
                 const warning = document.createElement('div');
                 warning.className = 'alert alert-warning mt-4';
-                warning.innerHTML = '<i class="fa-solid fa-exclamation-triangle mr-2"></i>L\'utilisateur sera désactivé lors de l\'enregistrement';
+                warning.innerHTML =
+                    '<i class="fa-solid fa-exclamation-triangle mr-2"></i>L\'utilisateur sera désactivé lors de l\'enregistrement';
                 form.insertBefore(warning, form.querySelector('.flex.justify-end'));
             }
         });
@@ -75,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const labels = sitesListContainer.querySelectorAll('label');
             let visibleCount = 0;
 
-            labels.forEach(label => {
+            labels.forEach((label) => {
                 const text = label.querySelector('.label-text')?.textContent.toLowerCase();
                 if (text && text.includes(term)) {
                     label.classList.remove('hidden');

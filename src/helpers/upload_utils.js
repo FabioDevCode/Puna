@@ -11,9 +11,9 @@ export function sanitizeFileName(name) {
 
 export function finalPathFor(site, form, filename) {
     const base = process.env.UPLOADS_DIR || path.join(process.cwd(), 'storage', 'uploads');
-    const domain = (site && site.domain) ? String(site.domain).replace(/[^a-zA-Z0-9.\-_]/g, '_') : 'unknown';
-    const formName = (form && form.name) ? String(form.name).replace(/[^a-zA-Z0-9.\-_]/g, '_') : 'form';
-    const code = (form && form.code) ? String(form.code) : 'nocode';
+    const domain = site && site.domain ? String(site.domain).replace(/[^a-zA-Z0-9.\-_]/g, '_') : 'unknown';
+    const formName = form && form.name ? String(form.name).replace(/[^a-zA-Z0-9.\-_]/g, '_') : 'form';
+    const code = form && form.code ? String(form.code) : 'nocode';
     const dir = path.join(base, domain, formName, code);
     return { dir, path: path.join(dir, filename) };
 }
@@ -24,5 +24,9 @@ export async function moveFile(src, dest) {
 }
 
 export async function removeFile(p) {
-    try { await fs.unlink(p); } catch (e) {console.error(e);}
+    try {
+        await fs.unlink(p);
+    } catch (e) {
+        console.error(e);
+    }
 }

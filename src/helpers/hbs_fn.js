@@ -8,7 +8,9 @@ export default {
         return i18n.__n.apply(this, arguments);
     },
     _capitalize: (str) => {
-        if (typeof str !== 'string') { return ''; }
+        if (typeof str !== 'string') {
+            return '';
+        }
         return str.charAt(0).toUpperCase() + str.slice(1);
     },
     _uppercase: (str) => {
@@ -24,7 +26,9 @@ export default {
     },
 
     slot: function (name, options) {
-        if (!this._slots) { this._slots = {}; }
+        if (!this._slots) {
+            this._slots = {};
+        }
         this._slots[name] = options.fn(this);
     },
     renderSlot: function (name) {

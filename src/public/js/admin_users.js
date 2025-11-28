@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         total: 0,
         search: '',
         searchField: 'auto', // Nouveau: champ de recherche sélectionné
-        isLoading: false
+        isLoading: false,
     };
 
     // Éléments du DOM
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         exportBtn: document.getElementById('exportExcelBtn'),
         searchInput: document.getElementById('searchInput'),
         clearSearchBtn: document.getElementById('clearSearch'),
-        searchFieldSelect: document.getElementById('searchFieldSelect') // Nouveau
+        searchFieldSelect: document.getElementById('searchFieldSelect'), // Nouveau
     };
 
     // Initialisation
@@ -60,7 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const userIdInput = document.getElementById('user_delete_id');
         const userLoginSpan = document.getElementById('delete_user_login');
 
-        if (!modal || !passwordInput || !confirmBtn) return;
+        if (!modal || !passwordInput || !confirmBtn) {
+            return;
+        }
 
         // Activer/désactiver le bouton selon le mot de passe
         passwordInput.addEventListener('input', (e) => {
@@ -88,14 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('sitesListContainer');
         const noResult = document.getElementById('noSiteFound');
 
-        if (!input || !container) return;
+        if (!input || !container) {
+            return;
+        }
 
         input.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const labels = container.querySelectorAll('label');
             let visibleCount = 0;
 
-            labels.forEach(label => {
+            labels.forEach((label) => {
                 const text = label.querySelector('.label-text').textContent.toLowerCase();
                 if (text.includes(term)) {
                     label.classList.remove('hidden');
@@ -144,7 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadUsers() {
-        if (state.isLoading) return;
+        if (state.isLoading) {
+            return;
+        }
         state.isLoading = true;
 
         // UI Loading
@@ -158,18 +164,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 limit: state.limit,
                 offset: state.offset,
                 search: state.search,
-                searchField: state.searchField
+                searchField: state.searchField,
             });
 
             const response = await fetch(`/admin/users/list?${params}`);
-            if (!response.ok) throw new Error('Erreur réseau');
+            if (!response.ok) {
+                throw new Error('Erreur réseau');
+            }
 
             const data = await response.json();
 
             state.total = data.total;
             renderTable(data.users);
             updatePagination();
-
         } catch (error) {
             console.error('Erreur chargement users:', error);
             // Afficher erreur dans le tableau ?
@@ -190,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const fragment = document.createDocumentFragment();
 
-        users.forEach(user => {
+        users.forEach((user) => {
             const tr = document.createElement('tr');
             // tr.className = 'hover';
 
@@ -198,7 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let roleBadge = '';
             switch (user.role) {
                 case 'super_admin':
-                    roleBadge = '<span class="badge badge-outline badge_role badge_super_admin badge-sm">Super Admin</span>';
+                    roleBadge =
+                        '<span class="badge badge-outline badge_role badge_super_admin badge-sm">Super Admin</span>';
                     break;
                 case 'owner':
                     roleBadge = '<span class="badge badge-outline badge_role badge_owner badge-sm">Owner</span>';
@@ -279,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalPages = Math.ceil(state.total / state.limit);
 
         // Update compteur
-        const start = state.total === 0 ? 0 : state.offset + 1;
+        const _start = state.total === 0 ? 0 : state.offset + 1;
         const end = Math.min(state.offset + state.limit, state.total);
         elements.countLabel.textContent = `${end} sur ${state.total}`;
 
@@ -300,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handlePageChange(direction) {
-        const newOffset = state.offset + (direction * state.limit);
+        const newOffset = state.offset + direction * state.limit;
         if (newOffset >= 0 && newOffset < state.total) {
             state.offset = newOffset;
             loadUsers();
@@ -318,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleExport() {
         const params = new URLSearchParams({
-            search: state.search
+            search: state.search,
         });
         window.location.href = `/admin/users/export-excel?${params}`;
     }

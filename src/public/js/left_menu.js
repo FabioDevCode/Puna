@@ -1,10 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const asideNav = document.querySelector('aside nav');
-        if (!asideNav) { return; }
+        if (!asideNav) {
+            return;
+        }
 
         const anchors = Array.from(asideNav.querySelectorAll('a[href]'));
-        if (!anchors.length) { return; }
+        if (!anchors.length) {
+            return;
+        }
 
         const activePathRaw = window.location.pathname || '/';
         const activePath = activePathRaw.replace(/\/+$|\/$/, '') || '/';
@@ -13,9 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let bestMatch = null;
         let bestScore = -1;
 
-        anchors.forEach(a => {
+        anchors.forEach((a) => {
             const href = a.getAttribute('href');
-            if (!href) { return; }
+            if (!href) {
+                return;
+            }
             // resolve relative urls
             let url;
             try {
@@ -48,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // NEW: Match by first segment
             // e.g., /site/all matches /site/123/view, /inbox/456/view, etc.
-            const linkSegments = linkPath.split('/').filter(s => s);
-            const activeSegments = activePath.split('/').filter(s => s);
+            const linkSegments = linkPath.split('/').filter((s) => s);
+            const activeSegments = activePath.split('/').filter((s) => s);
 
             if (linkSegments.length > 0 && activeSegments.length > 0) {
                 // If first segment matches (e.g., both start with /site, /inbox, /admin)
@@ -65,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Clear previous active classes on anchors
-        anchors.forEach(a => {
+        anchors.forEach((a) => {
             a.classList.remove('bg-secondary-content');
         });
 

@@ -9,7 +9,6 @@ import models from '../models/index.js';
 import { encryptObject } from '../utils/crypto.js';
 import stringUtils from '../utils/string.js';
 
-
 export const rootRedirect = (req, res) => {
     return res.redirect('/dashboard');
 };
@@ -21,7 +20,9 @@ export const getTopFroms = async (req, res) => {
 
     try {
         const end = dayjs().endOf('day');
-        const start = dayjs().startOf('day').subtract(days - 1, 'day');
+        const start = dayjs()
+            .startOf('day')
+            .subtract(days - 1, 'day');
 
         // Raw SQL for stable grouping and joins
         const sql = `
@@ -39,12 +40,12 @@ export const getTopFroms = async (req, res) => {
         const replacements = {
             userId,
             start: start.toDate(),
-            end: end.toDate()
+            end: end.toDate(),
         };
 
         const rows = await models.sequelize.query(sql, {
             replacements,
-            type: models.Sequelize.QueryTypes.SELECT
+            type: models.Sequelize.QueryTypes.SELECT,
         });
 
         // Ensure result has exactly up to 3 entries with rank
@@ -52,7 +53,7 @@ export const getTopFroms = async (req, res) => {
             rank: idx + 1,
             form_name: r.form_name || null,
             site_domain: r.site_domain || null,
-            count: Number(r.cnt) || 0
+            count: Number(r.cnt) || 0,
         }));
 
         return res.json({ days, items: result });
@@ -69,7 +70,9 @@ export const getTopSiteForms = async (req, res) => {
 
     try {
         const end = dayjs().endOf('day');
-        const start = dayjs().startOf('day').subtract(days - 1, 'day');
+        const start = dayjs()
+            .startOf('day')
+            .subtract(days - 1, 'day');
 
         // Find the site with most inbox rows in the period
         const sqlTopSite = `
@@ -86,7 +89,7 @@ export const getTopSiteForms = async (req, res) => {
 
         const topSiteRows = await models.sequelize.query(sqlTopSite, {
             replacements: { userId, start: start.toDate(), end: end.toDate() },
-            type: models.Sequelize.QueryTypes.SELECT
+            type: models.Sequelize.QueryTypes.SELECT,
         });
 
         if (!topSiteRows || !topSiteRows.length) {
@@ -108,13 +111,17 @@ export const getTopSiteForms = async (req, res) => {
 
         const perFormRows = await models.sequelize.query(sqlPerForm, {
             replacements: { siteId, start: start.toDate(), end: end.toDate() },
-            type: models.Sequelize.QueryTypes.SELECT
+            type: models.Sequelize.QueryTypes.SELECT,
         });
 
-        const labels = (perFormRows || []).map(r => r.form_name || `form-${r.form_id}`);
-        const series = (perFormRows || []).map(r => Number(r.cnt) || 0);
+        const labels = (perFormRows || []).map((r) => r.form_name || `form-${r.form_id}`);
+        const series = (perFormRows || []).map((r) => Number(r.cnt) || 0);
 
-        return res.json({ site: { id: siteId, domain: topSite.site_domain, total: Number(topSite.total) || 0 }, labels, series });
+        return res.json({
+            site: { id: siteId, domain: topSite.site_domain, total: Number(topSite.total) || 0 },
+            labels,
+            series,
+        });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Server error' });
@@ -127,7 +134,7 @@ export const dashboard = async (req, res) => {
         const sitesWithCounts = await getSitesWithCounts(userId);
 
         res.render('dashboard', {
-            stats: getGlobalStats(sitesWithCounts)
+            stats: getGlobalStats(sitesWithCounts),
         });
     } catch (err) {
         res.render('dashboard', {});
@@ -140,7 +147,7 @@ export const dashboard = async (req, res) => {
 export const admin = async (req, res) => {
     try {
         res.render('admin', {
-            layout: 'administration'
+            layout: 'administration',
         });
     } catch (err) {
         console.error('admin error:', err);
@@ -160,12 +167,12 @@ export const adminUsers = async (req, res) => {
         const sites = await models.Site.findAll({
             where: { fk_id_user: userId },
             attributes: ['id', 'domain'],
-            order: [['domain', 'ASC']]
+            order: [['domain', 'ASC']],
         });
 
         res.render('admin_users', {
             layout: 'administration',
-            sites: sites.map(s => s.toJSON())
+            sites: sites.map((s) => s.toJSON()),
         });
     } catch (err) {
         console.error('adminUsers error:', err);
@@ -190,7 +197,7 @@ export const adminUsersList = async (req, res) => {
                 // Recherche globale sur email et login
                 whereConditions[Op.or] = [
                     { email: { [Op.like]: `%${search}%` } },
-                    { login: { [Op.like]: `%${search}%` } }
+                    { login: { [Op.like]: `%${search}%` } },
                 ];
             } else if (searchField === 'role') {
                 // Recherche sur le rôle
@@ -211,22 +218,26 @@ export const adminUsersList = async (req, res) => {
             limit,
             offset,
             order: [['createdAt', 'DESC']],
-            include: [{
-                model: models.User,
-                as: 'creator',
-                attributes: ['id', 'login', 'email'],
-                // Si recherche sur created_by, filtrer ici
-                ...(searchField === 'created_by' && search ? {
-                    where: {
-                        login: { [Op.like]: `%${search}%` }
-                    }
-                } : {})
-            }],
-            attributes: ['id', 'email', 'login', 'role', 'status', 'last_connection', 'createdAt', 'created_by']
+            include: [
+                {
+                    model: models.User,
+                    as: 'creator',
+                    attributes: ['id', 'login', 'email'],
+                    // Si recherche sur created_by, filtrer ici
+                    ...(searchField === 'created_by' && search
+                        ? {
+                              where: {
+                                  login: { [Op.like]: `%${search}%` },
+                              },
+                          }
+                        : {}),
+                },
+            ],
+            attributes: ['id', 'email', 'login', 'role', 'status', 'last_connection', 'createdAt', 'created_by'],
         });
 
         // Formater les données
-        const formattedUsers = users.map(user => ({
+        const formattedUsers = users.map((user) => ({
             id: user.id,
             email: user.email,
             login: user.login,
@@ -234,16 +245,15 @@ export const adminUsersList = async (req, res) => {
             status: user.status || 'pending',
             created_by: user.creator ? user.creator.login : 'N/A',
             last_connection: user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
-            createdAt: dayjs(user.createdAt).format('YYYY-MM-DD')
+            createdAt: dayjs(user.createdAt).format('YYYY-MM-DD'),
         }));
 
         res.json({
             users: formattedUsers,
             total: count,
             limit,
-            offset
+            offset,
         });
-
     } catch (err) {
         console.error('adminUsersList error:', err);
         res.status(500).json({ error: 'Erreur serveur' });
@@ -260,21 +270,20 @@ export const adminUsersExportExcel = async (req, res) => {
         // Construire les conditions de recherche
         const whereConditions = {};
         if (search) {
-            whereConditions[Op.or] = [
-                { email: { [Op.like]: `%${search}%` } },
-                { login: { [Op.like]: `%${search}%` } }
-            ];
+            whereConditions[Op.or] = [{ email: { [Op.like]: `%${search}%` } }, { login: { [Op.like]: `%${search}%` } }];
         }
 
         // Récupérer tous les utilisateurs
         const users = await models.User.findAll({
             where: whereConditions,
             order: [['createdAt', 'DESC']],
-            include: [{
-                model: models.User,
-                as: 'creator',
-                attributes: ['login']
-            }]
+            include: [
+                {
+                    model: models.User,
+                    as: 'creator',
+                    attributes: ['login'],
+                },
+            ],
         });
 
         // Créer le workbook Excel
@@ -290,7 +299,7 @@ export const adminUsersExportExcel = async (req, res) => {
             { header: 'Créé par', key: 'created_by', width: 20 },
             { header: 'Activé', key: 'enabled', width: 10 },
             { header: 'Dernière connexion', key: 'last_connection', width: 20 },
-            { header: 'Créé le', key: 'createdAt', width: 20 }
+            { header: 'Créé le', key: 'createdAt', width: 20 },
         ];
 
         // Style des en-têtes
@@ -298,15 +307,17 @@ export const adminUsersExportExcel = async (req, res) => {
         worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'left' };
 
         // Ajouter les données
-        users.forEach(user => {
+        users.forEach((user) => {
             worksheet.addRow({
                 email: user.email || '',
                 login: user.login || '',
                 role: user.role || 'N/A',
                 created_by: user.creator ? user.creator.login : 'N/A',
                 enabled: user.enabled ? 'Oui' : 'Non',
-                last_connection: user.last_connection ? dayjs(user.last_connection).format('DD/MM/YYYY HH:mm') : 'Jamais',
-                createdAt: dayjs(user.createdAt).format('DD/MM/YYYY HH:mm')
+                last_connection: user.last_connection
+                    ? dayjs(user.last_connection).format('DD/MM/YYYY HH:mm')
+                    : 'Jamais',
+                createdAt: dayjs(user.createdAt).format('DD/MM/YYYY HH:mm'),
             });
         });
 
@@ -318,10 +329,9 @@ export const adminUsersExportExcel = async (req, res) => {
 
         await workbook.xlsx.write(res);
         res.end();
-
     } catch (err) {
         console.error('adminUsersExportExcel error:', err);
-        res.status(500).json({ error: 'Erreur lors de l\'export' });
+        res.status(500).json({ error: "Erreur lors de l'export" });
     }
 };
 
@@ -342,8 +352,8 @@ export const adminCreateUser = async (req, res) => {
         // Vérifier si l'utilisateur existe déjà
         const existingUser = await models.User.findOne({
             where: {
-                [Op.or]: [{ email }, { login }]
-            }
+                [Op.or]: [{ email }, { login }],
+            },
         });
 
         if (existingUser) {
@@ -356,16 +366,16 @@ export const adminCreateUser = async (req, res) => {
             email,
             role,
             created_by: creatorId,
-            status: 'pending'
+            status: 'pending',
         });
 
         // Assigner les sites
         if (sites) {
             // Si sites est une string (un seul site sélectionné), on le met dans un tableau
             const sitesArray = Array.isArray(sites) ? sites : [sites];
-            const siteUserEntries = sitesArray.map(siteId => ({
+            const siteUserEntries = sitesArray.map((siteId) => ({
                 fk_id_site: siteId,
-                fk_id_user: newUser.id
+                fk_id_user: newUser.id,
             }));
 
             if (siteUserEntries.length > 0) {
@@ -375,7 +385,6 @@ export const adminCreateUser = async (req, res) => {
 
         // TODO: Flash message "Utilisateur créé avec succès"
         res.redirect('/admin/users');
-
     } catch (err) {
         console.error('adminCreateUser error:', err);
         res.redirect('/admin/users');
@@ -409,17 +418,16 @@ export const adminDeleteUser = async (req, res) => {
 
         // Supprimer les associations dans SiteUser
         await models.SiteUser.destroy({
-            where: { fk_id_user: user_id }
+            where: { fk_id_user: user_id },
         });
 
         // Supprimer l'utilisateur
         await models.User.destroy({
-            where: { id: user_id }
+            where: { id: user_id },
         });
 
         // TODO: Flash message "Utilisateur supprimé avec succès"
         res.redirect('/admin/users');
-
     } catch (err) {
         console.error('adminDeleteUser error:', err);
         res.redirect('/admin/users');
@@ -438,18 +446,20 @@ export const adminViewUser = async (req, res) => {
                 {
                     model: models.User,
                     as: 'creator',
-                    attributes: ['login']
+                    attributes: ['login'],
                 },
                 {
                     model: models.SiteUser,
                     as: 'siteassignments',
-                    include: [{
-                        model: models.Site,
-                        as: 'site',
-                        attributes: ['id', 'domain']
-                    }]
-                }
-            ]
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            attributes: ['id', 'domain'],
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!user) {
@@ -465,9 +475,8 @@ export const adminViewUser = async (req, res) => {
 
         res.render('admin_user_view', {
             layout: 'administration',
-            user: userData
+            user: userData,
         });
-
     } catch (err) {
         console.error('adminViewUser error:', err);
         res.redirect('/admin/users');
@@ -487,18 +496,20 @@ export const adminEditUser = async (req, res) => {
                 {
                     model: models.User,
                     as: 'creator',
-                    attributes: ['login']
+                    attributes: ['login'],
                 },
                 {
                     model: models.SiteUser,
                     as: 'siteassignments',
-                    include: [{
-                        model: models.Site,
-                        as: 'site',
-                        attributes: ['id', 'domain']
-                    }]
-                }
-            ]
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            attributes: ['id', 'domain'],
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!user) {
@@ -509,14 +520,14 @@ export const adminEditUser = async (req, res) => {
         const sites = await models.Site.findAll({
             where: { fk_id_user: currentUserId },
             attributes: ['id', 'domain'],
-            order: [['domain', 'ASC']]
+            order: [['domain', 'ASC']],
         });
 
         // Marquer les sites assignés
-        const assignedSiteIds = user.siteassignments?.map(sa => sa.site.id) || [];
-        const sitesWithAssignment = sites.map(s => ({
+        const assignedSiteIds = user.siteassignments?.map((sa) => sa.site.id) || [];
+        const sitesWithAssignment = sites.map((s) => ({
             ...s.toJSON(),
-            isAssigned: assignedSiteIds.includes(s.id)
+            isAssigned: assignedSiteIds.includes(s.id),
         }));
 
         // Formater les données pour l'affichage
@@ -529,9 +540,8 @@ export const adminEditUser = async (req, res) => {
         res.render('admin_user_edit', {
             layout: 'administration',
             user: userData,
-            sites: sitesWithAssignment
+            sites: sitesWithAssignment,
         });
-
     } catch (err) {
         console.error('adminEditUser error:', err);
         res.redirect('/admin/users');
@@ -554,7 +564,7 @@ export const adminUpdateUser = async (req, res) => {
         const updateData = {
             login,
             email,
-            role
+            role,
         };
 
         // Si le mot de passe est vidé, désactiver l'utilisateur
@@ -565,21 +575,21 @@ export const adminUpdateUser = async (req, res) => {
 
         // Mettre à jour l'utilisateur
         await models.User.update(updateData, {
-            where: { id: userId }
+            where: { id: userId },
         });
 
         // Gérer les sites assignés
         // D'abord supprimer toutes les assignations existantes
         await models.SiteUser.destroy({
-            where: { fk_id_user: userId }
+            where: { fk_id_user: userId },
         });
 
         // Puis recréer les assignations si des sites sont sélectionnés
         if (sites) {
             const sitesArray = Array.isArray(sites) ? sites : [sites];
-            const siteUserEntries = sitesArray.map(siteId => ({
+            const siteUserEntries = sitesArray.map((siteId) => ({
                 fk_id_site: siteId,
-                fk_id_user: userId
+                fk_id_user: userId,
             }));
 
             if (siteUserEntries.length > 0) {
@@ -589,7 +599,6 @@ export const adminUpdateUser = async (req, res) => {
 
         // TODO: Flash message "Utilisateur mis à jour avec succès"
         res.redirect('/admin/users');
-
     } catch (err) {
         console.error('adminUpdateUser error:', err);
         res.redirect(`/admin/users/${req.params.id}/edit`);
@@ -602,9 +611,8 @@ export const adminUpdateUser = async (req, res) => {
 export const adminSettings = async (req, res) => {
     try {
         res.render('admin_settings', {
-            layout: 'administration'
+            layout: 'administration',
         });
-
     } catch (err) {
         console.error('adminSettings error:', err);
         res.redirect('/admin');
@@ -619,13 +627,13 @@ export const error = async (req, res) => {
 
 export const dpLogin = (req, res) => {
     res.render('login', {
-        layout: 'login'
+        layout: 'login',
     });
 };
 
 export const dpFirstCo = (req, res) => {
     res.render('first_co', {
-        layout: 'login'
+        layout: 'login',
     });
 };
 
@@ -636,7 +644,7 @@ export const createSite = async (req, res) => {
         const site = await models.Site.create({
             domain,
             fk_id_user: userId,
-            control_code: stringUtils.generateCode(16)
+            control_code: stringUtils.generateCode(16),
         });
         return res.redirect(`/site/${site.id}/view`);
     } catch (err) {
@@ -661,7 +669,7 @@ export const showSite = async (req, res) => {
         const formsRaw = await models.Form.findAll({
             where: { fk_id_site: siteId },
             raw: true,
-            order: [['createdAt', 'ASC']]
+            order: [['createdAt', 'ASC']],
         });
 
         const forms = (formsRaw || []).map((f) => {
@@ -679,7 +687,7 @@ export const showSite = async (req, res) => {
             return {
                 ...f,
                 templateObj,
-                template_entries
+                template_entries,
             };
         });
 
@@ -713,7 +721,7 @@ export const showSite = async (req, res) => {
         res.render('site_show', {
             site,
             forms,
-            activeForm
+            activeForm,
         });
     } catch (err) {
         res.redirect('/dashboard');
@@ -769,11 +777,15 @@ export const deleteForm = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(form_id);
-        if (!form) { return res.redirect('/dashboard'); }
+        if (!form) {
+            return res.redirect('/dashboard');
+        }
 
         // get site id and verify ownership
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) { return res.redirect('/dashboard'); }
+        if (!site || site.fk_id_user !== userId) {
+            return res.redirect('/dashboard');
+        }
 
         const siteId = site.id;
         await form.destroy();
@@ -790,10 +802,14 @@ export const updateFormTemplateSave = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) { return res.redirect('/dashboard'); }
+        if (!form) {
+            return res.redirect('/dashboard');
+        }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) { return res.redirect('/dashboard'); }
+        if (!site || site.fk_id_user !== userId) {
+            return res.redirect('/dashboard');
+        }
 
         // Expecting nested fields in req.body.template (e.g. template[fieldName]=New label)
         const newTemplate = req.body?.template || {};
@@ -816,10 +832,14 @@ export const getFormInbox = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) { return res.status(404).json({ error: 'Form not found' }); }
+        if (!form) {
+            return res.status(404).json({ error: 'Form not found' });
+        }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
+        if (!site || site.fk_id_user !== userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
         // Server-side pagination: accept ?limit=..&offset=..
         const limitRaw = parseInt(req.query.limit, 10);
@@ -837,15 +857,26 @@ export const getFormInbox = async (req, res) => {
                     const conditions = [];
                     const Sequelize = models.Sequelize;
                     for (const [k, v] of Object.entries(parsed)) {
-                        if (v === null || typeof v === 'undefined' || String(v).trim() === '') { continue; }
+                        if (v === null || typeof v === 'undefined' || String(v).trim() === '') {
+                            continue;
+                        }
                         if (k === 'createdAt') {
                             // filter by date (YYYY-MM-DD) on createdAt using DATE(createdAt) = 'YYYY-MM-DD'
-                            conditions.push(Sequelize.where(Sequelize.fn('DATE', Sequelize.col('createdAt')), String(v)));
+                            conditions.push(
+                                Sequelize.where(Sequelize.fn('DATE', Sequelize.col('createdAt')), String(v))
+                            );
                         } else {
                             // contains match on JSON stringified field
                             const Op = Sequelize.Op;
                             const expr = Sequelize.where(
-                                Sequelize.fn('JSON_UNQUOTE', Sequelize.fn('JSON_EXTRACT', Sequelize.col('content'), Sequelize.literal(`'$.${k}'`))),
+                                Sequelize.fn(
+                                    'JSON_UNQUOTE',
+                                    Sequelize.fn(
+                                        'JSON_EXTRACT',
+                                        Sequelize.col('content'),
+                                        Sequelize.literal(`'$.${k}'`)
+                                    )
+                                ),
                                 { [Op.like]: `%${String(v)}%` }
                             );
                             conditions.push(expr);
@@ -867,11 +898,11 @@ export const getFormInbox = async (req, res) => {
             order: [['createdAt', 'DESC']],
             limit,
             offset,
-            raw: true
+            raw: true,
         });
 
         const rows = result.rows || [];
-        const total = typeof result.count === 'number' ? result.count : (result.count || 0);
+        const total = typeof result.count === 'number' ? result.count : result.count || 0;
 
         const items = (rows || []).map((r) => {
             let parsed = null;
@@ -883,7 +914,7 @@ export const getFormInbox = async (req, res) => {
             return {
                 id: r.id,
                 content: parsed,
-                createdAt: r.createdAt
+                createdAt: r.createdAt,
             };
         });
 
@@ -898,15 +929,23 @@ export const updateFormColumns = async (req, res) => {
     const userId = req.session.user?.id;
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) { return res.status(404).json({ error: 'Form not found' }); }
+        if (!form) {
+            return res.status(404).json({ error: 'Form not found' });
+        }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
+        if (!site || site.fk_id_user !== userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
         // Expect JSON body { columns: { key1: true, key2: false, ... } }
         let cols = req.body && req.body.columns ? req.body.columns : null;
         if (typeof cols === 'string') {
-            try { cols = JSON.parse(cols); } catch (e) { cols = null; }
+            try {
+                cols = JSON.parse(cols);
+            } catch (e) {
+                cols = null;
+            }
         }
 
         // If cols is not an object, reject
@@ -932,26 +971,32 @@ export const getInboxCounts = async (req, res) => {
     try {
         // Use dayjs to compute start/end (local day boundaries) and labels
         const end = dayjs().endOf('day');
-        const start = dayjs().startOf('day').subtract(days - 1, 'day');
+        const start = dayjs()
+            .startOf('day')
+            .subtract(days - 1, 'day');
 
         // fetch Inbox rows linked to forms/sites owned by the user
         const inboxRows = await models.Inbox.findAll({
             where: {
                 createdAt: {
                     [Op.gte]: start.toDate(),
-                    [Op.lte]: end.toDate()
-                }
+                    [Op.lte]: end.toDate(),
+                },
             },
             attributes: ['id', 'createdAt'],
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         // prepare labels (dates) and initialize counts to 0 using dayjs local dates
@@ -968,7 +1013,9 @@ export const getInboxCounts = async (req, res) => {
         // aggregate counts per day from fetched rows (use same local format)
         (inboxRows || []).forEach((r) => {
             const key = dayjs(r.createdAt).format('YYYY-MM-DD');
-            if (countsMap[key] !== undefined) { countsMap[key]++; }
+            if (countsMap[key] !== undefined) {
+                countsMap[key]++;
+            }
         });
 
         const data = labels.map((l) => countsMap[l] || 0);
@@ -989,18 +1036,22 @@ export const getInboxPercentages = async (req, res) => {
                 where: {
                     createdAt: {
                         [Op.gte]: start.toDate(),
-                        [Op.lte]: end.toDate()
-                    }
+                        [Op.lte]: end.toDate(),
+                    },
                 },
-                include: [{
-                    model: models.Form,
-                    as: 'form',
-                    include: [{
-                        model: models.Site,
-                        as: 'site',
-                        where: { fk_id_user: userId }
-                    }]
-                }]
+                include: [
+                    {
+                        model: models.Form,
+                        as: 'form',
+                        include: [
+                            {
+                                model: models.Site,
+                                as: 'site',
+                                where: { fk_id_user: userId },
+                            },
+                        ],
+                    },
+                ],
             });
         };
 
@@ -1033,12 +1084,18 @@ export const getInboxPercentages = async (req, res) => {
 
         const computePercent = (current, previous) => {
             if (previous === 0) {
-                if (current === 0) { return { percent: 0, trend: 'neutral' }; }
+                if (current === 0) {
+                    return { percent: 0, trend: 'neutral' };
+                }
                 return { percent: 100, trend: 'up' };
             }
             const change = Math.round(((current - previous) / previous) * 100);
-            if (change > 0) { return { percent: Math.abs(change), trend: 'up' }; }
-            if (change < 0) { return { percent: Math.abs(change), trend: 'down' }; }
+            if (change > 0) {
+                return { percent: Math.abs(change), trend: 'up' };
+            }
+            if (change < 0) {
+                return { percent: Math.abs(change), trend: 'down' };
+            }
             return { percent: 0, trend: 'neutral' };
         };
 
@@ -1059,15 +1116,19 @@ export const getInboxCountsBySite = async (req, res) => {
     try {
         // fetch Inbox rows linked to forms/sites owned by the user
         const inboxRows = await models.Inbox.findAll({
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         // aggregate counts per site
@@ -1076,7 +1137,9 @@ export const getInboxCountsBySite = async (req, res) => {
 
         (inboxRows || []).forEach((r) => {
             const site = r.form && r.form.site ? r.form.site : null;
-            if (!site) { return; }
+            if (!site) {
+                return;
+            }
             const key = String(site.id);
             countsMap[key] = (countsMap[key] || 0) + 1;
             // Use domain if available, otherwise a fallback label
@@ -1112,18 +1175,22 @@ export const getInboxHeatmap = async (req, res) => {
             where: {
                 createdAt: {
                     [Op.gte]: start,
-                    [Op.lte]: end
-                }
+                    [Op.lte]: end,
+                },
             },
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         // Prepare a 7x24 matrix (Monday..Sunday, hours 00..23)
@@ -1146,7 +1213,7 @@ export const getInboxHeatmap = async (req, res) => {
 
         let series = daysOfWeek.map((d, i) => ({
             name: d,
-            data: hours.map((h, j) => ({ x: h, y: matrix[i][j] }))
+            data: hours.map((h, j) => ({ x: h, y: matrix[i][j] })),
         }));
 
         series = series.reverse();
@@ -1163,16 +1230,20 @@ export const getLastInboxEntry = async (req, res) => {
 
     try {
         const lastRow = await models.Inbox.findOne({
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }],
-            order: [['createdAt', 'DESC']]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
+            order: [['createdAt', 'DESC']],
         });
 
         if (!lastRow) {
@@ -1195,8 +1266,12 @@ export const getSiteToken = async (req, res) => {
 
     try {
         const site = await models.Site.findByPk(siteId);
-        if (!site) { return res.status(404).json({ error: 'Site not found' }); }
-        if (site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
+        if (!site) {
+            return res.status(404).json({ error: 'Site not found' });
+        }
+        if (site.fk_id_user !== userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
         // load key from env or config file
         let secret = process.env.KEY_TK;
@@ -1209,13 +1284,15 @@ export const getSiteToken = async (req, res) => {
             }
         }
 
-        if (!secret) { return res.status(500).json({ error: 'Server key not configured' }); }
+        if (!secret) {
+            return res.status(500).json({ error: 'Server key not configured' });
+        }
 
         const payload = {
             data: encryptObject({
                 id: site.id,
-                control_code: site.control_code
-            })
+                control_code: site.control_code,
+            }),
         };
 
         const token = jwt.sign(payload, secret);
@@ -1232,8 +1309,12 @@ export const revokeSiteTokens = async (req, res) => {
 
     try {
         const site = await models.Site.findByPk(siteId);
-        if (!site) { return res.status(404).json({ error: 'Site not found' }); }
-        if (site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
+        if (!site) {
+            return res.status(404).json({ error: 'Site not found' });
+        }
+        if (site.fk_id_user !== userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
         const newCode = stringUtils.generateCode(16);
         site.control_code = newCode;
@@ -1251,15 +1332,19 @@ export const showInbox = async (req, res) => {
 
     try {
         const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!inbox) {
@@ -1306,7 +1391,9 @@ export const showInbox = async (req, res) => {
 
         // Helper function to determine file type color and icon
         const getFileTypeInfo = (filename) => {
-            if (!filename) { return { color: 'neutral', icon: 'fa-file', label: 'Fichier' }; }
+            if (!filename) {
+                return { color: 'neutral', icon: 'fa-file', label: 'Fichier' };
+            }
 
             const ext = filename.toLowerCase().split('.').pop();
             // Images - Purple
@@ -1315,7 +1402,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#b0a010',
                     icon: 'fa-solid fa-file-image',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -1324,7 +1411,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#186E3F',
                     icon: 'fa-solid fa-file-excel',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -1333,7 +1420,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#077D3E',
                     icon: 'fa-solid fa-file-csv',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -1342,7 +1429,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#AA0101',
                     icon: 'fa-solid fa-file-pdf',
-                    label: 'PDF'
+                    label: 'PDF',
                 };
             }
 
@@ -1351,7 +1438,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#2A5893',
                     icon: 'fa-solid fa-file-word',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -1360,7 +1447,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#4A90E2',
                     icon: 'fa-solid fa-file-lines',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -1369,7 +1456,7 @@ export const showInbox = async (req, res) => {
                     color: 'white',
                     bg_color: '#444444',
                     icon: 'fa-solid fa-file-lines',
-                    label: ext.toUpperCase()
+                    label: ext.toUpperCase(),
                 };
             }
 
@@ -1377,7 +1464,7 @@ export const showInbox = async (req, res) => {
                 color: 'white',
                 bg_color: '#1F2937',
                 icon: 'fa-solid fa-file',
-                label: ext.toUpperCase()
+                label: ext.toUpperCase(),
             };
         };
 
@@ -1399,7 +1486,7 @@ export const showInbox = async (req, res) => {
                         label,
                         filename,
                         original_filename: filename.split('_').slice(1).join('_'),
-                        ...typeInfo
+                        ...typeInfo,
                     });
                 });
             }
@@ -1407,17 +1494,15 @@ export const showInbox = async (req, res) => {
 
         // Prepare content entries with labels from template (excluding files)
         const contentEntries = Object.keys(contentObj || {})
-            .filter(key => !fileKeys.includes(key)) // Exclude file fields
+            .filter((key) => !fileKeys.includes(key)) // Exclude file fields
             .map((key) => ({
                 key,
                 label: templateObj[key] || key,
-                value: contentObj[key] !== undefined && contentObj[key] !== null ? String(contentObj[key]) : '-'
+                value: contentObj[key] !== undefined && contentObj[key] !== null ? String(contentObj[key]) : '-',
             }));
 
         // Format date
-        const formattedDate = inbox.createdAt
-            ? dayjs(inbox.createdAt).format('YYYY-MM-DD HH:mm:ss')
-            : '-';
+        const formattedDate = inbox.createdAt ? dayjs(inbox.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-';
 
         res.render('show_inbox', {
             inbox: inbox.toJSON(),
@@ -1425,7 +1510,7 @@ export const showInbox = async (req, res) => {
             site: site.toJSON(),
             contentEntries,
             fileEntries,
-            formattedDate
+            formattedDate,
         });
     } catch (err) {
         console.error(err);
@@ -1439,15 +1524,19 @@ export const deleteInbox = async (req, res) => {
 
     try {
         const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!inbox) {
@@ -1491,15 +1580,19 @@ export const downloadFile = async (req, res) => {
     try {
         // Verify inbox exists and user has access
         const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!inbox) {
@@ -1585,15 +1678,19 @@ export const downloadInboxZip = async (req, res) => {
     try {
         // Verify inbox exists and user has access
         const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!inbox) {
@@ -1642,7 +1739,7 @@ export const downloadInboxZip = async (req, res) => {
                         const originalFilename = filename.split('_').slice(1).join('_');
                         allFiles.push({
                             path: filePath,
-                            name: originalFilename
+                            name: originalFilename,
                         });
                     }
                 }
@@ -1657,7 +1754,7 @@ export const downloadInboxZip = async (req, res) => {
         // Create ZIP using archiver
         const archiver = (await import('archiver')).default;
         const archive = archiver('zip', {
-            zlib: { level: 9 } // Maximum compression
+            zlib: { level: 9 }, // Maximum compression
         });
 
         // Set response headers
@@ -1698,11 +1795,13 @@ export const exportFormToExcel = async (req, res) => {
     try {
         // Verify form exists and user has access
         const form = await models.Form.findByPk(formId, {
-            include: [{
-                model: models.Site,
-                as: 'site',
-                where: { fk_id_user: userId }
-            }]
+            include: [
+                {
+                    model: models.Site,
+                    as: 'site',
+                    where: { fk_id_user: userId },
+                },
+            ],
         });
 
         if (!form) {
@@ -1718,7 +1817,7 @@ export const exportFormToExcel = async (req, res) => {
         const inboxEntries = await models.Inbox.findAll({
             where: { fk_id_form: formId },
             order: [['createdAt', 'DESC']],
-            raw: true
+            raw: true,
         });
 
         // Parse template to get column headers
@@ -1755,10 +1854,10 @@ export const exportFormToExcel = async (req, res) => {
 
         // Get all unique keys from inbox content (INCLUDING file fields now)
         const allKeys = new Set();
-        inboxEntries.forEach(entry => {
+        inboxEntries.forEach((entry) => {
             try {
                 const content = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
-                Object.keys(content || {}).forEach(key => {
+                Object.keys(content || {}).forEach((key) => {
                     allKeys.add(key);
                 });
             } catch (e) {
@@ -1767,7 +1866,7 @@ export const exportFormToExcel = async (req, res) => {
         });
 
         // Add headers with template labels
-        allKeys.forEach(key => {
+        allKeys.forEach((key) => {
             const label = templateObj[key] || key;
             headers.push(label);
             dataKeys.push(key);
@@ -1782,7 +1881,7 @@ export const exportFormToExcel = async (req, res) => {
         headerRow.alignment = { vertical: 'middle', horizontal: 'left' };
 
         // Add data rows
-        inboxEntries.forEach(entry => {
+        inboxEntries.forEach((entry) => {
             const row = [];
 
             // Add reception date
@@ -1798,7 +1897,7 @@ export const exportFormToExcel = async (req, res) => {
             }
 
             // Add data columns
-            dataKeys.forEach(key => {
+            dataKeys.forEach((key) => {
                 const value = content[key];
 
                 // Check if this is a file field
@@ -1823,9 +1922,9 @@ export const exportFormToExcel = async (req, res) => {
         });
 
         // Auto-size columns
-        worksheet.columns.forEach(column => {
+        worksheet.columns.forEach((column) => {
             let maxLength = 0;
-            column.eachCell({ includeEmpty: true }, cell => {
+            column.eachCell({ includeEmpty: true }, (cell) => {
                 const columnLength = cell.value ? String(cell.value).length : 10;
                 if (columnLength > maxLength) {
                     maxLength = columnLength;
@@ -1845,7 +1944,6 @@ export const exportFormToExcel = async (req, res) => {
         // Stream the workbook directly to response
         await workbook.xlsx.write(res);
         res.end();
-
     } catch (err) {
         console.error('exportFormToExcel error:', err);
         if (!res.headersSent) {
@@ -1860,7 +1958,7 @@ export const allSite = async (req, res) => {
         const sitesWithCounts = await getSitesWithCounts(userId);
 
         res.render('site_list', {
-            sites: sitesWithCounts
+            sites: sitesWithCounts,
         });
     } catch (err) {
         res.render('site_list', {});

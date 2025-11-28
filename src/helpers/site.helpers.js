@@ -1,37 +1,38 @@
 import models from '../models/index.js';
 
-
 export async function getSitesWithCounts(userId) {
     const sites = await models.Site.findAll({
         where: { fk_id_user: userId },
-        raw: true
+        raw: true,
     });
 
-    const sitesWithCounts = await Promise.all(sites.map(async (site) => {
-        let formCount = 0;
-        let inboxCount = 0;
+    const sitesWithCounts = await Promise.all(
+        sites.map(async (site) => {
+            let formCount = 0;
+            let inboxCount = 0;
 
-        const forms = await models.Form.findAll({
-            where: { fk_id_site: site.id },
-            attributes: ['id'],
-            raw: true
-        });
-
-        if (forms?.length) {
-            formCount = forms.length;
-            const formIds = forms.map(f => f.id);
-            inboxCount = await models.Inbox.count({
-                where: { fk_id_form: formIds }
+            const forms = await models.Form.findAll({
+                where: { fk_id_site: site.id },
+                attributes: ['id'],
+                raw: true,
             });
-        }
 
-        return {
-            id: site.id,
-            domain: site.domain,
-            form: formCount,
-            inbox: inboxCount
-        };
-    }));
+            if (forms?.length) {
+                formCount = forms.length;
+                const formIds = forms.map((f) => f.id);
+                inboxCount = await models.Inbox.count({
+                    where: { fk_id_form: formIds },
+                });
+            }
+
+            return {
+                id: site.id,
+                domain: site.domain,
+                form: formCount,
+                inbox: inboxCount,
+            };
+        })
+    );
 
     // Tri alphabétique par domaine
     sitesWithCounts.sort((a, b) => a.domain.localeCompare(b.domain));
@@ -49,7 +50,7 @@ export function getGlobalStats(sitesWithCounts) {
         globalForm,
         globalForm_icon: 'fas fa-file-alt',
         globalSite,
-        globalSite_icon: 'fas fa-globe'
+        globalSite_icon: 'fas fa-globe',
     };
 
     return tinyStats;

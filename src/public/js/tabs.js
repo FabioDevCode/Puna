@@ -4,10 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatDateTime(value) {
-        if (!value && value !== 0) { return ' - '; }
+        if (!value && value !== 0) {
+            return ' - ';
+        }
         try {
-            const d = (value instanceof Date) ? value : new Date(value);
-            if (Number.isNaN(d.getTime())) { return String(value); }
+            const d = value instanceof Date ? value : new Date(value);
+            if (Number.isNaN(d.getTime())) {
+                return String(value);
+            }
             return `
                 <div class="flex flex-wrap gap-1">
                     <p class="w-max">${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}&nbsp;</p>
@@ -21,12 +25,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Format a date value as YYYY-MM-DD for the date input
     function formatDateYYYYMMDD(value) {
-        if (!value && value !== 0) { return ''; }
+        if (!value && value !== 0) {
+            return '';
+        }
         try {
-            const d = (value instanceof Date) ? value : new Date(value);
-            if (Number.isNaN(d.getTime())) { return String(value); }
+            const d = value instanceof Date ? value : new Date(value);
+            if (Number.isNaN(d.getTime())) {
+                return String(value);
+            }
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        } catch (e) { return String(value); }
+        } catch (e) {
+            return String(value);
+        }
     }
 
     const tabLists = document.querySelectorAll('.tabs');
@@ -52,12 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openColumnsModal() {
-        if (!modalColumns) { return; }
+        if (!modalColumns) {
+            return;
+        }
 
         if (modalColumnsList) {
             modalColumnsList.innerHTML = '';
             if (!activeKeys.length) {
-                modalColumnsList.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour ce formulaire.</p>';
+                modalColumnsList.innerHTML =
+                    '<p class="text-sm text-muted">Aucune colonne disponible pour ce formulaire.</p>';
             } else {
                 activeKeys.forEach((k) => {
                     const label = document.createElement('label');
@@ -76,7 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
-        try { modalColumns.showModal(); } catch (e) { console.error(e); }
+        try {
+            modalColumns.showModal();
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     if (btnColumns) {
@@ -111,16 +128,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalColumnsCancel) {
         modalColumnsCancel.addEventListener('click', (e) => {
             e.preventDefault();
-            try { modalColumns.close(); } catch (e) { console.error(e); }
+            try {
+                modalColumns.close();
+            } catch (e) {
+                console.error(e);
+            }
         });
     }
 
     if (modalColumnsForm) {
         modalColumnsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!activeFormId) { return; }
+            if (!activeFormId) {
+                return;
+            }
 
-            const inputs = modalColumnsList ? Array.from(modalColumnsList.querySelectorAll('input[type="checkbox"][data-key]')) : [];
+            const inputs = modalColumnsList
+                ? Array.from(modalColumnsList.querySelectorAll('input[type="checkbox"][data-key]'))
+                : [];
             const payload = {};
             inputs.forEach((inp) => {
                 const k = inp.dataset.key;
@@ -132,21 +157,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ columns: payload })
+                    body: JSON.stringify({ columns: payload }),
                 });
                 const json = await resp.json().catch(() => ({}));
-                if (!resp.ok || !json.success) { throw new Error(json.error || 'Network error'); }
+                if (!resp.ok || !json.success) {
+                    throw new Error(json.error || 'Network error');
+                }
 
                 activeColumns = payload;
 
                 const activeTab = document.querySelector('.tab.tab-active[data-id]');
-                if (activeTab) { activeTab.dataset.columns = JSON.stringify(payload); }
+                if (activeTab) {
+                    activeTab.dataset.columns = JSON.stringify(payload);
+                }
 
-                try { modalColumns.close(); } catch (e) { console.error(e); }
+                try {
+                    modalColumns.close();
+                } catch (e) {
+                    console.error(e);
+                }
 
-                if (activeTab) { activeTab.click(); }
+                if (activeTab) {
+                    activeTab.click();
+                }
             } catch (err) {
-                alert('Erreur lors de l\'enregistrement des colonnes.');
+                alert("Erreur lors de l'enregistrement des colonnes.");
             }
         });
     }
@@ -154,7 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
     tabLists.forEach((tabList) => {
         tabList.addEventListener('click', (e) => {
             const target = e.target.closest('[role="tab"], .tab');
-            if (!target || !tabList.contains(target)) { return; }
+            if (!target || !tabList.contains(target)) {
+                return;
+            }
             e.preventDefault();
 
             resetFilter();
@@ -176,20 +213,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const deleteInput = document.getElementById('form_delete_id');
                 const deleteBtn = document.getElementById('btn_delete_form');
-                if (deleteInput) { deleteInput.value = target.dataset.id || ''; }
+                if (deleteInput) {
+                    deleteInput.value = target.dataset.id || '';
+                }
                 if (deleteBtn) {
-                    if (hasId) { deleteBtn.classList.remove('none'); } else { deleteBtn.classList.add('none'); }
+                    if (hasId) {
+                        deleteBtn.classList.remove('none');
+                    } else {
+                        deleteBtn.classList.add('none');
+                    }
                 }
 
                 const codeEl = document.getElementById('info_form_code');
                 const codeWrap = document.getElementById('info_form_code_wrap');
                 const copyBtn = document.getElementById('btn_copy_code');
-                if (codeEl) { codeEl.textContent = code; }
+                if (codeEl) {
+                    codeEl.textContent = code;
+                }
                 if (codeWrap) {
-                    if (hasId) { codeWrap.classList.remove('opacity-25'); } else { codeWrap.classList.add('opacity-25'); }
+                    if (hasId) {
+                        codeWrap.classList.remove('opacity-25');
+                    } else {
+                        codeWrap.classList.add('opacity-25');
+                    }
                 }
                 if (copyBtn) {
-                    if (hasId) { copyBtn.classList.remove('none'); } else { copyBtn.classList.add('none'); }
+                    if (hasId) {
+                        copyBtn.classList.remove('none');
+                    } else {
+                        copyBtn.classList.add('none');
+                    }
                 }
             }
 
@@ -200,20 +253,32 @@ document.addEventListener('DOMContentLoaded', () => {
             const valuesContainer = document.getElementById('modal_template_values');
 
             function clearModalContainers() {
-                if (keysContainer) { keysContainer.innerHTML = ''; }
-                if (valuesContainer) { valuesContainer.innerHTML = ''; }
+                if (keysContainer) {
+                    keysContainer.innerHTML = '';
+                }
+                if (valuesContainer) {
+                    valuesContainer.innerHTML = '';
+                }
             }
 
             if (hasId) {
-                if (btnOpenTemplate) { btnOpenTemplate.classList.remove('none'); }
-                if (btnDeleteForm) { btnDeleteForm.classList.remove('none'); }
+                if (btnOpenTemplate) {
+                    btnOpenTemplate.classList.remove('none');
+                }
+                if (btnDeleteForm) {
+                    btnDeleteForm.classList.remove('none');
+                }
 
-                if (modalForm) { modalForm.action = `/form/${target.dataset.id}/template`; }
+                if (modalForm) {
+                    modalForm.action = `/form/${target.dataset.id}/template`;
+                }
 
                 let tpl = {};
                 try {
                     const raw = target.dataset.template || '';
-                    if (raw) { tpl = JSON.parse(raw); }
+                    if (raw) {
+                        tpl = JSON.parse(raw);
+                    }
                 } catch (e) {
                     tpl = {};
                 }
@@ -228,16 +293,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 let colsObj = {};
                 try {
                     const rawc = target.dataset.columns || '';
-                    if (rawc) { colsObj = JSON.parse(rawc); }
+                    if (rawc) {
+                        colsObj = JSON.parse(rawc);
+                    }
                 } catch (e) {
                     colsObj = {};
                 }
                 activeColumns = colsObj;
 
-                const visibleKeys = keys.filter((k) => (colsObj && typeof colsObj[k] !== 'undefined') ? !!colsObj[k] : true);
+                const visibleKeys = keys.filter((k) =>
+                    colsObj && typeof colsObj[k] !== 'undefined' ? !!colsObj[k] : true
+                );
                 if (!keys.length) {
-                    if (keysContainer) { keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>'; }
-                    if (valuesContainer) { valuesContainer.innerHTML = ''; }
+                    if (keysContainer) {
+                        keysContainer.innerHTML =
+                            '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>';
+                    }
+                    if (valuesContainer) {
+                        valuesContainer.innerHTML = '';
+                    }
                 } else {
                     keys.forEach((k) => {
                         const d = document.createElement('div');
@@ -266,22 +340,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 const paginationEl = document.getElementById('paginationTable');
 
                 function clearInbox() {
-                    if (inboxHead) { inboxHead.innerHTML = ''; }
-                    if (inboxBody) { inboxBody.innerHTML = ''; }
+                    if (inboxHead) {
+                        inboxHead.innerHTML = '';
+                    }
+                    if (inboxBody) {
+                        inboxBody.innerHTML = '';
+                    }
 
                     const countEl = document.getElementById('count_inbox');
-                    if (countEl) { countEl.textContent = ''; }
+                    if (countEl) {
+                        countEl.textContent = '';
+                    }
 
-                    if (tableActions) { tableActions.classList.add('none'); }
-                    if (tableInboxEl) { tableInboxEl.classList.add('none'); }
+                    if (tableActions) {
+                        tableActions.classList.add('none');
+                    }
+                    if (tableInboxEl) {
+                        tableInboxEl.classList.add('none');
+                    }
 
                     // Show 'no form selected' message
                     const noFormMsg = document.getElementById('no_form_selected');
-                    if (noFormMsg) { noFormMsg.classList.remove('none'); }
+                    if (noFormMsg) {
+                        noFormMsg.classList.remove('none');
+                    }
                 }
 
                 function buildHead(keysArr) {
-                    if (!inboxHead) { return; }
+                    if (!inboxHead) {
+                        return;
+                    }
                     const tr = document.createElement('tr');
 
                     // const thCheck = document.createElement('th');
@@ -313,7 +401,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 function buildRows(items, keysArr) {
-                    if (!inboxBody) { return; }
+                    if (!inboxBody) {
+                        return;
+                    }
                     items.forEach((it) => {
                         const tr = document.createElement('tr');
                         tr.dataset.id = it.id;
@@ -385,7 +475,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (modal && form && input) {
                                     input.value = inboxId;
                                     form.action = `/inbox/${inboxId}/delete?redirect=site&formName=${encodeURIComponent(formName)}`;
-                                    try { modal.showModal(); } catch (err) { console.error(err); }
+                                    try {
+                                        modal.showModal();
+                                    } catch (err) {
+                                        console.error(err);
+                                    }
                                 }
                             });
                         }
@@ -398,11 +492,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 function renderTable(pageItems, keysArr, total) {
                     const limit = selectLimit ? parseInt(selectLimit.value, 10) || 10 : 10;
                     const maxPage = Math.max(1, Math.ceil((total || 0) / limit));
-                    if (currentPage > maxPage) { currentPage = maxPage; }
+                    if (currentPage > maxPage) {
+                        currentPage = maxPage;
+                    }
 
                     // clear and build
-                    if (inboxHead) { inboxHead.innerHTML = ''; }
-                    if (inboxBody) { inboxBody.innerHTML = ''; }
+                    if (inboxHead) {
+                        inboxHead.innerHTML = '';
+                    }
+                    if (inboxBody) {
+                        inboxBody.innerHTML = '';
+                    }
 
                     buildHead(keysArr);
 
@@ -412,14 +512,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         buildRows(items, keysArr);
                     } else {
                         // no rows: show an empty state row but keep table visible when filters are active
-                        const columnsCount = ((keysArr && keysArr.length) ? keysArr.length : 1) + 2; // date + data cols + actions
+                        const columnsCount = (keysArr && keysArr.length ? keysArr.length : 1) + 2; // date + data cols + actions
                         const trEmpty = document.createElement('tr');
                         const tdEmpty = document.createElement('td');
                         tdEmpty.colSpan = columnsCount;
                         tdEmpty.className = 'text-sm text-center text-muted py-4';
                         tdEmpty.textContent = 'Aucun résultat';
                         trEmpty.appendChild(tdEmpty);
-                        if (inboxBody) { inboxBody.appendChild(trEmpty); }
+                        if (inboxBody) {
+                            inboxBody.appendChild(trEmpty);
+                        }
                     }
 
                     // If there's a filter active we must keep the table and actions visible even with zero results
@@ -427,27 +529,47 @@ document.addEventListener('DOMContentLoaded', () => {
                     const noFormMsg = document.getElementById('no_form_selected');
 
                     if ((total && total > 0) || hasFilters) {
-                        if (tableActions) { tableActions.classList.remove('none'); }
-                        if (tableInboxEl) { tableInboxEl.classList.remove('none'); }
-                        if (noFormMsg) { noFormMsg.classList.add('none'); }
+                        if (tableActions) {
+                            tableActions.classList.remove('none');
+                        }
+                        if (tableInboxEl) {
+                            tableInboxEl.classList.remove('none');
+                        }
+                        if (noFormMsg) {
+                            noFormMsg.classList.add('none');
+                        }
                     } else {
-                        if (tableActions) { tableActions.classList.add('none'); }
-                        if (tableInboxEl) { tableInboxEl.classList.add('none'); }
-                        if (noFormMsg) { noFormMsg.classList.remove('none'); }
+                        if (tableActions) {
+                            tableActions.classList.add('none');
+                        }
+                        if (tableInboxEl) {
+                            tableInboxEl.classList.add('none');
+                        }
+                        if (noFormMsg) {
+                            noFormMsg.classList.remove('none');
+                        }
                     }
 
                     // update count text to 'affichés sur total'
                     const countEl = document.getElementById('count_inbox');
                     const shown = items.length;
-                    if (countEl) { countEl.textContent = `${shown} sur ${total || 0}`; }
+                    if (countEl) {
+                        countEl.textContent = `${shown} sur ${total || 0}`;
+                    }
 
                     // update pagination UI if present
                     if (paginationEl) {
                         const btns = Array.from(paginationEl.querySelectorAll('button'));
                         // expect: [prev, center, next]
-                        if (btns[1]) { btns[1].textContent = `${currentPage}`; }
-                        if (btns[0]) { btns[0].disabled = currentPage <= 1; }
-                        if (btns[2]) { btns[2].disabled = currentPage >= maxPage; }
+                        if (btns[1]) {
+                            btns[1].textContent = `${currentPage}`;
+                        }
+                        if (btns[0]) {
+                            btns[0].disabled = currentPage <= 1;
+                        }
+                        if (btns[2]) {
+                            btns[2].disabled = currentPage >= maxPage;
+                        }
                     }
                 }
 
@@ -464,7 +586,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (currentFilters && Object.keys(currentFilters).length) {
                             url += `&filters=${encodeURIComponent(JSON.stringify(currentFilters))}`;
                         }
-                    } catch (e) { /* ignore */ }
+                    } catch (e) {
+                        /* ignore */
+                    }
 
                     // anti-cache
                     url += `&_=${Date.now()}`;
@@ -478,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             // attach select change to fetch first page
                             if (selectLimit) {
-                                selectLimit.removeEventListener('change', selectLimit._listener || (() => { }));
+                                selectLimit.removeEventListener('change', selectLimit._listener || (() => {}));
                                 selectLimit._listener = () => {
                                     fetchPage(1);
                                 };
@@ -493,24 +617,30 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const next = btns[2];
 
                                 if (prev) {
-                                    prev.removeEventListener('click', prev._listener || (() => { }));
+                                    prev.removeEventListener('click', prev._listener || (() => {}));
                                     prev._listener = (e) => {
                                         e.preventDefault();
-                                        if (currentPage > 1) { fetchPage(currentPage - 1); }
+                                        if (currentPage > 1) {
+                                            fetchPage(currentPage - 1);
+                                        }
                                     };
                                     prev.addEventListener('click', prev._listener);
                                 }
                                 if (next) {
-                                    next.removeEventListener('click', next._listener || (() => { }));
+                                    next.removeEventListener('click', next._listener || (() => {}));
                                     next._listener = (e) => {
                                         e.preventDefault();
                                         const maxPage = Math.max(1, Math.ceil(total / limit));
-                                        if (currentPage < maxPage) { fetchPage(currentPage + 1); }
+                                        if (currentPage < maxPage) {
+                                            fetchPage(currentPage + 1);
+                                        }
                                     };
                                     next.addEventListener('click', next._listener);
                                 }
                                 // initial page label
-                                if (pageBtn) { pageBtn.textContent = String(currentPage); }
+                                if (pageBtn) {
+                                    pageBtn.textContent = String(currentPage);
+                                }
                             }
 
                             // render returned page
@@ -536,17 +666,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     const modalFilterClear = document.getElementById('modal_filter_clear');
 
                     if (btnFilter) {
-                        btnFilter.removeEventListener('click', btnFilter._listener || (() => { }));
+                        btnFilter.removeEventListener('click', btnFilter._listener || (() => {}));
                         btnFilter._listener = (ev) => {
                             ev.preventDefault();
-                            if (modalFilterKeys) { modalFilterKeys.innerHTML = ''; }
-                            if (modalFilterValues) { modalFilterValues.innerHTML = ''; }
+                            if (modalFilterKeys) {
+                                modalFilterKeys.innerHTML = '';
+                            }
+                            if (modalFilterValues) {
+                                modalFilterValues.innerHTML = '';
+                            }
 
                             // prepare visible keys snapshot
                             currentVisibleKeys = (visibleKeys || []).slice();
 
                             if (!currentVisibleKeys || !currentVisibleKeys.length) {
-                                if (modalFilterKeys) { modalFilterKeys.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour filtrer.</p>'; }
+                                if (modalFilterKeys) {
+                                    modalFilterKeys.innerHTML =
+                                        '<p class="text-sm text-muted">Aucune colonne disponible pour filtrer.</p>';
+                                }
                             } else {
                                 // Date label left (disabled input) and date input right
                                 if (modalFilterKeys) {
@@ -572,7 +709,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     dateInput.dataset.key = 'createdAt';
                                     dateInput.name = 'filter[createdAt]';
                                     dateInput.className = 'input input-bordered w-full input-sm';
-                                    if (currentFilters && currentFilters.createdAt) { dateInput.value = formatDateYYYYMMDD(currentFilters.createdAt); }
+                                    if (currentFilters && currentFilters.createdAt) {
+                                        dateInput.value = formatDateYYYYMMDD(currentFilters.createdAt);
+                                    }
                                     rightDateWrap.appendChild(dateInput);
                                     modalFilterValues.appendChild(rightDateWrap);
                                 }
@@ -598,7 +737,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         input.dataset.key = k;
                                         input.name = `filter[${k}]`;
                                         input.className = 'input input-bordered w-full input-sm';
-                                        if (currentFilters && typeof currentFilters[k] !== 'undefined') { input.value = currentFilters[k]; }
+                                        if (currentFilters && typeof currentFilters[k] !== 'undefined') {
+                                            input.value = currentFilters[k];
+                                        }
                                         rightWrap.appendChild(input);
                                         modalFilterValues.appendChild(rightWrap);
                                     }
@@ -612,85 +753,147 @@ document.addEventListener('DOMContentLoaded', () => {
                                     modalFilterValues.style.height = 'max-content';
                                     let syncing = false;
                                     modalFilterKeys.addEventListener('scroll', () => {
-                                        if (syncing) { return; }
+                                        if (syncing) {
+                                            return;
+                                        }
                                         syncing = true;
                                         modalFilterValues.scrollTop = modalFilterKeys.scrollTop;
-                                        requestAnimationFrame(() => { syncing = false; });
+                                        requestAnimationFrame(() => {
+                                            syncing = false;
+                                        });
                                     });
                                     modalFilterValues.addEventListener('scroll', () => {
-                                        if (syncing) { return; }
+                                        if (syncing) {
+                                            return;
+                                        }
                                         syncing = true;
                                         modalFilterKeys.scrollTop = modalFilterValues.scrollTop;
-                                        requestAnimationFrame(() => { syncing = false; });
+                                        requestAnimationFrame(() => {
+                                            syncing = false;
+                                        });
                                     });
-                                } catch (e) { /* ignore */ }
+                                } catch (e) {
+                                    /* ignore */
+                                }
                             }
 
-                            try { modalFilter.showModal(); } catch (e) { try { modalFilter.classList.remove('none'); } catch (err) { /* ignore */ } }
+                            try {
+                                modalFilter.showModal();
+                            } catch (e) {
+                                try {
+                                    modalFilter.classList.remove('none');
+                                } catch (err) {
+                                    /* ignore */
+                                }
+                            }
                         };
                         btnFilter.addEventListener('click', btnFilter._listener);
                     }
 
                     // Cancel: clear inputs, reset filters and reload
                     if (modalFilterCancel) {
-                        modalFilterCancel.removeEventListener('click', modalFilterCancel._listener || (() => { }));
+                        modalFilterCancel.removeEventListener('click', modalFilterCancel._listener || (() => {}));
                         modalFilterCancel._listener = (ev) => {
                             ev.preventDefault();
                             try {
                                 const d = document.getElementById('modal_filter_date');
-                                if (d) { d.value = ''; }
-                            } catch (e) { /* ignore */ }
+                                if (d) {
+                                    d.value = '';
+                                }
+                            } catch (e) {
+                                /* ignore */
+                            }
                             try {
-                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
-                                vals.forEach((inp) => { inp.value = ''; });
-                            } catch (e) { /* ignore */ }
+                                const vals = modalFilterValues
+                                    ? Array.from(modalFilterValues.querySelectorAll('input[data-key]'))
+                                    : [];
+                                vals.forEach((inp) => {
+                                    inp.value = '';
+                                });
+                            } catch (e) {
+                                /* ignore */
+                            }
                             currentFilters = {};
                             if (btnFilter) {
                                 btnFilter.classList.remove('btn-info');
                                 btnFilter.classList.remove('btn-warning');
                             }
-                            try { modalFilter.close(); } catch (e) { try { modalFilter.classList.add('none'); } catch (err) { /* ignore */ } }
-                            try { fetchPage(1); } catch (e) { /* ignore */ }
+                            try {
+                                modalFilter.close();
+                            } catch (e) {
+                                try {
+                                    modalFilter.classList.add('none');
+                                } catch (err) {
+                                    /* ignore */
+                                }
+                            }
+                            try {
+                                fetchPage(1);
+                            } catch (e) {
+                                /* ignore */
+                            }
                         };
                         modalFilterCancel.addEventListener('click', modalFilterCancel._listener);
                     }
 
                     // Clear button: empty inputs but keep modal open
                     if (modalFilterClear) {
-                        modalFilterClear.removeEventListener('click', modalFilterClear._listener || (() => { }));
+                        modalFilterClear.removeEventListener('click', modalFilterClear._listener || (() => {}));
                         modalFilterClear._listener = (ev) => {
                             ev.preventDefault();
                             try {
                                 const d = document.getElementById('modal_filter_date');
-                                if (d) { d.value = ''; }
-                            } catch (e) { /* ignore */ }
+                                if (d) {
+                                    d.value = '';
+                                }
+                            } catch (e) {
+                                /* ignore */
+                            }
                             try {
-                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
-                                vals.forEach((inp) => { inp.value = ''; });
-                            } catch (e) { /* ignore */ }
+                                const vals = modalFilterValues
+                                    ? Array.from(modalFilterValues.querySelectorAll('input[data-key]'))
+                                    : [];
+                                vals.forEach((inp) => {
+                                    inp.value = '';
+                                });
+                            } catch (e) {
+                                /* ignore */
+                            }
                         };
                         modalFilterClear.addEventListener('click', modalFilterClear._listener);
                     }
 
                     // Apply (form submit)
                     if (modalFilterForm) {
-                        modalFilterForm.removeEventListener('submit', modalFilterForm._listener || (() => { }));
+                        modalFilterForm.removeEventListener('submit', modalFilterForm._listener || (() => {}));
                         modalFilterForm._listener = (ev) => {
                             ev.preventDefault();
                             const filters = {};
                             try {
                                 const d = document.getElementById('modal_filter_date');
-                                if (d && d.value) { filters.createdAt = d.value; }
-                            } catch (e) { /* ignore */ }
+                                if (d && d.value) {
+                                    filters.createdAt = d.value;
+                                }
+                            } catch (e) {
+                                /* ignore */
+                            }
                             try {
-                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
+                                const vals = modalFilterValues
+                                    ? Array.from(modalFilterValues.querySelectorAll('input[data-key]'))
+                                    : [];
                                 vals.forEach((inp) => {
                                     const k = inp.dataset.key;
-                                    if (!k) { return; }
+                                    if (!k) {
+                                        return;
+                                    }
                                     const v = inp.value ? String(inp.value).trim() : '';
-                                    if (v !== '') { filters[k] = v; }
+                                    if (v !== '') {
+                                        filters[k] = v;
+                                    }
                                 });
-                            } catch (e) { /* ignore */ }
+                            } catch (e) {
+                                /* ignore */
+                            }
                             currentFilters = filters;
                             try {
                                 if (btnFilter) {
@@ -702,30 +905,53 @@ document.addEventListener('DOMContentLoaded', () => {
                                         btnFilter.classList.remove('btn-warning');
                                     }
                                 }
-                            } catch (e) { /* ignore */ }
-                            try { modalFilter.close(); } catch (e) { modalFilter.classList.add('none'); }
+                            } catch (e) {
+                                /* ignore */
+                            }
+                            try {
+                                modalFilter.close();
+                            } catch (e) {
+                                modalFilter.classList.add('none');
+                            }
                             fetchPage(1);
                         };
                         modalFilterForm.addEventListener('submit', modalFilterForm._listener);
                     }
-                } catch (e) { /* ignore missing DOM */ }
-
+                } catch (e) {
+                    /* ignore missing DOM */
+                }
             } else {
                 // hide button and clear modal
-                if (btnOpenTemplate) { btnOpenTemplate.classList.add('none'); }
-                if (btnDeleteForm) { btnDeleteForm.classList.add('none'); }
-                if (modalForm) { modalForm.action = '#'; }
+                if (btnOpenTemplate) {
+                    btnOpenTemplate.classList.add('none');
+                }
+                if (btnDeleteForm) {
+                    btnDeleteForm.classList.add('none');
+                }
+                if (modalForm) {
+                    modalForm.action = '#';
+                }
                 clearModalContainers();
                 // hide table-level actions and clear inbox table
-                if (tableActions) { tableActions.classList.add('none'); }
+                if (tableActions) {
+                    tableActions.classList.add('none');
+                }
                 const inboxHead = document.getElementById('inbox_table_head');
                 const inboxBody = document.getElementById('inbox_table_body');
                 const tableInboxEl = document.getElementById('tableInbox');
                 const noFormMsg = document.getElementById('no_form_selected');
-                if (inboxHead) { inboxHead.innerHTML = ''; }
-                if (inboxBody) { inboxBody.innerHTML = ''; }
-                if (tableInboxEl) { tableInboxEl.classList.add('none'); }
-                if (noFormMsg) { noFormMsg.classList.remove('none'); }
+                if (inboxHead) {
+                    inboxHead.innerHTML = '';
+                }
+                if (inboxBody) {
+                    inboxBody.innerHTML = '';
+                }
+                if (tableInboxEl) {
+                    tableInboxEl.classList.add('none');
+                }
+                if (noFormMsg) {
+                    noFormMsg.classList.remove('none');
+                }
             }
         });
 
@@ -739,20 +965,38 @@ document.addEventListener('DOMContentLoaded', () => {
             const copyBtn = document.getElementById('btn_copy_code');
             const codeWrap = document.getElementById('info_form_code_wrap');
             const codeEl = document.getElementById('info_form_code');
-            if (deleteBtn) { deleteBtn.classList.add('none'); }
-            if (copyBtn) { copyBtn.classList.add('none'); }
-            if (codeWrap) { codeWrap.classList.add('opacity-25'); }
-            if (codeEl) { codeEl.textContent = ''; }
+            if (deleteBtn) {
+                deleteBtn.classList.add('none');
+            }
+            if (copyBtn) {
+                copyBtn.classList.add('none');
+            }
+            if (codeWrap) {
+                codeWrap.classList.add('opacity-25');
+            }
+            if (codeEl) {
+                codeEl.textContent = '';
+            }
             // hide table actions and clear inbox table when nothing is selected
-            if (tableActions) { tableActions.classList.add('none'); }
+            if (tableActions) {
+                tableActions.classList.add('none');
+            }
             const inboxHeadInit = document.getElementById('inbox_table_head');
             const inboxBodyInit = document.getElementById('inbox_table_body');
             const tableInboxInit = document.getElementById('tableInbox');
             const noFormMsgInit = document.getElementById('no_form_selected');
-            if (inboxHeadInit) { inboxHeadInit.innerHTML = ''; }
-            if (inboxBodyInit) { inboxBodyInit.innerHTML = ''; }
-            if (tableInboxInit) { tableInboxInit.classList.add('none'); }
-            if (noFormMsgInit) { noFormMsgInit.classList.remove('none'); }
+            if (inboxHeadInit) {
+                inboxHeadInit.innerHTML = '';
+            }
+            if (inboxBodyInit) {
+                inboxBodyInit.innerHTML = '';
+            }
+            if (tableInboxInit) {
+                tableInboxInit.classList.add('none');
+            }
+            if (noFormMsgInit) {
+                noFormMsgInit.classList.remove('none');
+            }
         }
     });
 
@@ -762,16 +1006,22 @@ document.addEventListener('DOMContentLoaded', () => {
         copyBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const codeEl = document.getElementById('info_form_code');
-            if (!codeEl) { return; }
+            if (!codeEl) {
+                return;
+            }
             const text = codeEl.textContent.trim();
-            if (!text) { return; }
+            if (!text) {
+                return;
+            }
 
             try {
                 await navigator.clipboard.writeText(text);
                 // temporary feedback: change button text/icon like token.js but without green color
                 const old = copyBtn.innerHTML;
                 copyBtn.innerHTML = '<i class="fas fa-check"></i> Code copié';
-                setTimeout(() => { copyBtn.innerHTML = old; }, 1200);
+                setTimeout(() => {
+                    copyBtn.innerHTML = old;
+                }, 1200);
             } catch (err) {
                 console.error(err);
             }

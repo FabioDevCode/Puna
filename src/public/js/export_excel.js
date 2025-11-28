@@ -34,7 +34,8 @@
             // Disable button during download
             exportBtn.disabled = true;
             const originalContent = exportBtn.innerHTML;
-            exportBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span class="hidden md:flex">Export...</span>';
+            exportBtn.innerHTML =
+                '<i class="fa-solid fa-spinner fa-spin"></i><span class="hidden md:flex">Export...</span>';
 
             // Create hidden iframe to trigger download
             const iframe = document.createElement('iframe');
@@ -50,7 +51,7 @@
 
                 // Clean up iframe
                 const tempIframes = document.querySelectorAll('iframe[data-temp-export]');
-                tempIframes.forEach(frame => {
+                tempIframes.forEach((frame) => {
                     if (frame.parentNode) {
                         frame.parentNode.removeChild(frame);
                     }

@@ -19,7 +19,7 @@ export const dashboard = async (req, res) => {
         const sitesWithCounts = await getSitesWithCounts(userId);
 
         res.render('dashboard', {
-            stats: getGlobalStats(sitesWithCounts)
+            stats: getGlobalStats(sitesWithCounts),
         });
     } catch (err) {
         res.render('dashboard', {});
@@ -36,7 +36,9 @@ export const getTopFroms = async (req, res) => {
 
     try {
         const end = dayjs().endOf('day');
-        const start = dayjs().startOf('day').subtract(days - 1, 'day');
+        const start = dayjs()
+            .startOf('day')
+            .subtract(days - 1, 'day');
 
         // Raw SQL for stable grouping and joins
         const sql = `
@@ -54,12 +56,12 @@ export const getTopFroms = async (req, res) => {
         const replacements = {
             userId,
             start: start.toDate(),
-            end: end.toDate()
+            end: end.toDate(),
         };
 
         const rows = await models.sequelize.query(sql, {
             replacements,
-            type: models.Sequelize.QueryTypes.SELECT
+            type: models.Sequelize.QueryTypes.SELECT,
         });
 
         // Ensure result has exactly up to 3 entries with rank
@@ -67,7 +69,7 @@ export const getTopFroms = async (req, res) => {
             rank: idx + 1,
             form_name: r.form_name || null,
             site_domain: r.site_domain || null,
-            count: Number(r.cnt) || 0
+            count: Number(r.cnt) || 0,
         }));
 
         return res.json({ days, items: result });
@@ -87,7 +89,9 @@ export const getTopSiteForms = async (req, res) => {
 
     try {
         const end = dayjs().endOf('day');
-        const start = dayjs().startOf('day').subtract(days - 1, 'day');
+        const start = dayjs()
+            .startOf('day')
+            .subtract(days - 1, 'day');
 
         // Find the site with most inbox rows in the period
         const sqlTopSite = `
@@ -104,7 +108,7 @@ export const getTopSiteForms = async (req, res) => {
 
         const topSiteRows = await models.sequelize.query(sqlTopSite, {
             replacements: { userId, start: start.toDate(), end: end.toDate() },
-            type: models.Sequelize.QueryTypes.SELECT
+            type: models.Sequelize.QueryTypes.SELECT,
         });
 
         if (!topSiteRows || !topSiteRows.length) {
@@ -126,20 +130,20 @@ export const getTopSiteForms = async (req, res) => {
 
         const perFormRows = await models.sequelize.query(sqlPerForm, {
             replacements: { siteId, start: start.toDate(), end: end.toDate() },
-            type: models.Sequelize.QueryTypes.SELECT
+            type: models.Sequelize.QueryTypes.SELECT,
         });
 
-        const labels = (perFormRows || []).map(r => r.form_name || `form-${r.form_id}`);
-        const series = (perFormRows || []).map(r => Number(r.cnt) || 0);
+        const labels = (perFormRows || []).map((r) => r.form_name || `form-${r.form_id}`);
+        const series = (perFormRows || []).map((r) => Number(r.cnt) || 0);
 
         return res.json({
             site: {
                 id: siteId,
                 domain: topSite.site_domain,
-                total: Number(topSite.total) || 0
+                total: Number(topSite.total) || 0,
             },
             labels,
-            series
+            series,
         });
     } catch (err) {
         console.error(err);
@@ -157,7 +161,9 @@ export const getInboxCounts = async (req, res) => {
 
     try {
         const end = dayjs().endOf('day');
-        const start = dayjs().startOf('day').subtract(days - 1, 'day');
+        const start = dayjs()
+            .startOf('day')
+            .subtract(days - 1, 'day');
 
         // Build day labels from start to end
         const labels = [];
@@ -180,23 +186,23 @@ export const getInboxCounts = async (req, res) => {
         const replacements = {
             userId,
             start: start.toDate(),
-            end: end.toDate()
+            end: end.toDate(),
         };
 
         const rows = await models.sequelize.query(sql, {
             replacements,
-            type: models.Sequelize.QueryTypes.SELECT
+            type: models.Sequelize.QueryTypes.SELECT,
         });
 
         // Map into a dict for quick access
         const countMap = {};
-        rows.forEach(r => {
+        rows.forEach((r) => {
             const dayStr = dayjs(r.day_str).format('YYYY-MM-DD');
             countMap[dayStr] = Number(r.cnt) || 0;
         });
 
         // Fill data
-        const data = labels.map(label => countMap[label] || 0);
+        const data = labels.map((label) => countMap[label] || 0);
 
         return res.json({ labels, data, days });
     } catch (err) {
@@ -218,18 +224,22 @@ export const getInboxPercentages = async (req, res) => {
                 where: {
                     createdAt: {
                         [Op.gte]: start.toDate(),
-                        [Op.lte]: end.toDate()
-                    }
+                        [Op.lte]: end.toDate(),
+                    },
                 },
-                include: [{
-                    model: models.Form,
-                    as: 'form',
-                    include: [{
-                        model: models.Site,
-                        as: 'site',
-                        where: { fk_id_user: userId }
-                    }]
-                }]
+                include: [
+                    {
+                        model: models.Form,
+                        as: 'form',
+                        include: [
+                            {
+                                model: models.Site,
+                                as: 'site',
+                                where: { fk_id_user: userId },
+                            },
+                        ],
+                    },
+                ],
             });
         };
 
@@ -262,12 +272,18 @@ export const getInboxPercentages = async (req, res) => {
 
         const computePercent = (current, previous) => {
             if (previous === 0) {
-                if (current === 0) { return { percent: 0, trend: 'neutral' }; }
+                if (current === 0) {
+                    return { percent: 0, trend: 'neutral' };
+                }
                 return { percent: 100, trend: 'up' };
             }
             const change = Math.round(((current - previous) / previous) * 100);
-            if (change > 0) { return { percent: Math.abs(change), trend: 'up' }; }
-            if (change < 0) { return { percent: Math.abs(change), trend: 'down' }; }
+            if (change > 0) {
+                return { percent: Math.abs(change), trend: 'up' };
+            }
+            if (change < 0) {
+                return { percent: Math.abs(change), trend: 'down' };
+            }
             return { percent: 0, trend: 'neutral' };
         };
 
@@ -301,11 +317,11 @@ export const getInboxCountsBySite = async (req, res) => {
 
         const rows = await models.sequelize.query(sql, {
             replacements: { userId },
-            type: models.Sequelize.QueryTypes.SELECT
+            type: models.Sequelize.QueryTypes.SELECT,
         });
 
-        const labels = (rows || []).map(r => r.site_domain);
-        const data = (rows || []).map(r => Number(r.cnt) || 0);
+        const labels = (rows || []).map((r) => r.site_domain);
+        const data = (rows || []).map((r) => Number(r.cnt) || 0);
 
         return res.json({ labels, data });
     } catch (err) {
@@ -333,18 +349,22 @@ export const getInboxHeatmap = async (req, res) => {
             where: {
                 createdAt: {
                     [Op.gte]: start,
-                    [Op.lte]: end
-                }
+                    [Op.lte]: end,
+                },
             },
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
         });
 
         // Prepare a 7x24 matrix (Monday..Sunday, hours 00..23)
@@ -367,7 +387,7 @@ export const getInboxHeatmap = async (req, res) => {
 
         let series = daysOfWeek.map((d, i) => ({
             name: d,
-            data: hours.map((h, j) => ({ x: h, y: matrix[i][j] }))
+            data: hours.map((h, j) => ({ x: h, y: matrix[i][j] })),
         }));
 
         series = series.reverse();
@@ -387,16 +407,20 @@ export const getLastInboxEntry = async (req, res) => {
 
     try {
         const lastRow = await models.Inbox.findOne({
-            include: [{
-                model: models.Form,
-                as: 'form',
-                include: [{
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId }
-                }]
-            }],
-            order: [['createdAt', 'DESC']]
+            include: [
+                {
+                    model: models.Form,
+                    as: 'form',
+                    include: [
+                        {
+                            model: models.Site,
+                            as: 'site',
+                            where: { fk_id_user: userId },
+                        },
+                    ],
+                },
+            ],
+            order: [['createdAt', 'DESC']],
         });
 
         if (!lastRow) {
@@ -427,7 +451,7 @@ export const error = async (req, res) => {
  */
 export const dpLogin = (req, res) => {
     res.render('auth/login', {
-        layout: 'auth'
+        layout: 'auth',
     });
 };
 
@@ -436,7 +460,7 @@ export const dpLogin = (req, res) => {
  */
 export const dpFirstCo = (req, res) => {
     res.render('auth/first-login', {
-        layout: 'auth'
+        layout: 'auth',
     });
 };
 
@@ -449,7 +473,7 @@ export const allSite = async (req, res) => {
         const sitesWithCounts = await getSitesWithCounts(userId);
 
         res.render('sites/list', {
-            sites: sitesWithCounts
+            sites: sitesWithCounts,
         });
     } catch (err) {
         res.render('sites/list', {});

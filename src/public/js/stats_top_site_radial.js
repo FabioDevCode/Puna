@@ -3,13 +3,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const legendEl = document.getElementById('statTopSite_legend');
     let chart = null;
 
-    if (!chartEl) {return;}
+    if (!chartEl) {
+        return;
+    }
 
     async function fetchData() {
         try {
             // Controller is fixed to 90 days
             const resp = await fetch(`/stats/top-site-forms`, { credentials: 'same-origin' });
-            if (!resp.ok) {throw new Error('Network error');}
+            if (!resp.ok) {
+                throw new Error('Network error');
+            }
             return await resp.json();
         } catch (err) {
             console.error(err);
@@ -20,19 +24,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function render(site, labels, series) {
         if (!site) {
             chartEl.innerHTML = '<div class="text-center text-sm text-muted">Aucun site actif sur la période</div>';
-            if (legendEl) {legendEl.textContent = '';}
+            if (legendEl) {
+                legendEl.textContent = '';
+            }
             return;
         }
 
         const total = series.reduce((a, b) => a + b, 0);
-        const seriesUp = series.map(v => (v / total) * 100);
+        const seriesUp = series.map((v) => (v / total) * 100);
 
         const options = {
             chart: {
                 height: 'auto',
                 width: 300,
                 type: 'radialBar',
-                toolbar: { show: false }
+                toolbar: { show: false },
             },
             plotOptions: {
                 radialBar: {
@@ -51,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         value: {
                             show: false,
-                        }
+                        },
                     },
                     barLabels: {
                         enabled: true,
@@ -63,31 +69,33 @@ document.addEventListener('DOMContentLoaded', () => {
                             return seriesName + ': ' + series[index];
                         },
                     },
-                }
+                },
             },
             colors: ['#0075C3'],
             fill: {
                 type: 'solid',
-                colors: undefined
+                colors: undefined,
             },
             theme: {
                 monochrome: {
                     enabled: true,
                     color: '#0075C3',
                     shadeTo: 'dark',
-                    shadeIntensity: 0.6
-                }
+                    shadeIntensity: 0.6,
+                },
             },
             series: seriesUp,
             labels: labels,
             legend: { show: false },
             tooltip: { enabled: false },
-            responsive: [{
-                breakpoint: 200,
-                options: {
-                    chart: { width: 200 },
-                }
-            }]
+            responsive: [
+                {
+                    breakpoint: 200,
+                    options: {
+                        chart: { width: 200 },
+                    },
+                },
+            ],
         };
 
         if (chart) {
@@ -99,7 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // site.total
-        if (legendEl) {legendEl.textContent = `${site.domain}`;}
+        if (legendEl) {
+            legendEl.textContent = `${site.domain}`;
+        }
     }
 
     async function load() {

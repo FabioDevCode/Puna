@@ -9,27 +9,27 @@ export function initializePassport() {
             {
                 usernameField: 'login',
                 passwordField: 'password',
-                passReqToCallback: true
+                passReqToCallback: true,
             },
             async (req, login, password, done) => {
                 try {
                     const user = await models.User.findOne({
                         where: {
                             login,
-                            status: 'active'
-                        }
+                            status: 'active',
+                        },
                     });
 
                     if (!user) {
                         return done(null, false, {
-                            message: 'Utilisateur non trouvé ou non activé'
+                            message: 'Utilisateur non trouvé ou non activé',
                         });
                     }
                     const isValid = await bcrypt.compare(password, user.password);
 
                     if (!isValid) {
                         return done(null, false, {
-                            message: 'Mot de passe incorrect'
+                            message: 'Mot de passe incorrect',
                         });
                     }
                     return done(null, user);

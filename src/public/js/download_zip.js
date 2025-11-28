@@ -44,7 +44,7 @@
                     modal.close();
                     // Clean up iframe
                     const tempIframes = document.querySelectorAll('iframe[data-temp-download]');
-                    tempIframes.forEach(frame => {
+                    tempIframes.forEach((frame) => {
                         if (frame.parentNode) {
                             frame.parentNode.removeChild(frame);
                         }
@@ -62,7 +62,7 @@
     function autoInitialize() {
         const buttons = document.querySelectorAll('[data-zip-download]');
 
-        buttons.forEach(button => {
+        buttons.forEach((button) => {
             const inboxId = button.getAttribute('data-inbox-id');
             const modalId = button.getAttribute('data-modal-id');
             const btnId = button.id;

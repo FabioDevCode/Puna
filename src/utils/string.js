@@ -7,5 +7,5 @@ export default {
             code += chars[Math.floor(Math.random() * chars.length)];
         }
         return code;
-    }
+    },
 };

@@ -13,7 +13,7 @@ export const createSite = async (req, res) => {
         const site = await models.Site.create({
             domain,
             fk_id_user: userId,
-            control_code: stringUtils.generateCode(16)
+            control_code: stringUtils.generateCode(16),
         });
         return res.redirect(`/site/${site.id}/view`);
     } catch (err) {
@@ -41,7 +41,7 @@ export const showSite = async (req, res) => {
         const formsRaw = await models.Form.findAll({
             where: { fk_id_site: siteId },
             raw: true,
-            order: [['createdAt', 'ASC']]
+            order: [['createdAt', 'ASC']],
         });
 
         const forms = (formsRaw || []).map((f) => {
@@ -59,7 +59,7 @@ export const showSite = async (req, res) => {
             return {
                 ...f,
                 templateObj,
-                template_entries
+                template_entries,
             };
         });
 
@@ -93,7 +93,7 @@ export const showSite = async (req, res) => {
         res.render('sites/show', {
             site,
             forms,
-            activeForm
+            activeForm,
         });
     } catch (err) {
         res.redirect('/dashboard');
@@ -134,8 +134,12 @@ export const getSiteToken = async (req, res) => {
 
     try {
         const site = await models.Site.findByPk(siteId);
-        if (!site) { return res.status(404).json({ error: 'Site not found' }); }
-        if (site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
+        if (!site) {
+            return res.status(404).json({ error: 'Site not found' });
+        }
+        if (site.fk_id_user !== userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
         const secret = process.env.KEY_TK;
         if (!secret) {
@@ -145,8 +149,8 @@ export const getSiteToken = async (req, res) => {
         const payload = {
             data: encryptObject({
                 id: site.id,
-                control_code: site.control_code
-            })
+                control_code: site.control_code,
+            }),
         };
 
         const token = jwt.sign(payload, secret);
@@ -166,8 +170,12 @@ export const revokeSiteTokens = async (req, res) => {
 
     try {
         const site = await models.Site.findByPk(siteId);
-        if (!site) { return res.status(404).json({ error: 'Site not found' }); }
-        if (site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
+        if (!site) {
+            return res.status(404).json({ error: 'Site not found' });
+        }
+        if (site.fk_id_user !== userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
         const newCode = stringUtils.generateCode(16);
         site.control_code = newCode;

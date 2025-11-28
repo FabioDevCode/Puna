@@ -8,16 +8,16 @@
         "sourceType": "module"
     },
     "extends": [
-        "eslint:recommended"
+        "eslint:recommended",
+        "plugin:prettier/recommended"
     ],
     "plugins": [
         "import",
         "jsonc"
     ],
     "rules": {
-        "indent": ["error", 4, {
-            "SwitchCase": 1
-        }],
+        "prettier/prettier": "error",
+        "indent": "off",
         "linebreak-style": ["error", "unix"],
         "quotes": ["error", "single", {
             "avoidEscape": true,

@@ -20,12 +20,12 @@ const storage = multer.diskStorage({
         const ts = Date.now();
         const safe = sanitizeName(file.originalname || 'file');
         cb(null, `${ts}_${safe}`);
-    }
+    },
 });
 
 const upload = multer({
     storage,
-    limits: { fileSize: MAX_FILE_SIZE }
+    limits: { fileSize: MAX_FILE_SIZE },
 });
 
 // We don't know field names in advance, accept any fields but enforce one-file-per-field later

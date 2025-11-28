@@ -1,7 +1,9 @@
-(function (){
+(function () {
     const elDate = document.getElementById('statC-date');
     const elHour = document.getElementById('statC-hour');
-    if (!elDate || !elHour) {return;}
+    if (!elDate || !elHour) {
+        return;
+    }
 
     [elDate, elHour].forEach((el) => {
         el.style.transition = 'opacity 360ms cubic-bezier(.2,.9,.2,1), transform 360ms cubic-bezier(.2,.9,.2,1)';
@@ -14,7 +16,9 @@
     async function loadLast() {
         try {
             const resp = await fetch('/stats/last-inbox', { credentials: 'same-origin' });
-            if (!resp.ok) {return;}
+            if (!resp.ok) {
+                return;
+            }
             const json = await resp.json();
             const date = json.date || '—';
             const time = json.time || '';

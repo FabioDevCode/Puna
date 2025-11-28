@@ -10,7 +10,6 @@ import { isConnected, isConnectDash } from '../helpers/authHelper.js';
 
 const router = express.Router();
 
-
 router.get('/error', dashboardCtl.error);
 router.get('/', isConnected, dashboardCtl.rootRedirect);
 
@@ -63,6 +62,5 @@ router.get('/inbox/:id/view', isConnected, inboxCtl.showInbox);
 router.post('/inbox/:id/delete', isConnected, inboxCtl.deleteInbox);
 router.get('/inbox/:inboxId/download/:filename', isConnected, inboxCtl.downloadFile);
 router.get('/inbox/:inboxId/download-zip', isConnected, exportCtl.downloadInboxZip);
-
 
 export default router;

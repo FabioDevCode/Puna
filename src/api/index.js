@@ -7,15 +7,15 @@ const __dirname = path.dirname(__filename);
 
 export default async (app) => {
     // Lire tous les dossiers de version (commençant par 'v')
-    const versionDirs = fs.readdirSync(__dirname, { withFileTypes: true })
+    const versionDirs = fs
+        .readdirSync(__dirname, { withFileTypes: true })
         .filter((dirent) => dirent.isDirectory() && /^v\d+/.test(dirent.name))
         .map((dirent) => dirent.name);
 
     for (const version of versionDirs) {
         const versionPath = path.join(__dirname, version);
         // Lire tous les fichiers .api.js
-        const apiFiles = fs.readdirSync(versionPath)
-            .filter((file) => file.endsWith('.api.js'));
+        const apiFiles = fs.readdirSync(versionPath).filter((file) => file.endsWith('.api.js'));
 
         for (const file of apiFiles) {
             let routePath;

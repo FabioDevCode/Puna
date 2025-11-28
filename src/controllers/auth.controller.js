@@ -8,31 +8,31 @@ export const dpFirstCoPost = async (req, res) => {
         const user = await models.User.findOne({
             where: {
                 login,
-                status: 'pending'
-            }
+                status: 'pending',
+            },
         });
         if (!user) {
             return res.render('auth/first-login', {
                 layout: 'auth',
-                error: 'Login inconnu.'
+                error: 'Login inconnu.',
             });
         }
         if (password !== confirm_password) {
             return res.render('auth/first-login', {
                 layout: 'auth',
-                error: 'Les mots de passe ne correspondent pas.'
+                error: 'Les mots de passe ne correspondent pas.',
             });
         }
         const hash = await bcrypt.hash(password, 10);
         await user.update({
             password: hash,
-            status: 'active'
+            status: 'active',
         });
         return res.redirect('/dp-login');
     } catch (err) {
         return res.render('auth/first-login', {
             layout: 'auth',
-            error: 'Erreur lors de la mise à jour du mot de passe.'
+            error: 'Erreur lors de la mise à jour du mot de passe.',
         });
     }
 };
@@ -44,13 +44,16 @@ export const dpConnect = (req, res) => {
         }
 
         try {
-            await models.User.update({
-                last_connection: new Date()
-            }, {
-                where: {
-                    id: user.id
+            await models.User.update(
+                {
+                    last_connection: new Date(),
+                },
+                {
+                    where: {
+                        id: user.id,
+                    },
                 }
-            });
+            );
         } catch (e) {
             console.error('Failed to update last_connection for user', user && user.id, e);
         }
@@ -58,7 +61,7 @@ export const dpConnect = (req, res) => {
         req.session.user = {
             id: user.id,
             login: user.login,
-            email: user.email
+            email: user.email,
         };
         return res.redirect('/dashboard');
     })(req, res);

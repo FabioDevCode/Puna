@@ -1,4 +1,9 @@
 {
+    "created_by": {
+        "allowNull": true,
+        "defaultValue": null,
+        "type": "UUID"
+    },
     "email": {
         "allowNull": true,
         "type": "STRING"
@@ -26,30 +31,12 @@
         "allowNull": false,
         "defaultValue": "viewer",
         "type": "ENUM",
-        "values": [
-            "super_admin",
-            "owner",
-            "editor",
-            "viewer",
-            "beta"
-        ]
-    },
-    "created_by": {
-        "allowNull": true,
-        "defaultValue": null,
-        "type": "UUID"
+        "values": ["super_admin", "owner", "editor", "viewer", "beta"]
     },
     "status": {
         "allowNull": false,
         "defaultValue": "pending",
         "type": "ENUM",
-        "values": [
-            "pending",
-            "active",
-            "inactive",
-            "suspended",
-            "banned",
-            "deleted"
-        ]
+        "values": ["pending", "active", "inactive", "suspended", "banned", "deleted"]
     }
 }

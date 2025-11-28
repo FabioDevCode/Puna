@@ -11,7 +11,6 @@ import { sanitizeRequestBody } from './validators/sanitizeRequest.js';
 
 const router = express.Router();
 
-
 router.post(
     '/send/:code',
     authApiKeyAccess,
@@ -24,6 +23,5 @@ router.post(
     updateFormTemplate,
     sendHandler
 );
-
 
 export default router;

@@ -4,9 +4,7 @@ const KEV = process.env.KEV;
 const KIV = process.env.KIV;
 
 if (!KEV || !KIV) {
-    throw new Error(
-        'Encryption keys not found: please set KEV and KIV environment variables in .env file'
-    );
+    throw new Error('Encryption keys not found: please set KEV and KIV environment variables in .env file');
 }
 
 export function encryptObject(object) {

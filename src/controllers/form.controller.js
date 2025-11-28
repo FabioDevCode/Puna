@@ -1,4 +1,3 @@
-import { Op } from 'sequelize';
 import models from '../models/index.js';
 import stringUtils from '../utils/string.js';
 
@@ -35,11 +34,15 @@ export const deleteForm = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(form_id);
-        if (!form) { return res.redirect('/dashboard'); }
+        if (!form) {
+            return res.redirect('/dashboard');
+        }
 
         // get site id and verify ownership
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) { return res.redirect('/dashboard'); }
+        if (!site || site.fk_id_user !== userId) {
+            return res.redirect('/dashboard');
+        }
 
         const siteId = site.id;
         await form.destroy();
@@ -59,10 +62,14 @@ export const updateFormTemplateSave = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) { return res.redirect('/dashboard'); }
+        if (!form) {
+            return res.redirect('/dashboard');
+        }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) { return res.redirect('/dashboard'); }
+        if (!site || site.fk_id_user !== userId) {
+            return res.redirect('/dashboard');
+        }
 
         // Expecting nested fields in req.body.template (e.g. template[fieldName]=New label)
         const newTemplate = req.body?.template || {};
@@ -88,10 +95,14 @@ export const getFormInbox = async (req, res) => {
 
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) { return res.status(404).json({ error: 'Form not found' }); }
+        if (!form) {
+            return res.status(404).json({ error: 'Form not found' });
+        }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
+        if (!site || site.fk_id_user !== userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
         // Server-side pagination: accept ?limit=..&offset=..
         const limitRaw = parseInt(req.query.limit, 10);
@@ -109,15 +120,26 @@ export const getFormInbox = async (req, res) => {
                     const conditions = [];
                     const Sequelize = models.Sequelize;
                     for (const [k, v] of Object.entries(parsed)) {
-                        if (v === null || typeof v === 'undefined' || String(v).trim() === '') { continue; }
+                        if (v === null || typeof v === 'undefined' || String(v).trim() === '') {
+                            continue;
+                        }
                         if (k === 'createdAt') {
                             // filter by date (YYYY-MM-DD) on createdAt using DATE(createdAt) = 'YYYY-MM-DD'
-                            conditions.push(Sequelize.where(Sequelize.fn('DATE', Sequelize.col('createdAt')), String(v)));
+                            conditions.push(
+                                Sequelize.where(Sequelize.fn('DATE', Sequelize.col('createdAt')), String(v))
+                            );
                         } else {
                             // contains match on JSON stringified field
                             const Op = Sequelize.Op;
                             const expr = Sequelize.where(
-                                Sequelize.fn('JSON_UNQUOTE', Sequelize.fn('JSON_EXTRACT', Sequelize.col('content'), Sequelize.literal(`'$.${k}'`))),
+                                Sequelize.fn(
+                                    'JSON_UNQUOTE',
+                                    Sequelize.fn(
+                                        'JSON_EXTRACT',
+                                        Sequelize.col('content'),
+                                        Sequelize.literal(`'$.${k}'`)
+                                    )
+                                ),
                                 { [Op.like]: `%${String(v)}%` }
                             );
                             conditions.push(expr);
@@ -139,11 +161,11 @@ export const getFormInbox = async (req, res) => {
             order: [['createdAt', 'DESC']],
             limit,
             offset,
-            raw: true
+            raw: true,
         });
 
         const rows = result.rows || [];
-        const total = typeof result.count === 'number' ? result.count : (result.count || 0);
+        const total = typeof result.count === 'number' ? result.count : result.count || 0;
 
         const items = (rows || []).map((r) => {
             let parsed = null;
@@ -155,7 +177,7 @@ export const getFormInbox = async (req, res) => {
             return {
                 id: r.id,
                 content: parsed,
-                createdAt: r.createdAt
+                createdAt: r.createdAt,
             };
         });
 
@@ -173,15 +195,23 @@ export const updateFormColumns = async (req, res) => {
     const userId = req.session.user?.id;
     try {
         const form = await models.Form.findByPk(formId);
-        if (!form) { return res.status(404).json({ error: 'Form not found' }); }
+        if (!form) {
+            return res.status(404).json({ error: 'Form not found' });
+        }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
+        if (!site || site.fk_id_user !== userId) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
         // Expect JSON body { columns: { key1: true, key2: false, ... } }
         let cols = req.body && req.body.columns ? req.body.columns : null;
         if (typeof cols === 'string') {
-            try { cols = JSON.parse(cols); } catch (e) { cols = null; }
+            try {
+                cols = JSON.parse(cols);
+            } catch (e) {
+                cols = null;
+            }
         }
 
         // If cols is not an object, reject
