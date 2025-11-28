@@ -191,8 +191,10 @@ h3 {
     background-color: var(--btn-ghost-gray-hover, #e0e2e6);
 }
 
-.tab-active {
+.tabs-boxed .tab {
+    border-radius: 4px !important;
     font-weight: 600;
+     transition: all 0.25s ease;
 }
 
 .tabs-boxed :is(.tab-active, [aria-selected=true]):not(.tab-disabled):not([disabled]),
@@ -433,11 +435,6 @@ h3 {
 
 .card-title {
     margin-bottom: 4px;
-}
-
-/* Amélioration visuelle des tabs */
-.tabs-boxed .tab {
-    transition: all 0.2s ease;
 }
 
 /* Animation smooth pour les cards */

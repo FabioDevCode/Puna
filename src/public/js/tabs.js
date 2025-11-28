@@ -305,7 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     const thAction = document.createElement('th');
-                    thAction.innerHTML = "Actions"
+                    thAction.classList.add('text-right');
+                    thAction.innerHTML = 'Actions';
                     tr.appendChild(thAction);
 
                     inboxHead.appendChild(tr);
@@ -358,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const tdAct = document.createElement('th');
                         tdAct.classList.add('text-right');
                         tdAct.innerHTML = `
-                        <div class="flex gap-2 w-max">
+                        <div class="flex justify-end gap-2 w-full">
                             <a href="/inbox/${it.id}/view" class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
                                 <i class="fa-regular fa-eye"></i>
                             </a>
@@ -605,10 +606,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 // sync scroll between columns
                                 try {
-                                    modalFilterKeys.style.overflow = 'auto';
-                                    modalFilterKeys.style.maxHeight = '320px';
-                                    modalFilterValues.style.overflow = 'auto';
-                                    modalFilterValues.style.maxHeight = '320px';
+                                    modalFilterKeys.style.overflow = 'visible';
+                                    modalFilterKeys.style.height = 'max-content';
+                                    modalFilterValues.style.overflow = 'visible';
+                                    modalFilterValues.style.height = 'max-content';
                                     let syncing = false;
                                     modalFilterKeys.addEventListener('scroll', () => {
                                         if (syncing) { return; }

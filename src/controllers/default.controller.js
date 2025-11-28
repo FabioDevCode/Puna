@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
@@ -7,7 +8,6 @@ import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
 import models from '../models/index.js';
 import { encryptObject } from '../utils/crypto.js';
 import stringUtils from '../utils/string.js';
-import bcrypt from 'bcrypt';
 
 
 export const rootRedirect = (req, res) => {
@@ -1306,7 +1306,7 @@ export const showInbox = async (req, res) => {
 
         // Helper function to determine file type color and icon
         const getFileTypeInfo = (filename) => {
-            if (!filename) return { color: 'neutral', icon: 'fa-file', label: 'Fichier' };
+            if (!filename) {return { color: 'neutral', icon: 'fa-file', label: 'Fichier' };}
 
             const ext = filename.toLowerCase().split('.').pop();
             // Images - Purple
@@ -1398,7 +1398,7 @@ export const showInbox = async (req, res) => {
                         template: template[key],
                         label,
                         filename,
-                        original_filename: filename.split("_").slice(1).join("_"),
+                        original_filename: filename.split('_').slice(1).join('_'),
                         ...typeInfo
                     });
                 });
@@ -1416,7 +1416,7 @@ export const showInbox = async (req, res) => {
 
         // Format date
         const formattedDate = inbox.createdAt
-            ? dayjs(inbox.createdAt).format('DD/MM/YYYY HH:mm:ss')
+            ? dayjs(inbox.createdAt).format('YYYY-MM-DD HH:mm:ss')
             : '-';
 
         res.render('show_inbox', {
