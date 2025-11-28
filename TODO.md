@@ -44,11 +44,13 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ## 🔐 Sécurité
 
-- [ ] Déplacer tous les secrets vers `.env`
-  - [ ] Secret de session (actuellement en dur)
-  - [ ] Clés JWT
-  - [ ] Identifiants DB
-- [ ] Créer `.env.example` complet
+- [x] Déplacer tous les secrets vers `.env`
+  - [x] Clés de chiffrement (KEV, KIV)
+  - [x] Clés JWT (KEY_TK)
+  - [x] Identifiants DB
+  - [ ] Secret de session (actuellement en dur dans app.js)
+- [x] Créer `.env.example` complet
+- [x] Supprimer fichier `keys.json` (utiliser uniquement `.env`)
 - [ ] Ajouter validation des variables d'environnement au démarrage
 - [ ] Implémenter `helmet.js` pour sécuriser les headers
 - [ ] Ajouter rate limiting sur les routes API

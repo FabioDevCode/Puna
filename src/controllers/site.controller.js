@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import jwt from 'jsonwebtoken';
 import models from '../models/index.js';
 import { encryptObject } from '../utils/crypto.js';
@@ -139,18 +137,10 @@ export const getSiteToken = async (req, res) => {
         if (!site) { return res.status(404).json({ error: 'Site not found' }); }
         if (site.fk_id_user !== userId) { return res.status(403).json({ error: 'Forbidden' }); }
 
-        // load key from env or config file
-        let secret = process.env.KEY_TK;
+        const secret = process.env.KEY_TK;
         if (!secret) {
-            const keysPath = path.resolve('src/config/keys.json');
-            if (fs.existsSync(keysPath)) {
-                const raw = fs.readFileSync(keysPath, 'utf8');
-                const cfg = JSON.parse(raw);
-                secret = cfg.KEY_TK;
-            }
+            return res.status(500).json({ error: 'KEY_TK not configured in environment variables' });
         }
-
-        if (!secret) { return res.status(500).json({ error: 'Server key not configured' }); }
 
         const payload = {
             data: encryptObject({

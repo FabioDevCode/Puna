@@ -28,7 +28,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-
 const app = express();
 
 i18n.configure({
@@ -93,14 +92,16 @@ const sessionStore = new MySQLStore(database);
 app.use(
     session({
         name: 'puna',
-        secret: 'example_secret',
+        secret: process.env.SESSION_SECRET || (() => {
+            throw new Error('SESSION_SECRET must be set in environment variables');
+        })(),
         store: sessionStore,
         resave: false,
         saveUninitialized: false,
         cookie: {
             secure: process.env.NODE_ENV === 'production', // true if https (HTTPS requis)
             httpOnly: true,
-            maxAge: 12 * 60 * 60 * 1000, // 12 heures
+            maxAge: parseInt(process.env.SESSION_MAX_AGE || '43200000', 10), // 12 heures par défaut
             sameSite: 'lax',
         },
         rolling: false,

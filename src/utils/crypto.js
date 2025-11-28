@@ -1,25 +1,12 @@
-import fs from 'fs';
 import CryptoJS from 'crypto-js';
 
-let KEV;
-let KIV;
+const KEV = process.env.KEV;
+const KIV = process.env.KIV;
 
-if (process.env.KEV && process.env.KIV) {
-    KEV = process.env.KEV;
-    KIV = process.env.KIV;
-} else {
-    try {
-        const keysUrl = new URL('../config/keys.json', import.meta.url);
-        const raw = fs.readFileSync(keysUrl, 'utf8');
-        const parsed = JSON.parse(raw);
-        KEV = parsed.KEV;
-        KIV = parsed.KIV;
-    } catch (err) {
-        throw new Error(
-            'Encryption keys not found: please set process.env.KEV and process.env.KIV, or ensure src/config/keys.json exists and contains KEV/KIV.\n' +
-				err.message
-        );
-    }
+if (!KEV || !KIV) {
+    throw new Error(
+        'Encryption keys not found: please set KEV and KIV environment variables in .env file'
+    );
 }
 
 export function encryptObject(object) {

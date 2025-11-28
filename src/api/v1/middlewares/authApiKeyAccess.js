@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import jwt from 'jsonwebtoken';
 import models from '../../../models/index.js';
 import { decryptObject } from '../../../utils/crypto.js';
@@ -20,17 +18,10 @@ export async function authApiKeyAccess(req, res, next) {
 
         const token = auth.slice(7).trim();
 
-        // load secret
-        let secret = process.env.KEY_TK;
+        const secret = process.env.KEY_TK;
         if (!secret) {
-            const keysPath = path.resolve('src/config/keys.json');
-            if (fs.existsSync(keysPath)) {
-                const raw = fs.readFileSync(keysPath, 'utf8');
-                const cfg = JSON.parse(raw);
-                secret = cfg.KEY_TK;
-            }
+            return res.status(500).json({ error: 'KEY_TK not configured in environment variables' });
         }
-        if (!secret) {return res.status(500).json({ error: 'Server key not configured' });}
 
         let payload;
         try {
