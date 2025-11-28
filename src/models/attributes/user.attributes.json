@@ -28,8 +28,8 @@
         "type": "STRING"
     },
     "role": {
-        "allowNull": true,
-        "defaultValue": null,
+        "allowNull": false,
+        "defaultValue": "viewer",
         "type": "ENUM",
         "values": [
             "super_admin",
@@ -43,5 +43,18 @@
         "allowNull": true,
         "defaultValue": null,
         "type": "UUID"
+    },
+    "status": {
+        "allowNull": false,
+        "defaultValue": "pending",
+        "type": "ENUM",
+        "values": [
+            "pending",
+            "active",
+            "inactive",
+            "suspended",
+            "banned",
+            "deleted"
+        ]
     }
 }

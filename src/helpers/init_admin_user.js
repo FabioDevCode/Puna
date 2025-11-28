@@ -7,6 +7,8 @@ export const initAdminUSer = async () => {
             await models.User.create({
                 email: '',
                 login: 'admin',
+                role: 'super_admin',
+                status: 'pending',
                 enabled: false
             });
         }
