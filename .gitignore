@@ -7,7 +7,7 @@ node_modules/*
 package-lock.json
 src/config/database.js
 src/config/keys.json
-src/api/Puna/Puna Send.bru
+src/api/Puna/**/*
 src/api/Puna/burno.json
 storage/**/**
 storage/
