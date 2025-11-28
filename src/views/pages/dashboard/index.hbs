@@ -5,7 +5,7 @@
 {{/slot}}
 
 
-{{> _ui/stats_inbox_percentages }}
+{{> widgets/inbox-percentages }}
 
 {{!-- <div class="stats h-max bg-base-100 overflow-hidden col-span-2 md:col-span-6 lg:col-span-8">
     <div class="stat flex items-center justify-around gap-4 h-[76px] w-full select-none">
@@ -44,23 +44,23 @@
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="stats-grid gap-4">
-        {{> _ui/stats_inbox_counts }}
+        {{> widgets/inbox-counts }}
 
-        {{> _ui/stats_last_receive }}
+        {{> widgets/last-receive }}
 
-        {{> _ui/stats_repartition_site }}
+        {{> widgets/site-distribution }}
     </div>
 </div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
-    {{> _ui/stats_inbox_heatmap }}
+    {{> widgets/inbox-heatmap }}
 </div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-8">
-    {{> _ui/stats_top_froms }}
+    {{> widgets/top-forms }}
 </div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-4">
-    {{> _ui/stats_top_site_radial }}
+    {{> widgets/top-sites-radial }}
 </div>
 

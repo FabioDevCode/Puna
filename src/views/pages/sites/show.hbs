@@ -17,9 +17,9 @@
     </span>
 </button>
 
-{{> _ui/btn_revoke_tokens id=site.id }}
+{{> components/buttons/revoke-tokens id=site.id }}
 
-{{> _ui/delete_site
+{{> components/modals/delete-site
 id=site.id
 domain=site.domain
 }}
@@ -59,8 +59,8 @@ domain=site.domain
 {{/slot}}
 
 <!-- Modales -->
-{{> _ui/form_filter_modal }}
-{{> _ui/modal_delete_inbox }}
+{{> components/modals/form-filter }}
+{{> components/modals/delete-inbox }}
 
 <!-- Contenu principal -->
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12">
@@ -78,7 +78,7 @@ domain=site.domain
                     </a>
                     {{/each}}
                 </div>
-                {{> _ui/btn_new_form id=site.id }}
+                {{> components/buttons/new-form id=site.id }}
             </div>
             {{else}}
             <div class="flex flex-col items-center justify-center py-8 gap-4">
@@ -88,7 +88,7 @@ domain=site.domain
                         Aucun formulaire créé pour ce site
                     </p>
                 </div>
-                {{> _ui/btn_new_form id=site.id }}
+                {{> components/buttons/new-form id=site.id }}
             </div>
             {{/if}}
         </div>
@@ -112,8 +112,8 @@ domain=site.domain
                     </div>
                 </div>
                 <div class="flex justify-end items-start h-full gap-2">
-                    {{> _ui/delete_form }}
-                    {{> _ui/form_template_modal }}
+                    {{> components/modals/delete-form }}
+                    {{> components/modals/form-template }}
                 </div>
             </div>
         </div>
@@ -169,7 +169,7 @@ domain=site.domain
                                 <i class="fa-solid fa-filter"></i>
                                 <span class="hidden md:flex">Filtre</span>
                             </button>
-                            {{> _ui/form_columns_modal }}
+                            {{> components/modals/form-columns }}
                         </div>
                     </div>
                 </div>

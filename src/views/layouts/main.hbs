@@ -2,7 +2,7 @@
 <html lang="fr" data-theme="fantasy">
 
 <head>
-    {{> head}}
+    {{> layout/head}}
     <script src="/js/tabs.js"></script>
     <script src="/js/search.js"></script>
     <script src="/js/token.js"></script>
@@ -13,10 +13,10 @@
 
 <body>
     <div class="flex h-screen overflow-hidden w-full min-w-[320px]">
-        {{> left_menu}}
-        {{> mobile_menu }}
+        {{> layout/left-menu}}
+        {{> layout/mobile-menu }}
         <div id="nav_main" class="flex flex-col h-full w-full">
-            {{> navbar}}
+            {{> layout/navbar}}
             <main class="p-4 bg-secondary-content/75 rounded-4xl app-main pb-[116px] md:pb-4">
                 <div class="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-4">
                     {{{body}}}

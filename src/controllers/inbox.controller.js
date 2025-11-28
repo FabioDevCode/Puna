@@ -180,7 +180,7 @@ export const showInbox = async (req, res) => {
             ? dayjs(inbox.createdAt).format('YYYY-MM-DD HH:mm:ss')
             : '-';
 
-        res.render('show_inbox', {
+        res.render('inbox/show', {
             inbox: inbox.toJSON(),
             form: form.toJSON(),
             site: site.toJSON(),

@@ -80,7 +80,7 @@
                 <h2 class="card-title select-none">
                     Documents reçus
                 </h2>
-                {{> _ui/btn_download_all_files inbox_id=inbox.id}}
+                {{> components/buttons/download-all-files inbox_id=inbox.id}}
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {{#each fileEntries}}
@@ -120,7 +120,7 @@
     {{/if}}
 </div>
 
-{{> _ui/delete_inbox_show
+{{> components/modals/delete-inbox-show
 inbox_id=inbox.id
 form_name=form.name
 site_id=site.id

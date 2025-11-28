@@ -5,12 +5,12 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-{{> _ui/search_site }}
-{{> _ui/btn_new_site }}
+{{> components/search/site-search }}
+{{> components/buttons/new-site }}
 {{/slot}}
 
 {{#each sites}}
-{{> _ui/site
+{{> components/cards/site
 id=id
 domain=domain
 form=form

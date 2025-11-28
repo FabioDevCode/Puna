@@ -12,14 +12,14 @@ export const dpFirstCoPost = async (req, res) => {
             }
         });
         if (!user) {
-            return res.render('first_co', {
-                layout: 'login',
+            return res.render('auth/first-login', {
+                layout: 'auth',
                 error: 'Login inconnu.'
             });
         }
         if (password !== confirm_password) {
-            return res.render('first_co', {
-                layout: 'login',
+            return res.render('auth/first-login', {
+                layout: 'auth',
                 error: 'Les mots de passe ne correspondent pas.'
             });
         }
@@ -30,8 +30,8 @@ export const dpFirstCoPost = async (req, res) => {
         });
         return res.redirect('/dp-login');
     } catch (err) {
-        return res.render('first_co', {
-            layout: 'login',
+        return res.render('auth/first-login', {
+            layout: 'auth',
             error: 'Erreur lors de la mise à jour du mot de passe.'
         });
     }

@@ -8,8 +8,8 @@ import models from '../models/index.js';
  */
 export const admin = async (req, res) => {
     try {
-        res.render('admin', {
-            layout: 'administration'
+        res.render('admin/index', {
+            layout: 'admin'
         });
     } catch (err) {
         console.error('admin error:', err);
@@ -31,8 +31,8 @@ export const adminUsers = async (req, res) => {
             order: [['domain', 'ASC']]
         });
 
-        res.render('admin_users', {
-            layout: 'administration',
+        res.render('admin/users/list', {
+            layout: 'admin',
             sites: sites.map(s => s.toJSON())
         });
     } catch (err) {
@@ -314,8 +314,8 @@ export const adminViewUser = async (req, res) => {
             : null;
         userData.createdAt = dayjs(userData.createdAt).format('YYYY-MM-DD HH:mm');
 
-        res.render('admin_user_view', {
-            layout: 'administration',
+        res.render('admin/users/view', {
+            layout: 'admin',
             user: userData
         });
 
@@ -377,8 +377,8 @@ export const adminEditUser = async (req, res) => {
             : null;
         userData.createdAt = dayjs(userData.createdAt).format('YYYY-MM-DD HH:mm');
 
-        res.render('admin_user_edit', {
-            layout: 'administration',
+        res.render('admin/users/edit', {
+            layout: 'admin',
             user: userData,
             sites: sitesWithAssignment
         });
@@ -448,8 +448,8 @@ export const adminUpdateUser = async (req, res) => {
  */
 export const adminSettings = async (req, res) => {
     try {
-        res.render('admin_settings', {
-            layout: 'administration'
+        res.render('admin/settings', {
+            layout: 'admin'
         });
 
     } catch (err) {

@@ -417,7 +417,7 @@ export const getLastInboxEntry = async (req, res) => {
  * Page d'erreur
  */
 export const error = async (req, res) => {
-    res.render('error', {
+    res.render('errors/generic', {
         layout: false,
     });
 };
@@ -426,8 +426,8 @@ export const error = async (req, res) => {
  * Page de login
  */
 export const dpLogin = (req, res) => {
-    res.render('login', {
-        layout: 'login'
+    res.render('auth/login', {
+        layout: 'auth'
     });
 };
 
@@ -435,8 +435,8 @@ export const dpLogin = (req, res) => {
  * Page de première connexion
  */
 export const dpFirstCo = (req, res) => {
-    res.render('first_co', {
-        layout: 'login'
+    res.render('auth/first-login', {
+        layout: 'auth'
     });
 };
 
@@ -448,10 +448,10 @@ export const allSite = async (req, res) => {
         const userId = req.session.user?.id;
         const sitesWithCounts = await getSitesWithCounts(userId);
 
-        res.render('site_list', {
+        res.render('sites/list', {
             sites: sitesWithCounts
         });
     } catch (err) {
-        res.render('site_list', {});
+        res.render('sites/list', {});
     }
 };

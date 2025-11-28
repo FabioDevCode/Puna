@@ -90,7 +90,7 @@ export const showSite = async (req, res) => {
                 activeForm = forms[0];
             }
         }
-        res.render('site_show', {
+        res.render('sites/show', {
             site,
             forms,
             activeForm
