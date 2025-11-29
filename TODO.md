@@ -146,8 +146,8 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ### 🔥 Urgent (À faire maintenant)
 
-- [ ] Créer `.env.example`
-- [ ] Déplacer secrets vers `.env`
+- [x] Créer `.env.example`
+- [x] Déplacer secrets vers `.env`
 - [ ] Enrichir README.md
 
 ### ⚡ Important (Court terme)
