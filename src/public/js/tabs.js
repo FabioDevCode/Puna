@@ -428,8 +428,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             const td = document.createElement('td');
                             const str = value !== undefined && value !== null ? String(value) : '';
                             const MAX = 80;
+
                             if (str.length > MAX) {
-                                td.textContent = str.substring(0, MAX) + '...';
+                                td.classList.add('text-nowrap');
+                                td.textContent = str.substring(0, 47) + '...';
                             } else {
                                 td.textContent = str;
                             }
