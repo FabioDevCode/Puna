@@ -154,7 +154,7 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 - [ ] Créer couche services
 - [ ] Ajouter validation des variables d'env
-- [ ] Configurer Prettier/ESLint
+- [x] Configurer Prettier/ESLint
 
 ### 💡 À planifier (Moyen/Long terme)
 
