@@ -213,3 +213,7 @@ notes: |
 
     - il faudrait que dans le controller j'ai j'ai accès a une variable
     du genre "user_role" qui aurait le role du user connecté.
+
+    - il faudrait aussi un 2 helpers pour handlebars un peu comme
+    actionAccess et roleAccess afin de pouvoir conditionné l'affichage
+    de certains bloc.

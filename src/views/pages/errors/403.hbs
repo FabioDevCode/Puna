@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>403 - Accès interdit</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .error-container {
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                max-width: 600px;
+                width: 100%;
+                padding: 60px 40px;
+                text-align: center;
+            }
+
+            .error-icon {
+                font-size: 80px;
+                margin-bottom: 20px;
+                animation: shake 0.5s ease-in-out;
+            }
+
+            @keyframes shake {
+                0%,
+                100% {
+                    transform: translateX(0);
+                }
+                25% {
+                    transform: translateX(-10px);
+                }
+                75% {
+                    transform: translateX(10px);
+                }
+            }
+
+            .error-code {
+                font-size: 120px;
+                font-weight: 900;
+                color: #667eea;
+                line-height: 1;
+                margin-bottom: 10px;
+            }
+
+            .error-title {
+                font-size: 32px;
+                font-weight: 700;
+                color: #2d3748;
+                margin-bottom: 20px;
+            }
+
+            .error-message {
+                font-size: 18px;
+                color: #718096;
+                margin-bottom: 30px;
+                line-height: 1.6;
+            }
+
+            .error-details {
+                background: #f7fafc;
+                border-left: 4px solid #667eea;
+                padding: 15px 20px;
+                margin: 30px 0;
+                text-align: left;
+                border-radius: 8px;
+            }
+
+            .error-details p {
+                color: #4a5568;
+                font-size: 14px;
+                margin: 8px 0;
+            }
+
+            .error-details strong {
+                color: #2d3748;
+            }
+
+            .btn-home {
+                display: inline-block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 15px 40px;
+                border-radius: 50px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 16px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            .btn-home:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+
+            .btn-back {
+                display: inline-block;
+                color: #667eea;
+                padding: 15px 30px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 16px;
+                transition: all 0.3s ease;
+                margin-left: 10px;
+            }
+
+            .btn-back:hover {
+                color: #764ba2;
+            }
+
+            @media (max-width: 600px) {
+                .error-container {
+                    padding: 40px 30px;
+                }
+
+                .error-code {
+                    font-size: 80px;
+                }
+
+                .error-title {
+                    font-size: 24px;
+                }
+
+                .error-message {
+                    font-size: 16px;
+                }
+
+                .btn-home,
+                .btn-back {
+                    display: block;
+                    margin: 10px 0;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="error-container">
+            <div class="error-icon">🔒</div>
+            <div class="error-code">403</div>
+            <h1 class="error-title">Accès interdit</h1>
+            <p class="error-message">
+                {{#if message}}
+                    {{message}}
+                {{else}}
+                    Vous n'avez pas les permissions nécessaires pour accéder à cette ressource.
+                {{/if}}
+            </p>
+
+            {{#if entity}}
+                <div class="error-details">
+                    <p><strong>Entité :</strong> {{entity}}</p>
+                    {{#if action}}
+                        <p><strong>Action :</strong> {{action}}</p>
+                    {{/if}}
+                    {{#if userRole}}
+                        <p><strong>Votre rôle :</strong> {{roleLabel userRole}}</p>
+                    {{/if}}
+                    {{#if allowedRoles}}
+                        <p>
+                            <strong>Rôles autorisés :</strong>
+                            {{#each allowedRoles}}
+                                {{roleLabel this}}{{#unless @last}}, {{/unless}}
+                            {{/each}}
+                        </p>
+                    {{/if}}
+                </div>
+            {{/if}}
+
+            <div style="margin-top: 40px">
+                <a href="/dashboard" class="btn-home">Retour au tableau de bord</a>
+                <a href="javascript:history.back()" class="btn-back">← Retour</a>
+            </div>
+        </div>
+    </body>
+</html>
