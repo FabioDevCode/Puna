@@ -28,8 +28,6 @@ entities:
     - site # Sites web (domaines)
     - form # Formulaires liés à un site
     - inbox # Entrées de formulaires (données reçues)
-    - dashboard # Tableau de bord et statistiques
-    - admin # Panel d'administration
 
 # ================================================================
 # MATRICE DES PERMISSIONS À COMPLÉTER
@@ -45,46 +43,25 @@ permissions:
     super_admin:
         user:
             read: true # Voir détails d'un utilisateur
-            list: true # Lister tous les utilisateurs
             create: true # Créer un utilisateur
             update: true # Modifier un utilisateur
             delete: true # Supprimer un utilisateur
-            export: true # Exporter liste en Excel
-            assign_role: true # Changer le rôle d'un utilisateur
 
         site:
             read: true # Voir détails d'un site
-            list: true # Lister tous les sites
             create: true # Créer un site
             update: true # Modifier un site
             delete: true # Supprimer un site
-            manage_tokens: true # Générer/révoquer tokens JWT
-            assign_users: true # Assigner des utilisateurs au site (via SiteUser)
 
         form:
             read: true # Voir détails d'un formulaire
-            list: true # Lister tous les formulaires
             create: true # Créer un formulaire
             update: true # Modifier un formulaire (colonnes, template)
             delete: true # Supprimer un formulaire
-            export: true # Exporter données en Excel
 
         inbox:
             read: true # Voir une entrée de formulaire
-            list: true # Lister toutes les entrées
-            create: false # Créer entrée (généralement via API seulement)
-            update: false # Modifier une entrée (non implémenté actuellement)
             delete: true # Supprimer une entrée
-            download: true # Télécharger fichiers joints
-            export: true # Exporter en ZIP
-
-        dashboard:
-            read: true # Accéder au dashboard
-            stats: true # Voir statistiques détaillées
-
-        admin:
-            access: true # Accéder au panel /admin
-            settings: true # Modifier paramètres système
 
     # ------------------------------------------------------------
     # OWNER - Propriétaire de sites
@@ -93,47 +70,26 @@ permissions:
     # ------------------------------------------------------------
     owner:
         user:
-            read: false # ❌ Ne peut pas voir autres utilisateurs
-            list: false
-            create: false
-            update: false
-            delete: false
-            export: false
-            assign_role: false
+            read: true # Voir détails d'un utilisateur
+            create: true # Créer un utilisateur
+            update: true # Modifier un utilisateur
+            delete: true # Supprimer un utilisateur
 
         site:
-            read: true # ✅ Voir SES sites uniquement
-            list: true # ✅ Lister SES sites
-            create: true # ✅ Créer des sites
-            update: true # ✅ Modifier SES sites
-            delete: true # ✅ Supprimer SES sites
-            manage_tokens: true # ✅ Gérer tokens de SES sites
-            assign_users: true # ✅ Assigner utilisateurs à SES sites
+            read: true # Voir détails d'un site
+            create: true # Créer un site
+            update: true # Modifier un site
+            delete: true # Supprimer un site
 
         form:
-            read: true # ✅ Voir formulaires de SES sites
-            list: true
-            create: true # ✅ Créer formulaires sur SES sites
-            update: true # ✅ Modifier formulaires de SES sites
-            delete: true # ✅ Supprimer formulaires de SES sites
-            export: true # ✅ Exporter données de SES formulaires
+            read: true # Voir détails d'un formulaire
+            create: true # Créer un formulaire
+            update: true # Modifier un formulaire (colonnes, template)
+            delete: true # Supprimer un formulaire
 
         inbox:
-            read: true # ✅ Voir entrées de SES formulaires
-            list: true
-            create: false # ❌ Création via API seulement
-            update: false
-            delete: true # ✅ Supprimer entrées de SES formulaires
-            download: true # ✅ Télécharger fichiers
-            export: true # ✅ Exporter en ZIP
-
-        dashboard:
-            read: true # ✅ Accéder au dashboard
-            stats: true # ✅ Voir statistiques de SES sites
-
-        admin:
-            access: false # ❌ Pas d'accès admin
-            settings: false
+            read: true # Voir une entrée de formulaire
+            delete: true # Supprimer une entrée
 
     # ------------------------------------------------------------
     # EDITOR - Éditeur
@@ -143,47 +99,26 @@ permissions:
     # ------------------------------------------------------------
     editor:
         user:
-            read: false
-            list: false
-            create: false
-            update: false
-            delete: false
-            export: false
-            assign_role: false
+            read: false # Voir détails d'un utilisateur
+            create: false # Créer un utilisateur
+            update: false # Modifier un utilisateur
+            delete: false # Supprimer un utilisateur
 
         site:
-            read: true # ✅ Voir sites assignés
-            list: true # ✅ Lister sites assignés
-            create: false # ❌ Ne peut pas créer de sites
-            update: false # ❌ Ne peut pas modifier config site
-            delete: false # ❌ Ne peut pas supprimer sites
-            manage_tokens: false # ❌ Ne peut pas gérer tokens
-            assign_users: false # ❌ Ne peut pas assigner utilisateurs
+            read: true # Voir détails d'un site
+            create: false # Créer un site
+            update: false # Modifier un site
+            delete: false # Supprimer un site
 
         form:
-            read: true # ✅ Voir formulaires des sites assignés
-            list: true
-            create: false # ❌ Ne peut pas créer formulaires
-            update: true # ✅ Modifier formulaires (colonnes, template)
-            delete: false # ❌ Ne peut pas supprimer formulaires
-            export: true # ✅ Exporter données
+            read: true # Voir détails d'un formulaire
+            create: true # Créer un formulaire
+            update: true # Modifier un formulaire (colonnes, template)
+            delete: true # Supprimer un formulaire
 
         inbox:
-            read: true # ✅ Voir entrées
-            list: true
-            create: false
-            update: false
-            delete: false # ❌ Ne peut pas supprimer entrées
-            download: true # ✅ Télécharger fichiers
-            export: true # ✅ Exporter en ZIP
-
-        dashboard:
-            read: true # ✅ Accéder au dashboard
-            stats: true # ✅ Voir statistiques
-
-        admin:
-            access: false
-            settings: false
+            read: true # Voir une entrée de formulaire
+            delete: true # Supprimer une entrée
 
     # ------------------------------------------------------------
     # VIEWER - Lecteur seul
@@ -192,47 +127,26 @@ permissions:
     # ------------------------------------------------------------
     viewer:
         user:
-            read: false
-            list: false
-            create: false
-            update: false
-            delete: false
-            export: false
-            assign_role: false
+            read: false # Voir détails d'un utilisateur
+            create: false # Créer un utilisateur
+            update: false # Modifier un utilisateur
+            delete: false # Supprimer un utilisateur
 
         site:
-            read: true # ✅ Voir sites assignés
-            list: true # ✅ Lister sites assignés
-            create: false # ❌ Lecture seule
-            update: false
-            delete: false
-            manage_tokens: false
-            assign_users: false
+            read: true # Voir détails d'un site
+            create: false # Créer un site
+            update: false # Modifier un site
+            delete: false # Supprimer un site
 
         form:
-            read: true # ✅ Voir formulaires
-            list: true
-            create: false # ❌ Lecture seule
-            update: false
-            delete: false
-            export: false # ❌ Pas d'export pour viewer
+            read: true # Voir détails d'un formulaire
+            create: false # Créer un formulaire
+            update: false # Modifier un formulaire (colonnes, template)
+            delete: false # Supprimer un formulaire
 
         inbox:
-            read: true # ✅ Voir entrées
-            list: true
-            create: false
-            update: false
-            delete: false
-            download: true # ✅ Télécharger fichiers (lecture seule)
-            export: false # ❌ Pas d'export
-
-        dashboard:
-            read: true # ✅ Accéder au dashboard
-            stats: true # ✅ Voir statistiques
-
-        admin:
-            access: false
-            settings: false
+            read: true # Voir une entrée de formulaire
+            delete: false # Supprimer une entrée
 
     # ------------------------------------------------------------
     # BETA - Testeur beta
@@ -241,47 +155,26 @@ permissions:
     # ------------------------------------------------------------
     beta:
         user:
-            read: false
-            list: false
-            create: false
-            update: false
-            delete: false
-            export: false
-            assign_role: false
+            read: false # Voir détails d'un utilisateur
+            create: false # Créer un utilisateur
+            update: false # Modifier un utilisateur
+            delete: false # Supprimer un utilisateur
 
         site:
-            read: true # ✅ Voir sites (pour tester)
-            list: true
-            create: true # ✅ Créer sites de test
-            update: false # ❌ Ne peut pas modifier
-            delete: false # ❌ Ne peut pas supprimer
-            manage_tokens: false
-            assign_users: false
+            read: true # Voir détails d'un site
+            create: true # Créer un site
+            update: true # Modifier un site
+            delete: true # Supprimer un site
 
         form:
-            read: true # ✅ Voir formulaires
-            list: true
-            create: false # ❌ Ne peut pas créer formulaires
-            update: false
-            delete: false
-            export: false
+            read: true # Voir détails d'un formulaire
+            create: true # Créer un formulaire
+            update: true # Modifier un formulaire (colonnes, template)
+            delete: true # Supprimer un formulaire
 
         inbox:
-            read: true # ✅ Voir entrées (pour tester)
-            list: true
-            create: false
-            update: false
-            delete: false
-            download: false # ❌ Pas de téléchargement
-            export: false
-
-        dashboard:
-            read: true # ✅ Accéder au dashboard
-            stats: false # ❌ Pas de stats détaillées
-
-        admin:
-            access: false
-            settings: false
+            read: true # Voir une entrée de formulaire
+            delete: true # Supprimer une entrée
 
 # ================================================================
 # RÈGLES SPÉCIALES (optionnel)
@@ -290,32 +183,18 @@ permissions:
 # ================================================================
 
 special_rules:
-    # Ownership check - Vérifier que l'utilisateur possède la ressource
-    # Applicable pour: owner, editor, viewer (pas super_admin)
-    ownership_required:
-        - entity: site
-          roles: [owner, editor, viewer]
-          check: 'userOwnsSite(userId, siteId)'
-
-        - entity: form
-          roles: [owner, editor, viewer]
-          check: "userOwnsResource(userId, formId, 'form')"
-
-        - entity: inbox
-          roles: [owner, editor, viewer]
-          check: "userOwnsResource(userId, inboxId, 'inbox')"
-
-    # Super admin bypass - super_admin peut tout faire sans ownership check
-    bypass_ownership:
-        role: super_admin
-
     # Rate limiting - Limiter créations pour beta
     rate_limiting:
         role: beta
         limits:
-            - action: create
-              entity: site
-              max_per_day: 3
+            - entity: site
+              max: 4
+            - entity: form
+              max: 2
+              info: 2 per site
+            - entity: inbox
+              max: 200
+              info: 200 per form
 
 # ================================================================
 # NOTES & QUESTIONS
@@ -324,27 +203,13 @@ special_rules:
 # ================================================================
 
 notes: |
-    Questions à décider:
+    - J'ai besoin d'un middleware afin de gérer l'accès à certaines
+    routes qui prendrais 2 entrées, nom de l'entité, action.
+    ex: actionAccess("user", "create")
 
-    1. Est-ce qu'un OWNER peut assigner des EDITORS/VIEWERS à ses sites ?
-       → Actuellement prévu à true (owner.site.assign_users)
+    - il me faut le meme genre de middleware mais ou cette fois,
+    je passe un tableau de string avec une liste de role.
+    ex: roleAccess(["super_admin", "owner"])
 
-    2. Est-ce qu'un EDITOR peut supprimer des entrées inbox ?
-       → Actuellement à false (lecture/export seulement)
-
-    3. Est-ce que BETA doit pouvoir créer des formulaires ?
-       → Actuellement à false (peut créer sites mais pas forms)
-
-    4. Est-ce que VIEWER peut exporter en Excel ?
-       → Actuellement à false (lecture seule stricte)
-
-    5. Permissions granulaires par site (future) ?
-       → Exemple: EDITOR peut update form sur site A mais pas site B
-       → Nécessiterait une table site_user_permissions
-
-# ================================================================
-# VALIDATION
-# ================================================================
-# Une fois rempli, lance: node validate_permissions.js
-# Pour vérifier la cohérence de la matrice
-# ================================================================
+    - il faudrait que dans le controller j'ai j'ai accès a une variable
+    du genre "user_role" qui aurait le role du user connecté.
