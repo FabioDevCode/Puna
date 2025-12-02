@@ -152,44 +152,4 @@ export default {
             return options.inverse(this);
         }
     },
-
-    /**
-     * Helper pour afficher le nom du rôle en français
-     * Usage: {{roleLabel userRole}}
-     *
-     * @example
-     * <p>Votre rôle : {{roleLabel userRole}}</p>
-     * // Affiche: "Votre rôle : Administrateur"
-     */
-    roleLabel: function (role) {
-        const labels = {
-            super_admin: 'Administrateur',
-            owner: 'Propriétaire',
-            editor: 'Éditeur',
-            viewer: 'Lecteur',
-            beta: 'Testeur Beta',
-        };
-
-        return labels[role] || role;
-    },
-
-    /**
-     * Helper pour afficher un badge coloré selon le rôle
-     * Usage: {{roleBadge userRole}}
-     *
-     * @example
-     * {{roleBadge userRole}}
-     * // Affiche: <span class="badge badge-danger">ADMIN</span>
-     */
-    roleBadge: function (role) {
-        const badges = {
-            super_admin: '<span class="badge badge-danger">ADMIN</span>',
-            owner: '<span class="badge badge-primary">OWNER</span>',
-            editor: '<span class="badge badge-info">EDITOR</span>',
-            viewer: '<span class="badge badge-secondary">VIEWER</span>',
-            beta: '<span class="badge badge-warning">BETA</span>',
-        };
-
-        return badges[role] || `<span class="badge">${role}</span>`;
-    },
 };

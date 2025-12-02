@@ -7,6 +7,7 @@ import * as formCtl from '../controllers/form.controller.js';
 import * as inboxCtl from '../controllers/inbox.controller.js';
 import * as siteCtl from '../controllers/site.controller.js';
 import { isConnected, isConnectDash } from '../helpers/authHelper.js';
+import { actionAccess, roleAccess } from '../middlewares/checkAccess.js';
 
 const router = express.Router();
 
@@ -32,35 +33,54 @@ router.get('/stats/inbox-by-site', isConnected, dashboardCtl.getInboxCountsBySit
 router.get('/stats/last-inbox', isConnected, dashboardCtl.getLastInboxEntry);
 
 // Administration
-router.get('/admin', isConnected, adminCtl.admin);
-router.get('/admin/users', isConnected, adminCtl.adminUsers);
-router.get('/admin/users/list', isConnected, adminCtl.adminUsersList);
-router.get('/admin/users/export-excel', isConnected, adminCtl.adminUsersExportExcel);
-router.post('/admin/users/create', isConnected, adminCtl.adminCreateUser);
-router.post('/admin/users/delete', isConnected, adminCtl.adminDeleteUser);
-router.get('/admin/users/:id/view', isConnected, adminCtl.adminViewUser);
-router.get('/admin/users/:id/edit', isConnected, adminCtl.adminEditUser);
-router.post('/admin/users/:id/update', isConnected, adminCtl.adminUpdateUser);
-router.get('/admin/settings', isConnected, adminCtl.adminSettings);
+router.get('/admin', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.admin);
+router.get('/admin/users', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminUsers);
+router.get('/admin/users/list', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminUsersList);
+router.get(
+    '/admin/users/export-excel',
+    isConnected,
+    roleAccess(['super_admin', 'owner']),
+    adminCtl.adminUsersExportExcel
+);
+router.post('/admin/users/create', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminCreateUser);
+router.post('/admin/users/delete', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminDeleteUser);
+router.get('/admin/users/:id/view', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminViewUser);
+router.get('/admin/users/:id/edit', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminEditUser);
+router.post('/admin/users/:id/update', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminUpdateUser);
+router.get('/admin/settings', isConnected, roleAccess(['super_admin']), adminCtl.adminSettings);
 
-router.get('/site/all', isConnected, dashboardCtl.allSite);
-router.get('/site/:id/token', isConnected, siteCtl.getSiteToken);
-router.get('/site/:id/view', isConnected, siteCtl.showSite);
-router.put('/site/:id/revoke-tokens', isConnected, siteCtl.revokeSiteTokens);
-router.post('/create-site', isConnected, siteCtl.createSite);
-router.post('/delete-site/:id', isConnected, siteCtl.deleteSite);
+router.get('/site/all', isConnected, actionAccess('site', 'read'), dashboardCtl.allSite);
+router.get('/site/:id/view', isConnected, actionAccess('site', 'read'), siteCtl.showSite);
 
-router.post('/create-form', isConnected, formCtl.createForm);
-router.post('/delete-form', isConnected, formCtl.deleteForm);
+router.get(
+    '/site/:id/token',
+    isConnected,
+    roleAccess(['super_admin', 'owner', 'editor', 'beta']),
+    actionAccess('site', 'read'),
+    siteCtl.getSiteToken
+);
+router.put(
+    '/site/:id/revoke-tokens',
+    isConnected,
+    roleAccess(['super_admin', 'owner', 'beta']),
+    actionAccess('site', 'update'),
+    siteCtl.revokeSiteTokens
+);
 
-router.get('/form/:id/inbox', isConnected, formCtl.getFormInbox);
-router.post('/form/:id/columns', isConnected, formCtl.updateFormColumns);
-router.post('/form/:id/template', isConnected, formCtl.updateFormTemplateSave);
-router.get('/form/:id/export-excel', isConnected, exportCtl.exportFormToExcel);
+router.post('/create-site', isConnected, actionAccess('site', 'create'), siteCtl.createSite);
+router.post('/delete-site/:id', isConnected, actionAccess('site', 'delete'), siteCtl.deleteSite);
 
-router.get('/inbox/:id/view', isConnected, inboxCtl.showInbox);
-router.post('/inbox/:id/delete', isConnected, inboxCtl.deleteInbox);
-router.get('/inbox/:inboxId/download/:filename', isConnected, inboxCtl.downloadFile);
-router.get('/inbox/:inboxId/download-zip', isConnected, exportCtl.downloadInboxZip);
+router.post('/create-form', isConnected, actionAccess('form', 'create'), formCtl.createForm);
+router.post('/delete-form', isConnected, actionAccess('form', 'delete'), formCtl.deleteForm);
+
+router.get('/form/:id/inbox', isConnected, actionAccess('form', 'read'), formCtl.getFormInbox);
+router.post('/form/:id/columns', isConnected, actionAccess('form', 'update'), formCtl.updateFormColumns);
+router.post('/form/:id/template', isConnected, actionAccess('form', 'update'), formCtl.updateFormTemplateSave);
+router.get('/form/:id/export-excel', isConnected, actionAccess('form', 'read'), exportCtl.exportFormToExcel);
+
+router.get('/inbox/:id/view', isConnected, actionAccess('inbox', 'read'), inboxCtl.showInbox);
+router.post('/inbox/:id/delete', isConnected, actionAccess('inbox', 'delete'), inboxCtl.deleteInbox);
+router.get('/inbox/:inboxId/download/:filename', isConnected, actionAccess('inbox', 'read'), inboxCtl.downloadFile);
+router.get('/inbox/:inboxId/download-zip', isConnected, actionAccess('inbox', 'read'), exportCtl.downloadInboxZip);
 
 export default router;

@@ -62,6 +62,8 @@ export const dpConnect = (req, res) => {
             id: user.id,
             login: user.login,
             email: user.email,
+            role: user.role, // 🆕 Ajouter le rôle
+            status: user.status, // 🆕 Optionnel mais utile
         };
         return res.redirect('/dashboard');
     })(req, res);

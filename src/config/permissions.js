@@ -6,8 +6,6 @@
  *
  * Format: permissions[role][entity][action] = boolean
  *
- * Source: PERMISSIONS_TEMPLATE.yml
- * Date: 2 décembre 2025
  * ================================================================
  */
 

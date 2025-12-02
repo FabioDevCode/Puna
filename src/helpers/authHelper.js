@@ -44,7 +44,8 @@ export function initializePassport() {
     passport.deserializeUser(async (id, done) => {
         try {
             const user = await models.User.findByPk(id);
-            done(null, user || false);
+            // Convertir l'objet Sequelize en objet JavaScript simple
+            done(null, user ? user.toJSON() : false);
         } catch (err) {
             done(err);
         }

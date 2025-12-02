@@ -18,6 +18,7 @@ import database from './config/database.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
+import { injectUserRole } from './middlewares/injectUserRole.js';
 import models from './models/index.js';
 import routes from './routes/index.js';
 
@@ -113,6 +114,9 @@ app.use(
 initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
+
+// 🆕 injectUserRole APRÈS session et passport
+app.use(injectUserRole);
 
 // Middleware pour rendre les données de session disponibles dans toutes les vues
 app.use((req, res, next) => {
