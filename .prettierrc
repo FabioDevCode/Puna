@@ -8,5 +8,16 @@
     "arrowParens": "always",
     "endOfLine": "lf",
     "bracketSpacing": true,
-    "bracketSameLine": false
+    "bracketSameLine": false,
+    "plugins": ["prettier-plugin-handlebars"],
+    "overrides": [
+        {
+            "files": "*.hbs",
+            "options": {
+                "parser": "glimmer",
+                "singleQuote": false,
+                "printWidth": 120
+            }
+        }
+    ]
 }

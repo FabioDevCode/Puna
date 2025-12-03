@@ -1,123 +1,122 @@
 {{#slot "title"}}
-<div class="flex items-center gap-4">
+    <div class="flex items-center gap-4">
     <a href="/site/{{site.id}}/view?f={{form.name}}" class="btn btn-sm btn-outline">
-        <i class="fa-solid fa-arrow-left"></i>
+    <i class="fa-solid fa-arrow-left"></i>
     </a>
     <h3 class="font-inter truncate ellipsis-truncate title-max-w">
-        #{{inbox.id}}
+    #{{inbox.id}}
     </h3>
-</div>
+    </div>
 {{/slot}}
 
 {{#slot "buttons"}}
-{{#actionCan entity='inbox' action='delete'}}
-<button class="btn btn-sm btn-error btn-outline" id="btn_delete_inbox_show">
-    <i class="fa-regular fa-trash-can"></i>
-    <span class="hidden md:flex">
+    {{#actionCan entity='inbox' action='delete'}}
+        <button class="btn btn-sm btn-error btn-outline" id="btn_delete_inbox_show">
+        <i class="fa-regular fa-trash-can"></i>
+        <span class="hidden md:flex">
         Supprimer
-    </span>
-</button>
-{{/actionCan}}
+        </span>
+        </button>
+    {{/actionCan}}
 {{/slot}}
 
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12 overflow-hidden">
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body p-4 overflow-hidden">
-            <h2 class="card-title select-none">Informations générales</h2>
-            <div id="{{inbox.id}}" class="flex flex-wrap items-center gap-4">
-                <div>
-                    <p class="text-sm text-muted select-none">Site</p>
-                    <p class="font-semibold">{{site.domain}}</p>
-                </div>
-                <div class="divider divider-horizontal mx-0"></div>
-                <div>
-                    <p class="text-sm text-muted select-none">Formulaire</p>
-                    <p class="font-semibold">{{form.name}}</p>
-                </div>
-                <div class="divider divider-horizontal mx-0"></div>
-                <div>
-                    <p class="text-sm text-muted select-none">Date de réception</p>
-                    <p class="font-semibold">{{formattedDate}}</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="card bg-base-100 shadow-xl">
+<div class="card-body p-4 overflow-hidden">
+<h2 class="card-title select-none">Informations générales</h2>
+<div id="{{inbox.id}}" class="flex flex-wrap items-center gap-4">
+<div>
+<p class="text-sm text-muted select-none">Site</p>
+<p class="font-semibold">{{site.domain}}</p>
+</div>
+<div class="divider divider-horizontal mx-0"></div>
+<div>
+<p class="text-sm text-muted select-none">Formulaire</p>
+<p class="font-semibold">{{form.name}}</p>
+</div>
+<div class="divider divider-horizontal mx-0"></div>
+<div>
+<p class="text-sm text-muted select-none">Date de réception</p>
+<p class="font-semibold">{{formattedDate}}</p>
+</div>
+</div>
+</div>
+</div>
 
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body p-4 overflow-hidden">
-            <h2 class="card-title select-none">Données du formulaire</h2>
-            {{#if contentEntries}}
-            <div class="overflow-x-auto">
-                <table class="table w-full">
-                    <thead class="select-none">
-                        <tr>
-                            <th>Champ</th>
-                            <th>Valeur</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each contentEntries}}
-                        <tr>
-                            <td class="font-semibold select-none">{{this.label}}</td>
-                            <td>
-                                <div class="whitespace-pre-wrap break-words">{{this.value}}</div>
-                            </td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-            </div>
-            {{else}}
-            <p class="text-sm text-muted">Aucune donnée disponible</p>
-            {{/if}}
-        </div>
+<div class="card bg-base-100 shadow-xl">
+<div class="card-body p-4 overflow-hidden">
+<h2 class="card-title select-none">Données du formulaire</h2>
+{{#if contentEntries}}
+    <div class="overflow-x-auto">
+    <table class="table w-full">
+    <thead class="select-none">
+    <tr>
+    <th>Champ</th>
+    <th>Valeur</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each contentEntries}}
+        <tr>
+        <td class="font-semibold select-none">{{this.label}}</td>
+        <td>
+        <div class="whitespace-pre-wrap break-words">{{this.value}}</div>
+        </td>
+        </tr>
+    {{/each}}
+    </tbody>
+    </table>
     </div>
+{{else}}
+    <p class="text-sm text-muted">Aucune donnée disponible</p>
+{{/if}}
+</div>
+</div>
 
-    {{#if fileEntries}}
+{{#if fileEntries}}
     <div class="card bg-base-100 shadow-xl select-none">
-        <div class="card-body p-4 overflow-hidden">
-            <div class="flex items-center justify-between mb-2">
-                <h2 class="card-title select-none">
-                    Documents reçus
-                </h2>
-                {{> components/buttons/download-all-files inbox_id=inbox.id}}
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {{#each fileEntries}}
-                <div
-                    class="download-card relative flex items-center gap-3 p-4 rounded-lg border border-neutral-content bg-neutral-content/30 hover:shadow-md transition-all duration-200 group">
-                    <div class="flex-shrink-0">
-                        <div class="w-12 h-12 rounded-lg bg-[{{this.bg_color}}] flex items-center justify-center">
-                            <i class="{{this.icon}} text-3xl text-{{this.color}}"></i>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="badge bg-[{{this.bg_color}}] text-{{this.color}} text-[10px] badge-sm">
-                                {{this.label}}
-                            </span>
-                        </div>
-                        <p class="text-sm font-medium text-base-content truncate" title="{{this.filename}}">
-                            {{this.original_filename}}
-                        </p>
-                        <p class="text-xs text-muted mt-1">
-                            Champ : {{this.template}}
-                        </p>
-                    </div>
-
-
-                    <!-- Download button (visible on hover) -->
-                    <a href="/inbox/{{../inbox.id}}/download/{{this.filename}}" data-download-link
-                        class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn btn-xs btn-neutral gap-1 pointer-events-auto z-10 shadow-md">
-                        <i class="fa-solid fa-download text-xs"></i>
-                        <span>Télécharger</span>
-                    </a>
-                </div>
-                {{/each}}
-            </div>
-        </div>
+    <div class="card-body p-4 overflow-hidden">
+    <div class="flex items-center justify-between mb-2">
+    <h2 class="card-title select-none">
+    Documents reçus
+    </h2>
+    {{> components/buttons/download-all-files inbox_id=inbox.id}}
     </div>
-    {{/if}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {{#each fileEntries}}
+        <div
+        class="download-card relative flex items-center gap-3 p-4 rounded-lg border border-neutral-content bg-neutral-content/30 hover:shadow-md transition-all duration-200 group">
+        <div class="flex-shrink-0">
+        <div class="w-12 h-12 rounded-lg bg-[{{this.bg_color}}] flex items-center justify-center">
+        <i class="{{this.icon}} text-3xl text-{{this.color}}"></i>
+        </div>
+        </div>
+        <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1">
+        <span class="badge bg-[{{this.bg_color}}] text-{{this.color}} text-[10px] badge-sm">
+        {{this.label}}
+        </span>
+        </div>
+        <p class="text-sm font-medium text-base-content truncate" title="{{this.filename}}">
+        {{this.original_filename}}
+        </p>
+        <p class="text-xs text-muted mt-1">
+        Champ : {{this.template}}
+        </p>
+        </div>
+
+        <!-- Download button (visible on hover) -->
+        <a href="/inbox/{{../inbox.id}}/download/{{this.filename}}" data-download-link
+        class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn btn-xs btn-neutral gap-1 pointer-events-auto z-10 shadow-md">
+        <i class="fa-solid fa-download text-xs"></i>
+        <span>Télécharger</span>
+        </a>
+        </div>
+    {{/each}}
+    </div>
+    </div>
+    </div>
+{{/if}}
 </div>
 
 {{> components/modals/delete-inbox-show
@@ -125,3 +124,4 @@ inbox_id=inbox.id
 form_name=form.name
 site_id=site.id
 }}
+

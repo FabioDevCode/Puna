@@ -12,8 +12,9 @@
 		"start": "node --env-file=.env server.js",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"format": "prettier --write \"**/*.{js,json}\"",
+		"format": "prettier --write \"**/*.{js,json}\" && node scripts/format-hbs.js \"src/views/**/*.hbs\"",
 		"format:check": "prettier --check \"**/*.{js,json}\"",
+		"format:hbs": "node scripts/format-hbs.js \"src/views/**/*.hbs\"",
 		"prepare": "husky"
 	},
 	"lint-staged": {
@@ -23,6 +24,9 @@
 		],
 		"*.json": [
 			"prettier --write"
+		],
+		"*.hbs": [
+			"node scripts/format-hbs.js"
 		]
 	},
 	"keywords": [
@@ -66,9 +70,11 @@
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-jsonc": "^2.21.0",
 		"eslint-plugin-prettier": "^5.5.4",
+		"glob": "^13.0.0",
 		"husky": "^9.1.7",
 		"jsonc-eslint-parser": "^2.4.1",
 		"lint-staged": "^16.2.7",
-		"prettier": "^3.7.1"
+		"prettier": "^3.7.1",
+		"prettier-plugin-handlebars": "^0.0.1"
 	}
 }
