@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import dayjs from 'dayjs';
+import { getSiteWhereCondition } from '../helpers/site.helpers.js';
 import models from '../models/index.js';
 
 /**
@@ -9,22 +10,30 @@ import models from '../models/index.js';
 export const showInbox = async (req, res) => {
     const inboxId = req.params.id;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        const inbox = await models.Inbox.findByPk(inboxId, {
+        // Récupérer la condition WHERE pour filtrer les sites
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+
+        const includeOptions = {
+            model: models.Form,
+            as: 'form',
             include: [
                 {
-                    model: models.Form,
-                    as: 'form',
-                    include: [
-                        {
-                            model: models.Site,
-                            as: 'site',
-                            where: { fk_id_user: userId },
-                        },
-                    ],
+                    model: models.Site,
+                    as: 'site',
                 },
             ],
+        };
+
+        // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
+        if (siteWhereCondition) {
+            includeOptions.include[0].where = siteWhereCondition;
+        }
+
+        const inbox = await models.Inbox.findByPk(inboxId, {
+            include: [includeOptions],
         });
 
         if (!inbox) {
@@ -204,22 +213,30 @@ export const showInbox = async (req, res) => {
 export const deleteInbox = async (req, res) => {
     const inboxId = req.params.id;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        const inbox = await models.Inbox.findByPk(inboxId, {
+        // Récupérer la condition WHERE pour filtrer les sites
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+
+        const includeOptions = {
+            model: models.Form,
+            as: 'form',
             include: [
                 {
-                    model: models.Form,
-                    as: 'form',
-                    include: [
-                        {
-                            model: models.Site,
-                            as: 'site',
-                            where: { fk_id_user: userId },
-                        },
-                    ],
+                    model: models.Site,
+                    as: 'site',
                 },
             ],
+        };
+
+        // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
+        if (siteWhereCondition) {
+            includeOptions.include[0].where = siteWhereCondition;
+        }
+
+        const inbox = await models.Inbox.findByPk(inboxId, {
+            include: [includeOptions],
         });
 
         if (!inbox) {
@@ -277,23 +294,31 @@ export const deleteInbox = async (req, res) => {
 export const downloadFile = async (req, res) => {
     const { inboxId, filename } = req.params;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        // Verify inbox exists and user has access
-        const inbox = await models.Inbox.findByPk(inboxId, {
+        // Récupérer la condition WHERE pour filtrer les sites
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+
+        const includeOptions = {
+            model: models.Form,
+            as: 'form',
             include: [
                 {
-                    model: models.Form,
-                    as: 'form',
-                    include: [
-                        {
-                            model: models.Site,
-                            as: 'site',
-                            where: { fk_id_user: userId },
-                        },
-                    ],
+                    model: models.Site,
+                    as: 'site',
                 },
             ],
+        };
+
+        // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
+        if (siteWhereCondition) {
+            includeOptions.include[0].where = siteWhereCondition;
+        }
+
+        // Verify inbox exists and user has access
+        const inbox = await models.Inbox.findByPk(inboxId, {
+            include: [includeOptions],
         });
 
         if (!inbox) {

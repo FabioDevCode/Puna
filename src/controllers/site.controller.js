@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { getSiteWhereCondition } from '../helpers/site.helpers.js';
 import models from '../models/index.js';
 import { encryptObject } from '../utils/crypto.js';
 import stringUtils from '../utils/string.js';
@@ -26,6 +27,9 @@ export const createSite = async (req, res) => {
  */
 export const showSite = async (req, res) => {
     const siteId = req.params.id;
+    const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
+
     try {
         const site = await models.Site.findByPk(siteId, { raw: true });
 
@@ -33,9 +37,22 @@ export const showSite = async (req, res) => {
             throw new Error('error');
         }
 
-        const userId = req.session.user?.id;
-        if (site.fk_id_user !== userId) {
-            return res.redirect('/dashboard');
+        // Vérifier que l'utilisateur a accès à ce site selon son rôle
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+
+        // Si pas super_admin, vérifier l'accès au site
+        if (siteWhereCondition) {
+            // Vérifier si le site correspond aux conditions d'accès
+            const accessibleSite = await models.Site.findOne({
+                where: {
+                    id: siteId,
+                    ...siteWhereCondition,
+                },
+            });
+
+            if (!accessibleSite) {
+                return res.redirect('/dashboard');
+            }
         }
 
         const formsRaw = await models.Form.findAll({
@@ -106,11 +123,25 @@ export const showSite = async (req, res) => {
 export const deleteSite = async (req, res) => {
     const siteId = req.params.id;
     const { confirm_domain } = req.body;
+    const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
+
     try {
         const site = await models.Site.findByPk(siteId);
 
         if (!site) {
             throw new Error('error');
+        }
+
+        // Vérifier que l'utilisateur a accès à ce site selon son rôle
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        if (siteWhereCondition) {
+            const accessibleSite = await models.Site.findOne({
+                where: { id: siteId, ...siteWhereCondition },
+            });
+            if (!accessibleSite) {
+                return res.redirect('/dashboard');
+            }
         }
 
         if (site.domain === confirm_domain.trim()) {
@@ -131,14 +162,23 @@ export const deleteSite = async (req, res) => {
 export const getSiteToken = async (req, res) => {
     const siteId = req.params.id;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
         const site = await models.Site.findByPk(siteId);
         if (!site) {
             return res.status(404).json({ error: 'Site not found' });
         }
-        if (site.fk_id_user !== userId) {
-            return res.status(403).json({ error: 'Forbidden' });
+
+        // Vérifier l'accès au site selon le rôle
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        if (siteWhereCondition) {
+            const accessibleSite = await models.Site.findOne({
+                where: { id: siteId, ...siteWhereCondition },
+            });
+            if (!accessibleSite) {
+                return res.status(403).json({ error: 'Forbidden' });
+            }
         }
 
         const secret = process.env.KEY_TK;
@@ -167,14 +207,23 @@ export const getSiteToken = async (req, res) => {
 export const revokeSiteTokens = async (req, res) => {
     const siteId = req.params.id;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
         const site = await models.Site.findByPk(siteId);
         if (!site) {
             return res.status(404).json({ error: 'Site not found' });
         }
-        if (site.fk_id_user !== userId) {
-            return res.status(403).json({ error: 'Forbidden' });
+
+        // Vérifier l'accès au site selon le rôle
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        if (siteWhereCondition) {
+            const accessibleSite = await models.Site.findOne({
+                where: { id: siteId, ...siteWhereCondition },
+            });
+            if (!accessibleSite) {
+                return res.status(403).json({ error: 'Forbidden' });
+            }
         }
 
         const newCode = stringUtils.generateCode(16);

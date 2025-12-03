@@ -6,7 +6,9 @@
 
 {{#slot "buttons"}}
 {{> components/search/site-search }}
-{{> components/buttons/new-site }}
+{{#actionCan entity='site' action='create'}}
+    {{> components/buttons/new-site }}
+{{/actionCan}}
 {{/slot}}
 
 {{#each sites}}

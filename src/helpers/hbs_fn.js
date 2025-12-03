@@ -45,10 +45,6 @@ export default {
         return args.join('');
     },
 
-    // ============================================================
-    // HELPERS ACL (Access Control List)
-    // ============================================================
-
     /**
      * Helper pour vérifier si l'utilisateur peut faire une action
      * Usage: {{#actionCan entity="site" action="create"}}...{{/actionCan}}
@@ -62,7 +58,7 @@ export default {
      */
     actionCan: function (options) {
         // Récupérer l'utilisateur depuis res.locals (injecté par injectUserRole middleware)
-        const user = this.user || options.data?.root?.user;
+        const user = this.connectedUser || options.data?.root?.connectedUser;
         const entity = options.hash.entity;
         const action = options.hash.action;
 
@@ -89,7 +85,7 @@ export default {
      * {{/roleIs}}
      */
     roleIs: function (options) {
-        const user = this.user || options.data?.root?.user;
+        const user = this.connectedUser || options.data?.root?.connectedUser;
         const rolesStr = options.hash.roles;
 
         if (!user || !user.role || !rolesStr) {
@@ -116,7 +112,7 @@ export default {
      * {{/isRole}}
      */
     isRole: function (options) {
-        const user = this.user || options.data?.root?.user;
+        const user = this.connectedUser || options.data?.root?.connectedUser;
         const role = options.hash.role;
 
         if (!user || !user.role || !role) {
@@ -140,7 +136,7 @@ export default {
      * {{/isAdmin}}
      */
     isAdmin: function (options) {
-        const user = this.user || options.data?.root?.user;
+        const user = this.connectedUser || options.data?.root?.connectedUser;
 
         if (!user || !user.role) {
             return options.inverse(this);

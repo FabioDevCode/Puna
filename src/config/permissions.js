@@ -208,7 +208,7 @@ export function can(role, entity, action) {
     // Vérifier que l'entité existe pour ce rôle
     const entityPerms = rolePerms[entity];
     if (!entityPerms) {
-        console.warn(`[ACL] Unknown entity "${entity}" for role "${role}"`);
+        // console.warn(`[ACL] Unknown entity "${entity}" for role "${role}"`);
         return false;
     }
 
@@ -217,7 +217,7 @@ export function can(role, entity, action) {
 
     // Log pour debug (à retirer en production si nécessaire)
     if (!hasPermission) {
-        console.debug(`[ACL] Permission denied: ${role} cannot ${action} ${entity}`);
+        // console.debug(`[ACL] Permission denied: ${role} cannot ${action} ${entity}`);
     }
 
     return hasPermission;

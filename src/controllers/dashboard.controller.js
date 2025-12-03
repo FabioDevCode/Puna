@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
-import { getSitesWithCounts, getGlobalStats } from '../helpers/site.helpers.js';
+import { getSitesWithCounts, getGlobalStats, getSiteWhereCondition } from '../helpers/site.helpers.js';
 import models from '../models/index.js';
 
 /**
@@ -16,7 +16,8 @@ export const rootRedirect = (req, res) => {
 export const dashboard = async (req, res) => {
     try {
         const userId = req.session.user?.id;
-        const sitesWithCounts = await getSitesWithCounts(userId);
+        const userRole = req.userRole || req.session.user?.role || 'viewer';
+        const sitesWithCounts = await getSitesWithCounts(userId, userRole);
 
         res.render('dashboard', {
             stats: getGlobalStats(sitesWithCounts),
@@ -216,10 +217,30 @@ export const getInboxCounts = async (req, res) => {
  */
 export const getInboxPercentages = async (req, res) => {
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
+        // Récupérer la condition WHERE pour filtrer les sites
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+
         // Helper to count inbox items in a date range filtered by user's sites
         const countInRange = async (start, end) => {
+            const includeOptions = {
+                model: models.Form,
+                as: 'form',
+                include: [
+                    {
+                        model: models.Site,
+                        as: 'site',
+                    },
+                ],
+            };
+
+            // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
+            if (siteWhereCondition) {
+                includeOptions.include[0].where = siteWhereCondition;
+            }
+
             return await models.Inbox.count({
                 where: {
                     createdAt: {
@@ -227,19 +248,7 @@ export const getInboxPercentages = async (req, res) => {
                         [Op.lte]: end.toDate(),
                     },
                 },
-                include: [
-                    {
-                        model: models.Form,
-                        as: 'form',
-                        include: [
-                            {
-                                model: models.Site,
-                                as: 'site',
-                                where: { fk_id_user: userId },
-                            },
-                        ],
-                    },
-                ],
+                include: [includeOptions],
             });
         };
 
@@ -335,6 +344,7 @@ export const getInboxCountsBySite = async (req, res) => {
  */
 export const getInboxHeatmap = async (req, res) => {
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
     const daysRaw = parseInt(req.query.days, 10) || 7;
     const days = [7, 30, 90, 180].includes(daysRaw) ? daysRaw : 7;
 
@@ -345,6 +355,25 @@ export const getInboxHeatmap = async (req, res) => {
         start.setHours(0, 0, 0, 0);
         start.setDate(start.getDate() - (days - 1));
 
+        // Récupérer la condition WHERE pour filtrer les sites
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+
+        const includeOptions = {
+            model: models.Form,
+            as: 'form',
+            include: [
+                {
+                    model: models.Site,
+                    as: 'site',
+                },
+            ],
+        };
+
+        // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
+        if (siteWhereCondition) {
+            includeOptions.include[0].where = siteWhereCondition;
+        }
+
         const inboxRows = await models.Inbox.findAll({
             where: {
                 createdAt: {
@@ -352,19 +381,7 @@ export const getInboxHeatmap = async (req, res) => {
                     [Op.lte]: end,
                 },
             },
-            include: [
-                {
-                    model: models.Form,
-                    as: 'form',
-                    include: [
-                        {
-                            model: models.Site,
-                            as: 'site',
-                            where: { fk_id_user: userId },
-                        },
-                    ],
-                },
-            ],
+            include: [includeOptions],
         });
 
         // Prepare a 7x24 matrix (Monday..Sunday, hours 00..23)
@@ -404,22 +421,30 @@ export const getInboxHeatmap = async (req, res) => {
  */
 export const getLastInboxEntry = async (req, res) => {
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        const lastRow = await models.Inbox.findOne({
+        // Récupérer la condition WHERE pour filtrer les sites
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+
+        const includeOptions = {
+            model: models.Form,
+            as: 'form',
             include: [
                 {
-                    model: models.Form,
-                    as: 'form',
-                    include: [
-                        {
-                            model: models.Site,
-                            as: 'site',
-                            where: { fk_id_user: userId },
-                        },
-                    ],
+                    model: models.Site,
+                    as: 'site',
                 },
             ],
+        };
+
+        // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
+        if (siteWhereCondition) {
+            includeOptions.include[0].where = siteWhereCondition;
+        }
+
+        const lastRow = await models.Inbox.findOne({
+            include: [includeOptions],
             order: [['createdAt', 'DESC']],
         });
 
@@ -470,7 +495,8 @@ export const dpFirstCo = (req, res) => {
 export const allSite = async (req, res) => {
     try {
         const userId = req.session.user?.id;
-        const sitesWithCounts = await getSitesWithCounts(userId);
+        const userRole = req.userRole || req.session.user?.role || 'viewer';
+        const sitesWithCounts = await getSitesWithCounts(userId, userRole);
 
         res.render('sites/list', {
             sites: sitesWithCounts,

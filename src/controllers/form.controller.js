@@ -1,3 +1,4 @@
+import { getSiteWhereCondition } from '../helpers/site.helpers.js';
 import models from '../models/index.js';
 import stringUtils from '../utils/string.js';
 
@@ -7,12 +8,23 @@ import stringUtils from '../utils/string.js';
 export const createForm = async (req, res) => {
     const { name, fk_id_site } = req.body;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        // Verify site exists and belongs to current user
+        // Vérifier que le site existe et que l'utilisateur y a accès
         const site = await models.Site.findByPk(fk_id_site);
-        if (!site || site.fk_id_user !== userId) {
+        if (!site) {
             return res.redirect('/dashboard');
+        }
+
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        if (siteWhereCondition) {
+            const accessibleSite = await models.Site.findOne({
+                where: { id: fk_id_site, ...siteWhereCondition },
+            });
+            if (!accessibleSite) {
+                return res.redirect('/dashboard');
+            }
         }
 
         const code = stringUtils.generateCode(10);
@@ -31,6 +43,7 @@ export const createForm = async (req, res) => {
 export const deleteForm = async (req, res) => {
     const { form_id } = req.body;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
         const form = await models.Form.findByPk(form_id);
@@ -38,10 +51,20 @@ export const deleteForm = async (req, res) => {
             return res.redirect('/dashboard');
         }
 
-        // get site id and verify ownership
+        // Vérifier l'accès au site
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) {
+        if (!site) {
             return res.redirect('/dashboard');
+        }
+
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        if (siteWhereCondition) {
+            const accessibleSite = await models.Site.findOne({
+                where: { id: site.id, ...siteWhereCondition },
+            });
+            if (!accessibleSite) {
+                return res.redirect('/dashboard');
+            }
         }
 
         const siteId = site.id;
@@ -59,6 +82,7 @@ export const deleteForm = async (req, res) => {
 export const updateFormTemplateSave = async (req, res) => {
     const formId = req.params.id;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
         const form = await models.Form.findByPk(formId);
@@ -67,8 +91,18 @@ export const updateFormTemplateSave = async (req, res) => {
         }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) {
+        if (!site) {
             return res.redirect('/dashboard');
+        }
+
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        if (siteWhereCondition) {
+            const accessibleSite = await models.Site.findOne({
+                where: { id: site.id, ...siteWhereCondition },
+            });
+            if (!accessibleSite) {
+                return res.redirect('/dashboard');
+            }
         }
 
         // Expecting nested fields in req.body.template (e.g. template[fieldName]=New label)
@@ -92,6 +126,7 @@ export const updateFormTemplateSave = async (req, res) => {
 export const getFormInbox = async (req, res) => {
     const formId = req.params.id;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
         const form = await models.Form.findByPk(formId);
@@ -100,8 +135,19 @@ export const getFormInbox = async (req, res) => {
         }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) {
-            return res.status(403).json({ error: 'Forbidden' });
+        if (!site) {
+            return res.status(404).json({ error: 'Site not found' });
+        }
+
+        // Vérifier l'accès au site selon le rôle
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        if (siteWhereCondition) {
+            const accessibleSite = await models.Site.findOne({
+                where: { id: site.id, ...siteWhereCondition },
+            });
+            if (!accessibleSite) {
+                return res.status(403).json({ error: 'Forbidden' });
+            }
         }
 
         // Server-side pagination: accept ?limit=..&offset=..
@@ -193,6 +239,7 @@ export const getFormInbox = async (req, res) => {
 export const updateFormColumns = async (req, res) => {
     const formId = req.params.id;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
     try {
         const form = await models.Form.findByPk(formId);
         if (!form) {
@@ -200,8 +247,18 @@ export const updateFormColumns = async (req, res) => {
         }
 
         const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site || site.fk_id_user !== userId) {
-            return res.status(403).json({ error: 'Forbidden' });
+        if (!site) {
+            return res.status(404).json({ error: 'Site not found' });
+        }
+
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        if (siteWhereCondition) {
+            const accessibleSite = await models.Site.findOne({
+                where: { id: site.id, ...siteWhereCondition },
+            });
+            if (!accessibleSite) {
+                return res.status(403).json({ error: 'Forbidden' });
+            }
         }
 
         // Expect JSON body { columns: { key1: true, key2: false, ... } }

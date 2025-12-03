@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import dayjs from 'dayjs';
+import { getSiteWhereCondition } from '../helpers/site.helpers.js';
 import models from '../models/index.js';
 
 /**
@@ -8,23 +9,29 @@ import models from '../models/index.js';
 export const downloadInboxZip = async (req, res) => {
     const { inboxId } = req.params;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        // Verify inbox exists and user has access
-        const inbox = await models.Inbox.findByPk(inboxId, {
+        // Vérifier l'accès au site selon le rôle
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        const includeOptions = {
+            model: models.Form,
+            as: 'form',
             include: [
                 {
-                    model: models.Form,
-                    as: 'form',
-                    include: [
-                        {
-                            model: models.Site,
-                            as: 'site',
-                            where: { fk_id_user: userId },
-                        },
-                    ],
+                    model: models.Site,
+                    as: 'site',
                 },
             ],
+        };
+
+        if (siteWhereCondition) {
+            includeOptions.include[0].where = siteWhereCondition;
+        }
+
+        // Verify inbox exists and user has access
+        const inbox = await models.Inbox.findByPk(inboxId, {
+            include: [includeOptions],
         });
 
         if (!inbox) {
@@ -128,17 +135,23 @@ export const downloadInboxZip = async (req, res) => {
 export const exportFormToExcel = async (req, res) => {
     const formId = req.params.id;
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
+        // Vérifier l'accès au site selon le rôle
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        const includeOptions = {
+            model: models.Site,
+            as: 'site',
+        };
+
+        if (siteWhereCondition) {
+            includeOptions.where = siteWhereCondition;
+        }
+
         // Verify form exists and user has access
         const form = await models.Form.findByPk(formId, {
-            include: [
-                {
-                    model: models.Site,
-                    as: 'site',
-                    where: { fk_id_user: userId },
-                },
-            ],
+            include: [includeOptions],
         });
 
         if (!form) {

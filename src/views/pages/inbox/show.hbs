@@ -10,14 +10,14 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-
-
+{{#actionCan entity='inbox' action='delete'}}
 <button class="btn btn-sm btn-error btn-outline" id="btn_delete_inbox_show">
     <i class="fa-regular fa-trash-can"></i>
     <span class="hidden md:flex">
         Supprimer
     </span>
 </button>
+{{/actionCan}}
 {{/slot}}
 
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12 overflow-hidden">

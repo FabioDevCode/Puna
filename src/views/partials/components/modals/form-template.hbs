@@ -1,3 +1,4 @@
+{{#if showButton}}
 <button id="btn_open_template" class="btn btn-sm btn-warning none" type="button"
     onclick="document.getElementById('modal_form_template').showModal()">
     <i class="fa-regular fa-paste"></i>
@@ -5,6 +6,7 @@
         Template
     </span>
 </button>
+{{/if}}
 
 <dialog id="modal_form_template" class="modal">
     <form id="modal_template_form" method="post" action="#" class="modal-box w-11/12 max-w-3xl">

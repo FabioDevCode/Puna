@@ -404,6 +404,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!inboxBody) {
                         return;
                     }
+
+                    // 🆕 Lire les permissions depuis les data attributes
+                    const tableInboxEl = document.getElementById('tableInbox');
+                    const canDeleteInbox = tableInboxEl?.dataset.canDeleteInbox === 'true';
+
                     items.forEach((it) => {
                         const tr = document.createElement('tr');
                         tr.dataset.id = it.id;
@@ -450,19 +455,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         const tdAct = document.createElement('th');
                         tdAct.classList.add('text-right');
-                        tdAct.innerHTML = `
-                        <div class="flex justify-end gap-2 w-full">
+
+                        // 🆕 Construire les boutons selon les permissions
+                        const buttons = [];
+
+                        // Bouton "Voir" (toujours visible)
+                        buttons.push(`
                             <a href="/inbox/${it.id}/view" class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
                                 <i class="fa-regular fa-eye"></i>
                             </a>
-                            <button class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px] btn-delete-inbox" data-inbox-id="${it.id}" data-form-name="${target.dataset.name || ''}">
-                                <i class="fa-regular fa-trash-can"></i>
-                            </button>
-                        </div>
-                        `;
+                        `);
+
+                        // 🆕 Bouton "Supprimer" (conditionnel selon permission)
+                        if (canDeleteInbox) {
+                            buttons.push(`
+                                <button class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px] btn-delete-inbox" data-inbox-id="${it.id}" data-form-name="${target.dataset.name || ''}">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            `);
+                        }
+
+                        tdAct.innerHTML = `<div class="flex justify-end gap-2 w-full">${buttons.join('')}</div>`;
                         tr.appendChild(tdAct);
 
-                        // Add event listener for delete button
+                        // Add event listener for delete button (uniquement si le bouton existe)
                         const deleteBtn = tdAct.querySelector('.btn-delete-inbox');
                         if (deleteBtn) {
                             deleteBtn.addEventListener('click', (e) => {
