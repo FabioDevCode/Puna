@@ -49,11 +49,11 @@
 
     <div class="mt-auto text-sm text-neutral">
         <ul class="menu p-2 gap-[1px] rounded-lg">
-            {{#if user}}
+            {{#if connectedUser}}
             <li>
                 <a>
                     <i class="fa-regular fa-user"></i>
-                    {{user.login}}
+                    {{connectedUser.login}}
                 </a>
             </li>
             {{/if}}

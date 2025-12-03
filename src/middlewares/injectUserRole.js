@@ -19,7 +19,7 @@
  * Ajoute:
  * - req.userRole → Rôle de l'utilisateur (string)
  * - req.userId → ID de l'utilisateur (UUID)
- * - res.locals.user → Objet user complet (accessible dans les templates Handlebars)
+ * - res.locals.connectedUser → Objet user connecté (accessible dans les templates Handlebars)
  * - res.locals.userRole → Rôle (accessible dans les templates)
  * - res.locals.userId → ID (accessible dans les templates)
  *
@@ -40,11 +40,15 @@
  *
  * @example
  * // Dans un template Handlebars
- * <p>Bonjour {{user.login}} !</p>
+ * <p>Bonjour {{connectedUser.login}} !</p>
  * <p>Votre rôle : {{userRole}}</p>
- * {{#if user}}
+ * {{#if connectedUser}}
  *     <a href="/dashboard">Tableau de bord</a>
  * {{/if}}
+ *
+ * ⚠️ IMPORTANT: Dans les pages admin où tu affiches un autre utilisateur,
+ * utilise un nom différent (viewedUser, user) pour éviter le conflit avec res.locals.connectedUser
+ * Exemple: res.render('admin/users/edit', { user: userData })
  */
 export function injectUserRole(req, res, next) {
     // Vérifier si un utilisateur est connecté
@@ -56,7 +60,7 @@ export function injectUserRole(req, res, next) {
         req.userId = user.id || null;
 
         // Injection dans res.locals (accessible dans les templates Handlebars)
-        res.locals.user = user;
+        res.locals.connectedUser = user;
         res.locals.userRole = user.role || null;
         res.locals.userId = user.id || null;
 
@@ -66,7 +70,7 @@ export function injectUserRole(req, res, next) {
         // Aucun utilisateur connecté
         req.userRole = null;
         req.userId = null;
-        res.locals.user = null;
+        res.locals.connectedUser = null;
         res.locals.userRole = null;
         res.locals.userId = null;
         res.locals.isAuthenticated = false;

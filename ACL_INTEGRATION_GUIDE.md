@@ -180,11 +180,13 @@ router.delete(
 
 ```handlebars
 <div class='user-info'>
-    <span>{{user.login}}</span>
+    <span>{{connectedUser.login}}</span>
     {{{roleBadge userRole}}}
 </div>
 {{! Affiche: <span class="badge badge-danger">ADMIN</span> }}
 ```
+
+⚠️ **IMPORTANT:** `connectedUser` représente l'utilisateur connecté. Dans les pages admin où tu affiches un autre utilisateur, utilise `user`.
 
 ---
 

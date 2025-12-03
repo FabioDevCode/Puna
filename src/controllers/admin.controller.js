@@ -23,10 +23,13 @@ export const admin = async (req, res) => {
 export const adminUsers = async (req, res) => {
     try {
         const userId = req.session.user?.id;
+        const userRole = req.session.user?.role;
 
-        // Récupérer les sites de l'utilisateur connecté (pour l'assignation)
+        // Récupérer les sites disponibles (super_admin voit tous les sites)
+        const whereCondition = userRole === 'super_admin' ? {} : { fk_id_user: userId };
+
         const sites = await models.Site.findAll({
-            where: { fk_id_user: userId },
+            where: whereCondition,
             attributes: ['id', 'domain'],
             order: [['domain', 'ASC']],
         });
@@ -222,7 +225,7 @@ export const adminCreateUser = async (req, res) => {
             const siteIds = Array.isArray(sites) ? sites : [sites];
             const siteAssignments = siteIds.map((siteId) => ({
                 fk_id_user: newUser.id,
-                fk_id_site: parseInt(siteId, 10),
+                fk_id_site: siteId, // UUID string (pas parseInt !)
             }));
             await models.SiteUser.bulkCreate(siteAssignments);
         }
@@ -359,8 +362,14 @@ export const adminEditUser = async (req, res) => {
         }
 
         // Récupérer tous les sites disponibles
+        const currentUserRole = req.session.user?.role;
+        const whereCondition =
+            currentUserRole === 'super_admin'
+                ? {} // Super_admin voit TOUS les sites
+                : { fk_id_user: currentUserId }; // Autres voient seulement leurs sites
+
         const sites = await models.Site.findAll({
-            where: { fk_id_user: currentUserId },
+            where: whereCondition,
             attributes: ['id', 'domain'],
             order: [['domain', 'ASC']],
         });
@@ -430,8 +439,8 @@ export const adminUpdateUser = async (req, res) => {
         if (sites) {
             const siteIds = Array.isArray(sites) ? sites : [sites];
             const siteAssignments = siteIds.map((siteId) => ({
-                fk_id_user: parseInt(userId, 10),
-                fk_id_site: parseInt(siteId, 10),
+                fk_id_user: userId, // UUID string
+                fk_id_site: siteId, // UUID string (pas parseInt !)
             }));
             await models.SiteUser.bulkCreate(siteAssignments);
         }
