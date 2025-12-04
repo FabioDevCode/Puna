@@ -1,29 +1,30 @@
 <div id="statTopFroms"
-    class="bg-base-100 h-[350px] w-full flex flex-col gap-4 p-4 justify-between stats-item flex-1 shadow-xl">
-    <div class="flex items-center justify-between w-full">
-        <div class="text-sm font-semibold select-none">Top 5 formulaires</div>
-        <select id="statTop_range" class="select select-sm select-bordered select-secondary">
-            <option value="7" selected>7 derniers jours</option>
-            <option value="30">30 derniers jours</option>
-        </select>
-    </div>
+class="bg-base-100 h-[350px] w-full flex flex-col gap-4 p-4 justify-between stats-item flex-1 shadow-xl">
+<div class="flex items-center justify-between w-full">
+<div class="text-sm font-semibold select-none">Top 5 formulaires</div>
+<select id="statTop_range" class="select select-sm select-bordered select-secondary">
+<option value="7" selected>7 derniers jours</option>
+<option value="30">30 derniers jours</option>
+</select>
+</div>
 
-    <div id="tableTopContainer" class="overflow-x-auto w-full border border-base-200">
-        <table id="statTopTable" class="table w-full table-pin-cols bg-base-100">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Formulaire</th>
-                    <th>Site</th>
-                </tr>
-            </thead>
-            <tbody id="statTop_body">
-                <tr>
-                    <td colspan="3" class="text-center text-sm text-muted">Chargement…</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div id="tableTopContainer" class="overflow-x-auto w-full border border-base-200">
+<table id="statTopTable" class="table w-full table-pin-cols bg-base-100">
+<thead>
+<tr>
+<th>#</th>
+<th>Formulaire</th>
+<th>Site</th>
+</tr>
+</thead>
+<tbody id="statTop_body">
+<tr>
+<td colspan="3" class="text-center text-sm text-muted">Chargement…</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 <script src="/js/stats_top_froms.js"></script>
+

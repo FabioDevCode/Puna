@@ -14,21 +14,22 @@ icon="fas fa-inbox"
 --}}
 
 <div class="stats h-max bg-base-100 overflow-hidden col-span-2 {{fallback class ''}} shadow-xl">
-    <div class="stat">
-        {{#icon}}
-        <div class="stat-figure text-4xl">
-            <i class="{{.}}"></i>
-        </div>
-        {{/icon}}
-
-        <div class="stat-title">
-            {{fallback title ''}}
-        </div>
-        <div class="stat-value">
-            {{fallback value ''}}
-        </div>
-        <div class="stat-desc">
-            {{fallback desc ''}}
-        </div>
-    </div>
+<div class="stat">
+{{#icon}}
+<div class="stat-figure text-4xl">
+<i class="{{.}}"></i>
 </div>
+{{/icon}}
+
+<div class="stat-title">
+{{fallback title ''}}
+</div>
+<div class="stat-value">
+{{fallback value ''}}
+</div>
+<div class="stat-desc">
+{{fallback desc ''}}
+</div>
+</div>
+</div>
+
