@@ -20,7 +20,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Installer VuePress dans dossier `docs/`
     - [ ] Configurer `.vuepress/config.js`
     - [ ] Créer 3 sections principales :
-        
+
         **1. Guide Utilisateur**
         - [ ] Introduction & Présentation
         - [ ] Premiers pas
@@ -30,7 +30,7 @@ Liste des tâches à réaliser pour améliorer le projet.
         - [ ] Exports (Excel, ZIP, CSV)
         - [ ] Gestion des permissions & rôles
         - [ ] FAQ utilisateur
-        
+
         **2. Guide Développeur**
         - [ ] Architecture de l'application
         - [ ] Structure des dossiers
@@ -43,7 +43,7 @@ Liste des tâches à réaliser pour améliorer le projet.
         - [ ] Configuration Pino/Logs
         - [ ] Tests (quand implémentés)
         - [ ] Contribution guidelines
-        
+
         **3. Guide Auto-hébergement**
         - [ ] Prérequis système (Node.js, MariaDB, ClamAV)
         - [ ] Installation pas à pas
@@ -55,7 +55,7 @@ Liste des tâches à réaliser pour améliorer le projet.
         - [ ] Maintenance & Backups
         - [ ] Mise à jour de version
         - [ ] Troubleshooting courant
-    
+
     - [ ] Déployer documentation sur GitHub Pages ou Netlify
     - [ ] Ajouter recherche dans la documentation
     - [ ] Versioning de la documentation (par version app)
@@ -226,7 +226,7 @@ Liste des tâches à réaliser pour améliorer le projet.
             - [ ] Formulaire d'inscription beta
             - [ ] Avantages beta testeurs
             - [ ] Roadmap publique
-    
+
     - [ ] **Formulaire Beta avec intégration Puna**
         - [ ] Créer formulaire Nuxt (nom, email, entreprise, use case)
         - [ ] Validation côté serveur
@@ -236,14 +236,14 @@ Liste des tâches à réaliser pour améliorer le projet.
         - [ ] Email de confirmation automatique
         - [ ] Page de remerciement après soumission
         - [ ] Stocker dans formulaire "Beta Signups" sur Puna
-    
+
     - [ ] Design & UX
         - [ ] Design moderne et responsive
         - [ ] Dark mode
         - [ ] Animations Nuxt (transitions, scroll)
         - [ ] SEO optimisé (meta tags, sitemap, schema.org)
         - [ ] Performance (Lighthouse 90+)
-    
+
     - [ ] Déploiement
         - [ ] Héberger sur Vercel/Netlify
         - [ ] Domaine personnalisé (puna.app ?)
