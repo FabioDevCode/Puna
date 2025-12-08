@@ -18,18 +18,18 @@
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-            <h2 class="card-title text-2xl mb-4">
+            <h2 class="card-title text-2xl">
                 <i class="fa-solid fa-user text-neutral mr-2"></i>
                 {{user.login}}
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <!-- Login -->
                 <div class="form-control w-full">
                     <label class="label">
                         <span class="label-text font-semibold">Login</span>
                     </label>
-                    <input type="text" value="{{user.login}}" class="input input-sm input-bordered w-full" disabled>
+                    <input type="text" value="{{user.login}}" class="input input-sm input-bordered w-full" disabled="">
                 </div>
 
                 <!-- Email -->
@@ -37,7 +37,7 @@
                     <label class="label">
                         <span class="label-text font-semibold">Email</span>
                     </label>
-                    <input type="text" value="{{user.email}}" class="input input-sm input-bordered w-full" disabled>
+                    <input type="text" value="{{user.email}}" class="input input-sm input-bordered w-full" disabled="">
                 </div>
 
                 <!-- Rôle -->
@@ -45,7 +45,7 @@
                     <label class="label">
                         <span class="label-text font-semibold">Rôle</span>
                     </label>
-                    <input type="text" value="{{user.role}}" class="input input-sm input-bordered w-full" disabled>
+                    <input type="text" value="{{user.role}}" class="input input-sm input-bordered w-full" disabled="">
                 </div>
 
                 <!-- Statut -->
@@ -69,7 +69,7 @@
                     </label>
                     <input type="text" value="{{#if user.last_connection}}{{user.last_connection}}{{else}}N/A{{/if}}"
                     class="input input-sm input-bordered w-full {{#unless user.last_connection}}text-neutral-content{{/unless}}"
-                    disabled>
+                    disabled="">
                 </div>
 
                 <!-- Créé par -->
@@ -79,7 +79,7 @@
                     </label>
                     <input type="text" value="{{#if user.creator}}{{user.creator.login}}{{else}}N/A{{/if}}"
                     class="input input-sm input-bordered w-full {{#unless user.creator}}text-neutral-content{{/unless}}"
-                    disabled>
+                    disabled="">
                 </div>
 
                 <!-- Créé le -->
@@ -87,7 +87,7 @@
                     <label class="label">
                         <span class="label-text font-semibold">Créé le</span>
                     </label>
-                    <input type="text" value="{{user.createdAt}}" class="input input-sm input-bordered w-full" disabled>
+                    <input type="text" value="{{user.createdAt}}" class="input input-sm input-bordered w-full" disabled="">
                 </div>
 
                 <!-- Sites assignés -->
@@ -113,6 +113,7 @@
         </div>
     </div>
 </div>
+
 
 
 

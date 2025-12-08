@@ -11,15 +11,15 @@
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-            <h2 class="card-title text-2xl mb-4">
+            <h2 class="card-title text-2xl">
                 <i class="fa-solid fa-user-edit text-neutral mr-2"></i>
                 {{user.login}}
             </h2>
 
-            <form action="/admin/users/{{user.id}}/update" method="POST" class="flex flex-col gap-6">
+            <form action="/admin/users/{{user.id}}/update" method="POST" class="flex flex-col gap-0">
                 <input type="hidden" name="clear_password" id="clear_password_field" value="false">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <!-- Login -->
                     <div class="form-control w-full">
                         <label class="label">
@@ -81,7 +81,7 @@
                         </label>
                         <div class="flex gap-2">
                             <input type="password" id="passwordDisplay" value="••••••••••"
-                            class="input input-sm input-bordered flex-1" disabled>
+                            class="input input-sm input-bordered flex-1" disabled="">
                             <button type="button" id="clearPasswordBtn" class="btn btn-sm btn-primary btn-outline">
                                 <i class="fa-solid fa-trash"></i>
                                 Vider le mot de passe
@@ -99,7 +99,7 @@
                         <input type="text"
                         value="{{#if user.last_connection}}{{user.last_connection}}{{else}}N/A{{/if}}"
                         class="input input-sm input-bordered w-full {{#unless user.last_connection}}text-neutral-content{{/unless}}"
-                        disabled>
+                        disabled="">
                     </div>
 
                     <!-- Créé par (non modifiable) -->
@@ -109,7 +109,7 @@
                         </label>
                         <input type="text" value="{{#if user.creator}}{{user.creator.login}}{{else}}N/A{{/if}}"
                         class="input input-sm input-bordered w-full {{#unless user.creator}}text-neutral-content{{/unless}}"
-                        disabled>
+                        disabled="">
                     </div>
 
                     <!-- Créé le (non modifiable) -->
@@ -118,7 +118,7 @@
                             <span class="label-text font-semibold">Créé le</span>
                         </label>
                         <input type="text" value="{{user.createdAt}}" class="input input-sm input-bordered w-full"
-                        disabled>
+                        disabled="">
                     </div>
 
                     <!-- Sites assignés -->
@@ -177,6 +177,7 @@
 </div>
 
 <script src="/js/admin_user_edit.js"></script>
+
 
 
 
