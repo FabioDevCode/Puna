@@ -36,6 +36,8 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] `form.service.js`
     - [ ] `inbox.service.js`
 - [ ] Peupler dossier `middlewares/`
+    - [x] `checkAccess.js` (vérification des permissions)
+    - [x] `injectUserRole.js` (injection du rôle utilisateur)
     - [ ] `errorHandler.middleware.js`
     - [ ] `validation.middleware.js`
     - [ ] `rateLimiter.middleware.js`
@@ -101,7 +103,8 @@ Liste des tâches à réaliser pour améliorer le projet.
 - [x] Améliorer configuration ESLint
 - [x] Créer `.editorconfig` complet
 - [x] Ajouter pre-commit hooks (husky)
-- [ ] Documenter conventions de code
+- [x] Créer script de formatage Handlebars personnalisé
+- [x] Documenter conventions de code (COMMIT_FORMAT.md)
 
 ---
 
@@ -122,7 +125,12 @@ Liste des tâches à réaliser pour améliorer le projet.
 ## 🚀 Améliorations Fonctionnelles
 
 - [ ] Ajouter système de notifications
-- [ ] Améliorer gestion des permissions
+- [x] Améliorer gestion des permissions
+    - [x] Système ACL complet (actionCan, roleIs helpers)
+    - [x] Middleware d'injection du rôle utilisateur
+    - [x] Protection de toutes les routes avec droits d'accès
+    - [x] Helpers Handlebars pour boutons conditionnels
+    - [x] Support des rôles : super_admin, owner, beta, editor, viewer
 - [ ] Ajouter pagination sur toutes les listes
 - [ ] Implémenter recherche avancée
 - [ ] Ajouter exports CSV en plus d'Excel
@@ -133,11 +141,12 @@ Liste des tâches à réaliser pour améliorer le projet.
 ## 📦 Configuration & Dépendances
 
 - [ ] Vérifier et mettre à jour les dépendances
-- [ ] Ajouter scripts npm utiles :
+- [x] Ajouter scripts npm utiles :
+    - [x] `npm run format:hbs` (formatage Handlebars)
     - [ ] `npm run dev` (développement avec hot-reload)
     - [ ] `npm run build` (production)
     - [ ] `npm run lint:fix`
-    - [ ] `npm run format`
+    - [ ] `npm run format` (tous les fichiers)
 - [ ] Documenter tous les scripts npm
 
 ---
@@ -146,23 +155,33 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ### 🔥 Urgent (À faire maintenant)
 
-- [x] Créer `.env.example`
-- [x] Déplacer secrets vers `.env`
-- [ ] Enrichir README.md
+1. **Enrichir README.md** - Le projet mérite une vraie documentation
+2. **Ajouter validation des variables d'env** - Sécurité essentielle au démarrage
+3. **Implémenter helmet.js** - Headers de sécurité HTTP
 
 ### ⚡ Important (Court terme)
 
-- [ ] Créer couche services
-- [ ] Ajouter validation des variables d'env
-- [x] Configurer Prettier/ESLint
+1. **Créer couche services** - Séparer la logique métier des controllers
+2. **Ajouter rate limiting** - Protection contre les abus API
+3. **Logger professionnel** - Remplacer console.log par winston/pino
+4. **Pagination** - Améliorer performance sur grandes listes
 
 ### 💡 À planifier (Moyen/Long terme)
 
-- [ ] Tests automatisés
-- [ ] Docker support
-- [ ] CI/CD
-- [ ] Documentation complète
+1. **Tests automatisés** - Garantir la qualité du code
+2. **Docker support** - Faciliter le déploiement
+3. **CI/CD** - Automatiser les workflows
+4. **Documentation API complète** - docs/ avec architecture
+
+### ✅ Récemment complété
+
+- ✅ Système ACL complet avec 5 rôles
+- ✅ Protection de toutes les routes
+- ✅ Helpers Handlebars pour permissions
+- ✅ Script formatage HBS personnalisé
+- ✅ Pre-commit hooks avec Husky
+- ✅ Guide des commits (COMMIT_FORMAT.md)
 
 ---
 
-**Dernière mise à jour :** 28 novembre 2025
+**Dernière mise à jour :** 8 décembre 2025
