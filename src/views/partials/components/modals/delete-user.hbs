@@ -1,39 +1,42 @@
 <!-- Modal de suppression d'utilisateur -->
 <dialog id="modal_delete_user" class="modal">
-<div class="modal-box w-11/12 md:w-6/12 lg:w-5/12">
-<h3 class="font-bold text-lg text-error">
-Supprimer un utilisateur
-</h3>
-<p class="py-2">
-Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="delete_user_login"></strong> ?<br>
-Cette action est <span class="text-error font-bold">irréversible</span>.
-</p>
+    <div class="modal-box w-11/12 md:w-6/12 lg:w-5/12">
+        <h3 class="font-bold text-lg text-error">
+            Supprimer un utilisateur
+        </h3>
+        <p class="py-2">
+            Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="delete_user_login"></strong> ?<br>
+            Cette action est <span class="text-error font-bold">irréversible</span>.
+        </p>
 
-<form id="formDeleteUser" action="" method="post" class="flex flex-col gap-4">
-<input type="hidden" name="user_id" id="user_delete_id" value="" />
+        <form id="formDeleteUser" action="" method="post" class="flex flex-col gap-4">
+            <input type="hidden" name="user_id" id="user_delete_id" value="" />
 
-<div class="form-control w-full">
-<label class="label">
-<span class="label-text font-semibold">Confirmez avec votre mot de passe <span
-class="text-error">*</span></span>
-</label>
-<input type="password" id="delete_user_password" name="password" placeholder="Votre mot de passe"
-class="input input-sm input-bordered w-full" autocomplete="current-password" required />
-</div>
-</form>
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-semibold">Confirmez avec votre mot de passe <span
+                        class="text-error">*</span></span>
+            </label>
+            <input type="password" id="delete_user_password" name="password" placeholder="Votre mot de passe"
+            class="input input-sm input-bordered w-full" autocomplete="current-password" required />
+        </div>
+    </form>
 
-<div class="modal-action mt-4">
-<form method="dialog">
-<button class="btn btn-sm">Annuler</button>
-</form>
-<button type="submit" form="formDeleteUser" id="confirmDeleteUserBtn" class="btn btn-sm btn-error" disabled>
-<i class="fa-solid fa-trash"></i>
-Supprimer
-</button>
-</div>
+    <div class="modal-action mt-4">
+        <form method="dialog">
+            <button class="btn btn-sm">Annuler</button>
+        </form>
+        <button type="submit" form="formDeleteUser" id="confirmDeleteUserBtn" class="btn btn-sm btn-error" disabled>
+            <i class="fa-solid fa-trash"></i>
+            Supprimer
+        </button>
+    </div>
 </div>
 <form method="dialog" class="modal-backdrop">
-<button>close</button>
+    <button>close</button>
 </form>
 </dialog>
+
+
+
 

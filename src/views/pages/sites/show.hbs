@@ -1,11 +1,11 @@
 {{#slot "title"}}
     <div class="flex items-center gap-4">
-    <a href="/site/all" class="btn btn-sm btn-outline">
-    <i class="fa-solid fa-arrow-left"></i>
-    </a>
-    <h3 class="font-inter truncate ellipsis-truncate title-max-w">
-    {{site.domain}}
-    </h3>
+        <a href="/site/all" class="btn btn-sm btn-outline">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h3 class="font-inter truncate ellipsis-truncate title-max-w">
+            {{site.domain}}
+        </h3>
     </div>
 {{/slot}}
 
@@ -13,10 +13,10 @@
     {{#roleIs roles='super_admin,owner,editor,beta'}}
         {{#actionCan entity='site' action='read'}}
             <button id="btn_copy_token" class="btn btn-sm btn-outline btn-info" data-site-id="{{site.id}}">
-            <i class="fa-solid fa-clone"></i>
-            <span class="hidden md:flex">
-            Copier un token
-            </span>
+                <i class="fa-solid fa-clone"></i>
+                <span class="hidden md:flex">
+                    Copier un token
+                </span>
             </button>
         {{/actionCan}}
     {{/roleIs}}
@@ -41,138 +41,138 @@
 
 <!-- Contenu principal -->
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12">
-<!-- Card: Gestion des formulaires -->
-<div class="card bg-base-100 shadow-xl">
-<div class="card-body p-4 overflow-hidden">
-{{#if forms}}
-    <div class="flex flex-wrap items-center gap-2">
-    <div role="tablist" class="tabs tabs-boxed flex flex-wrap flex-1">
-    {{#each forms}}
-        <a role="tab" class="tab {{#if is_active}}tab-active{{/if}}" data-id="{{this.id}}"
-        data-code="{{this.code}}" data-name="{{this.name}}" data-template='{{this.template}}'
-        data-columns='{{this.columns}}'>
-        {{this.name}}
-        </a>
-    {{/each}}
-    </div>
+    <!-- Card: Gestion des formulaires -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body p-4 overflow-hidden">
+            {{#if forms}}
+                <div class="flex flex-wrap items-center gap-2">
+                    <div role="tablist" class="tabs tabs-boxed flex flex-wrap flex-1">
+                        {{#each forms}}
+                            <a role="tab" class="tab {{#if is_active}}tab-active{{/if}}" data-id="{{this.id}}"
+                            data-code="{{this.code}}" data-name="{{this.name}}" data-template='{{this.template}}'
+                            data-columns='{{this.columns}}'>
+                            {{this.name}}
+                        </a>
+                    {{/each}}
+                </div>
 
-    {{#actionCan entity='form' action='create'}}
-        {{> components/buttons/new-form id=site.id }}
-    {{/actionCan}}
+                {{#actionCan entity='form' action='create'}}
+                    {{> components/buttons/new-form id=site.id }}
+                {{/actionCan}}
 
+            </div>
+        {{else}}
+            <div class="flex flex-col items-center justify-center py-8 gap-4">
+                <div class="text-center">
+                    <i class="fa-solid fa-file-alt text-5xl text-base-300 mb-2"></i>
+                    <p class="text-sm text-muted">
+                        Aucun formulaire créé pour ce site
+                    </p>
+                </div>
+                {{#actionCan entity='form' action='create'}}
+                    {{> components/buttons/new-form id=site.id }}
+                {{/actionCan}}
+            </div>
+        {{/if}}
     </div>
-{{else}}
-    <div class="flex flex-col items-center justify-center py-8 gap-4">
-    <div class="text-center">
-    <i class="fa-solid fa-file-alt text-5xl text-base-300 mb-2"></i>
-    <p class="text-sm text-muted">
-    Aucun formulaire créé pour ce site
-    </p>
-    </div>
-    {{#actionCan entity='form' action='create'}}
-        {{> components/buttons/new-form id=site.id }}
-    {{/actionCan}}
-    </div>
-{{/if}}
-</div>
 </div>
 
 <!-- Card: Informations du formulaire sélectionné -->
 {{#if forms}}
     <div class="card bg-base-100 shadow-xl {{#actionCan entity='form' action='update'}}{{else}}none{{/actionCan}}">
-    <div class="card-body p-4 overflow-hidden" id="info_form_panel">
-    <div class="flex flex-row items-center flex-wrap justify-between gap-2">
-    <div class="flex flex-col w-auto min-w-[160px]">
-    <div id="info_form_code_wrap" class="flex items-center gap-2 opacity-25">
-    <span class="text-sm text-muted select-none">CODE&nbsp;:</span>
-    <code id="info_form_code" class="text-sm font-mono bg-base-200 px-2 py-1 rounded"></code>
+        <div class="card-body p-4 overflow-hidden" id="info_form_panel">
+            <div class="flex flex-row items-center flex-wrap justify-between gap-2">
+                <div class="flex flex-col w-auto min-w-[160px]">
+                    <div id="info_form_code_wrap" class="flex items-center gap-2 opacity-25">
+                        <span class="text-sm text-muted select-none">CODE&nbsp;:</span>
+                        <code id="info_form_code" class="text-sm font-mono bg-base-200 px-2 py-1 rounded"></code>
 
-    {{#actionCan entity='form' action='update'}}
-        <button id="btn_copy_code" class="btn btn-sm btn-outline btn-info none">
-        <i class="fa-solid fa-clone"></i>
-        <span class="hidden md:flex">
-        Copier le code
-        </span>
-        </button>
-    {{/actionCan}}
+                        {{#actionCan entity='form' action='update'}}
+                            <button id="btn_copy_code" class="btn btn-sm btn-outline btn-info none">
+                                <i class="fa-solid fa-clone"></i>
+                                <span class="hidden md:flex">
+                                    Copier le code
+                                </span>
+                            </button>
+                        {{/actionCan}}
 
-    </div>
-    </div>
-    <div class="flex justify-end items-start h-full gap-2">
-    {{#actionCan entity='form' action='delete'}}
-        {{> components/modals/delete-form }}
-    {{/actionCan}}
+                    </div>
+                </div>
+                <div class="flex justify-end items-start h-full gap-2">
+                    {{#actionCan entity='form' action='delete'}}
+                        {{> components/modals/delete-form }}
+                    {{/actionCan}}
 
-    {{! Le modal est toujours rendu pour que le JS puisse accéder aux éléments DOM }}
-    {{#actionCan entity='form' action='update'}}
-        {{> components/modals/form-template showButton=true }}
-    {{else}}
-        {{> components/modals/form-template showButton=false }}
-    {{/actionCan}}
-    </div>
-    </div>
-    </div>
+                    {{! Le modal est toujours rendu pour que le JS puisse accéder aux éléments DOM }}
+                    {{#actionCan entity='form' action='update'}}
+                        {{> components/modals/form-template showButton=true }}
+                    {{else}}
+                        {{> components/modals/form-template showButton=false }}
+                    {{/actionCan}}
+                </div>
+            </div>
+        </div>
     </div>
 {{/if}}
 
 {{#if forms}}
     <!-- Card: Table des entrées Inbox -->
     <div class="card bg-base-100 shadow-xl">
-    <div class="card-body p-4 overflow-hidden">
-    <!-- Actions de la table (masquée par défaut) -->
-    <div id="tableActions" class="none">
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-    <div class="flex items-center gap-2">
-    <!-- Sélecteur de nombre de lignes et compteur -->
-    <select id="numLignTable" class="select select-sm select-bordered w-max">
-    <option value="10" selected="">10</option>
-    <option value="25">25</option>
-    <option value="50">50</option>
-    <option value="100">100</option>
-    </select>
-    <div id="count_inbox" class="text-sm min-w-[102px] select-none"></div>
-    </div>
+        <div class="card-body p-4 overflow-hidden">
+            <!-- Actions de la table (masquée par défaut) -->
+            <div id="tableActions" class="none">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div class="flex items-center gap-2">
+                        <!-- Sélecteur de nombre de lignes et compteur -->
+                        <select id="numLignTable" class="select select-sm select-bordered w-max">
+                            <option value="10" selected="">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <div id="count_inbox" class="text-sm min-w-[102px] select-none"></div>
+                    </div>
 
-    <!-- Pagination -->
-    <div id="paginationTable" class="join">
-    <button class="join-item btn btn-sm">«</button>
-    <button class="join-item btn btn-sm w-[34px] no-activate">1</button>
-    <button class="join-item btn btn-sm">»</button>
-    </div>
+                    <!-- Pagination -->
+                    <div id="paginationTable" class="join">
+                        <button class="join-item btn btn-sm">«</button>
+                        <button class="join-item btn btn-sm w-[34px] no-activate">1</button>
+                        <button class="join-item btn btn-sm">»</button>
+                    </div>
 
-    <div class="flex flex-wrap justify-between items-center gap-2">
-    <!-- Boutons d'action -->
-    <div class="flex gap-2">
-    <!-- Dropdown Export -->
-    <div class="dropdown dropdown-end">
-    <div tabindex="0" role="button" class="btn btn-sm">
-    <i class="fa-solid fa-caret-down"></i>
-    </div>
-    <ul tabindex="0"
-    class="dropdown-content menu bg-base-100 rounded-box z-[100] w-52 p-2 mt-1 shadow-xl border border-base-300">
-    <li>
-    <button id="exportExcelBtn"
-    class="flex items-center gap-2 text-green-800 bg-green-100 hover:bg-green-700 hover:text-base-100">
-    <i class="fa-solid fa-file-excel"></i>
-    Exporter un Excel
-    </button>
-    </li>
-    </ul>
-    </div>
+                    <div class="flex flex-wrap justify-between items-center gap-2">
+                        <!-- Boutons d'action -->
+                        <div class="flex gap-2">
+                            <!-- Dropdown Export -->
+                            <div class="dropdown dropdown-end">
+                                <div tabindex="0" role="button" class="btn btn-sm">
+                                    <i class="fa-solid fa-caret-down"></i>
+                                </div>
+                                <ul tabindex="0"
+                                class="dropdown-content menu bg-base-100 rounded-box z-[100] w-52 p-2 mt-1 shadow-xl border border-base-300">
+                                <li>
+                                    <button id="exportExcelBtn"
+                                    class="flex items-center gap-2 text-green-800 bg-green-100 hover:bg-green-700 hover:text-base-100">
+                                    <i class="fa-solid fa-file-excel"></i>
+                                    Exporter un Excel
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
 
-    {{#actionCan entity='form' action='read'}}
-        <button id="filtreTableBtn" class="btn btn-sm">
-        <i class="fa-solid fa-filter"></i>
-        <span class="hidden md:flex">Filtre</span>
-        </button>
-    {{/actionCan}}
+                    {{#actionCan entity='form' action='read'}}
+                        <button id="filtreTableBtn" class="btn btn-sm">
+                            <i class="fa-solid fa-filter"></i>
+                            <span class="hidden md:flex">Filtre</span>
+                        </button>
+                    {{/actionCan}}
 
-    {{#actionCan entity='form' action='update'}}
-        {{> components/modals/form-columns }}
-    {{/actionCan}}
-    </div>
-    </div>
-    </div>
+                    {{#actionCan entity='form' action='update'}}
+                        {{> components/modals/form-columns }}
+                    {{/actionCan}}
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Table (masquée par défaut) -->
@@ -180,22 +180,25 @@
     class="overflow-x-auto w-full none"
     data-can-delete-inbox="{{#actionCan entity='inbox' action='delete'}}true{{else}}false{{/actionCan}}">
     <table class="table w-full table-pin-cols">
-    <thead id="inbox_table_head" class="text-[14px] bg-base-200"></thead>
-    <tbody id="inbox_table_body"></tbody>
+        <thead id="inbox_table_head" class="text-[14px] bg-base-200"></thead>
+        <tbody id="inbox_table_body"></tbody>
     </table>
-    </div>
+</div>
 
-    <!-- Message quand aucun formulaire n'est sélectionné (visible par défaut via JS) -->
-    <div id="no_form_selected"
-    class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4">
-    <i class="fa-solid fa-table text-5xl text-neutral-content"></i>
-    <p class="text-sm text-neutral text-center select-none">
+<!-- Message quand aucun formulaire n'est sélectionné (visible par défaut via JS) -->
+<div id="no_form_selected"
+class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4">
+<i class="fa-solid fa-table text-5xl text-neutral-content"></i>
+<p class="text-sm text-neutral text-center select-none">
     Aucune entrée reçu pour ce formualire
-    </p>
-    </div>
-    </div>
-    </div>
+</p>
+</div>
+</div>
+</div>
 {{/if}}
 </div>
+
+
+
 
 

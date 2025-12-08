@@ -1,83 +1,86 @@
 <button class="btn btn-sm btn-secondary" onclick="my_modal_new_site.showModal()">
-<i class="fas fa-plus"></i>
-<span class="hidden md:flex">
-Nouveau
-</span>
+    <i class="fas fa-plus"></i>
+    <span class="hidden md:flex">
+        Nouveau
+    </span>
 </button>
 
 <dialog id="my_modal_new_site" class="modal">
-<div class="modal-box w-12/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
-<h2 class="text-lg font-bol mb-2">
-Créer un nouveau site
-</h2>
-<p class="py-1 text-sm text-muted">253 caractères maximum.</p>
+    <div class="modal-box w-12/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
+        <h2 class="text-lg font-bol mb-2">
+            Créer un nouveau site
+        </h2>
+        <p class="py-1 text-sm text-muted">253 caractères maximum.</p>
 
-<form id="fromCreateSite" action="/create-site" method="post" class="flex flex-col mt-2 gap-4">
-<input type="text" name="domain" class="input input-sm input-bordered w-full" placeholder="Nom de domaine" maxlength="253" required="" />
-<p id="create_site_msg" class="text-sm text-error hidden">Un site avec ce domaine existe déjà.</p>
-</form>
-<div class="modal-action mt-4">
-<form method="dialog">
-<button class="btn btn-sm">Annuler</button>
-</form>
-<button id="btnCreateSite" type="submit" class="btn btn-sm btn-secondary" form="fromCreateSite">Créer</button>
-</div>
-</div>
+        <form id="fromCreateSite" action="/create-site" method="post" class="flex flex-col mt-2 gap-4">
+            <input type="text" name="domain" class="input input-sm input-bordered w-full" placeholder="Nom de domaine" maxlength="253" required="" />
+            <p id="create_site_msg" class="text-sm text-error hidden">Un site avec ce domaine existe déjà.</p>
+        </form>
+        <div class="modal-action mt-4">
+            <form method="dialog">
+                <button class="btn btn-sm">Annuler</button>
+            </form>
+            <button id="btnCreateSite" type="submit" class="btn btn-sm btn-secondary" form="fromCreateSite">Créer</button>
+        </div>
+    </div>
 </dialog>
 
 <script>
-(function(){
-try {
-const modal = document.getElementById('my_modal_new_site');
-const form = document.getElementById('fromCreateSite');
-const input = form ? form.querySelector('input[name="domain"]') : (modal ? modal.querySelector('input[name="domain"]') : null);
-const submit = document.getElementById('btnCreateSite');
-const msg = document.getElementById('create_site_msg');
-if (!input || !submit) return;
+    (function(){
+    try {
+    const modal = document.getElementById('my_modal_new_site');
+    const form = document.getElementById('fromCreateSite');
+    const input = form ? form.querySelector('input[name="domain"]') : (modal ? modal.querySelector('input[name="domain"]') : null);
+    const submit = document.getElementById('btnCreateSite');
+    const msg = document.getElementById('create_site_msg');
+    if (!input || !submit) return;
 
-const gatherDomains = () => {
-return Array.from(document.querySelectorAll('.dash-site')).map(el => (el.getAttribute('domain') || '').trim());
-};
+    const gatherDomains = () => {
+    return Array.from(document.querySelectorAll('.dash-site')).map(el => (el.getAttribute('domain') || '').trim());
+    };
 
-const checkDuplicate = () => {
-const val = (input.value || '').trim();
-if (!val) {
-submit.disabled = false;
-if (msg) msg.classList.add('hidden');
-return;
-}
-const domains = gatherDomains();
-const exists = domains.includes(val);
-submit.disabled = !!exists;
-if (msg) {
-if (exists) msg.classList.remove('hidden'); else msg.classList.add('hidden');
-}
-};
+    const checkDuplicate = () => {
+    const val = (input.value || '').trim();
+    if (!val) {
+    submit.disabled = false;
+    if (msg) msg.classList.add('hidden');
+    return;
+    }
+    const domains = gatherDomains();
+    const exists = domains.includes(val);
+    submit.disabled = !!exists;
+    if (msg) {
+    if (exists) msg.classList.remove('hidden'); else msg.classList.add('hidden');
+    }
+    };
 
-input.addEventListener('input', (e) => {
-// remove any whitespace characters typed by the user
-const cleaned = (input.value || '').replace(/\s+/g, '');
-if (input.value !== cleaned) {
-input.value = cleaned;
-}
-checkDuplicate();
-});
-// initial check
-checkDuplicate();
+    input.addEventListener('input', (e) => {
+    // remove any whitespace characters typed by the user
+    const cleaned = (input.value || '').replace(/\s+/g, '');
+    if (input.value !== cleaned) {
+    input.value = cleaned;
+    }
+    checkDuplicate();
+    });
+    // initial check
+    checkDuplicate();
 
-// Observe changes to the site list so new sites update validation
-const anySite = document.querySelector('.dash-site');
-if (anySite && window.MutationObserver) {
-const parent = anySite.parentElement || document.body;
-const mo = new MutationObserver(() => checkDuplicate());
-mo.observe(parent, { childList: true, subtree: true, attributes: true, attributeFilter: ['domain'] });
-} else if (window.MutationObserver) {
-const mo = new MutationObserver(() => checkDuplicate());
-mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['domain'] });
-}
-} catch (e) {
-// silent
-}
-})();
+    // Observe changes to the site list so new sites update validation
+    const anySite = document.querySelector('.dash-site');
+    if (anySite && window.MutationObserver) {
+    const parent = anySite.parentElement || document.body;
+    const mo = new MutationObserver(() => checkDuplicate());
+    mo.observe(parent, { childList: true, subtree: true, attributes: true, attributeFilter: ['domain'] });
+    } else if (window.MutationObserver) {
+    const mo = new MutationObserver(() => checkDuplicate());
+    mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['domain'] });
+    }
+    } catch (e) {
+    // silent
+    }
+    })();
 </script>
+
+
+
 

@@ -7,27 +7,30 @@ Usage:
 --}}
 
 <label id="btn_revoke_tokens_opener_{{id}}" for="revoke_tokens_modal_{{id}}" class="btn btn-sm btn-outline btn-primary">
-<i class="fa-solid fa-rotate"></i>
-<span class="hidden md:flex">Révoquer les tokens</span>
+    <i class="fa-solid fa-rotate"></i>
+    <span class="hidden md:flex">Révoquer les tokens</span>
 </label>
 
 <input id="revoke_tokens_modal_{{id}}" type="checkbox" class="modal-toggle hidden" />
 <div class="modal">
-<div class="modal-box max-w-md">
-<h3 class="font-bold text-lg">Révoquer les tokens</h3>
-<p class="py-2 text-sm">
-En révoquant les tokens, tous les tokens utilisés et copiés précédemment pour ce site seront invalidés.<br>
-Cette action est définitive.
-</p>
+    <div class="modal-box max-w-md">
+        <h3 class="font-bold text-lg">Révoquer les tokens</h3>
+        <p class="py-2 text-sm">
+            En révoquant les tokens, tous les tokens utilisés et copiés précédemment pour ce site seront invalidés.<br>
+            Cette action est définitive.
+        </p>
 
-<div class="modal-action mt-1">
-<label for="revoke_tokens_modal_{{id}}" class="btn btn-sm">
-Annuler
-</label>
-<button type="button" class="btn btn-sm btn-primary btn-confirm-revoke" data-site-id="{{id}}">
-Révoquer
-</button>
+        <div class="modal-action mt-1">
+            <label for="revoke_tokens_modal_{{id}}" class="btn btn-sm">
+                Annuler
+            </label>
+            <button type="button" class="btn btn-sm btn-primary btn-confirm-revoke" data-site-id="{{id}}">
+                Révoquer
+            </button>
+        </div>
+    </div>
 </div>
-</div>
-</div>
+
+
+
 
