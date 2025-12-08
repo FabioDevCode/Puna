@@ -14,10 +14,51 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Liste des variables d'environnement
 - [ ] Créer CONTRIBUTING.md (guide contributeurs)
 - [ ] Créer CHANGELOG.md (historique des versions)
-- [ ] Créer dossier `docs/` avec :
-    - [ ] Architecture détaillée
-    - [ ] Guide d'API
-    - [ ] Schéma de base de données
+
+### 📚 Documentation VuePress
+- [ ] **Mettre en place VuePress pour documentation complète**
+    - [ ] Installer VuePress dans dossier `docs/`
+    - [ ] Configurer `.vuepress/config.js`
+    - [ ] Créer 3 sections principales :
+        
+        **1. Guide Utilisateur**
+        - [ ] Introduction & Présentation
+        - [ ] Premiers pas
+        - [ ] Gestion des sites
+        - [ ] Gestion des formulaires
+        - [ ] Consultation des soumissions (inbox)
+        - [ ] Exports (Excel, ZIP, CSV)
+        - [ ] Gestion des permissions & rôles
+        - [ ] FAQ utilisateur
+        
+        **2. Guide Développeur**
+        - [ ] Architecture de l'application
+        - [ ] Structure des dossiers
+        - [ ] Models Sequelize
+        - [ ] Controllers & Services
+        - [ ] Système ACL / Permissions
+        - [ ] Helpers Handlebars
+        - [ ] API Routes
+        - [ ] Hooks & Middlewares
+        - [ ] Configuration Pino/Logs
+        - [ ] Tests (quand implémentés)
+        - [ ] Contribution guidelines
+        
+        **3. Guide Auto-hébergement**
+        - [ ] Prérequis système (Node.js, MariaDB, ClamAV)
+        - [ ] Installation pas à pas
+        - [ ] Configuration `.env`
+        - [ ] Migrations base de données
+        - [ ] Configuration serveur web (Nginx/Apache)
+        - [ ] SSL/HTTPS avec Let's Encrypt
+        - [ ] Déploiement avec Docker
+        - [ ] Maintenance & Backups
+        - [ ] Mise à jour de version
+        - [ ] Troubleshooting courant
+    
+    - [ ] Déployer documentation sur GitHub Pages ou Netlify
+    - [ ] Ajouter recherche dans la documentation
+    - [ ] Versioning de la documentation (par version app)
 
 ---
 
@@ -30,14 +71,58 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] `inbox.controller.js` (gestion inbox, téléchargements)
     - [x] `export.controller.js` (exports Excel/ZIP)
     - [x] `admin.controller.js` (administration utilisateurs)
-- [ ] Créer couche `services/` pour la logique métier
-    - [ ] `auth.service.js`
-    - [ ] `site.service.js`
-    - [ ] `form.service.js`
-    - [ ] `inbox.service.js`
-    - [ ] `csv.service.js` (exports CSV)
-    - [ ] `antivirus.service.js` (scan ClamAV)
-    - [ ] `logger.service.js` (gestion logs)
+
+- [ ] **Réorganiser structure JavaScript front-end (`src/public/js/`)**
+    - [ ] Créer structure modulaire :
+        ```
+        src/public/js/
+        ├── core/           # Fonctions utilitaires globales
+        │   ├── api.js      # Appels API centralisés
+        │   ├── utils.js    # Helpers JS
+        │   └── events.js   # Event bus/dispatcher
+        ├── components/     # Composants réutilisables
+        │   ├── modal.js
+        │   ├── toast.js
+        │   └── datepicker.js
+        ├── pages/          # Scripts spécifiques par page
+        │   ├── dashboard/
+        │   │   ├── index.js
+        │   │   └── charts.js
+        │   ├── sites/
+        │   │   ├── list.js
+        │   │   └── show.js
+        │   ├── inbox/
+        │   │   └── show.js
+        │   └── admin/
+        │       ├── users.js
+        │       └── settings.js
+        └── vendors/        # Librairies tierces locales
+        ```
+    - [ ] Migrer les fichiers existants vers nouvelle structure
+    - [ ] Créer système de build/bundle (Webpack ou Vite)
+    - [ ] Minification pour production
+    - [ ] Source maps pour développement
+
+- [ ] **Créer couche `services/` pour la logique base de données**
+    - [ ] Déplacer toute logique DB depuis controllers vers services
+    - [ ] Structure recommandée :
+        ```
+        src/services/
+        ├── auth.service.js        # Login, JWT, sessions
+        ├── user.service.js        # CRUD users, roles
+        ├── site.service.js        # CRUD sites, tokens
+        ├── form.service.js        # CRUD formulaires
+        ├── inbox.service.js       # CRUD inbox, fichiers
+        ├── export.service.js      # Excel, ZIP, CSV
+        ├── csv.service.js         # Exports CSV
+        ├── antivirus.service.js   # Scan ClamAV
+        ├── logger.service.js      # Gestion logs
+        └── stats.service.js       # Statistiques, graphiques
+        ```
+    - [ ] Pattern : Services retournent des données, Controllers gèrent HTTP
+    - [ ] Ajouter gestion d'erreurs centralisée dans services
+    - [ ] Permettre réutilisation des services (API, cron, CLI)
+
 - [ ] Peupler dossier `middlewares/`
     - [x] `checkAccess.js` (vérification des permissions)
     - [x] `injectUserRole.js` (injection du rôle utilisateur)
@@ -111,7 +196,61 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ---
 
-## 🌐 Open Source
+## 🌐 Marketing & Communication
+
+### 🌐 Site Web de Présentation (Landing Page)
+- [ ] **Créer site vitrine pour Puna avec Nuxt.js**
+    - [ ] Setup projet Nuxt 3 (SSR)
+    - [ ] Structure du site :
+        - [ ] **Page d'accueil**
+            - [ ] Hero section avec accroche
+            - [ ] Présentation du produit (problème/solution)
+            - [ ] Features principales avec icônes
+            - [ ] Screenshots/démos de l'application
+            - [ ] Témoignages (quand disponibles)
+            - [ ] CTA "Rejoindre la Beta"
+        - [ ] **Page Features**
+            - [ ] Liste détaillée des fonctionnalités
+            - [ ] Comparaison avec solutions existantes
+            - [ ] Cas d'usage
+        - [ ] **Page Pricing** (pour future version SaaS)
+            - [ ] Plans gratuit/pro/entreprise
+            - [ ] Tableau comparatif
+        - [ ] **Page Documentation**
+            - [ ] Lien vers docs VuePress
+            - [ ] Guide de démarrage rapide
+        - [ ] **Page À propos**
+            - [ ] Vision du projet
+            - [ ] Open source commitment
+        - [ ] **Page Beta**
+            - [ ] Formulaire d'inscription beta
+            - [ ] Avantages beta testeurs
+            - [ ] Roadmap publique
+    
+    - [ ] **Formulaire Beta avec intégration Puna**
+        - [ ] Créer formulaire Nuxt (nom, email, entreprise, use case)
+        - [ ] Validation côté serveur
+        - [ ] API route dans Nuxt : `/api/beta-signup`
+        - [ ] Envoyer données vers instance Puna en production
+        - [ ] Utiliser API Puna ou créer endpoint dédié
+        - [ ] Email de confirmation automatique
+        - [ ] Page de remerciement après soumission
+        - [ ] Stocker dans formulaire "Beta Signups" sur Puna
+    
+    - [ ] Design & UX
+        - [ ] Design moderne et responsive
+        - [ ] Dark mode
+        - [ ] Animations Nuxt (transitions, scroll)
+        - [ ] SEO optimisé (meta tags, sitemap, schema.org)
+        - [ ] Performance (Lighthouse 90+)
+    
+    - [ ] Déploiement
+        - [ ] Héberger sur Vercel/Netlify
+        - [ ] Domaine personnalisé (puna.app ?)
+        - [ ] Analytics (Plausible ou similar)
+        - [ ] Monitoring erreurs
+
+### 🌐 Open Source
 
 - [ ] Créer templates GitHub
     - [ ] Issue template (bug report)
@@ -196,6 +335,25 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Options : restaurer, supprimer définitivement
     - [ ] Statistiques : scans effectués, menaces détectées
 
+### 🌍 Internationalisation (i18n)
+- [ ] **Ajouter support multilingue FR/EN**
+    - [ ] Utiliser package `i18n` déjà installé
+    - [ ] Créer fichiers de traduction :
+        - [ ] `src/locales/fr.json` (déjà existant, à compléter)
+        - [ ] `src/locales/en.json` (nouveau)
+    - [ ] Traduire tous les textes de l'interface
+        - [ ] Layouts (navbar, sidebar, footer)
+        - [ ] Pages (dashboard, sites, forms, inbox, admin)
+        - [ ] Messages d'erreur et validation
+        - [ ] Emails (si applicable)
+        - [ ] Flash messages / Toasts
+    - [ ] Ajouter sélecteur de langue dans navbar
+    - [ ] Persister la langue choisie (cookie/session)
+    - [ ] Middleware pour détecter langue navigateur
+    - [ ] Variables i18n dans Handlebars : `{{t 'key'}}`
+    - [ ] Documentation multilingue avec VuePress
+    - [ ] **À faire en dernier** (priorité basse)
+
 ### Autres améliorations
 - [x] Améliorer gestion des permissions
     - [x] Système ACL complet (actionCan, roleIs helpers)
@@ -224,7 +382,12 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] `pino-roll` ou `pino-rotating-file` (rotation logs)
     - [ ] `clamscan` (scanner antivirus ClamAV)
     - [ ] `express-flash` ou créer système custom
+    - [ ] `vuepress` (documentation)
+    - [ ] `webpack` ou `vite` (bundler JS front-end)
 - [ ] Documenter tous les scripts npm
+- [ ] Projet Nuxt séparé pour site vitrine :
+    - [ ] Setup git submodule ou repo séparé
+    - [ ] Configuration déploiement Vercel/Netlify
 
 ---
 
@@ -238,20 +401,23 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ### ⚡ Important (Court terme)
 
-1. **Système de Toasts (Toastify)** - Notifications utilisateur + flash messages
-2. **Logger Pino** - Logs structurés + interface admin + rotation
-3. **Export CSV** - Compléter les exports (Excel déjà fait)
-4. **ClamAV** - Scanner antivirus pour fichiers uploadés
-5. **Créer couche services** - Séparer la logique métier des controllers
-6. **Rate limiting** - Protection contre les abus API
-7. **Pagination** - Améliorer performance sur grandes listes
+1. **Créer couche services** - Déplacer logique DB des controllers vers services
+2. **Restructurer JS front-end** - Architecture modulaire pour travail en équipe
+3. **Système de Toasts (Toastify)** - Notifications utilisateur + flash messages
+4. **Logger Pino** - Logs structurés + interface admin + rotation
+5. **Export CSV** - Compléter les exports (Excel déjà fait)
+6. **ClamAV** - Scanner antivirus pour fichiers uploadés
+7. **Rate limiting** - Protection contre les abus API
+8. **Pagination** - Améliorer performance sur grandes listes
 
 ### 💡 À planifier (Moyen/Long terme)
 
-1. **Tests automatisés** - Garantir la qualité du code
-2. **Docker support** - Faciliter le déploiement
-3. **CI/CD** - Automatiser les workflows
-4. **Documentation API complète** - docs/ avec architecture
+1. **Documentation VuePress** - Guides utilisateur, dev, auto-hébergement
+2. **Site web vitrine Nuxt** - Landing page + formulaire beta
+3. **Tests automatisés** - Garantir la qualité du code
+4. **Docker support** - Faciliter le déploiement
+5. **CI/CD** - Automatiser les workflows
+6. **Internationalisation FR/EN** - À faire en dernier
 
 ### ✅ Récemment complété
 
