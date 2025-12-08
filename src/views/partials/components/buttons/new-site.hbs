@@ -14,15 +14,15 @@
 
         <form id="fromCreateSite" action="/create-site" method="post" class="flex flex-col mt-2 gap-4">
             <input type="text" name="domain" class="input input-sm input-bordered w-full" placeholder="Nom de domaine" maxlength="253" required="" />
-            <p id="create_site_msg" class="text-sm text-error hidden">Un site avec ce domaine existe déjà.</p>
+        <p id="create_site_msg" class="text-sm text-error hidden">Un site avec ce domaine existe déjà.</p>
+    </form>
+    <div class="modal-action mt-4">
+        <form method="dialog">
+            <button class="btn btn-sm">Annuler</button>
         </form>
-        <div class="modal-action mt-4">
-            <form method="dialog">
-                <button class="btn btn-sm">Annuler</button>
-            </form>
-            <button id="btnCreateSite" type="submit" class="btn btn-sm btn-secondary" form="fromCreateSite">Créer</button>
-        </div>
+        <button id="btnCreateSite" type="submit" class="btn btn-sm btn-secondary" form="fromCreateSite">Créer</button>
     </div>
+</div>
 </dialog>
 
 <script>
@@ -80,6 +80,8 @@
     }
     })();
 </script>
+
+
 
 
 

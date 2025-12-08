@@ -56,47 +56,49 @@
             <!-- Liste des sites (Checkboxes) -->
             <div id="sitesListContainer"
             class="border border-base-300 rounded-lg h-48 overflow-y-auto bg-base-100 p-1">
-            {{#each sites}}
-                <label
-                class="cursor-pointer label hover:bg-base-200 rounded-md px-3 py-2 transition-colors justify-start gap-3">
-                <input type="checkbox" name="sites" value="{{this.id}}"
-                class="checkbox checkbox-sm checkbox-neutral rounded-md" />
-                <span class="label-text flex-1 truncate" title="{{this.domain}}">{{this.domain}}</span>
-            </label>
-        {{else}}
-            <div class="text-center text-neutral text-sm p-8 flex flex-col items-center gap-2">
-                <i class="fa-solid fa-globe text-2xl opacity-20"></i>
-                <span>Aucun site disponible</span>
+                {{#each sites}}
+                    <label
+                    class="cursor-pointer label hover:bg-base-200 rounded-md px-3 py-2 transition-colors justify-start gap-3">
+                        <input type="checkbox" name="sites" value="{{this.id}}"
+                        class="checkbox checkbox-sm checkbox-neutral rounded-md" />
+                        <span class="label-text flex-1 truncate" title="{{this.domain}}">{{this.domain}}</span>
+                    </label>
+                {{else}}
+                    <div class="text-center text-neutral text-sm p-8 flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-globe text-2xl opacity-20"></i>
+                        <span>Aucun site disponible</span>
+                    </div>
+                {{/each}}
+
+                <!-- Message aucun résultat recherche -->
+                <div id="noSiteFound" class="hidden text-center text-neutral text-sm p-4">
+                    Aucun site ne correspond à votre recherche
+                </div>
             </div>
-        {{/each}}
 
-        <!-- Message aucun résultat recherche -->
-        <div id="noSiteFound" class="hidden text-center text-neutral text-sm p-4">
-            Aucun site ne correspond à votre recherche
+            <label class="label">
+                <span class="label-text-alt text-neutral">Sélectionnez les sites auxquels l'utilisateur aura
+                    accès.</span>
+            </label>
         </div>
-    </div>
-
-    <label class="label">
-        <span class="label-text-alt text-neutral">Sélectionnez les sites auxquels l'utilisateur aura
-            accès.</span>
-    </label>
-</div>
-</form>
-
-<div class="modal-action mt-2">
-    <form method="dialog">
-        <!-- Le bouton annuler ferme la modale car il est dans un form method="dialog" -->
-        <button class="btn btn-sm">Annuler</button>
     </form>
-    <button type="submit" form="formCreateUser" class="btn btn-sm btn-secondary gap-2">
-        Créer l'utilisateur
-    </button>
-</div>
+
+    <div class="modal-action mt-2">
+        <form method="dialog">
+            <!-- Le bouton annuler ferme la modale car il est dans un form method="dialog" -->
+            <button class="btn btn-sm">Annuler</button>
+        </form>
+        <button type="submit" form="formCreateUser" class="btn btn-sm btn-secondary gap-2">
+            Créer l'utilisateur
+        </button>
+    </div>
 </div>
 <form method="dialog" class="modal-backdrop">
     <button>close</button>
 </form>
 </dialog>
+
+
 
 
 

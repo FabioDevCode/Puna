@@ -45,6 +45,7 @@ function formatHandlebars(content) {
     const lines = content.split('\n');
     const formatted = [];
     let indentLevel = 0;
+    let pendingTagOpen = false; // Balise qui a commencé mais n'est pas terminée
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -70,62 +71,96 @@ function formatHandlebars(content) {
         if (BLOCK_CLOSE.test(trimmed)) {
             lineIndent = Math.max(0, indentLevel - 1);
             adjustAfter = -1;
+            pendingTagOpen = false;
         } else if (ELSE_BLOCK.test(trimmed)) {
             // 2. {{else}}
             lineIndent = Math.max(0, indentLevel - 1);
+            pendingTagOpen = false;
         } else if (BLOCK_OPEN.test(trimmed)) {
             // 3. Ouverture de bloc Handlebars {{#xxx}}
             lineIndent = indentLevel;
             adjustAfter = 1;
+            pendingTagOpen = false;
         } else {
             // 4. Analyser HTML
-            // Compter les balises ouvrantes et fermantes sur cette ligne
-            const openTags = [];
-            const closeTags = [];
-            const selfClosingTags = [];
 
-            // Détecter les balises auto-fermantes <tag />
-            let match;
-            const scRegex = /<([a-zA-Z][a-zA-Z0-9-]*)[^>]*\/>/g;
-            while ((match = scRegex.exec(trimmed)) !== null) {
-                selfClosingTags.push(match[1]);
-            }
+            // Vérifier si c'est une ligne d'attributs (continuation de balise)
+            const isAttributeLine =
+                pendingTagOpen &&
+                !trimmed.includes('<') &&
+                !trimmed.startsWith('>') &&
+                (trimmed.includes('=') ||
+                    trimmed.includes('class') ||
+                    trimmed.includes('id') ||
+                    trimmed.includes('data-') ||
+                    trimmed.includes('href') ||
+                    trimmed.includes('src'));
 
-            // Détecter les balises fermantes </tag>
-            const closeRegex = /<\/([a-zA-Z][a-zA-Z0-9-]*)>/g;
-            while ((match = closeRegex.exec(trimmed)) !== null) {
-                closeTags.push(match[1]);
-            }
-
-            // Détecter les balises ouvrantes <tag>
-            const openRegex = /<([a-zA-Z][a-zA-Z0-9-]*)[^>]*>/g;
-            while ((match = openRegex.exec(trimmed)) !== null) {
-                const tagName = match[1];
-                const fullMatch = match[0];
-                // Ignorer si c'est une balise auto-fermante ou void element
-                if (!fullMatch.endsWith('/>') && !HTML_VOID_ELEMENTS.has(tagName)) {
-                    openTags.push(tagName);
+            if (isAttributeLine) {
+                // Ligne d'attributs - même niveau que la balise ouvrante
+                lineIndent = indentLevel;
+                // Vérifier si la ligne se termine par '>'
+                if (trimmed.endsWith('>')) {
+                    pendingTagOpen = false;
+                    adjustAfter = 1; // La balise est maintenant complète
+                } else {
+                    adjustAfter = 0;
                 }
-            }
+            } else {
+                // Compter les balises ouvrantes et fermantes sur cette ligne
+                const openTags = [];
+                const closeTags = [];
 
-            // Si la ligne commence par une fermeture
-            if (closeTags.length > 0 && trimmed.startsWith('</')) {
-                // Nombre de fermetures au début
-                let leadingCloses = 0;
-                for (const tag of closeTags) {
-                    if (trimmed.startsWith(`</${tag}>`)) {
-                        leadingCloses++;
-                    } else {
-                        break;
+                // Compter les '<' et '>' pour détecter les balises incomplètes
+                const openBrackets = (trimmed.match(/</g) || []).length;
+                const closeBrackets = (trimmed.match(/>/g) || []).length;
+
+                // Détecter les balises auto-fermantes <tag />
+                const scMatches = trimmed.match(/<([a-zA-Z][a-zA-Z0-9-]*)[^>]*\/>/g) || [];
+                const selfClosingCount = scMatches.length;
+
+                // Détecter les balises fermantes </tag>
+                let match;
+                const closeRegex = /<\/([a-zA-Z][a-zA-Z0-9-]*)>/g;
+                while ((match = closeRegex.exec(trimmed)) !== null) {
+                    closeTags.push(match[1]);
+                }
+
+                // Détecter les balises ouvrantes <tag> ou <tag (incomplète)
+                const openRegex = /<([a-zA-Z][a-zA-Z0-9-]*)/g;
+                while ((match = openRegex.exec(trimmed)) !== null) {
+                    const tagName = match[1];
+                    // Vérifier que ce n'est pas une balise fermante
+                    const beforeMatch = trimmed.substring(0, match.index);
+                    if (!beforeMatch.endsWith('/') && !HTML_VOID_ELEMENTS.has(tagName)) {
+                        openTags.push(tagName);
                     }
                 }
 
-                lineIndent = Math.max(0, indentLevel - leadingCloses);
-                adjustAfter = openTags.length - closeTags.length;
-            } else {
-                // Sinon, balance normale
-                lineIndent = indentLevel;
-                adjustAfter = openTags.length - closeTags.length;
+                // Ajuster pour les self-closing tags (ne comptent pas comme ouvertures)
+                const realOpenTags = openTags.length - selfClosingCount;
+
+                // Déterminer si une balise commence sans se terminer
+                const tagStartsWithoutEnd = openBrackets > closeBrackets;
+
+                // Si la ligne commence par une fermeture
+                if (closeTags.length > 0 && trimmed.startsWith('</')) {
+                    lineIndent = Math.max(0, indentLevel - 1);
+                    adjustAfter = realOpenTags - closeTags.length;
+                    pendingTagOpen = false;
+                } else {
+                    // Balance normale
+                    lineIndent = indentLevel;
+
+                    if (tagStartsWithoutEnd && realOpenTags > 0) {
+                        // Balise commence mais pas de '>' correspondant
+                        pendingTagOpen = true;
+                        adjustAfter = 0; // On n'ajuste pas encore, on attend la fin de la balise
+                    } else {
+                        pendingTagOpen = false;
+                        adjustAfter = realOpenTags - closeTags.length;
+                    }
+                }
             }
         }
 

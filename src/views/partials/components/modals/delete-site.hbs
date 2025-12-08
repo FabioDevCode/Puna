@@ -12,10 +12,10 @@ domain="puna.fr"
 
 <button class="btn btn-sm btn-error btn-outline"
 onclick="document.getElementById('delete_site_modal_{{id}}').showModal()">
-<i class="far fa-trash-alt"></i>
-<span class="hidden md:flex">
-    Supprimer ce site
-</span>
+    <i class="far fa-trash-alt"></i>
+    <span class="hidden md:flex">
+        Supprimer ce site
+    </span>
 </button>
 
 <dialog id="delete_site_modal_{{id}}" class="modal">
@@ -57,6 +57,8 @@ onclick="document.getElementById('delete_site_modal_{{id}}').showModal()">
     } catch (err) { }
     })();
 </script>
+
+
 
 
 
