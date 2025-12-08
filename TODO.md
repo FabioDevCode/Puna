@@ -35,6 +35,9 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] `site.service.js`
     - [ ] `form.service.js`
     - [ ] `inbox.service.js`
+    - [ ] `csv.service.js` (exports CSV)
+    - [ ] `antivirus.service.js` (scan ClamAV)
+    - [ ] `logger.service.js` (gestion logs)
 - [ ] Peupler dossier `middlewares/`
     - [x] `checkAccess.js` (vérification des permissions)
     - [x] `injectUserRole.js` (injection du rôle utilisateur)
@@ -124,7 +127,76 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ## 🚀 Améliorations Fonctionnelles
 
-- [ ] Ajouter système de notifications
+### 🔔 Système de Notifications (Toastify)
+- [ ] Intégrer Toastify JS pour notifications toast
+    - [ ] Ajouter CDN ou installer package dans public/
+    - [ ] Créer helper Handlebars `{{toastMessages}}` pour afficher les toasts
+    - [ ] Implémenter middleware `req.flash()` pour messages session
+    - [ ] Créer helper `src/helpers/flash.js` pour gérer les messages
+    - [ ] Types de messages : success, error, warning, info
+    - [ ] Support messages multiples dans une session
+    - [ ] Auto-dismiss configurable (3-5 secondes)
+    - [ ] Persister les messages entre redirections
+    - [ ] Exemples :
+        ```javascript
+        req.flash('success', 'Site créé avec succès');
+        req.flash('error', 'Erreur lors de la suppression');
+        ```
+
+### 📊 Amélioration des Logs (Pino)
+- [ ] Configurer Pino pour logging professionnel
+    - [ ] Créer `src/config/logger.js` avec configuration Pino
+    - [ ] Niveaux de logs : trace, debug, info, warn, error, fatal
+    - [ ] Format JSON structuré pour parsing facile
+    - [ ] Créer dossier `logs/` avec sous-dossiers par type
+        - [ ] `logs/app/` - logs application
+        - [ ] `logs/access/` - logs HTTP (Morgan + Pino)
+        - [ ] `logs/error/` - logs erreurs uniquement
+    - [ ] Rotation des logs avec `pino-roll` ou `pino-rotating-file`
+        - [ ] Rotation quotidienne
+        - [ ] Conserver 30 jours
+        - [ ] Compression des logs anciens (.gz)
+        - [ ] Limite de taille (100MB par fichier)
+    - [ ] Remplacer tous les `console.log` par logger
+    - [ ] Ajouter contexte aux logs (userId, requestId, etc.)
+- [ ] Interface admin pour visualiser les logs
+    - [ ] Route `/admin/logs` (super_admin uniquement)
+    - [ ] Liste des fichiers de logs avec taille/date
+    - [ ] Viewer de logs avec pagination
+    - [ ] Filtres : niveau, date, recherche texte
+    - [ ] Télécharger un fichier de log
+    - [ ] Supprimer manuellement des logs anciens
+
+### 📤 Export CSV
+- [ ] Implémenter exports CSV avec fast-csv
+    - [ ] Ajouter bouton "Export CSV" sur toutes les listes
+    - [ ] Route `/export/csv/:entity` (sites, forms, inbox, users)
+    - [ ] Créer service `src/services/csv.service.js`
+    - [ ] Support des filtres existants (dates, recherche)
+    - [ ] Headers personnalisés selon l'entité
+    - [ ] Encoding UTF-8 avec BOM pour Excel
+    - [ ] Nom de fichier : `entity_YYYY-MM-DD_HHmmss.csv`
+    - [ ] Streaming pour grandes quantités de données
+    - [ ] Respect des permissions (viewer peut exporter ses données)
+
+### 🛡️ Sécurité des fichiers (ClamAV)
+- [ ] Intégrer ClamAV pour scan antivirus
+    - [ ] Installer `clamscan` npm package
+    - [ ] Variable d'env `CLAMAV_ENABLED=true/false`
+    - [ ] Variables ClamAV : socket path, host, port
+    - [ ] Créer service `src/services/antivirus.service.js`
+    - [ ] Scanner les fichiers avant stockage
+    - [ ] Quarantaine pour fichiers suspects
+        - [ ] Dossier `storage/quarantine/`
+        - [ ] Table `quarantined_files` avec raison
+    - [ ] Notification admin si virus détecté
+    - [ ] Log détaillé des scans
+    - [ ] Bypass pour environnement dev (si ClamAV non installé)
+    - [ ] Interface admin : vue fichiers en quarantaine
+    - [ ] Options : restaurer, supprimer définitivement
+    - [ ] Statistiques : scans effectués, menaces détectées
+
+### Autres améliorations
 - [x] Améliorer gestion des permissions
     - [x] Système ACL complet (actionCan, roleIs helpers)
     - [x] Middleware d'injection du rôle utilisateur
@@ -133,7 +205,6 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Support des rôles : super_admin, owner, beta, editor, viewer
 - [ ] Ajouter pagination sur toutes les listes
 - [ ] Implémenter recherche avancée
-- [ ] Ajouter exports CSV en plus d'Excel
 - [ ] Système de backup automatique
 
 ---
@@ -142,11 +213,17 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 - [ ] Vérifier et mettre à jour les dépendances
 - [x] Ajouter scripts npm utiles :
+    - [x] `npm run dev` (développement avec hot-reload)
     - [x] `npm run format:hbs` (formatage Handlebars)
-    - [ ] `npm run dev` (développement avec hot-reload)
+    - [x] `npm run format` (tous les fichiers)
+    - [x] `npm run lint:fix` (correction ESLint)
     - [ ] `npm run build` (production)
-    - [ ] `npm run lint:fix`
-    - [ ] `npm run format` (tous les fichiers)
+    - [ ] `npm run logs:clean` (nettoyage logs anciens)
+- [ ] Packages à installer :
+    - [ ] `toastify-js` (notifications front-end)
+    - [ ] `pino-roll` ou `pino-rotating-file` (rotation logs)
+    - [ ] `clamscan` (scanner antivirus ClamAV)
+    - [ ] `express-flash` ou créer système custom
 - [ ] Documenter tous les scripts npm
 
 ---
@@ -161,10 +238,13 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ### ⚡ Important (Court terme)
 
-1. **Créer couche services** - Séparer la logique métier des controllers
-2. **Ajouter rate limiting** - Protection contre les abus API
-3. **Logger professionnel** - Remplacer console.log par winston/pino
-4. **Pagination** - Améliorer performance sur grandes listes
+1. **Système de Toasts (Toastify)** - Notifications utilisateur + flash messages
+2. **Logger Pino** - Logs structurés + interface admin + rotation
+3. **Export CSV** - Compléter les exports (Excel déjà fait)
+4. **ClamAV** - Scanner antivirus pour fichiers uploadés
+5. **Créer couche services** - Séparer la logique métier des controllers
+6. **Rate limiting** - Protection contre les abus API
+7. **Pagination** - Améliorer performance sur grandes listes
 
 ### 💡 À planifier (Moyen/Long terme)
 
