@@ -1,8 +1,6 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import dayjs from 'dayjs';
-import { getSiteWhereCondition } from '../helpers/site.helpers.js';
-import models from '../models/index.js';
+import { getFileTypeInfo } from '../helpers/file.helpers.js';
+import { getInboxForDisplay, deleteInboxWithFiles, verifyFileAccessAndGetPath } from '../services/inbox.service.js';
 
 /**
  * Afficher une entrée inbox
@@ -13,158 +11,23 @@ export const showInbox = async (req, res) => {
     const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        // Récupérer la condition WHERE pour filtrer les sites
-        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        const data = await getInboxForDisplay(inboxId, userId, userRole);
 
-        const includeOptions = {
-            model: models.Form,
-            as: 'form',
-            include: [
-                {
-                    model: models.Site,
-                    as: 'site',
-                },
-            ],
-        };
-
-        // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
-        if (siteWhereCondition) {
-            includeOptions.include[0].where = siteWhereCondition;
-        }
-
-        const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [includeOptions],
-        });
-
-        if (!inbox) {
+        if (!data) {
             return res.redirect('/dashboard');
         }
 
-        const form = inbox.form;
-        const site = form?.site;
+        const { inbox, form, site, contentObj, templateObj, fileKeys } = data;
 
-        if (!site) {
-            return res.redirect('/dashboard');
-        }
+        // Parse template pour les file entries
+        const template = typeof form.template === 'string' ? JSON.parse(form.template) : form.template;
 
-        // Parse content
-        let contentObj = {};
-        try {
-            contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
-        } catch (e) {
-            contentObj = {};
-        }
-
-        // Get template labels
-        let templateObj = {};
-        try {
-            if (form.template) {
-                templateObj = typeof form.template === 'string' ? JSON.parse(form.template) : form.template;
-            }
-        } catch (e) {
-            templateObj = {};
-        }
-
-        // Get file_keys from form
-        let fileKeys = [];
-        try {
-            if (form.file_keys) {
-                const parsed = typeof form.file_keys === 'string' ? JSON.parse(form.file_keys) : form.file_keys;
-                if (Array.isArray(parsed)) {
-                    fileKeys = parsed;
-                }
-            }
-        } catch (e) {
-            fileKeys = [];
-        }
-
-        // Helper function to determine file type color and icon
-        const getFileTypeInfo = (filename) => {
-            if (!filename) {
-                return { color: 'neutral', icon: 'fa-file', label: 'Fichier' };
-            }
-
-            const ext = filename.toLowerCase().split('.').pop();
-            // Images - Purple
-            if (['png', 'jpg', 'jpeg', 'webp'].includes(ext)) {
-                return {
-                    color: 'white',
-                    bg_color: '#b0a010',
-                    icon: 'fa-solid fa-file-image',
-                    label: ext.toUpperCase(),
-                };
-            }
-
-            if (['xls', 'xlsx'].includes(ext)) {
-                return {
-                    color: 'white',
-                    bg_color: '#186E3F',
-                    icon: 'fa-solid fa-file-excel',
-                    label: ext.toUpperCase(),
-                };
-            }
-
-            if (['csv'].includes(ext)) {
-                return {
-                    color: 'white',
-                    bg_color: '#077D3E',
-                    icon: 'fa-solid fa-file-csv',
-                    label: ext.toUpperCase(),
-                };
-            }
-
-            if (ext === 'pdf') {
-                return {
-                    color: 'white',
-                    bg_color: '#AA0101',
-                    icon: 'fa-solid fa-file-pdf',
-                    label: 'PDF',
-                };
-            }
-
-            if (['doc', 'docx'].includes(ext)) {
-                return {
-                    color: 'white',
-                    bg_color: '#2A5893',
-                    icon: 'fa-solid fa-file-word',
-                    label: ext.toUpperCase(),
-                };
-            }
-
-            if (['odt'].includes(ext)) {
-                return {
-                    color: 'white',
-                    bg_color: '#4A90E2',
-                    icon: 'fa-solid fa-file-lines',
-                    label: ext.toUpperCase(),
-                };
-            }
-
-            if (['txt'].includes(ext)) {
-                return {
-                    color: 'white',
-                    bg_color: '#444444',
-                    icon: 'fa-solid fa-file-lines',
-                    label: ext.toUpperCase(),
-                };
-            }
-
-            return {
-                color: 'white',
-                bg_color: '#1F2937',
-                icon: 'fa-solid fa-file',
-                label: ext.toUpperCase(),
-            };
-        };
-
-        const template = JSON.parse(JSON.parse(JSON.stringify(form)).template);
         // Extract files from content
         const fileEntries = [];
         for (const key of fileKeys) {
             const value = contentObj[key];
             if (value) {
                 const label = templateObj[key] || key;
-                // value can be a single filename or array of filenames
                 const filenames = Array.isArray(value) ? value : [value];
 
                 filenames.forEach((filename) => {
@@ -183,7 +46,7 @@ export const showInbox = async (req, res) => {
 
         // Prepare content entries with labels from template (excluding files)
         const contentEntries = Object.keys(contentObj || {})
-            .filter((key) => !fileKeys.includes(key)) // Exclude file fields
+            .filter((key) => !fileKeys.includes(key))
             .map((key) => ({
                 key,
                 label: templateObj[key] || key,
@@ -194,9 +57,9 @@ export const showInbox = async (req, res) => {
         const formattedDate = inbox.createdAt ? dayjs(inbox.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-';
 
         res.render('inbox/show', {
-            inbox: inbox.toJSON(),
-            form: form.toJSON(),
-            site: site.toJSON(),
+            inbox,
+            form,
+            site,
             contentEntries,
             fileEntries,
             formattedDate,
@@ -216,70 +79,21 @@ export const deleteInbox = async (req, res) => {
     const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        // Récupérer la condition WHERE pour filtrer les sites
-        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
-
-        const includeOptions = {
-            model: models.Form,
-            as: 'form',
-            include: [
-                {
-                    model: models.Site,
-                    as: 'site',
-                },
-            ],
-        };
-
-        // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
-        if (siteWhereCondition) {
-            includeOptions.include[0].where = siteWhereCondition;
-        }
-
-        const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [includeOptions],
-        });
-
-        if (!inbox) {
+        // Récupérer les infos avant suppression pour redirection
+        const data = await getInboxForDisplay(inboxId, userId, userRole);
+        if (!data) {
             return res.redirect('/dashboard');
         }
 
-        const siteId = inbox.form.fk_id_site;
+        const siteId = data.form.fk_id_site;
 
-        // Delete associated files from storage
-        const form = inbox.form;
-        let fileKeys = [];
-        try {
-            if (form.file_keys) {
-                const parsed = typeof form.file_keys === 'string' ? JSON.parse(form.file_keys) : form.file_keys;
-                if (Array.isArray(parsed)) {
-                    fileKeys = parsed;
-                }
-            }
-        } catch (e) {
-            fileKeys = [];
+        // Supprimer avec les fichiers
+        const result = await deleteInboxWithFiles(inboxId, userId, userRole);
+
+        if (!result.success) {
+            console.error(result.error);
+            return res.redirect('/dashboard');
         }
-
-        // Delete files
-        const siteDomain = inbox.form.site.domain;
-        const uploadsDir = path.resolve(process.cwd(), `./storage/uploads/${siteDomain}`);
-        let contentObj = {};
-        try {
-            contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
-        } catch (e) {
-            contentObj = {};
-        }
-
-        fileKeys.forEach((key) => {
-            const filename = contentObj[key];
-            if (filename) {
-                const filePath = path.join(uploadsDir, filename);
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
-            }
-        });
-
-        await inbox.destroy();
 
         res.redirect(`/site/${siteId}/view`);
     } catch (err) {
@@ -297,93 +111,17 @@ export const downloadFile = async (req, res) => {
     const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        // Récupérer la condition WHERE pour filtrer les sites
-        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
+        const result = await verifyFileAccessAndGetPath(inboxId, filename, userId, userRole);
 
-        const includeOptions = {
-            model: models.Form,
-            as: 'form',
-            include: [
-                {
-                    model: models.Site,
-                    as: 'site',
-                },
-            ],
-        };
-
-        // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
-        if (siteWhereCondition) {
-            includeOptions.include[0].where = siteWhereCondition;
-        }
-
-        // Verify inbox exists and user has access
-        const inbox = await models.Inbox.findByPk(inboxId, {
-            include: [includeOptions],
-        });
-
-        if (!inbox) {
-            return res.status(404).json({ error: 'Inbox entry not found' });
-        }
-
-        const form = inbox.form;
-        const site = form?.site;
-
-        if (!site) {
-            return res.status(403).json({ error: 'Forbidden' });
-        }
-
-        // Parse content to verify file exists in this inbox
-        let contentObj = {};
-        try {
-            contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
-        } catch (e) {
-            contentObj = {};
-        }
-
-        // Get file_keys from form
-        let fileKeys = [];
-        try {
-            if (form.file_keys) {
-                const parsed = typeof form.file_keys === 'string' ? JSON.parse(form.file_keys) : form.file_keys;
-                if (Array.isArray(parsed)) {
-                    fileKeys = parsed;
-                }
-            }
-        } catch (e) {
-            fileKeys = [];
-        }
-
-        // Check if the filename exists in any of the file fields
-        let fileFound = false;
-        for (const key of fileKeys) {
-            const value = contentObj[key];
-            if (value) {
-                const filenames = Array.isArray(value) ? value : [value];
-                if (filenames.includes(filename)) {
-                    fileFound = true;
-                    break;
-                }
-            }
-        }
-
-        if (!fileFound) {
-            return res.status(404).json({ error: 'File not found in this inbox entry' });
-        }
-
-        // Construct file path using the helper
-        const { finalPathFor } = await import('../helpers/upload_utils.js');
-        const { path: filePath } = finalPathFor(site, form, filename);
-
-        // Check if file exists on disk
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: 'File not found on server' });
+        if (!result.success) {
+            return res.status(404).json({ error: result.error });
         }
 
         // Get original filename (remove timestamp prefix)
         const originalFilename = filename.split('_').slice(1).join('_');
 
         // Send file for download
-        res.download(filePath, originalFilename, (err) => {
+        res.download(result.filePath, originalFilename, (err) => {
             if (err) {
                 console.error('Download error:', err);
                 if (!res.headersSent) {

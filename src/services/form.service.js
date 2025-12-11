@@ -4,7 +4,8 @@
  */
 
 import { Op } from 'sequelize';
-import { Form, Site } from '../models/index.js';
+import models from '../models/index.js';
+import stringUtils from '../utils/string.js';
 import { getSiteWhereCondition } from './access.service.js';
 
 /**
@@ -13,8 +14,8 @@ import { getSiteWhereCondition } from './access.service.js';
  * @returns {Promise<Array>} - Liste des formulaires
  */
 export async function getFormsBySite(siteId) {
-    const forms = await Form.findAll({
-        where: { siteId },
+    const forms = await models.Form.findAll({
+        where: { fk_id_site: siteId },
         attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'createdAt', 'updatedAt'],
         order: [['createdAt', 'DESC']],
     });
@@ -31,14 +32,14 @@ export async function getFormsBySite(siteId) {
 export async function getFormsForUser(userId, userRole) {
     const siteWhereCondition = getSiteWhereCondition(userId, userRole);
 
-    const forms = await Form.findAll({
+    const forms = await models.Form.findAll({
         attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'createdAt', 'updatedAt'],
         include: [
             {
-                model: Site,
+                model: models.Site,
                 as: 'site',
                 where: siteWhereCondition,
-                attributes: ['id', 'name', 'domain'],
+                attributes: ['id', 'domain'],
             },
         ],
         order: [['createdAt', 'DESC']],
@@ -55,20 +56,20 @@ export async function getFormsForUser(userId, userRole) {
  */
 export async function getFormById(formId, includeSite = false) {
     const options = {
-        attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'siteId', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'fk_id_site', 'createdAt', 'updatedAt'],
     };
 
     if (includeSite) {
         options.include = [
             {
-                model: Site,
+                model: models.Site,
                 as: 'site',
-                attributes: ['id', 'name', 'domain'],
+                attributes: ['id', 'domain'],
             },
         ];
     }
 
-    const form = await Form.findByPk(formId, options);
+    const form = await models.Form.findByPk(formId, options);
     return form ? form.toJSON() : null;
 }
 
@@ -81,40 +82,54 @@ export async function getFormById(formId, includeSite = false) {
 export async function getFormByEndpoint(endpoint, includeSite = false) {
     const options = {
         where: { endpoint },
-        attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'siteId', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'fk_id_site', 'createdAt', 'updatedAt'],
     };
 
     if (includeSite) {
         options.include = [
             {
-                model: Site,
+                model: models.Site,
                 as: 'site',
-                attributes: ['id', 'name', 'domain', 'token'],
+                attributes: ['id', 'domain', 'token'],
             },
         ];
     }
 
-    const form = await Form.findOne(options);
+    const form = await models.Form.findOne(options);
     return form ? form.toJSON() : null;
 }
 
 /**
  * Créer un nouveau formulaire
  * @param {Object} formData - Données du formulaire
- * @param {number} formData.siteId - ID du site parent
+ * @param {string} formData.fk_id_site - ID du site parent
  * @param {string} formData.name - Nom du formulaire
- * @param {string} formData.endpoint - Endpoint unique
- * @param {Object} [formData.template] - Template JSON (optionnel)
- * @param {Array} [formData.columns] - Colonnes personnalisées (optionnel)
+ * @param {string} [formData.code] - Code unique (généré automatiquement si non fourni)
+ * @param {Object|string} [formData.template] - Template JSON (optionnel)
+ * @param {Object|string} [formData.columns] - Colonnes personnalisées (optionnel)
  * @returns {Promise<Object>} - Formulaire créé
  */
 export async function createForm(formData) {
-    const form = await Form.create({
-        siteId: formData.siteId,
+    // Générer un code automatiquement si non fourni
+    const code = formData.code || stringUtils.generateCode(10);
+
+    // Stringifier template et columns si ce sont des objets
+    let template = formData.template || null;
+    if (template && typeof template === 'object') {
+        template = JSON.stringify(template);
+    }
+
+    let columns = formData.columns || null;
+    if (columns && typeof columns === 'object') {
+        columns = JSON.stringify(columns);
+    }
+
+    const form = await models.Form.create({
+        fk_id_site: formData.fk_id_site || formData.siteId,
         name: formData.name,
-        endpoint: formData.endpoint,
-        template: formData.template || null,
-        columns: formData.columns || null,
+        code: code,
+        template: template,
+        columns: columns,
     });
 
     return form.toJSON();
@@ -125,15 +140,25 @@ export async function createForm(formData) {
  * @param {number} formId - ID du formulaire
  * @param {Object} updateData - Données à mettre à jour
  * @param {string} [updateData.name] - Nouveau nom
- * @param {string} [updateData.endpoint] - Nouvel endpoint
- * @param {Object} [updateData.template] - Nouveau template
- * @param {Array} [updateData.columns] - Nouvelles colonnes
+ * @param {string} [updateData.code] - Nouveau code
+ * @param {Object|string} [updateData.template] - Nouveau template
+ * @param {Object|string} [updateData.columns] - Nouvelles colonnes
  * @returns {Promise<Object|null>} - Formulaire mis à jour ou null
  */
 export async function updateForm(formId, updateData) {
-    const form = await Form.findByPk(formId);
+    const form = await models.Form.findByPk(formId);
     if (!form) {
         return null;
+    }
+
+    // Stringifier template si c'est un objet
+    if (updateData.template && typeof updateData.template === 'object') {
+        updateData.template = JSON.stringify(updateData.template);
+    }
+
+    // Stringifier columns si c'est un objet
+    if (updateData.columns && typeof updateData.columns === 'object') {
+        updateData.columns = JSON.stringify(updateData.columns);
     }
 
     await form.update(updateData);
@@ -146,7 +171,7 @@ export async function updateForm(formId, updateData) {
  * @returns {Promise<boolean>} - true si suppression réussie
  */
 export async function deleteForm(formId) {
-    const result = await Form.destroy({
+    const result = await models.Form.destroy({
         where: { id: formId },
     });
 
@@ -166,7 +191,7 @@ export async function endpointExists(endpoint, excludeFormId = null) {
         where.id = { [Op.ne]: excludeFormId };
     }
 
-    const form = await Form.findOne({ where });
+    const form = await models.Form.findOne({ where });
     return !!form;
 }
 
@@ -176,8 +201,8 @@ export async function endpointExists(endpoint, excludeFormId = null) {
  * @returns {Promise<number>} - Nombre de formulaires
  */
 export async function countForms(siteId = null) {
-    const where = siteId ? { siteId } : {};
-    return await Form.count({ where });
+    const where = siteId ? { fk_id_site: siteId } : {};
+    return await models.Form.count({ where });
 }
 
 /**
@@ -185,19 +210,66 @@ export async function countForms(siteId = null) {
  * @returns {Promise<Array>} - Liste des formulaires ayant un template
  */
 export async function getFormTemplates() {
-    const forms = await Form.findAll({
+    const forms = await models.Form.findAll({
         where: {
             template: { [Op.ne]: null },
         },
-        attributes: ['id', 'name', 'endpoint', 'template', 'siteId'],
+        attributes: ['id', 'name', 'endpoint', 'template', 'fk_id_site'],
         include: [
             {
-                model: Site,
+                model: models.Site,
                 as: 'site',
-                attributes: ['id', 'name'],
+                attributes: ['id', 'domain'],
             },
         ],
     });
 
     return forms.map((f) => f.toJSON());
+}
+
+/**
+ * Vérifier l'accès à un formulaire et récupérer ses données
+ * @param {string} formId - ID du formulaire
+ * @param {string} userId - ID de l'utilisateur
+ * @param {string} userRole - Rôle de l'utilisateur
+ * @returns {Promise<Object|null>} - { form, site } ou null si pas d'accès
+ */
+export async function verifyFormAccess(formId, userId, userRole) {
+    // Récupérer le formulaire avec le site
+    const form = await models.Form.findByPk(formId, {
+        include: [
+            {
+                model: models.Site,
+                as: 'site',
+                attributes: ['id', 'domain'],
+            },
+        ],
+    });
+
+    if (!form) {
+        return null;
+    }
+
+    const site = form.site;
+    if (!site) {
+        return null;
+    }
+
+    // Vérifier l'accès au site selon le rôle
+    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+
+    if (siteWhereCondition) {
+        const accessibleSite = await models.Site.findOne({
+            where: { id: site.id, ...siteWhereCondition },
+        });
+
+        if (!accessibleSite) {
+            return null;
+        }
+    }
+
+    return {
+        form: form.toJSON(),
+        site: site.toJSON(),
+    };
 }

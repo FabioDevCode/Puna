@@ -1,16 +1,13 @@
-import bcrypt from 'bcrypt';
 import passport from 'passport';
-import models from '../models/index.js';
+import { findUserByLogin, activateUserAccount } from '../services/auth.service.js';
+import { updateLastConnection } from '../services/user.service.js';
 
 export const dpFirstCoPost = async (req, res) => {
     const { login, password, confirm_password } = req.body;
     try {
-        const user = await models.User.findOne({
-            where: {
-                login,
-                status: 'pending',
-            },
-        });
+        // Rechercher l'utilisateur via le service
+        const user = await findUserByLogin(login, 'pending');
+
         if (!user) {
             return res.render('auth/first-login', {
                 layout: 'auth',
@@ -23,11 +20,10 @@ export const dpFirstCoPost = async (req, res) => {
                 error: 'Les mots de passe ne correspondent pas.',
             });
         }
-        const hash = await bcrypt.hash(password, 10);
-        await user.update({
-            password: hash,
-            status: 'active',
-        });
+
+        // Activer le compte via le service
+        await activateUserAccount(user.id, password);
+
         return res.redirect('/dp-login');
     } catch (err) {
         return res.render('auth/first-login', {
@@ -44,16 +40,8 @@ export const dpConnect = (req, res) => {
         }
 
         try {
-            await models.User.update(
-                {
-                    last_connection: new Date(),
-                },
-                {
-                    where: {
-                        id: user.id,
-                    },
-                }
-            );
+            // Mettre à jour last_connection via le service
+            await updateLastConnection(user.id);
         } catch (e) {
             console.error('Failed to update last_connection for user', user && user.id, e);
         }
@@ -62,8 +50,8 @@ export const dpConnect = (req, res) => {
             id: user.id,
             login: user.login,
             email: user.email,
-            role: user.role, // 🆕 Ajouter le rôle
-            status: user.status, // 🆕 Optionnel mais utile
+            role: user.role,
+            status: user.status,
         };
         return res.redirect('/dashboard');
     })(req, res);

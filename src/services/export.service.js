@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import archiver from 'archiver';
 import ExcelJS from 'exceljs';
-import { Inbox, Form, Site } from '../models/index.js';
+import models from '../models/index.js';
 import { getSiteWhereCondition } from './access.service.js';
 
 /**
@@ -19,14 +19,14 @@ import { getSiteWhereCondition } from './access.service.js';
 export async function getInboxWithFiles(inboxId, userId, userRole) {
     const siteWhereCondition = getSiteWhereCondition(userId, userRole);
 
-    const inbox = await Inbox.findByPk(inboxId, {
+    const inbox = await models.Inbox.findByPk(inboxId, {
         include: [
             {
-                model: Form,
+                model: models.Form,
                 as: 'form',
                 include: [
                     {
-                        model: Site,
+                        model: models.Site,
                         as: 'site',
                         where: siteWhereCondition,
                     },
@@ -136,10 +136,10 @@ export function createZipArchive(files) {
 export async function getFormDataForExport(formId, userId, userRole) {
     const siteWhereCondition = getSiteWhereCondition(userId, userRole);
 
-    const form = await Form.findByPk(formId, {
+    const form = await models.Form.findByPk(formId, {
         include: [
             {
-                model: Site,
+                model: models.Site,
                 as: 'site',
                 where: siteWhereCondition,
             },
@@ -155,9 +155,9 @@ export async function getFormDataForExport(formId, userId, userRole) {
         return null;
     }
 
-    const submissions = await Inbox.findAll({
-        where: { formId },
-        attributes: ['id', 'content', 'file_keys', 'createdAt'],
+    const submissions = await models.Inbox.findAll({
+        where: { fk_id_form: formId },
+        attributes: ['id', 'content', 'createdAt'],
         order: [['createdAt', 'DESC']],
     });
 
@@ -172,26 +172,14 @@ export async function getFormDataForExport(formId, userId, userRole) {
  * Générer un fichier Excel à partir des soumissions
  * @param {Object} form - Formulaire
  * @param {Array} submissions - Liste des soumissions
+ * @param {Array} customColumns - Colonnes personnalisées [{key, header}] (optionnel)
  * @returns {Promise<ExcelJS.Workbook>} - Workbook Excel
  */
-export async function generateExcelWorkbook(form, submissions) {
+export async function generateExcelWorkbook(form, submissions, customColumns = []) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Submissions');
 
-    // Parser les colonnes personnalisées si elles existent
-    let customColumns = [];
-    try {
-        if (form.columns) {
-            const parsed = typeof form.columns === 'string' ? JSON.parse(form.columns) : form.columns;
-            if (Array.isArray(parsed)) {
-                customColumns = parsed;
-            }
-        }
-    } catch (e) {
-        customColumns = [];
-    }
-
-    // Extraire toutes les clés uniques des contenus
+    // Extraire toutes les clés uniques des contenus si pas de colonnes custom
     const allKeys = new Set();
     submissions.forEach((sub) => {
         let contentObj = {};
@@ -212,7 +200,11 @@ export async function generateExcelWorkbook(form, submissions) {
     // Ajouter les colonnes personnalisées ou auto-détectées
     if (customColumns.length > 0) {
         customColumns.forEach((col) => {
-            columns.push({ header: col, key: col, width: 20 });
+            columns.push({
+                header: col.header || col.key,
+                key: col.key,
+                width: 20,
+            });
         });
     } else {
         Array.from(allKeys).forEach((key) => {
@@ -245,7 +237,7 @@ export async function generateExcelWorkbook(form, submissions) {
         };
 
         // Ajouter les valeurs des colonnes
-        const keysToUse = customColumns.length > 0 ? customColumns : Array.from(allKeys);
+        const keysToUse = customColumns.length > 0 ? customColumns.map((c) => c.key) : Array.from(allKeys);
         keysToUse.forEach((key) => {
             const value = contentObj[key];
             // Convertir les tableaux et objets en chaînes
@@ -273,19 +265,19 @@ export async function generateExcelWorkbook(form, submissions) {
 export async function getAllSubmissionsForExport(userId, userRole) {
     const siteWhereCondition = getSiteWhereCondition(userId, userRole);
 
-    const submissions = await Inbox.findAll({
-        attributes: ['id', 'content', 'file_keys', 'createdAt'],
+    const submissions = await models.Inbox.findAll({
+        attributes: ['id', 'content', 'createdAt'],
         include: [
             {
-                model: Form,
+                model: models.Form,
                 as: 'form',
                 attributes: ['id', 'name', 'endpoint'],
                 include: [
                     {
-                        model: Site,
+                        model: models.Site,
                         as: 'site',
                         where: siteWhereCondition,
-                        attributes: ['id', 'name', 'domain'],
+                        attributes: ['id', 'domain'],
                     },
                 ],
             },

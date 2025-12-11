@@ -4,7 +4,7 @@
  */
 
 import { Op } from 'sequelize';
-import { User } from '../models/index.js';
+import models from '../models/index.js';
 import { hashPassword } from './auth.service.js';
 
 /**
@@ -16,7 +16,7 @@ import { hashPassword } from './auth.service.js';
 export async function getAllUsers(page = 1, limit = 20) {
     const offset = (page - 1) * limit;
 
-    const { rows: users, count: total } = await User.findAndCountAll({
+    const { rows: users, count: total } = await models.User.findAndCountAll({
         attributes: ['id', 'email', 'name', 'role', 'createdAt'],
         order: [['createdAt', 'DESC']],
         limit,
@@ -38,7 +38,7 @@ export async function getAllUsers(page = 1, limit = 20) {
  * @returns {Promise<Array>} - Liste des utilisateurs trouvés
  */
 export async function searchUsers(query, limit = 20) {
-    const users = await User.findAll({
+    const users = await models.User.findAll({
         where: {
             [Op.or]: [{ email: { [Op.like]: `%${query}%` } }, { name: { [Op.like]: `%${query}%` } }],
         },
@@ -60,7 +60,7 @@ export async function getUserById(userId, includePassword = false) {
         ? ['id', 'email', 'name', 'role', 'password', 'createdAt', 'updatedAt']
         : ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'];
 
-    const user = await User.findByPk(userId, { attributes });
+    const user = await models.User.findByPk(userId, { attributes });
     return user ? user.toJSON() : null;
 }
 
@@ -76,7 +76,7 @@ export async function getUserById(userId, includePassword = false) {
 export async function createUser(userData) {
     const hashedPassword = await hashPassword(userData.password);
 
-    const user = await User.create({
+    const user = await models.User.create({
         email: userData.email,
         name: userData.name,
         password: hashedPassword,
@@ -98,7 +98,7 @@ export async function createUser(userData) {
  * @returns {Promise<Object|null>} - Utilisateur mis à jour ou null
  */
 export async function updateUser(userId, updateData) {
-    const user = await User.findByPk(userId);
+    const user = await models.User.findByPk(userId);
     if (!user) {
         return null;
     }
@@ -122,7 +122,7 @@ export async function updateUser(userId, updateData) {
  * @returns {Promise<boolean>} - true si suppression réussie
  */
 export async function deleteUser(userId) {
-    const result = await User.destroy({
+    const result = await models.User.destroy({
         where: { id: userId },
     });
 
@@ -142,7 +142,7 @@ export async function emailExists(email, excludeUserId = null) {
         where.id = { [Op.ne]: excludeUserId };
     }
 
-    const user = await User.findOne({ where });
+    const user = await models.User.findOne({ where });
     return !!user;
 }
 
@@ -151,7 +151,7 @@ export async function emailExists(email, excludeUserId = null) {
  * @returns {Promise<number>} - Nombre d'utilisateurs
  */
 export async function countUsers() {
-    return await User.count();
+    return await models.User.count();
 }
 
 /**
@@ -159,7 +159,7 @@ export async function countUsers() {
  * @returns {Promise<Object>} - { super_admin: 1, owner: 5, ... }
  */
 export async function countUsersByRole() {
-    const users = await User.findAll({
+    const users = await models.User.findAll({
         attributes: ['role'],
     });
 
@@ -169,4 +169,209 @@ export async function countUsersByRole() {
     });
 
     return counts;
+}
+
+/**
+ * Récupérer tous les utilisateurs avec leur créateur (pour export Excel)
+ * @param {Object} filters - Filtres optionnels
+ * @param {string} [filters.search] - Recherche sur email ou login
+ * @returns {Promise<Array>} - Liste des utilisateurs avec créateur
+ */
+export async function getAllUsersWithCreator(filters = {}) {
+    const where = {};
+
+    if (filters.search) {
+        where[Op.or] = [
+            { email: { [Op.like]: `%${filters.search}%` } },
+            { login: { [Op.like]: `%${filters.search}%` } },
+        ];
+    }
+
+    const users = await models.User.findAll({
+        where,
+        order: [['createdAt', 'DESC']],
+        include: [
+            {
+                model: models.User,
+                as: 'creator',
+                attributes: ['id', 'login', 'email'],
+                required: false,
+            },
+        ],
+    });
+
+    return users.map((u) => u.toJSON());
+}
+
+/**
+ * Récupérer les utilisateurs avec pagination et filtres avancés
+ * @param {Object} options - Options de recherche
+ * @param {number} options.limit - Nombre de résultats par page
+ * @param {number} options.offset - Décalage
+ * @param {string} [options.search] - Terme de recherche
+ * @param {string} [options.searchField] - Champ de recherche (email, login, role, created_by, auto)
+ * @returns {Promise<Object>} - { users, total }
+ */
+export async function findUsersWithFilters(options = {}) {
+    const { limit = 10, offset = 0, search = '', searchField = 'auto' } = options;
+
+    const whereConditions = {};
+    const includeCreator = {
+        model: models.User,
+        as: 'creator',
+        attributes: ['id', 'login', 'email'],
+        required: false,
+    };
+
+    if (search) {
+        if (searchField === 'auto' || searchField === 'email') {
+            whereConditions.email = { [Op.like]: `%${search}%` };
+        } else if (searchField === 'login') {
+            whereConditions.login = { [Op.like]: `%${search}%` };
+        } else if (searchField === 'role') {
+            whereConditions.role = { [Op.like]: `%${search}%` };
+        } else if (searchField === 'created_by') {
+            includeCreator.where = {
+                login: { [Op.like]: `%${search}%` },
+            };
+        }
+    }
+
+    const { count, rows: users } = await models.User.findAndCountAll({
+        where: whereConditions,
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']],
+        include: [includeCreator],
+        attributes: ['id', 'email', 'login', 'role', 'status', 'last_connection', 'createdAt', 'created_by'],
+    });
+
+    return {
+        users: users.map((u) => u.toJSON()),
+        total: count,
+    };
+}
+
+/**
+ * Récupérer un utilisateur avec ses relations (creator + sites assignés)
+ * @param {string} userId - ID de l'utilisateur
+ * @returns {Promise<Object|null>} - Utilisateur avec relations ou null
+ */
+export async function getUserWithRelations(userId) {
+    const user = await models.User.findByPk(userId, {
+        include: [
+            {
+                model: models.User,
+                as: 'creator',
+                attributes: ['id', 'login', 'email'],
+                required: false,
+            },
+            {
+                model: models.SiteUser,
+                as: 'siteassignments',
+                include: [
+                    {
+                        model: models.Site,
+                        as: 'site',
+                        attributes: ['id', 'domain'],
+                    },
+                ],
+            },
+        ],
+    });
+
+    return user ? user.toJSON() : null;
+}
+
+/**
+ * Créer un utilisateur (version admin avec login, status, created_by)
+ * @param {Object} userData - Données de l'utilisateur
+ * @param {string} userData.login - Login
+ * @param {string} userData.email - Email
+ * @param {string} userData.role - Rôle
+ * @param {string} [userData.created_by] - ID du créateur
+ * @param {string} [userData.status] - Statut (pending, active)
+ * @param {string} [userData.password] - Mot de passe optionnel
+ * @returns {Promise<Object>} - Utilisateur créé
+ */
+export async function createUserAdmin(userData) {
+    const dataToCreate = {
+        login: userData.login,
+        email: userData.email,
+        role: userData.role || 'viewer',
+        created_by: userData.created_by || null,
+        status: userData.status || 'pending',
+    };
+
+    // Hash du password seulement s'il est fourni
+    if (userData.password) {
+        dataToCreate.password = await hashPassword(userData.password);
+    }
+
+    const user = await models.User.create(dataToCreate);
+    return user.toJSON();
+}
+
+/**
+ * Vérifier si un utilisateur existe (par email ou login)
+ * @param {string} email - Email
+ * @param {string} login - Login
+ * @param {string} [excludeUserId] - ID à exclure (pour updates)
+ * @returns {Promise<boolean>} - true si l'utilisateur existe
+ */
+export async function userExists(email, login, excludeUserId = null) {
+    const where = {
+        [Op.or]: [{ email }, { login }],
+    };
+
+    if (excludeUserId) {
+        where.id = { [Op.ne]: excludeUserId };
+    }
+
+    const user = await models.User.findOne({ where });
+    return !!user;
+}
+
+/**
+ * Supprimer un utilisateur et ses relations SiteUser
+ * @param {string} userId - ID de l'utilisateur
+ * @returns {Promise<boolean>} - true si suppression réussie
+ */
+export async function deleteUserWithRelations(userId) {
+    // Supprimer d'abord les SiteUser
+    await models.SiteUser.destroy({
+        where: { fk_id_user: userId },
+    });
+
+    // Puis supprimer l'utilisateur
+    const result = await models.User.destroy({
+        where: { id: userId },
+    });
+
+    return result > 0;
+}
+
+/**
+ * Mettre à jour un utilisateur (sans hasher le password si null)
+ * @param {string} userId - ID de l'utilisateur
+ * @param {Object} updateData - Données à mettre à jour
+ * @returns {Promise<boolean>} - true si mise à jour réussie
+ */
+export async function updateUserAdmin(userId, updateData) {
+    const result = await models.User.update(updateData, {
+        where: { id: userId },
+    });
+
+    return result[0] > 0;
+}
+
+/**
+ * Mettre à jour la dernière connexion d'un utilisateur
+ * @param {string} userId - ID de l'utilisateur
+ * @returns {Promise<boolean>} - true si mise à jour réussie
+ */
+export async function updateLastConnection(userId) {
+    const [updated] = await models.User.update({ last_connection: new Date() }, { where: { id: userId } });
+
+    return updated > 0;
 }

@@ -1,7 +1,17 @@
-import bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
-import { Op } from 'sequelize';
 import models from '../models/index.js';
+import { verifyPassword } from '../services/auth.service.js';
+import { getAvailableSites } from '../services/site.service.js';
+import { assignUserToSites, updateUserSiteAssignments } from '../services/siteUser.service.js';
+import {
+    findUsersWithFilters,
+    getAllUsersWithCreator,
+    userExists,
+    createUserAdmin,
+    deleteUserWithRelations,
+    getUserWithRelations,
+    updateUserAdmin,
+} from '../services/user.service.js';
 
 /**
  * Page d'administration
@@ -25,18 +35,12 @@ export const adminUsers = async (req, res) => {
         const userId = req.session.user?.id;
         const userRole = req.session.user?.role;
 
-        // Récupérer les sites disponibles (super_admin voit tous les sites)
-        const whereCondition = userRole === 'super_admin' ? {} : { fk_id_user: userId };
-
-        const sites = await models.Site.findAll({
-            where: whereCondition,
-            attributes: ['id', 'domain'],
-            order: [['domain', 'ASC']],
-        });
+        // Récupérer les sites disponibles via le service
+        const sites = await getAvailableSites(userId, userRole);
 
         res.render('admin/users/list', {
             layout: 'admin',
-            sites: sites.map((s) => s.toJSON()),
+            sites,
         });
     } catch (err) {
         console.error('adminUsers error:', err);
@@ -54,40 +58,12 @@ export const adminUsersList = async (req, res) => {
         const search = req.query.search || '';
         const searchField = req.query.searchField || 'auto';
 
-        // Construire les conditions de recherche
-        const whereConditions = {};
-        if (search) {
-            if (searchField === 'auto' || searchField === 'email') {
-                whereConditions.email = { [Op.like]: `%${search}%` };
-            } else if (searchField === 'login') {
-                whereConditions.login = { [Op.like]: `%${search}%` };
-            } else if (searchField === 'role') {
-                whereConditions.role = { [Op.like]: `%${search}%` };
-            }
-        }
-
-        // Récupérer les utilisateurs avec pagination
-        const { count, rows: users } = await models.User.findAndCountAll({
-            where: whereConditions,
+        // Récupérer les utilisateurs via le service
+        const { users, total } = await findUsersWithFilters({
             limit,
             offset,
-            order: [['createdAt', 'DESC']],
-            include: [
-                {
-                    model: models.User,
-                    as: 'creator',
-                    attributes: ['id', 'login', 'email'],
-                    required: false,
-                    ...(searchField === 'created_by' && search
-                        ? {
-                              where: {
-                                  login: { [Op.like]: `%${search}%` },
-                              },
-                          }
-                        : {}),
-                },
-            ],
-            attributes: ['id', 'email', 'login', 'role', 'status', 'last_connection', 'createdAt', 'created_by'],
+            search,
+            searchField,
         });
 
         // Formater les données
@@ -104,7 +80,7 @@ export const adminUsersList = async (req, res) => {
 
         res.json({
             users: formattedUsers,
-            total: count,
+            total,
             limit,
             offset,
         });
@@ -121,24 +97,8 @@ export const adminUsersExportExcel = async (req, res) => {
     try {
         const search = req.query.search || '';
 
-        // Construire les conditions de recherche
-        const whereConditions = {};
-        if (search) {
-            whereConditions[Op.or] = [{ email: { [Op.like]: `%${search}%` } }, { login: { [Op.like]: `%${search}%` } }];
-        }
-
-        // Récupérer tous les utilisateurs
-        const users = await models.User.findAll({
-            where: whereConditions,
-            order: [['createdAt', 'DESC']],
-            include: [
-                {
-                    model: models.User,
-                    as: 'creator',
-                    attributes: ['login'],
-                },
-            ],
-        });
+        // Récupérer tous les utilisateurs via le service
+        const users = await getAllUsersWithCreator({ search });
 
         // Créer le workbook Excel
         const ExcelJS = (await import('exceljs')).default;
@@ -200,19 +160,14 @@ export const adminCreateUser = async (req, res) => {
             return res.redirect('/admin/users');
         }
 
-        // Vérifier si l'utilisateur existe déjà
-        const existingUser = await models.User.findOne({
-            where: {
-                [Op.or]: [{ email }, { login }],
-            },
-        });
-
-        if (existingUser) {
+        // Vérifier si l'utilisateur existe déjà via le service
+        const exists = await userExists(email, login);
+        if (exists) {
             return res.redirect('/admin/users');
         }
 
-        // Créer l'utilisateur
-        const newUser = await models.User.create({
+        // Créer l'utilisateur via le service
+        const newUser = await createUserAdmin({
             login,
             email,
             role,
@@ -220,14 +175,10 @@ export const adminCreateUser = async (req, res) => {
             status: 'pending',
         });
 
-        // Assigner les sites
+        // Assigner les sites via le service
         if (sites) {
             const siteIds = Array.isArray(sites) ? sites : [sites];
-            const siteAssignments = siteIds.map((siteId) => ({
-                fk_id_user: newUser.id,
-                fk_id_site: siteId, // UUID string (pas parseInt !)
-            }));
-            await models.SiteUser.bulkCreate(siteAssignments);
+            await assignUserToSites(newUser.id, siteIds);
         }
 
         res.redirect('/admin/users');
@@ -256,21 +207,14 @@ export const adminDeleteUser = async (req, res) => {
             return res.redirect('/admin/users');
         }
 
-        const isPasswordValid = await bcrypt.compare(password, currentUser.password);
+        const isPasswordValid = await verifyPassword(password, currentUser.password);
         if (!isPasswordValid) {
             // TODO: Flash message "Mot de passe incorrect"
             return res.redirect('/admin/users');
         }
 
-        // Supprimer les associations dans SiteUser
-        await models.SiteUser.destroy({
-            where: { fk_id_user: user_id },
-        });
-
-        // Supprimer l'utilisateur
-        await models.User.destroy({
-            where: { id: user_id },
-        });
+        // Supprimer l'utilisateur et ses relations via le service
+        await deleteUserWithRelations(user_id);
 
         res.redirect('/admin/users');
     } catch (err) {
@@ -286,41 +230,20 @@ export const adminViewUser = async (req, res) => {
     try {
         const userId = req.params.id;
 
-        const user = await models.User.findByPk(userId, {
-            include: [
-                {
-                    model: models.User,
-                    as: 'creator',
-                    attributes: ['login'],
-                },
-                {
-                    model: models.SiteUser,
-                    as: 'siteassignments',
-                    include: [
-                        {
-                            model: models.Site,
-                            as: 'site',
-                            attributes: ['id', 'domain'],
-                        },
-                    ],
-                },
-            ],
-        });
+        // Récupérer l'utilisateur avec ses relations via le service
+        const user = await getUserWithRelations(userId);
 
         if (!user) {
             return res.redirect('/admin/users');
         }
 
         // Formater les données pour l'affichage
-        const userData = user.toJSON();
-        userData.last_connection = userData.last_connection
-            ? dayjs(userData.last_connection).format('YYYY-MM-DD HH:mm')
-            : null;
-        userData.createdAt = dayjs(userData.createdAt).format('YYYY-MM-DD HH:mm');
+        user.last_connection = user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : null;
+        user.createdAt = dayjs(user.createdAt).format('YYYY-MM-DD HH:mm');
 
         res.render('admin/users/view', {
             layout: 'admin',
-            user: userData,
+            user,
         });
     } catch (err) {
         console.error('adminViewUser error:', err);
@@ -335,62 +258,32 @@ export const adminEditUser = async (req, res) => {
     try {
         const userId = req.params.id;
         const currentUserId = req.session.user?.id;
+        const currentUserRole = req.session.user?.role;
 
-        const user = await models.User.findByPk(userId, {
-            include: [
-                {
-                    model: models.User,
-                    as: 'creator',
-                    attributes: ['login'],
-                },
-                {
-                    model: models.SiteUser,
-                    as: 'siteassignments',
-                    include: [
-                        {
-                            model: models.Site,
-                            as: 'site',
-                            attributes: ['id', 'domain'],
-                        },
-                    ],
-                },
-            ],
-        });
+        // Récupérer l'utilisateur avec ses relations via le service
+        const user = await getUserWithRelations(userId);
 
         if (!user) {
             return res.redirect('/admin/users');
         }
 
-        // Récupérer tous les sites disponibles
-        const currentUserRole = req.session.user?.role;
-        const whereCondition =
-            currentUserRole === 'super_admin'
-                ? {} // Super_admin voit TOUS les sites
-                : { fk_id_user: currentUserId }; // Autres voient seulement leurs sites
-
-        const sites = await models.Site.findAll({
-            where: whereCondition,
-            attributes: ['id', 'domain'],
-            order: [['domain', 'ASC']],
-        });
+        // Récupérer tous les sites disponibles via le service
+        const sites = await getAvailableSites(currentUserId, currentUserRole);
 
         // Marquer les sites assignés
         const assignedSiteIds = user.siteassignments?.map((sa) => sa.site.id) || [];
         const sitesWithAssignment = sites.map((s) => ({
-            ...s.toJSON(),
+            ...s,
             isAssigned: assignedSiteIds.includes(s.id),
         }));
 
         // Formater les données pour l'affichage
-        const userData = user.toJSON();
-        userData.last_connection = userData.last_connection
-            ? dayjs(userData.last_connection).format('YYYY-MM-DD HH:mm')
-            : null;
-        userData.createdAt = dayjs(userData.createdAt).format('YYYY-MM-DD HH:mm');
+        user.last_connection = user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : null;
+        user.createdAt = dayjs(user.createdAt).format('YYYY-MM-DD HH:mm');
 
         res.render('admin/users/edit', {
             layout: 'admin',
-            user: userData,
+            user,
             sites: sitesWithAssignment,
         });
     } catch (err) {
@@ -424,26 +317,12 @@ export const adminUpdateUser = async (req, res) => {
             updateData.status = 'pending';
         }
 
-        // Mettre à jour l'utilisateur
-        await models.User.update(updateData, {
-            where: { id: userId },
-        });
+        // Mettre à jour l'utilisateur via le service
+        await updateUserAdmin(userId, updateData);
 
-        // Gérer les sites assignés
-        // D'abord supprimer toutes les assignations existantes
-        await models.SiteUser.destroy({
-            where: { fk_id_user: userId },
-        });
-
-        // Puis recréer les assignations si des sites sont sélectionnés
-        if (sites) {
-            const siteIds = Array.isArray(sites) ? sites : [sites];
-            const siteAssignments = siteIds.map((siteId) => ({
-                fk_id_user: userId, // UUID string
-                fk_id_site: siteId, // UUID string (pas parseInt !)
-            }));
-            await models.SiteUser.bulkCreate(siteAssignments);
-        }
+        // Gérer les sites assignés via le service
+        const siteIds = sites ? (Array.isArray(sites) ? sites : [sites]) : [];
+        await updateUserSiteAssignments(userId, siteIds);
 
         res.redirect('/admin/users');
     } catch (err) {

@@ -5,7 +5,7 @@
 
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
-import { Inbox, Form, Site, sequelize, Sequelize } from '../models/index.js';
+import models from '../models/index.js';
 
 /**
  * Récupérer les statistiques globales d'un utilisateur
@@ -17,25 +17,25 @@ export async function getGlobalStats(userId, userRole) {
     const siteWhere = userRole === 'super_admin' ? {} : { fk_id_user: userId };
 
     const [sitesCount, formsCount, submissionsCount] = await Promise.all([
-        Site.count({ where: siteWhere }),
-        Form.count({
+        models.Site.count({ where: siteWhere }),
+        models.Form.count({
             include: [
                 {
-                    model: Site,
+                    model: models.Site,
                     as: 'site',
                     where: siteWhere,
                     attributes: [],
                 },
             ],
         }),
-        Inbox.count({
+        models.Inbox.count({
             include: [
                 {
-                    model: Form,
+                    model: models.Form,
                     as: 'form',
                     include: [
                         {
-                            model: Site,
+                            model: models.Site,
                             as: 'site',
                             where: siteWhere,
                             attributes: [],
@@ -78,13 +78,13 @@ export async function getTopForms(userId, days = 7) {
         LIMIT 5
     `;
 
-    const rows = await sequelize.query(sql, {
+    const rows = await models.sequelize.query(sql, {
         replacements: {
             userId,
             start: start.toDate(),
             end: end.toDate(),
         },
-        type: Sequelize.QueryTypes.SELECT,
+        type: models.Sequelize.QueryTypes.SELECT,
     });
 
     return (rows || []).map((r, idx) => ({
@@ -121,9 +121,9 @@ export async function getTopSiteWithForms(userId, days = 90) {
         LIMIT 1
     `;
 
-    const topSiteRows = await sequelize.query(sqlTopSite, {
+    const topSiteRows = await models.sequelize.query(sqlTopSite, {
         replacements: { userId, start: start.toDate(), end: end.toDate() },
-        type: Sequelize.QueryTypes.SELECT,
+        type: models.Sequelize.QueryTypes.SELECT,
     });
 
     if (!topSiteRows || !topSiteRows.length) {
@@ -143,9 +143,9 @@ export async function getTopSiteWithForms(userId, days = 90) {
         ORDER BY cnt DESC
     `;
 
-    const perFormRows = await sequelize.query(sqlPerForm, {
+    const perFormRows = await models.sequelize.query(sqlPerForm, {
         replacements: { siteId, start: start.toDate(), end: end.toDate() },
-        type: Sequelize.QueryTypes.SELECT,
+        type: models.Sequelize.QueryTypes.SELECT,
     });
 
     const labels = (perFormRows || []).map((r) => r.form_name || `form-${r.form_id}`);
@@ -192,13 +192,13 @@ export async function getInboxCountsByDay(userId, days = 7) {
         GROUP BY DATE(i.createdAt)
     `;
 
-    const rows = await sequelize.query(sql, {
+    const rows = await models.sequelize.query(sql, {
         replacements: {
             userId,
             start: start.toDate(),
             end: end.toDate(),
         },
-        type: Sequelize.QueryTypes.SELECT,
+        type: models.Sequelize.QueryTypes.SELECT,
     });
 
     // Mapper dans un dictionnaire pour accès rapide
@@ -225,7 +225,7 @@ export async function getInboxCountsByDay(userId, days = 7) {
 export async function countSubmissionsInRange(userId, userRole, startDate, endDate) {
     const siteWhere = userRole === 'super_admin' ? {} : { fk_id_user: userId };
 
-    return await Inbox.count({
+    return await models.Inbox.count({
         where: {
             createdAt: {
                 [Op.gte]: startDate,
@@ -234,11 +234,11 @@ export async function countSubmissionsInRange(userId, userRole, startDate, endDa
         },
         include: [
             {
-                model: Form,
+                model: models.Form,
                 as: 'form',
                 include: [
                     {
-                        model: Site,
+                        model: models.Site,
                         as: 'site',
                         where: siteWhere,
                         attributes: [],
@@ -322,36 +322,267 @@ export async function getInboxPercentages(userId, userRole) {
 export async function getSitesWithCounts(userId, userRole) {
     const siteWhere = userRole === 'super_admin' ? {} : { fk_id_user: userId };
 
-    const sites = await Site.findAll({
+    const sites = await models.Site.findAll({
         where: siteWhere,
-        attributes: ['id', 'name', 'domain'],
+        attributes: ['id', 'domain'],
+        raw: true,
+    });
+
+    const sitesWithCounts = await Promise.all(
+        sites.map(async (site) => {
+            let formCount = 0;
+            let inboxCount = 0;
+
+            const forms = await models.Form.findAll({
+                where: { fk_id_site: site.id },
+                attributes: ['id'],
+                raw: true,
+            });
+
+            if (forms?.length) {
+                formCount = forms.length;
+                const formIds = forms.map((f) => f.id);
+                inboxCount = await models.Inbox.count({
+                    where: { fk_id_form: formIds },
+                });
+            }
+
+            return {
+                id: site.id,
+                domain: site.domain,
+                form: formCount,
+                inbox: inboxCount,
+            };
+        })
+    );
+
+    // Tri alphabétique par domaine
+    sitesWithCounts.sort((a, b) => a.domain.localeCompare(b.domain));
+    return sitesWithCounts;
+}
+
+/**
+ * Calculer les statistiques globales à partir des sites avec compteurs
+ * @param {Array} sitesWithCounts - Sites avec compteurs form/inbox
+ * @returns {Object} - Statistiques globales
+ */
+export function getGlobalStatsFromSites(sitesWithCounts) {
+    const globalInbox = sitesWithCounts.reduce((acc, site) => acc + (site.inbox || 0), 0);
+    const globalForm = sitesWithCounts.reduce((acc, site) => acc + (site.form || 0), 0);
+    const globalSite = sitesWithCounts.length;
+
+    return {
+        globalInbox,
+        globalInbox_icon: 'fas fa-inbox',
+        globalForm,
+        globalForm_icon: 'fas fa-file-alt',
+        globalSite,
+        globalSite_icon: 'fas fa-globe',
+    };
+}
+
+/**
+ * Compter les inbox par site
+ * @param {string} userId - ID de l'utilisateur
+ * @returns {Promise<Object>} - { labels: [domains], data: [counts] }
+ */
+export async function getInboxCountsBySite(userId) {
+    const sql = `
+        SELECT s.id AS site_id, s.domain AS site_domain, COUNT(i.id) AS cnt
+        FROM site s
+        LEFT JOIN form f ON f.fk_id_site = s.id
+        LEFT JOIN inbox i ON i.fk_id_form = f.id
+        WHERE s.fk_id_user = :userId
+        GROUP BY s.id, s.domain
+        ORDER BY s.domain ASC
+    `;
+
+    const rows = await models.sequelize.query(sql, {
+        replacements: { userId },
+        type: models.Sequelize.QueryTypes.SELECT,
+    });
+
+    const labels = (rows || []).map((r) => r.site_domain);
+    const data = (rows || []).map((r) => Number(r.cnt) || 0);
+
+    return { labels, data };
+}
+
+/**
+ * Générer la heatmap des inbox (jour de semaine x heure)
+ * @param {string} userId - ID de l'utilisateur
+ * @param {string} userRole - Rôle de l'utilisateur
+ * @param {number} days - Nombre de jours (7, 30, 90, 180)
+ * @returns {Promise<Object>} - { hours: [], series: [{ name, data }] }
+ */
+export async function getInboxHeatmap(userId, userRole, days = 7) {
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - (days - 1));
+
+    const siteWhere = userRole === 'super_admin' ? null : { fk_id_user: userId };
+
+    const includeOptions = {
+        model: models.Form,
+        as: 'form',
+        attributes: [],
         include: [
             {
-                model: Form,
-                as: 'forms',
-                attributes: ['id'],
-                include: [
-                    {
-                        model: Inbox,
-                        as: 'inboxes',
-                        attributes: ['id'],
-                    },
-                ],
+                model: models.Site,
+                as: 'site',
+                attributes: [],
             },
         ],
+    };
+
+    // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
+    if (siteWhere) {
+        includeOptions.include[0].where = siteWhere;
+    }
+
+    const inboxRows = await models.Inbox.findAll({
+        where: {
+            createdAt: {
+                [Op.gte]: start,
+                [Op.lte]: end,
+            },
+        },
+        include: [includeOptions],
     });
 
-    return sites.map((site) => {
-        const siteData = site.toJSON();
-        const formsCount = siteData.forms?.length || 0;
-        const submissionsCount = siteData.forms?.reduce((sum, form) => sum + (form.inboxes?.length || 0), 0) || 0;
+    // Préparer matrice 7x24 (Lundi..Dimanche, heures 00..23)
+    const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const hours = Array.from({ length: 24 }, (_, i) => (i === 0 ? '00' : String(i)));
+    const matrix = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0));
 
-        return {
-            id: siteData.id,
-            name: siteData.name,
-            domain: siteData.domain,
-            formsCount,
-            submissionsCount,
-        };
+    (inboxRows || []).forEach((r) => {
+        const created = dayjs(r.createdAt);
+        // day() -> 0 (Sunday) .. 6 (Saturday); on veut Monday=0 .. Sunday=6
+        const dow = created.day();
+        const mondayIndex = (dow + 6) % 7;
+        const h = created.hour(); // 0..23
+        if (matrix[mondayIndex] && typeof matrix[mondayIndex][h] !== 'undefined') {
+            matrix[mondayIndex][h]++;
+        }
     });
+
+    let series = daysOfWeek.map((d, i) => ({
+        name: d,
+        data: hours.map((h, j) => ({ x: h, y: matrix[i][j] })),
+    }));
+
+    series = series.reverse();
+
+    return { hours, series };
+}
+
+/**
+ * Récupérer la dernière entrée inbox
+ * @param {string} userId - ID de l'utilisateur
+ * @param {string} userRole - Rôle de l'utilisateur
+ * @returns {Promise<Object|null>} - { date, time } ou { date: null, time: null }
+ */
+export async function getLastInboxEntry(userId, userRole) {
+    const siteWhere = userRole === 'super_admin' ? null : { fk_id_user: userId };
+
+    const includeOptions = {
+        model: models.Form,
+        as: 'form',
+        attributes: [],
+        include: [
+            {
+                model: models.Site,
+                as: 'site',
+                attributes: [],
+            },
+        ],
+    };
+
+    // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
+    if (siteWhere) {
+        includeOptions.include[0].where = siteWhere;
+    }
+
+    const lastRow = await models.Inbox.findOne({
+        include: [includeOptions],
+        order: [['createdAt', 'DESC']],
+    });
+
+    if (!lastRow) {
+        return { date: null, time: null };
+    }
+
+    const dt = dayjs(lastRow.createdAt);
+    return {
+        date: dt.format('YYYY-MM-DD'),
+        time: dt.format('HH:mm'),
+    };
+}
+
+/**
+ * Calculer les pourcentages de variation avec format complet
+ * @param {number} userId - ID de l'utilisateur
+ * @param {string} userRole - Rôle de l'utilisateur
+ * @returns {Promise<Object>} - { today: { current, previous, percent, trend }, ... }
+ */
+export async function getInboxPercentagesDetailed(userId, userRole) {
+    const now = dayjs();
+
+    // Aujourd'hui vs Hier
+    const todayStart = now.startOf('day');
+    const todayEnd = now.endOf('day');
+    const yesterdayStart = now.subtract(1, 'day').startOf('day');
+    const yesterdayEnd = now.subtract(1, 'day').endOf('day');
+
+    const [todayCount, yesterdayCount] = await Promise.all([
+        countSubmissionsInRange(userId, userRole, todayStart.toDate(), todayEnd.toDate()),
+        countSubmissionsInRange(userId, userRole, yesterdayStart.toDate(), yesterdayEnd.toDate()),
+    ]);
+
+    // 7 derniers jours vs 7 jours précédents
+    const last7Start = now.subtract(6, 'day').startOf('day');
+    const last7End = now.endOf('day');
+    const prev7Start = now.subtract(13, 'day').startOf('day');
+    const prev7End = now.subtract(7, 'day').endOf('day');
+
+    const [last7Count, prev7Count] = await Promise.all([
+        countSubmissionsInRange(userId, userRole, last7Start.toDate(), last7End.toDate()),
+        countSubmissionsInRange(userId, userRole, prev7Start.toDate(), prev7End.toDate()),
+    ]);
+
+    // 30 derniers jours vs 30 jours précédents
+    const last30Start = now.subtract(29, 'day').startOf('day');
+    const last30End = now.endOf('day');
+    const prev30Start = now.subtract(59, 'day').startOf('day');
+    const prev30End = now.subtract(30, 'day').endOf('day');
+
+    const [last30Count, prev30Count] = await Promise.all([
+        countSubmissionsInRange(userId, userRole, last30Start.toDate(), last30End.toDate()),
+        countSubmissionsInRange(userId, userRole, prev30Start.toDate(), prev30End.toDate()),
+    ]);
+
+    const computePercent = (current, previous) => {
+        if (previous === 0) {
+            if (current === 0) {
+                return { percent: 0, trend: 'neutral' };
+            }
+            return { percent: 100, trend: 'up' };
+        }
+        const change = Math.round(((current - previous) / previous) * 100);
+        if (change > 0) {
+            return { percent: Math.abs(change), trend: 'up' };
+        }
+        if (change < 0) {
+            return { percent: Math.abs(change), trend: 'down' };
+        }
+        return { percent: 0, trend: 'neutral' };
+    };
+
+    const today = { current: todayCount, previous: yesterdayCount, ...computePercent(todayCount, yesterdayCount) };
+    const last7 = { current: last7Count, previous: prev7Count, ...computePercent(last7Count, prev7Count) };
+    const last30 = { current: last30Count, previous: prev30Count, ...computePercent(last30Count, prev30Count) };
+
+    return { today, last7, last30 };
 }

@@ -1,6 +1,11 @@
-import { getSiteWhereCondition } from '../helpers/site.helpers.js';
-import models from '../models/index.js';
-import stringUtils from '../utils/string.js';
+import {
+    createForm as createFormService,
+    deleteForm as deleteFormService,
+    verifyFormAccess,
+    updateForm,
+} from '../services/form.service.js';
+import { getSubmissionsByFormWithFilters } from '../services/inbox.service.js';
+import { verifySiteAccess } from '../services/site.service.js';
 
 /**
  * Créer un formulaire
@@ -11,25 +16,14 @@ export const createForm = async (req, res) => {
     const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        // Vérifier que le site existe et que l'utilisateur y a accès
-        const site = await models.Site.findByPk(fk_id_site);
+        // Vérifier l'accès au site
+        const site = await verifySiteAccess(fk_id_site, userId, userRole);
         if (!site) {
             return res.redirect('/dashboard');
         }
 
-        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
-        if (siteWhereCondition) {
-            const accessibleSite = await models.Site.findOne({
-                where: { id: fk_id_site, ...siteWhereCondition },
-            });
-            if (!accessibleSite) {
-                return res.redirect('/dashboard');
-            }
-        }
-
-        const code = stringUtils.generateCode(10);
-
-        await models.Form.create({ name, fk_id_site, code });
+        // Créer le formulaire (le code est généré automatiquement)
+        await createFormService({ name, fk_id_site });
 
         return res.redirect(`/site/${fk_id_site}/view`);
     } catch (err) {
@@ -46,29 +40,16 @@ export const deleteForm = async (req, res) => {
     const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        const form = await models.Form.findByPk(form_id);
-        if (!form) {
+        // Vérifier l'accès au formulaire
+        const result = await verifyFormAccess(form_id, userId, userRole);
+        if (!result) {
             return res.redirect('/dashboard');
         }
 
-        // Vérifier l'accès au site
-        const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site) {
-            return res.redirect('/dashboard');
-        }
+        const siteId = result.form.fk_id_site;
 
-        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
-        if (siteWhereCondition) {
-            const accessibleSite = await models.Site.findOne({
-                where: { id: site.id, ...siteWhereCondition },
-            });
-            if (!accessibleSite) {
-                return res.redirect('/dashboard');
-            }
-        }
-
-        const siteId = site.id;
-        await form.destroy();
+        // Supprimer le formulaire
+        await deleteFormService(form_id);
 
         return res.redirect(`/site/${siteId}/view`);
     } catch (err) {
@@ -85,36 +66,20 @@ export const updateFormTemplateSave = async (req, res) => {
     const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        const form = await models.Form.findByPk(formId);
-        if (!form) {
+        // Vérifier l'accès au formulaire
+        const result = await verifyFormAccess(formId, userId, userRole);
+        if (!result) {
             return res.redirect('/dashboard');
         }
 
-        const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site) {
-            return res.redirect('/dashboard');
-        }
-
-        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
-        if (siteWhereCondition) {
-            const accessibleSite = await models.Site.findOne({
-                where: { id: site.id, ...siteWhereCondition },
-            });
-            if (!accessibleSite) {
-                return res.redirect('/dashboard');
-            }
-        }
-
-        // Expecting nested fields in req.body.template (e.g. template[fieldName]=New label)
+        // Récupérer le template depuis req.body.template
         const newTemplate = req.body?.template || {};
-
-        // Ensure object
         const templateObj = typeof newTemplate === 'object' ? newTemplate : {};
 
-        form.template = JSON.stringify(templateObj);
-        await form.save();
+        // Mettre à jour le formulaire (updateForm stringifie automatiquement)
+        await updateForm(formId, { template: templateObj });
 
-        return res.redirect(`/site/${form.fk_id_site}/view?f=${form.name}`);
+        return res.redirect(`/site/${result.form.fk_id_site}/view?f=${result.form.name}`);
     } catch (err) {
         return res.redirect('/error');
     }
@@ -129,106 +94,39 @@ export const getFormInbox = async (req, res) => {
     const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        const form = await models.Form.findByPk(formId);
-        if (!form) {
+        // Vérifier l'accès au formulaire
+        const result = await verifyFormAccess(formId, userId, userRole);
+        if (!result) {
             return res.status(404).json({ error: 'Form not found' });
         }
 
-        const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site) {
-            return res.status(404).json({ error: 'Site not found' });
-        }
-
-        // Vérifier l'accès au site selon le rôle
-        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
-        if (siteWhereCondition) {
-            const accessibleSite = await models.Site.findOne({
-                where: { id: site.id, ...siteWhereCondition },
-            });
-            if (!accessibleSite) {
-                return res.status(403).json({ error: 'Forbidden' });
-            }
-        }
-
-        // Server-side pagination: accept ?limit=..&offset=..
+        // Parser les paramètres de pagination
         const limitRaw = parseInt(req.query.limit, 10);
         const offsetRaw = parseInt(req.query.offset, 10);
         const allowedLimits = [10, 25, 50, 100];
         const limit = allowedLimits.includes(limitRaw) ? limitRaw : 10;
         const offset = !Number.isNaN(offsetRaw) && offsetRaw >= 0 ? offsetRaw : 0;
 
-        // support JSON filters passed as query param 'filters' (JSON encoded object)
-        let whereClause = { fk_id_form: formId };
+        // Parser les filtres JSON
+        let filters = {};
         try {
             if (req.query && req.query.filters) {
                 const parsed = JSON.parse(req.query.filters);
-                if (parsed && typeof parsed === 'object' && Object.keys(parsed).length) {
-                    const conditions = [];
-                    const Sequelize = models.Sequelize;
-                    for (const [k, v] of Object.entries(parsed)) {
-                        if (v === null || typeof v === 'undefined' || String(v).trim() === '') {
-                            continue;
-                        }
-                        if (k === 'createdAt') {
-                            // filter by date (YYYY-MM-DD) on createdAt using DATE(createdAt) = 'YYYY-MM-DD'
-                            conditions.push(
-                                Sequelize.where(Sequelize.fn('DATE', Sequelize.col('createdAt')), String(v))
-                            );
-                        } else {
-                            // contains match on JSON stringified field
-                            const Op = Sequelize.Op;
-                            const expr = Sequelize.where(
-                                Sequelize.fn(
-                                    'JSON_UNQUOTE',
-                                    Sequelize.fn(
-                                        'JSON_EXTRACT',
-                                        Sequelize.col('content'),
-                                        Sequelize.literal(`'$.${k}'`)
-                                    )
-                                ),
-                                { [Op.like]: `%${String(v)}%` }
-                            );
-                            conditions.push(expr);
-                        }
-                    }
-                    if (conditions.length) {
-                        const Op = Sequelize.Op;
-                        whereClause = { [Op.and]: [{ fk_id_form: formId }, ...conditions] };
-                    }
+                if (parsed && typeof parsed === 'object') {
+                    filters = parsed;
                 }
             }
         } catch (e) {
-            // ignore malformed filters and fallback to no filter
-            whereClause = { fk_id_form: formId };
+            // Ignorer les filtres malformés
+            filters = {};
         }
 
-        const result = await models.Inbox.findAndCountAll({
-            where: whereClause,
-            order: [['createdAt', 'DESC']],
-            limit,
-            offset,
-            raw: true,
-        });
+        // Récupérer les données avec filtres
+        const data = await getSubmissionsByFormWithFilters(formId, filters, limit, offset);
 
-        const rows = result.rows || [];
-        const total = typeof result.count === 'number' ? result.count : result.count || 0;
-
-        const items = (rows || []).map((r) => {
-            let parsed = null;
-            try {
-                parsed = typeof r.content === 'string' ? JSON.parse(r.content) : r.content;
-            } catch (e) {
-                parsed = null;
-            }
-            return {
-                id: r.id,
-                content: parsed,
-                createdAt: r.createdAt,
-            };
-        });
-
-        return res.json({ items, total });
+        return res.json(data);
     } catch (err) {
+        console.error('getFormInbox error:', err);
         return res.status(500).json({ error: 'Server error' });
     }
 };
@@ -241,27 +139,13 @@ export const updateFormColumns = async (req, res) => {
     const userId = req.session.user?.id;
     const userRole = req.userRole || req.session.user?.role || 'viewer';
     try {
-        const form = await models.Form.findByPk(formId);
-        if (!form) {
+        // Vérifier l'accès au formulaire
+        const result = await verifyFormAccess(formId, userId, userRole);
+        if (!result) {
             return res.status(404).json({ error: 'Form not found' });
         }
 
-        const site = await models.Site.findByPk(form.fk_id_site);
-        if (!site) {
-            return res.status(404).json({ error: 'Site not found' });
-        }
-
-        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
-        if (siteWhereCondition) {
-            const accessibleSite = await models.Site.findOne({
-                where: { id: site.id, ...siteWhereCondition },
-            });
-            if (!accessibleSite) {
-                return res.status(403).json({ error: 'Forbidden' });
-            }
-        }
-
-        // Expect JSON body { columns: { key1: true, key2: false, ... } }
+        // Parser les colonnes
         let cols = req.body && req.body.columns ? req.body.columns : null;
         if (typeof cols === 'string') {
             try {
@@ -271,13 +155,13 @@ export const updateFormColumns = async (req, res) => {
             }
         }
 
-        // If cols is not an object, reject
+        // Valider que cols est un objet
         if (!cols || typeof cols !== 'object') {
             return res.status(400).json({ error: 'Invalid columns payload' });
         }
 
-        form.columns = JSON.stringify(cols);
-        await form.save();
+        // Mettre à jour (updateForm stringifie automatiquement)
+        await updateForm(formId, { columns: cols });
 
         return res.json({ success: true, columns: cols });
     } catch (err) {
