@@ -15,6 +15,7 @@ import passport from 'passport';
 import split from 'split';
 import api from './api/index.js';
 import database from './config/database.js';
+import { helmetMiddleware } from './config/helmet.config.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
@@ -29,6 +30,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Sécurité: HTTP headers avec Helmet.js
+// Doit être appliqué en premier, avant tous les autres middlewares
+app.use(helmetMiddleware);
+
+// Trust proxy si derrière un reverse proxy (Nginx, Apache, etc.)
+app.set('trust proxy', 1);
 
 i18n.configure({
     locales: ['fr'],
