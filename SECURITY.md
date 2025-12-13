@@ -311,10 +311,9 @@ const upload = multer({
 Extensions validées :
 ```javascript
 const ALLOWED_EXTENSIONS = [
-    'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg',  // Images
-    'pdf', 'doc', 'docx', 'xls', 'xlsx',         // Documents
-    'txt', 'csv',                                 // Texte
-    'zip', 'rar', '7z'                            // Archives
+    'png', 'jpg', 'jpeg', 'webp',                // Images
+    'pdf', 'doc', 'docx', 'odt',                 // Documents
+    'txt', 'xls', 'xlsx', 'csv'                  // Tableurs & Texte
 ];
 ```
 
@@ -325,33 +324,7 @@ const ALLOWED_EXTENSIONS = [
 
 **Fichier :** `src/api/v1/middlewares/validateUpload.js`
 
-#### 2. Inspection des archives ZIP
-
-Les archives ZIP sont **inspectées** avant acceptation :
-
-```javascript
-// Vérification du contenu de l'archive
-import StreamZip from 'node-stream-zip';
-
-const zip = new StreamZip.async({ file: zipPath });
-const entries = await zip.entries();
-
-for (const entry of Object.values(entries)) {
-    // Vérifier que chaque fichier dans le ZIP est autorisé
-    if (!isAllowedExtension(entry.name)) {
-        throw new Error('Archive contains forbidden file type');
-    }
-}
-```
-
-**Protection contre :**
-- ✅ Zip bombs
-- ✅ Path traversal (`../../../etc/passwd`)
-- ✅ Fichiers exécutables cachés
-
-**Fichier :** `src/api/v1/middlewares/inspectArchive.js`
-
-#### 3. Sanitization des noms de fichiers
+#### 2. Sanitization des noms de fichiers
 
 ```javascript
 import sanitize from 'sanitize-filename';
@@ -366,7 +339,7 @@ const safeName = sanitize(originalName);
 - ✅ XSS dans les noms de fichiers
 - ✅ Caractères spéciaux problématiques
 
-#### 4. Stockage sécurisé
+#### 3. Stockage sécurisé
 
 Les fichiers sont stockés avec un **préfixe unique** pour éviter les collisions :
 
@@ -394,15 +367,14 @@ storage/
 ### Pipeline de traitement
 
 ```
-Upload → Validation → Inspection → Déplacement → BDD
-  ↓          ↓           ↓             ↓           ↓
-Multer → validateUpload → inspectArchive → moveFiles → saveInbox
+Upload → Validation → Déplacement → BDD
+  ↓          ↓            ↓           ↓
+Multer → validateUpload → moveFiles → saveInbox
 ```
 
 **Fichiers :**
 - `src/api/v1/middlewares/multipartUpload.js`
 - `src/api/v1/middlewares/validateUpload.js`
-- `src/api/v1/middlewares/inspectArchive.js`
 - `src/api/v1/middlewares/moveFilesToUploads.js`
 
 ---
@@ -767,7 +739,8 @@ curl -I https://yourdomain.com | grep -E "X-|Content-Security"
 ---
 
 **Dernière mise à jour :** 13 décembre 2025
-**Contact sécurité :** security@puna.io (à créer)
+
+**Contact sécurité :** ...
 
 ---
 
