@@ -146,8 +146,8 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Secret de session (actuellement en dur dans app.js)
 - [x] Créer `.env.example` complet
 - [x] Supprimer fichier `keys.json` (utiliser uniquement `.env`)
-- [ ] Ajouter validation des variables d'environnement au démarrage
-- [ ] Implémenter `helmet.js` pour sécuriser les headers
+- [x] Ajouter validation des variables d'environnement au démarrage
+- [x] Implémenter `helmet.js` pour sécuriser les headers
 - [ ] Ajouter rate limiting sur les routes API
 - [ ] Configurer CORS proprement
 - [ ] Ajouter validation/sanitization des entrées utilisateur
@@ -401,8 +401,8 @@ Liste des tâches à réaliser pour améliorer le projet.
 ### 🔥 Urgent (À faire maintenant)
 
 1. **Enrichir README.md** - Le projet mérite une vraie documentation
-2. **Ajouter validation des variables d'env** - Sécurité essentielle au démarrage
-3. **Implémenter helmet.js** - Headers de sécurité HTTP
+2. ~~**Ajouter validation des variables d'env**~~ ✅ **TERMINÉ**
+3. ~~**Implémenter helmet.js**~~ ✅ **TERMINÉ**
 
 ### ⚡ Important (Court terme)
 
@@ -426,6 +426,19 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ### ✅ Récemment complété
 
+- ✅ **Validation variables d'environnement** (13 décembre 2025)
+    - ✅ Helper `env.validator.js` pour vérification au démarrage
+    - ✅ Validation présence, format, sécurité des clés
+    - ✅ Messages d'erreur clairs si config incorrecte
+    - ✅ Compatible Docker et docker-compose
+- ✅ **Helmet.js intégré** (13 décembre 2025)
+    - ✅ Configuration hybride API/Web
+    - ✅ Headers de sécurité HTTP (CSP, HSTS, X-Frame-Options)
+    - ✅ Protection adaptée selon type de route
+- ✅ **Export CSV** (décembre 2025)
+    - ✅ Exports CSV avec fast-csv pour forms et users
+    - ✅ Encoding UTF-8 BOM pour Excel
+    - ✅ Respect des permissions utilisateurs
 - ✅ **Couche services complète** (décembre 2025)
     - ✅ Migration de 4 controllers vers services
     - ✅ Réduction moyenne de 60-65% du code des controllers
@@ -438,7 +451,8 @@ Liste des tâches à réaliser pour améliorer le projet.
 - ✅ Script formatage HBS personnalisé
 - ✅ Pre-commit hooks avec Husky
 - ✅ Guide des commits (COMMIT_FORMAT.md)
+- ✅ Documentation sécurité (SECURITY.md)
 
 ---
 
-**Dernière mise à jour :** 11 décembre 2025
+**Dernière mise à jour :** 13 décembre 2025
