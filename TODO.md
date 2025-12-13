@@ -312,16 +312,16 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Supprimer manuellement des logs anciens
 
 ### 📤 Export CSV
-- [ ] Implémenter exports CSV avec fast-csv
-    - [ ] Ajouter bouton "Export CSV" sur toutes les listes
-    - [ ] Route `/export/csv/:entity` (sites, forms, inbox, users)
-    - [ ] Créer service `src/services/csv.service.js`
-    - [ ] Support des filtres existants (dates, recherche)
-    - [ ] Headers personnalisés selon l'entité
-    - [ ] Encoding UTF-8 avec BOM pour Excel
-    - [ ] Nom de fichier : `entity_YYYY-MM-DD_HHmmss.csv`
-    - [ ] Streaming pour grandes quantités de données
-    - [ ] Respect des permissions (viewer peut exporter ses données)
+- [x] Implémenter exports CSV avec fast-csv
+    - [x] Ajouter bouton "Export CSV" sur toutes les listes
+    - [x] Route `/export/csv/:entity` (sites, forms, inbox, users)
+    - [x] Créer service `src/services/csv.service.js`
+    - [x] Support des filtres existants (dates, recherche)
+    - [x] Headers personnalisés selon l'entité
+    - [x] Encoding UTF-8 avec BOM pour Excel
+    - [x] Nom de fichier : `entity_YYYY-MM-DD_HHmmss.csv`
+    - [x] Streaming pour grandes quantités de données
+    - [x] Respect des permissions (viewer peut exporter ses données)
 
 ### 🛡️ Sécurité des fichiers (ClamAV)
 - [ ] Intégrer ClamAV pour scan antivirus
