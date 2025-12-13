@@ -60,6 +60,8 @@
 		"passport": "^0.7.0",
 		"passport-local": "^1.0.0",
 		"pino": "^10.1.0",
+		"pino-http": "^11.0.0",
+		"pino-roll": "^4.0.0",
 		"sanitize-filename": "^1.6.3",
 		"sequelize": "^6.37.7",
 		"split": "^1.0.1",
