@@ -143,7 +143,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Clés de chiffrement (KEV, KIV)
     - [x] Clés JWT (KEY_TK)
     - [x] Identifiants DB
-    - [ ] Secret de session (actuellement en dur dans app.js)
+    - [x] Secret de session
 - [x] Créer `.env.example` complet
 - [x] Supprimer fichier `keys.json` (utiliser uniquement `.env`)
 - [x] Ajouter validation des variables d'environnement au démarrage
@@ -366,7 +366,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Protection de toutes les routes avec droits d'accès
     - [x] Helpers Handlebars pour boutons conditionnels
     - [x] Support des rôles : super_admin, owner, beta, editor, viewer
-- [ ] Ajouter pagination sur toutes les listes
+- [x] Ajouter pagination sur toutes les listes
 - [ ] Implémenter recherche avancée
 - [ ] Système de backup automatique
 

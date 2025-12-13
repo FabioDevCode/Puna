@@ -100,11 +100,7 @@ const sessionStore = new MySQLStore(database);
 app.use(
     session({
         name: 'puna',
-        secret:
-            process.env.SESSION_SECRET ||
-            (() => {
-                throw new Error('SESSION_SECRET must be set in environment variables');
-            })(),
+        secret: process.env.SESSION_SECRET,
         store: sessionStore,
         resave: false,
         saveUninitialized: false,
