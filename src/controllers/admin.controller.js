@@ -148,6 +148,38 @@ export const adminUsersExportExcel = async (req, res) => {
 };
 
 /**
+ * Exporter les utilisateurs en CSV
+ */
+export const adminUsersExportCSV = async (req, res) => {
+    try {
+        const search = req.query.search || '';
+
+        // Récupérer tous les utilisateurs via le service
+        const users = await getAllUsersWithCreator({ search });
+
+        // Générer le CSV via le service d'export
+        const { generateUsersCSV } = await import('../services/export.service.js');
+        const csvData = await generateUsersCSV(users);
+
+        // Générer le fichier
+        const fileName = `utilisateurs_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.csv`;
+
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+
+        // Ajouter le BOM UTF-8 pour Excel
+        res.write('\uFEFF');
+
+        // Envoyer le CSV
+        res.write(csvData);
+        res.end();
+    } catch (err) {
+        console.error('adminUsersExportCSV error:', err);
+        res.status(500).json({ error: "Erreur lors de l'export" });
+    }
+};
+
+/**
  * Création d'un utilisateur
  */
 export const adminCreateUser = async (req, res) => {

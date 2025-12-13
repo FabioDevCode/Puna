@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextBtn: document.getElementById('nextPage'),
         currentBtn: document.getElementById('currentPage'),
         exportBtn: document.getElementById('exportExcelBtn'),
+        exportCSVBtn: document.getElementById('exportCSVBtn'),
         searchInput: document.getElementById('searchInput'),
         clearSearchBtn: document.getElementById('clearSearch'),
         searchFieldSelect: document.getElementById('searchFieldSelect'), // Nouveau
@@ -35,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.prevBtn.addEventListener('click', () => handlePageChange(-1));
         elements.nextBtn.addEventListener('click', () => handlePageChange(1));
         elements.exportBtn.addEventListener('click', handleExport);
+        elements.exportCSVBtn?.addEventListener('click', handleExportCSV);
 
         // Event listener pour le sélecteur de champ
         elements.searchFieldSelect.addEventListener('change', handleSearchFieldChange);
@@ -329,5 +331,12 @@ document.addEventListener('DOMContentLoaded', () => {
             search: state.search,
         });
         window.location.href = `/admin/users/export-excel?${params}`;
+    }
+
+    function handleExportCSV() {
+        const params = new URLSearchParams({
+            search: state.search,
+        });
+        window.location.href = `/admin/users/export-csv?${params}`;
     }
 });

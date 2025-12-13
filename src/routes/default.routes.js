@@ -42,6 +42,7 @@ router.get(
     roleAccess(['super_admin', 'owner']),
     adminCtl.adminUsersExportExcel
 );
+router.get('/admin/users/export-csv', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminUsersExportCSV);
 router.post('/admin/users/create', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminCreateUser);
 router.post('/admin/users/delete', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminDeleteUser);
 router.get('/admin/users/:id/view', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminViewUser);
@@ -77,6 +78,7 @@ router.get('/form/:id/inbox', isConnected, actionAccess('form', 'read'), formCtl
 router.post('/form/:id/columns', isConnected, actionAccess('form', 'update'), formCtl.updateFormColumns);
 router.post('/form/:id/template', isConnected, actionAccess('form', 'update'), formCtl.updateFormTemplateSave);
 router.get('/form/:id/export-excel', isConnected, actionAccess('form', 'read'), exportCtl.exportFormToExcel);
+router.get('/form/:id/export-csv', isConnected, actionAccess('form', 'read'), exportCtl.exportFormToCSV);
 
 router.get('/inbox/:id/view', isConnected, actionAccess('inbox', 'read'), inboxCtl.showInbox);
 router.post('/inbox/:id/delete', isConnected, actionAccess('inbox', 'delete'), inboxCtl.deleteInbox);

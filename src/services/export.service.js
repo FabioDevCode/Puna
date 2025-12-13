@@ -1,11 +1,13 @@
 /**
  * Service d'export
- * Gère les exports de données (Excel, ZIP)
+ * Gère les exports de données (Excel, CSV, ZIP)
  */
 
 import fs from 'node:fs';
 import archiver from 'archiver';
+import dayjs from 'dayjs';
 import ExcelJS from 'exceljs';
+import { format } from 'fast-csv';
 import models from '../models/index.js';
 import { getSiteWhereCondition } from './access.service.js';
 
@@ -362,4 +364,208 @@ export async function generateMultiFormExcelWorkbook(submissions) {
     });
 
     return workbook;
+}
+
+/**
+ * Générer un fichier CSV à partir des soumissions d'un formulaire
+ * @param {Object} form - Formulaire
+ * @param {Array} submissions - Liste des soumissions
+ * @param {Array} customColumns - Colonnes personnalisées [{key, header}] (optionnel)
+ * @returns {Promise<string>} - Contenu CSV
+ */
+export async function generateFormCSV(form, submissions, customColumns = []) {
+    return new Promise((resolve, reject) => {
+        const rows = [];
+
+        // Extraire toutes les clés uniques si pas de colonnes custom
+        const allKeys = new Set();
+        submissions.forEach((sub) => {
+            let contentObj = {};
+            try {
+                contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
+            } catch (e) {
+                contentObj = {};
+            }
+            Object.keys(contentObj).forEach((k) => allKeys.add(k));
+        });
+
+        // Définir les headers
+        const headers = ['ID', 'Date'];
+        const keysToUse =
+            customColumns.length > 0 ? customColumns : Array.from(allKeys).map((key) => ({ key, header: key }));
+
+        keysToUse.forEach((col) => {
+            headers.push(col.header || col.key);
+        });
+
+        // Préparer les données
+        submissions.forEach((sub) => {
+            let contentObj = {};
+            try {
+                contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
+            } catch (e) {
+                contentObj = {};
+            }
+
+            const row = {
+                ID: sub.id,
+                Date: dayjs(sub.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+            };
+
+            // Ajouter les valeurs des colonnes
+            keysToUse.forEach((col) => {
+                const key = col.key;
+                const header = col.header || col.key;
+                const value = contentObj[key];
+
+                // Convertir les tableaux et objets en chaînes
+                if (Array.isArray(value)) {
+                    row[header] = value.join(', ');
+                } else if (typeof value === 'object' && value !== null) {
+                    row[header] = JSON.stringify(value);
+                } else {
+                    row[header] = value ?? '';
+                }
+            });
+
+            rows.push(row);
+        });
+
+        // Générer le CSV
+        const csvStream = format({ headers: true, delimiter: ',' });
+        let csvData = '';
+
+        csvStream.on('data', (chunk) => {
+            csvData += chunk.toString();
+        });
+
+        csvStream.on('end', () => {
+            resolve(csvData);
+        });
+
+        csvStream.on('error', (err) => {
+            reject(err);
+        });
+
+        rows.forEach((row) => csvStream.write(row));
+        csvStream.end();
+    });
+}
+
+/**
+ * Générer un fichier CSV à partir de la liste des utilisateurs
+ * @param {Array} users - Liste des utilisateurs
+ * @returns {Promise<string>} - Contenu CSV
+ */
+export async function generateUsersCSV(users) {
+    return new Promise((resolve, reject) => {
+        const rows = [];
+
+        // Préparer les données
+        users.forEach((user) => {
+            rows.push({
+                Email: user.email || '',
+                Login: user.login || '',
+                Rôle: user.role || 'N/A',
+                'Créé par': user.creator ? user.creator.login : 'N/A',
+                Activé: user.enabled ? 'Oui' : 'Non',
+                'Dernière connexion': user.last_connection
+                    ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm')
+                    : 'N/A',
+                'Créé le': dayjs(user.createdAt).format('YYYY-MM-DD HH:mm'),
+            });
+        });
+
+        // Générer le CSV
+        const csvStream = format({ headers: true, delimiter: ',' });
+        let csvData = '';
+
+        csvStream.on('data', (chunk) => {
+            csvData += chunk.toString();
+        });
+
+        csvStream.on('end', () => {
+            resolve(csvData);
+        });
+
+        csvStream.on('error', (err) => {
+            reject(err);
+        });
+
+        rows.forEach((row) => csvStream.write(row));
+        csvStream.end();
+    });
+}
+
+/**
+ * Générer un fichier CSV avec toutes les soumissions (multi-forms)
+ * @param {Array} submissions - Liste des soumissions
+ * @returns {Promise<string>} - Contenu CSV
+ */
+export async function generateMultiFormCSV(submissions) {
+    return new Promise((resolve, reject) => {
+        const rows = [];
+
+        // Extraire toutes les clés uniques
+        const allKeys = new Set();
+        submissions.forEach((sub) => {
+            let contentObj = {};
+            try {
+                contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
+            } catch (e) {
+                contentObj = {};
+            }
+            Object.keys(contentObj).forEach((k) => allKeys.add(k));
+        });
+
+        // Préparer les données
+        submissions.forEach((sub) => {
+            let contentObj = {};
+            try {
+                contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
+            } catch (e) {
+                contentObj = {};
+            }
+
+            const row = {
+                ID: sub.id,
+                Site: sub.form?.site?.domain || '',
+                Form: sub.form?.name || '',
+                Date: dayjs(sub.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+            };
+
+            // Ajouter toutes les clés de contenu
+            Array.from(allKeys).forEach((key) => {
+                const value = contentObj[key];
+                if (Array.isArray(value)) {
+                    row[key] = value.join(', ');
+                } else if (typeof value === 'object' && value !== null) {
+                    row[key] = JSON.stringify(value);
+                } else {
+                    row[key] = value ?? '';
+                }
+            });
+
+            rows.push(row);
+        });
+
+        // Générer le CSV
+        const csvStream = format({ headers: true, delimiter: ',' });
+        let csvData = '';
+
+        csvStream.on('data', (chunk) => {
+            csvData += chunk.toString();
+        });
+
+        csvStream.on('end', () => {
+            resolve(csvData);
+        });
+
+        csvStream.on('error', (err) => {
+            reject(err);
+        });
+
+        rows.forEach((row) => csvStream.write(row));
+        csvStream.end();
+    });
 }
