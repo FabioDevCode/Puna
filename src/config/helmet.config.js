@@ -31,6 +31,7 @@ export const webHelmet = helmet({
                 "'unsafe-inline'", // Nécessaire pour Tailwind et styles inline
                 'cdn.jsdelivr.net',
                 'cdnjs.cloudflare.com',
+                'fonts.googleapis.com', // Google Fonts
             ],
 
             // Images: même domaine + data URLs + blob URLs
@@ -40,7 +41,7 @@ export const webHelmet = helmet({
             connectSrc: ["'self'"],
 
             // Fonts: CDN + data URLs
-            fontSrc: ["'self'", 'cdnjs.cloudflare.com', 'data:'],
+            fontSrc: ["'self'", 'cdnjs.cloudflare.com', 'fonts.gstatic.com', 'data:'],
 
             // Interdire les iframes
             frameSrc: ["'none'"],
