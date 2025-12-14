@@ -272,20 +272,52 @@ Liste des tâches à réaliser pour améliorer le projet.
 ## 🚀 Améliorations Fonctionnelles
 
 ### 🔔 Système de Notifications (Toastify)
-- [ ] Intégrer Toastify JS pour notifications toast
-    - [ ] Ajouter CDN ou installer package dans public/
-    - [ ] Créer helper Handlebars `{{toastMessages}}` pour afficher les toasts
-    - [ ] Implémenter middleware `req.flash()` pour messages session
-    - [ ] Créer helper `src/helpers/flash.js` pour gérer les messages
-    - [ ] Types de messages : success, error, warning, info
-    - [ ] Support messages multiples dans une session
-    - [ ] Auto-dismiss configurable (3-5 secondes)
-    - [ ] Persister les messages entre redirections
-    - [ ] Exemples :
+- [x] Intégrer Toastify JS pour notifications toast
+    - [x] Ajouter plugin dans public/ (toastify.js + toastify.css)
+    - [x] Créer fonction `Toast()` dans puna.js pour usage simplifié
+    - [x] Implémenter middleware `res.flash()` pour messages session
+    - [x] Créer middleware `src/middlewares/flashMessages.js`
+    - [x] Créer script client `toast-flash.js` pour affichage automatique
+    - [x] Ajouter helper Handlebars `json` pour sérialisation
+    - [x] Types de messages : puna, success, error, warning, info
+    - [x] Support messages multiples dans une session
+    - [x] Auto-dismiss configurable (3 secondes par défaut)
+    - [x] Persister les messages entre redirections
+    - [x] Créer guides : `FLASH_MESSAGES_GUIDE.md` et `FLASH_MESSAGES_MIGRATION.md`
+    - [x] Route de test `/test-flash` pour valider le système
+- [ ] **Migration progressive des controllers** (15 routes identifiées)
+    - [x] Phase 0: Test et validation (route `/test-flash`)
+    - [ ] Phase 1: auth.controller.js (3 routes - Priorité haute)
+    - [ ] Phase 2: site.controller.js + form.controller.js (5 routes - Priorité haute)
+    - [ ] Phase 3: inbox.controller.js (1 route - Priorité moyenne)
+    - [ ] Phase 4: admin.controller.js (6 routes - Priorité moyenne)
+- [ ] **Support i18n pour les messages flash** (À faire lors de la migration)
+    - [ ] Utiliser `req.__()` pour traduire les messages
+    - [ ] Créer clés de traduction dans `src/locales/fr.json` et `en.json`
+    - [ ] Exemples d'implémentation :
         ```javascript
-        req.flash('success', 'Site créé avec succès');
-        req.flash('error', 'Erreur lors de la suppression');
+        // ✅ Avec traduction i18n
+        res.flash('success', req.__('site.created.success', domain));
+        res.flash('error', req.__('site.deleted.error'));
+
+        // Dans src/locales/fr.json :
+        {
+            "site": {
+                "created": { "success": "Site \"%s\" créé avec succès" },
+                "deleted": { "error": "Erreur lors de la suppression" }
+            }
+        }
+
+        // Dans src/locales/en.json :
+        {
+            "site": {
+                "created": { "success": "Site \"%s\" created successfully" },
+                "deleted": { "error": "Error deleting site" }
+            }
+        }
         ```
+    - [ ] Créer fichier `FLASH_MESSAGES_I18N.md` avec guide de traduction
+    - [ ] Documenter structure des clés i18n par entité (site, form, user, inbox)
 
 ### 📊 Amélioration des Logs (Pino)
 - [ ] Configurer Pino pour logging professionnel
@@ -426,6 +458,17 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ### ✅ Récemment complété
 
+- ✅ **Système de notifications Toastify** (14 décembre 2025)
+    - ✅ Plugin Toastify.js intégré (CSS + JS)
+    - ✅ Fonction `Toast()` wrapper pour usage simplifié
+    - ✅ Middleware `flashMessages.js` pour messages de session
+    - ✅ Helper Handlebars `json` pour sérialisation
+    - ✅ Script client `toast-flash.js` pour affichage automatique
+    - ✅ Support 5 types : puna, info, success, warning, error
+    - ✅ Persistance entre redirections via session
+    - ✅ Guides complets créés (FLASH_MESSAGES_GUIDE.md + MIGRATION.md)
+    - ✅ Route de test `/test-flash` fonctionnelle
+    - ⏳ Migration controllers en cours (1/15 routes, dpConnect déjà fait)
 - ✅ **Validation variables d'environnement** (13 décembre 2025)
     - ✅ Helper `env.validator.js` pour vérification au démarrage
     - ✅ Validation présence, format, sécurité des clés
