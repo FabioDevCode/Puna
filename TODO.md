@@ -72,7 +72,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] `export.controller.js` (exports Excel/ZIP)
     - [x] `admin.controller.js` (administration utilisateurs)
 
-- [ ] **Réorganiser structure JavaScript front-end (`src/public/js/`)**
+- [ ] **Réorganiser structure JavaScript front-end (`src/public/js/`)** (Priorité moyenne)
     - [ ] Créer structure modulaire :
         ```
         src/public/js/
@@ -99,9 +99,13 @@ Liste des tâches à réaliser pour améliorer le projet.
         └── vendors/        # Librairies tierces locales
         ```
     - [ ] Migrer les fichiers existants vers nouvelle structure
-    - [ ] Créer système de build/bundle (Webpack ou Vite)
-    - [ ] Minification pour production
-    - [ ] Source maps pour développement
+    - [ ] **🔮 Optionnel/Futur** : Build system front-end (si le projet grandit)
+        - [ ] Évaluer besoin : ~20 fichiers JS → 1-3 bundles
+        - [ ] Choisir entre Webpack ou Vite
+        - [ ] Configuration bundling + minification
+        - [ ] Source maps pour développement
+        - [ ] Hot reload automatique
+        - [ ] Note : Pas nécessaire actuellement, architecture actuelle suffisante
 
 - [x] **Créer couche `services/` pour la logique base de données**
     - [x] Déplacer toute logique DB depuis controllers vers services
@@ -131,7 +135,20 @@ Liste des tâches à réaliser pour améliorer le projet.
 - [ ] Peupler dossier `middlewares/`
     - [x] `checkAccess.js` (vérification des permissions)
     - [x] `injectUserRole.js` (injection du rôle utilisateur)
-    - [ ] `errorHandler.middleware.js`
+    - [ ] **`errorHandler.middleware.js`** - Gestion centralisée des erreurs
+        - [ ] Créer classes d'erreur personnalisées (`src/utils/errors.js`)
+            - [ ] `NotFoundError` (404)
+            - [ ] `ForbiddenError` (403)
+            - [ ] `ValidationError` (400)
+            - [ ] `UnauthorizedError` (401)
+        - [ ] Middleware errorHandler avec :
+            - [ ] Logs automatiques avec errorLogger (Pino)
+            - [ ] Distinction routes API (JSON) vs routes web (HTML)
+            - [ ] StatusCode personnalisé selon type d'erreur
+            - [ ] Context (userId, url, method, IP)
+        - [ ] Intégration dans app.js (en dernier middleware)
+        - [ ] Supprimer try/catch des controllers (simplification)
+        - [ ] Bénéfices : -50% code, cohérence, logs centralisés
     - [ ] `validation.middleware.js`
     - [ ] `rateLimiter.middleware.js`
 
@@ -149,7 +166,22 @@ Liste des tâches à réaliser pour améliorer le projet.
 - [x] Ajouter validation des variables d'environnement au démarrage
 - [x] Implémenter `helmet.js` pour sécuriser les headers
 - [ ] Ajouter rate limiting sur les routes API
-- [ ] Configurer CORS proprement
+- [ ] **Configurer CORS avec stratégie hybride**
+    - [ ] Installer package `cors` : `npm install cors`
+    - [ ] Créer fichier `src/config/cors.config.js`
+    - [ ] **CORS permissif pour API publiques** (`/api/*`, `/send/*`)
+        - [ ] origin: true (accepter tous les domaines)
+        - [ ] methods: ['POST', 'OPTIONS']
+        - [ ] credentials: false (pas de cookies)
+        - [ ] Objectif : Permettre appels depuis sites clients externes
+    - [ ] **CORS restrictif pour routes authentifiées** (`/dashboard`, `/admin`)
+        - [ ] origin: process.env.APP_URL
+        - [ ] credentials: true (cookies de session)
+        - [ ] methods: ['GET', 'POST', 'PUT', 'DELETE']
+        - [ ] Objectif : Protéger contre CSRF cross-origin
+    - [ ] Appliquer middleware CORS dans app.js selon routes
+    - [ ] Tester avec formulaires clients sur domaines externes
+    - [ ] Documenter configuration dans SECURITY.md
 - [ ] Ajouter validation/sanitization des entrées utilisateur
 
 ---
@@ -435,12 +467,10 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] `npm run build` (production)
     - [ ] `npm run logs:clean` (nettoyage logs anciens)
 - [ ] Packages à installer :
-    - [ ] `toastify-js` (notifications front-end)
-    - [ ] `pino-roll` ou `pino-rotating-file` (rotation logs)
+    - [ ] `cors` (configuration CORS hybride)
     - [ ] `clamscan` (scanner antivirus ClamAV)
-    - [ ] `express-flash` ou créer système custom
     - [ ] `vuepress` (documentation)
-    - [ ] `webpack` ou `vite` (bundler JS front-end)
+    - [ ] 🔮 **Optionnel/Futur** : `webpack` ou `vite` (bundler JS front-end, si besoin)
 - [ ] Documenter tous les scripts npm
 - [ ] Projet Nuxt séparé pour site vitrine :
     - [ ] Setup git submodule ou repo séparé
@@ -459,22 +489,21 @@ Liste des tâches à réaliser pour améliorer le projet.
 ### ⚡ Important (Court terme)
 
 1. ~~**Créer couche services**~~ ✅ **TERMINÉ** - 4 controllers migrés (export, form, inbox, site)
-2. **Restructurer JS front-end** - Architecture modulaire pour travail en équipe
-3. **Système de Toasts (Toastify)** - Notifications utilisateur + flash messages
-4. **Logger Pino** - Logs structurés + interface admin + rotation
-5. **Export CSV** - Compléter les exports (Excel déjà fait)
+2. **Système de Toasts (Toastify)** - Migration flash messages (15 routes)
+3. **Logger Pino** - Migration controllers vers helpers Pino
+4. **CORS hybride** - Configuration API publiques vs routes authentifiées
+5. **Rate limiting** - Protection contre les abus API
 6. **ClamAV** - Scanner antivirus pour fichiers uploadés
-7. **Rate limiting** - Protection contre les abus API
-8. **Pagination** - Améliorer performance sur grandes listes
 
 ### 💡 À planifier (Moyen/Long terme)
 
 1. **Documentation VuePress** - Guides utilisateur, dev, auto-hébergement
 2. **Site web vitrine Nuxt** - Landing page + formulaire beta
-3. **Tests automatisés** - Garantir la qualité du code
-4. **Docker support** - Faciliter le déploiement
-5. **CI/CD** - Automatiser les workflows
-6. **Internationalisation FR/EN** - À faire en dernier
+3. **Restructurer JS front-end** - Architecture modulaire (optionnel : build system)
+4. **Tests automatisés** - Garantir la qualité du code
+5. **Docker support** - Faciliter le déploiement
+6. **CI/CD** - Automatiser les workflows
+7. **Internationalisation FR/EN** - À faire en dernier
 
 ### ✅ Récemment complété
 
