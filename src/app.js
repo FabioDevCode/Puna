@@ -19,6 +19,7 @@ import { helmetMiddleware } from './config/helmet.config.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
+import flashMessages from './middlewares/flashMessages.js';
 import { injectUserRole } from './middlewares/injectUserRole.js';
 import models from './models/index.js';
 import routes from './routes/index.js';
@@ -118,6 +119,9 @@ app.use(
 initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Flash messages - doit être après la session
+app.use(flashMessages);
 
 // 🆕 injectUserRole APRÈS session et passport
 app.use(injectUserRole);

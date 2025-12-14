@@ -436,12 +436,12 @@ res.flash('error', 'Action requise', { persistent: true, close: true });
 
 ## ✅ Checklist d'implémentation
 
-- [ ] Créer `src/middlewares/flashMessages.js`
-- [ ] Ajouter le middleware dans `src/app.js` après la session
-- [ ] Ajouter le helper `json` dans `src/helpers/hbs_fn.js`
-- [ ] Créer `src/public/js/toast-flash.js`
-- [ ] Ajouter le conteneur et le script dans `src/views/partials/layout/head.hbs`
-- [ ] Créer une route de test `/test-flash`
+- [x] Créer `src/middlewares/flashMessages.js`
+- [x] Ajouter le middleware dans `src/app.js` après la session
+- [x] Ajouter le helper `json` dans `src/helpers/hbs_fn.js`
+- [x] Créer `src/public/js/toast-flash.js`
+- [x] Ajouter le conteneur et le script dans `src/views/partials/layout/head.hbs`
+- [x] Créer une route de test `/test-flash`
 - [ ] Tester l'affichage des 5 types de messages
 - [ ] Migrer les controllers progressivement
 - [ ] Supprimer la route de test

@@ -11,6 +11,16 @@ import { actionAccess, roleAccess } from '../middlewares/checkAccess.js';
 
 const router = express.Router();
 
+// Route de test pour les flash messages
+router.get('/test-flash', (req, res) => {
+    res.flash('puna', 'Ceci est un message Puna');
+    res.flash('success', 'Ceci est un message de succès');
+    res.flash('info', "Ceci est un message d'information");
+    res.flash('warning', 'Ceci est un avertissement');
+    res.flash('error', 'Ceci est une erreur');
+    return res.redirect('/');
+});
+
 router.get('/error', dashboardCtl.error);
 router.get('/', isConnected, dashboardCtl.rootRedirect);
 
