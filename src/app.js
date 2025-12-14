@@ -10,12 +10,12 @@ import { create } from 'express-handlebars';
 import MySQLStoreConstructor from 'express-mysql-session';
 import session from 'express-session';
 import i18n from 'i18n';
-import morgan from 'morgan';
 import passport from 'passport';
-import split from 'split';
+import pinoHttp from 'pino-http';
 import api from './api/index.js';
 import database from './config/database.js';
 import { helmetMiddleware } from './config/helmet.config.js';
+import { logger, apiLogger } from './config/logger.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
@@ -49,27 +49,41 @@ i18n.configure({
     objectNotation: true,
 });
 
-const morgan_config = {
-    skip: (req) => {
-        if (
-            req.url === '/' ||
-            req.url.includes('/css') ||
-            req.url.includes('/img') ||
-            req.url.includes('/js') ||
-            req.url.includes('/plugins') ||
-            req.url.includes('/devtools') ||
-            req.url.includes('/favicon.ico') ||
-            req.url.includes('/.well-known/appspecific/com.chrome.devtools.json')
-        ) {
-            return true;
-        }
-    },
-    stream: split().on('data', (line) => {
-        process.stdout.write(`[${dayjs().tz('Europe/Paris').format('YYYY-MM-DD HH:mm:ss-SSS')}] ${line} \n`);
-    }),
-};
+// Logger Pino HTTP
+app.use((req, res, next) => {
+    // Skip les ressources statiques pour ne pas polluer les logs
+    if (
+        req.url === '/' ||
+        req.url.includes('/css') ||
+        req.url.includes('/img') ||
+        req.url.includes('/js') ||
+        req.url.includes('/plugins') ||
+        req.url.includes('/devtools') ||
+        req.url.includes('/favicon.ico') ||
+        req.url.includes('/.well-known/appspecific/com.chrome.devtools.json')
+    ) {
+        return next();
+    }
 
-app.use(morgan('dev', morgan_config));
+    // Utiliser le bon logger selon le type de requête
+    const isApi = req.url.startsWith('/api/') || req.url.startsWith('/send/');
+    const httpLogger = pinoHttp({
+        logger: isApi ? apiLogger : logger,
+        autoLogging: true,
+        customLogLevel: (req, res, _err) => {
+            if (res.statusCode >= 500) {
+                return 'error';
+            }
+            if (res.statusCode >= 400) {
+                return 'warn';
+            }
+            return 'info';
+        },
+    });
+
+    httpLogger(req, res);
+    next();
+});
 
 consoleStamp(console, {
     formatter: () => dayjs().tz('Europe/Paris').format('YYYY-MM-DD HH:mm:ss-SSS'),

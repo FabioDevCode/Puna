@@ -578,36 +578,149 @@ app.use('/api', apiLimiter);
 
 ## 📊 Audit & Logs
 
-### Logs actuels
+### Système de logging Pino
 
-**Console-stamp** : Horodatage des logs console
+**Pino** est intégré pour des logs structurés et performants.
+
+#### Configuration
+
+**4 loggers séparés** pour différents types d'événements :
 
 ```javascript
-import consoleStamp from 'console-stamp';
+import { logger, apiLogger, errorLogger, auditLogger } from './config/logger.js';
 
-consoleStamp(console, {
-    format: ':date(yyyy-mm-dd HH:MM:ss.l)'
+// Logger principal (app.log)
+logger.info({ userId, action }, 'User action completed');
+
+// Logger API (api.log)
+apiLogger.info({ siteId, formId, method: 'POST' }, 'API request');
+
+// Logger erreurs (error.log)
+errorLogger.error({ error, stack, userId }, 'Database error');
+
+// Logger audit/sécurité (audit.log)
+auditLogger.info({ userId, ip, event: 'login' }, 'User authenticated');
+```
+
+**Fichier :** `src/config/logger.js`
+
+#### Middleware HTTP
+
+**pino-http** remplace Morgan pour logger toutes les requêtes HTTP :
+
+```javascript
+import pinoHttp from 'pino-http';
+
+// Utilise le bon logger selon la route
+const isApi = req.url.startsWith('/api/') || req.url.startsWith('/send/');
+const httpLogger = pinoHttp({
+    logger: isApi ? apiLogger : logger,
+    customLogLevel: (req, res, err) => {
+        if (res.statusCode >= 500) return 'error';
+        if (res.statusCode >= 400) return 'warn';
+        return 'info';
+    }
 });
 ```
 
-**Morgan** : Logs HTTP (accès, requêtes)
+**Fichier :** `src/app.js`
+
+#### Helpers de logging
+
+15 fonctions helper pour des patterns de logging cohérents :
 
 ```javascript
-import morgan from 'morgan';
+import { logAction, logAuthSuccess, logApiError } from './helpers/logging.helpers.js';
 
-app.use(morgan('combined', {
-    skip: (req) => req.url.includes('/css') || req.url.includes('/js')
-}));
+// Action utilisateur
+logAction(userId, 'site.create', { siteId, domain });
+
+// Authentification réussie
+logAuthSuccess(userId, email, ip, userAgent);
+
+// Erreur API
+logApiError(siteId, formId, 'validation_failed', { errors });
 ```
 
-### ⚠️ À améliorer avec Pino
+**Fichier :** `src/helpers/logging.helpers.js`
 
-Migration vers **Pino** recommandée pour :
-- ✅ Logs structurés (JSON)
-- ✅ Rotation automatique
-- ✅ Niveaux de logs (trace, debug, info, warn, error, fatal)
-- ✅ Performance supérieure
-- ✅ Interface admin pour visualisation
+#### Stockage des logs
+
+```
+logs/
+├── app.log        # Logs applicatifs généraux
+├── api.log        # Requêtes API publiques uniquement
+├── error.log      # Erreurs de l'application
+└── audit.log      # Événements de sécurité
+```
+
+#### Rétention et nettoyage
+
+**Périodes de rétention configurables** via `.env` :
+
+```env
+LOG_RETENTION_APP=7      # 7 jours (test phase)
+LOG_RETENTION_API=14     # 14 jours
+LOG_RETENTION_ERROR=30   # 30 jours
+LOG_RETENTION_AUDIT=90   # 90 jours
+```
+
+**Scripts de gestion** :
+
+```bash
+# Nettoyer les logs anciens selon rétention
+npm run logs:clean
+
+# Afficher statistiques des logs
+npm run logs:stats
+```
+
+**Fichiers :** `scripts/clean-logs.js`, `scripts/logs-stats.js`
+
+#### Format des logs
+
+**Production :** JSON structuré pour parsing et analyse
+
+```json
+{"level":30,"time":1702566123456,"msg":"request completed","req":{"url":"/dashboard","method":"GET"},"res":{"statusCode":200}}
+```
+
+**Développement :** Format lisible avec pino-pretty (configurable)
+
+```
+[2025-12-14 17:56:00.386] INFO: request completed /dashboard
+```
+
+**Configuration console** via `.env` :
+
+```env
+# Désactiver les logs console en dev
+LOG_TO_CONSOLE=false
+```
+
+#### Personnalisation format console
+
+Options dans `src/config/logger.js` (lignes 52-56) :
+
+```javascript
+options: {
+    colorize: true,                              // Couleurs activées
+    translateTime: 'yyyy-mm-dd HH:MM:ss.l',     // Format date
+    ignore: 'pid,hostname,req,res',             // Champs cachés
+    messageFormat: '{msg} {req.url}',           # Format personnalisé
+    singleLine: true,                           // Tout sur une ligne
+}
+```
+
+### ⚠️ Migration en cours
+
+L'infrastructure Pino est **en place** mais les `console.log` dans les controllers ne sont **pas encore migrés**.
+
+**À faire :**
+- [ ] Remplacer `console.log()` par `logger.info()`
+- [ ] Remplacer `console.error()` par `errorLogger.error()`
+- [ ] Utiliser les helpers dans controllers (`logAction`, `logAuthSuccess`, etc.)
+- [ ] Créer interface admin pour visualiser les logs
 
 **Voir TODO.md pour plan détaillé**
 

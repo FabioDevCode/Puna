@@ -320,28 +320,48 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Documenter structure des clés i18n par entité (site, form, user, inbox)
 
 ### 📊 Amélioration des Logs (Pino)
-- [ ] Configurer Pino pour logging professionnel
-    - [ ] Créer `src/config/logger.js` avec configuration Pino
-    - [ ] Niveaux de logs : trace, debug, info, warn, error, fatal
-    - [ ] Format JSON structuré pour parsing facile
-    - [ ] Créer dossier `logs/` avec sous-dossiers par type
-        - [ ] `logs/app/` - logs application
-        - [ ] `logs/access/` - logs HTTP (Morgan + Pino)
-        - [ ] `logs/error/` - logs erreurs uniquement
-    - [ ] Rotation des logs avec `pino-roll` ou `pino-rotating-file`
-        - [ ] Rotation quotidienne
-        - [ ] Conserver 30 jours
-        - [ ] Compression des logs anciens (.gz)
-        - [ ] Limite de taille (100MB par fichier)
-    - [ ] Remplacer tous les `console.log` par logger
-    - [ ] Ajouter contexte aux logs (userId, requestId, etc.)
-- [ ] Interface admin pour visualiser les logs
+- [x] **Infrastructure Pino complète** ✅ (14 décembre 2025)
+    - [x] Créer `src/config/logger.js` avec 4 loggers (app, api, error, audit)
+    - [x] Niveaux de logs : trace, debug, info, warn, error, fatal
+    - [x] Format JSON structuré pour fichiers
+    - [x] Créer dossier `logs/` avec 4 fichiers séparés
+        - [x] `logs/app.log` - logs application
+        - [x] `logs/api.log` - logs API publiques uniquement
+        - [x] `logs/error.log` - logs erreurs uniquement
+        - [x] `logs/audit.log` - logs sécurité/audit
+    - [x] Remplacer Morgan par pino-http dans app.js
+    - [x] Console logs avec pino-pretty en développement
+    - [x] Variable LOG_TO_CONSOLE pour activer/désactiver console
+    - [x] Format console personnalisable (date, type, url)
+    - [x] Créer `src/helpers/logging.helpers.js` avec 15 fonctions
+    - [x] Scripts npm : `logs:clean` et `logs:stats`
+    - [x] Configuration rétention via variables d'environnement
+    - [x] Périodes de rétention : app=7j, api=14j, error=30j, audit=90j
+- [ ] **Migration des controllers vers Pino** (En cours)
+    - [ ] Remplacer tous les `console.log()` par `logger.info()`
+    - [ ] Remplacer tous les `console.error()` par `errorLogger.error()`
+    - [ ] Utiliser helpers de logging dans controllers :
+        - [ ] `logAction()` pour actions utilisateur
+        - [ ] `logAuthSuccess()` / `logAuthFailure()` dans auth.controller.js
+        - [ ] `logApiError()` dans API handlers
+        - [ ] `logDataDeletion()` pour suppressions
+        - [ ] `logAccessDenied()` pour erreurs 403
+        - [ ] `logUserCreated()` / `logRoleChanged()` dans admin.controller.js
+    - [ ] Ajouter contexte aux logs (userId, siteId, formId, IP, etc.)
+    - [ ] Tester et valider les logs générés
+- [ ] **Rotation automatique des logs** (À faire)
+    - [ ] Option 1 : Configurer logrotate système (Linux/macOS)
+    - [ ] Option 2 : Créer script cron avec rotation personnalisée
+    - [ ] Option 3 : Ré-évaluer alternatives pino-roll compatibles ESM
+    - [ ] Actuellement : Nettoyage manuel avec `npm run logs:clean`
+- [ ] **Interface admin pour visualiser les logs** (Futur)
     - [ ] Route `/admin/logs` (super_admin uniquement)
     - [ ] Liste des fichiers de logs avec taille/date
-    - [ ] Viewer de logs avec pagination
-    - [ ] Filtres : niveau, date, recherche texte
+    - [ ] Viewer de logs avec pagination et coloration syntaxique
+    - [ ] Filtres : niveau, date, recherche texte, utilisateur
     - [ ] Télécharger un fichier de log
     - [ ] Supprimer manuellement des logs anciens
+    - [ ] Graphiques de statistiques (erreurs par jour, etc.)
 
 ### 📤 Export CSV
 - [x] Implémenter exports CSV avec fast-csv

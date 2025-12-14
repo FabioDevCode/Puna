@@ -13,3 +13,8 @@ storage/**/**
 storage/
 migrations/**/**
 migrations/
+# Logs
+logs/
+*.log
+*.log.*
+*.gz
