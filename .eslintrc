@@ -91,7 +91,8 @@
             },
             "globals": {
                 "ApexCharts": "readonly",
-                "Toastify": "readonly"
+                "Toastify": "readonly",
+                "Toast": "readonly"
             },
             "rules": {
                 "import/order": "off",
