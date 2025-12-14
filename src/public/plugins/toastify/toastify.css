@@ -1,0 +1,113 @@
+/*!
+ * Toastify js 1.12.0
+ * https://github.com/apvarun/toastify-js
+ * @license MIT licensed
+ *
+ * Copyright (C) 2018 Varun A P
+ */
+.toastify {
+    padding: 12px 20px;
+    color: #fff;
+    display: inline-block;
+    position: fixed;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    max-width: 280px;
+    z-index: 2147483647;
+    line-height: 1.2em;
+}
+
+.toastify.puna {
+    box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 10px 36px -4px rgb(16, 30, 38, .3);
+    background: -webkit-linear-gradient(315deg, #101E26, #101E26);
+    background: linear-gradient(135deg, #101E26, #101E26);
+}
+
+.toastify.info {
+    box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 10px 36px -4px rgb(47, 110, 169, .3);
+    background: -webkit-linear-gradient(315deg, #2F6EA9, #2F6EA9);
+    background: linear-gradient(135deg, #2F6EA9, #2F6EA9);
+}
+
+.toastify.success {
+    box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 10px 36px -4px rgb(0, 169, 110, .3);
+    background: -webkit-linear-gradient(315deg, #00A96E, #00A96E);
+    background: linear-gradient(135deg, #00A96E, #00A96E);
+}
+
+.toastify.warning {
+    box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 10px 36px -4px rgb(255, 134, 0, .3);
+    background: -webkit-linear-gradient(315deg, #FF8600, #FF8600);
+    background: linear-gradient(135deg, #FF8600, #FF8600);
+}
+
+.toastify.error {
+    box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 10px 36px -4px rgb(227, 39, 16, .3);
+    background: -webkit-linear-gradient(315deg, #e32710, #e32710);
+    background: linear-gradient(135deg, #e32710, #e32710);
+}
+
+.toastify.on {
+    opacity: 1;
+}
+
+.toast-close {
+    background: 0 0;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1em;
+    opacity: 0.4;
+    padding: 0 5px;
+}
+
+.toastify-right {
+    right: 16px;
+}
+
+.toastify-left {
+    left: 16px;
+}
+
+.toastify-top {
+    top: -150px;
+}
+
+.toastify-bottom {
+    bottom: -150px;
+}
+
+.toastify-rounded {
+    border-radius: 25px;
+}
+
+.toastify-avatar {
+    width: 1.5em;
+    height: 1.5em;
+    margin: -7px 5px;
+    border-radius: 2px;
+}
+
+.toastify-center {
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    max-width: fit-content;
+    max-width: -moz-fit-content;
+}
+
+@media only screen and (max-width: 360px) {
+    .toastify-left,
+    .toastify-right {
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        max-width: fit-content;
+    }
+}

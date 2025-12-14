@@ -90,7 +90,8 @@
                 "node": false
             },
             "globals": {
-                "ApexCharts": "readonly"
+                "ApexCharts": "readonly",
+                "Toastify": "readonly"
             },
             "rules": {
                 "import/order": "off",
