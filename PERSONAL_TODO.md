@@ -2,7 +2,7 @@
 
 ## A implémenter
 
-- [ ] **Validation des entrées** coté app (Sanitization systématique)
+- [x] **Validation des entrées** coté app (Sanitization systématique)
 - [x] **Rate limite** (login, API, exports)
 - [ ] **CORS** - Configuration propre
 - [ ] **Refonte JS front-end** - Architecture modulaire (core/components/pages)

@@ -21,6 +21,7 @@ import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
 import flashMessages from './middlewares/flashMessages.js';
 import { injectUserRole } from './middlewares/injectUserRole.js';
+import sanitizeAll from './middlewares/sanitize.js';
 import models from './models/index.js';
 import routes from './routes/index.js';
 
@@ -107,6 +108,7 @@ app.use(i18n.init);
 app.use(express.static(`${__dirname}/public`));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(sanitizeAll);
 
 const MySQLStore = MySQLStoreConstructor(session);
 
