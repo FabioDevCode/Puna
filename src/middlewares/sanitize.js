@@ -57,6 +57,32 @@ const sanitizeData = (data) => {
 };
 
 /**
+ * Sanitize un objet en place (modifie les propriétés existantes)
+ * @param {Object} obj - Objet à nettoyer
+ */
+const sanitizeObjectInPlace = (obj) => {
+    if (!obj || typeof obj !== 'object') {
+        return;
+    }
+
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const value = obj[key];
+
+            if (typeof value === 'string') {
+                obj[key] = sanitizeString(value);
+            } else if (typeof value === 'object' && value !== null) {
+                if (Array.isArray(value)) {
+                    obj[key] = value.map((item) => sanitizeData(item));
+                } else {
+                    obj[key] = sanitizeData(value);
+                }
+            }
+        }
+    }
+};
+
+/**
  * Middleware Express pour sanitizer req.body
  * À placer après les parsers (express.json, express.urlencoded)
  */
@@ -72,7 +98,7 @@ export const sanitizeBody = (req, res, next) => {
  */
 export const sanitizeQuery = (req, res, next) => {
     if (req.query && typeof req.query === 'object') {
-        req.query = sanitizeData(req.query);
+        sanitizeObjectInPlace(req.query);
     }
     next();
 };
@@ -82,7 +108,7 @@ export const sanitizeQuery = (req, res, next) => {
  */
 export const sanitizeParams = (req, res, next) => {
     if (req.params && typeof req.params === 'object') {
-        req.params = sanitizeData(req.params);
+        sanitizeObjectInPlace(req.params);
     }
     next();
 };
@@ -95,10 +121,10 @@ export const sanitizeAll = (req, res, next) => {
         req.body = sanitizeData(req.body);
     }
     if (req.query && typeof req.query === 'object') {
-        req.query = sanitizeData(req.query);
+        sanitizeObjectInPlace(req.query);
     }
     if (req.params && typeof req.params === 'object') {
-        req.params = sanitizeData(req.params);
+        sanitizeObjectInPlace(req.params);
     }
     next();
 };
