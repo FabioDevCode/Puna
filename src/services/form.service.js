@@ -3,10 +3,16 @@
  * Gère les opérations CRUD sur les formulaires et leurs templates
  */
 
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { Op } from 'sequelize';
 import models from '../models/index.js';
 import stringUtils from '../utils/string.js';
 import { getSiteWhereCondition } from './access.service.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadsDir = path.resolve(__dirname, '../../storage/uploads');
 
 /**
  * Récupérer tous les formulaires d'un site
@@ -171,6 +177,30 @@ export async function updateForm(formId, updateData) {
  * @returns {Promise<boolean>} - true si suppression réussie
  */
 export async function deleteForm(formId) {
+    // Récupérer le form avec le site pour avoir le nom du site et le code du form
+    const form = await models.Form.findByPk(formId, {
+        attributes: ['id', 'name', 'code'],
+        include: [
+            {
+                model: models.Site,
+                as: 'site',
+                attributes: ['domain'],
+            },
+        ],
+    });
+
+    if (form && form.site) {
+        // Supprimer le dossier uploads/{site.domain}/{form.code}/
+        const formUploadPath = path.join(uploadsDir, form.site.domain, form.name);
+
+        try {
+            await fs.rm(formUploadPath, { recursive: true, force: true });
+            console.log(`Dossier supprimé: ${formUploadPath}`);
+        } catch (err) {
+            console.error(`Erreur lors de la suppression du dossier ${formUploadPath}:`, err);
+        }
+    }
+
     const result = await models.Form.destroy({
         where: { id: formId },
     });

@@ -2,12 +2,18 @@
  * Service de gestion des sites
  * Gère les opérations CRUD sur les sites et les tokens d'accès
  */
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import models from '../models/index.js';
 import { encryptObject } from '../utils/crypto.js';
 import stringUtils from '../utils/string.js';
 import { getSiteWhereCondition } from './access.service.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadsDir = path.resolve(__dirname, '../../storage/uploads');
 
 /**
  * Récupérer tous les sites accessibles par un utilisateur
@@ -394,6 +400,15 @@ export async function deleteSiteWithForms(siteId, userId, userRole, confirmDomai
         // Valider le domaine de confirmation
         if (site.domain !== confirmDomain.trim()) {
             return { success: false, error: 'Le domaine de confirmation ne correspond pas' };
+        }
+
+        // Supprimer le dossier uploads/{site.domain}/ et tout son contenu
+        const siteUploadPath = path.join(uploadsDir, site.domain);
+        try {
+            await fs.rm(siteUploadPath, { recursive: true, force: true });
+            console.log(`Dossier supprimé: ${siteUploadPath}`);
+        } catch (err) {
+            console.error(`Erreur lors de la suppression du dossier ${siteUploadPath}:`, err);
         }
 
         // Supprimer tous les formulaires associés
