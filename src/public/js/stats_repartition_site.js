@@ -50,19 +50,6 @@
                         },
                     },
                 },
-                responsive: [
-                    {
-                        breakpoint: 640,
-                        options: {
-                            chart: {
-                                width: 300,
-                            },
-                            legend: {
-                                position: 'bottom',
-                            },
-                        },
-                    },
-                ],
             };
 
             if (window.statCChart) {

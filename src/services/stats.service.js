@@ -479,49 +479,6 @@ export async function getInboxHeatmap(userId, userRole, days = 7) {
 }
 
 /**
- * Récupérer la dernière entrée inbox
- * @param {string} userId - ID de l'utilisateur
- * @param {string} userRole - Rôle de l'utilisateur
- * @returns {Promise<Object|null>} - { date, time } ou { date: null, time: null }
- */
-export async function getLastInboxEntry(userId, userRole) {
-    const siteWhere = userRole === 'super_admin' ? null : { fk_id_user: userId };
-
-    const includeOptions = {
-        model: models.Form,
-        as: 'form',
-        attributes: [],
-        include: [
-            {
-                model: models.Site,
-                as: 'site',
-                attributes: [],
-            },
-        ],
-    };
-
-    // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
-    if (siteWhere) {
-        includeOptions.include[0].where = siteWhere;
-    }
-
-    const lastRow = await models.Inbox.findOne({
-        include: [includeOptions],
-        order: [['createdAt', 'DESC']],
-    });
-
-    if (!lastRow) {
-        return { date: null, time: null };
-    }
-
-    const dt = dayjs(lastRow.createdAt);
-    return {
-        date: dt.format('YYYY-MM-DD'),
-        time: dt.format('HH:mm'),
-    };
-}
-
-/**
  * Calculer les pourcentages de variation avec format complet
  * @param {number} userId - ID de l'utilisateur
  * @param {string} userRole - Rôle de l'utilisateur

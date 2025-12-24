@@ -7,7 +7,6 @@ import {
     getInboxPercentagesDetailed,
     getInboxCountsBySite as getInboxCountsBySiteService,
     getInboxHeatmap as getInboxHeatmapService,
-    getLastInboxEntry as getLastInboxEntryService,
 } from '../services/stats.service.js';
 
 /**
@@ -129,21 +128,6 @@ export const getInboxHeatmap = async (req, res) => {
         return res.json(result);
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ error: 'Server error' });
-    }
-};
-
-/**
- * Dernière entrée inbox
- */
-export const getLastInboxEntry = async (req, res) => {
-    const userId = req.session.user?.id;
-    const userRole = req.userRole || req.session.user?.role || 'viewer';
-
-    try {
-        const result = await getLastInboxEntryService(userId, userRole);
-        return res.json(result);
-    } catch (err) {
         return res.status(500).json({ error: 'Server error' });
     }
 };

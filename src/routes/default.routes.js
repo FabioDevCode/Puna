@@ -40,7 +40,6 @@ router.get('/stats/inbox-heatmap', isConnected, dashboardCtl.getInboxHeatmap);
 router.get('/stats/top-froms', isConnected, dashboardCtl.getTopFroms);
 router.get('/stats/top-site-forms', isConnected, dashboardCtl.getTopSiteForms);
 router.get('/stats/inbox-by-site', isConnected, dashboardCtl.getInboxCountsBySite);
-router.get('/stats/last-inbox', isConnected, dashboardCtl.getLastInboxEntry);
 
 // Administration
 router.get('/admin', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.admin);

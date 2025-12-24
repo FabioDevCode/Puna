@@ -410,45 +410,35 @@ h3 {
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(8, 96px);
+    grid-template-rows: repeat(7, 96px);
     gap: 0.75rem;
     align-items: start;
 }
 
-.stats-item--b {
-    grid-column: 1 / -1;
-    grid-row: 1;
-}
-
 .stats-item--a {
     grid-column: 1 / -1;
-    grid-row: 2 / span 4;
+    grid-row: 1 / span 4;
 }
 
 .stats-item--c {
     grid-column: 1 / -1;
-    grid-row: 6 / span 3;
+    grid-row: 5 / span 4;
 }
 
 @media (min-width: 768px) {
     .stats-grid {
         grid-template-columns: repeat(6, 1fr);
-        grid-template-rows: repeat(8, 96px);
-    }
-
-    .stats-item--b {
-        grid-column: 1 / -1;
-        grid-row: 1;
+        grid-template-rows: repeat(7, 96px);
     }
 
     .stats-item--a {
         grid-column: 1 / -1;
-        grid-row: 2 / span 4;
+        grid-row: 1 / span 4;
     }
 
     .stats-item--c {
         grid-column: 1 / -1;
-        grid-row: 6 / span 3;
+        grid-row: 5 / span 3;
     }
 }
 
@@ -463,14 +453,9 @@ h3 {
         grid-row: span 4;
     }
 
-    .stats-item--b {
-        grid-column: span 4;
-        grid-row: span 1;
-    }
-
     .stats-item--c {
         grid-column: span 4;
-        grid-row: span 3;
+        grid-row: span 4;
     }
 }
 
