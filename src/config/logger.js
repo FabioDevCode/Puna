@@ -1,6 +1,9 @@
+import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cron from 'node-cron';
 import pino from 'pino';
+import * as tar from 'tar';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../..');
@@ -29,7 +32,97 @@ const env = process.env.NODE_ENV || 'development';
 const { level, appRetention, apiRetention, errorRetention, auditRetention } = config[env];
 
 // ============================================
-// STREAMS (destinations des logs)
+// ROTATION QUOTIDIENNE PERSONNALISÉE
+// ============================================
+
+/**
+ * Effectue la rotation des logs : archive les 4 fichiers dans une seule archive tar.gz
+ * 100% asynchrone pour ne pas bloquer le thread principal
+ */
+export async function rotateAllLogs() {
+    try {
+        const now = new Date();
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const dateStr = yesterday.toISOString().split('T')[0]; // Format: 2025-12-24
+        const archiveName = `${dateStr}-archive-log.tar.gz`;
+        const archivePath = path.join(archiveDir, archiveName);
+
+        // Créer le dossier archives s'il n'existe pas (async)
+        try {
+            await fs.access(archiveDir);
+        } catch {
+            await fs.mkdir(archiveDir, { recursive: true });
+        }
+
+        const logFiles = ['app.log', 'api.log', 'error.log', 'audit.log'];
+        const filesToArchive = [];
+
+        // Vérifier quels fichiers existent et ne sont pas vides (async)
+        for (const logFile of logFiles) {
+            const logPath = path.join(logDir, logFile);
+            try {
+                const stats = await fs.stat(logPath);
+                if (stats.size > 0) {
+                    filesToArchive.push(logFile);
+                }
+            } catch {
+                // Fichier n'existe pas, on ignore
+            }
+        }
+
+        if (filesToArchive.length === 0) {
+            logger.debug('Rotation quotidienne : aucun fichier à archiver');
+            return;
+        }
+
+        // Créer l'archive tar.gz (async via tar.create qui retourne une Promise)
+        await tar.create(
+            {
+                gzip: true,
+                file: archivePath,
+                cwd: logDir,
+            },
+            filesToArchive
+        );
+
+        // Vider les fichiers archivés (async)
+        await Promise.all(
+            filesToArchive.map((logFile) => {
+                const logPath = path.join(logDir, logFile);
+                return fs.writeFile(logPath, '');
+            })
+        );
+
+        const archiveStats = await fs.stat(archivePath);
+        logger.info(`Rotation quotidienne effectuée : ${archiveName} (${formatBytes(archiveStats.size)})`);
+    } catch (error) {
+        logger.error({ err: error }, 'Erreur lors de la rotation des logs');
+    }
+}
+
+/**
+ * Formatte les bytes en unités lisibles
+ */
+export function formatBytes(bytes) {
+    if (bytes === 0) {
+        return '0 Bytes';
+    }
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
+
+// Planifier la rotation quotidienne à minuit (00:00)
+cron.schedule('0 0 * * *', () => {
+    logger.info('Déclenchement de la rotation quotidienne des logs');
+    rotateAllLogs();
+});
+
+// ============================================
+// STREAMS (destinations des logs avec rotation)
 // ============================================
 
 // En développement, créer aussi un stream vers la console
@@ -124,17 +217,13 @@ export const auditLogger = pino(
 );
 
 // Log de démarrage
-logger.info(
-    {
-        env,
-        logLevel: level,
-        retention: {
-            app: `${appRetention} days`,
-            api: `${apiRetention} days`,
-            error: `${errorRetention} days`,
-            audit: `${auditRetention} days`,
-        },
-        logDir,
-    },
-    'Logger Pino configuré'
-);
+logger.info('Logger Pino configuré');
+logger.info(`  Environnement: ${env}`);
+logger.info(`  Niveau de log: ${level}`);
+logger.info(`  Répertoire: ${logDir}`);
+logger.info('  Rétention des logs:');
+logger.info(`    - app.log: ${appRetention} jours`);
+logger.info(`    - api.log: ${apiRetention} jours`);
+logger.info(`    - error.log: ${errorRetention} jours`);
+logger.info(`    - audit.log: ${auditRetention} jours`);
+logger.info('  Rotation: quotidienne à minuit (archive unique)');
