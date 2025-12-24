@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-case-declarations */
 document.addEventListener('DOMContentLoaded', () => {
     // État de la page
     const state = {
@@ -40,6 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Event listener pour le sélecteur de champ
         elements.searchFieldSelect.addEventListener('change', handleSearchFieldChange);
+
+        // Délégation d'événement pour les boutons d'action dans le tableau
+        elements.tableBody.addEventListener('click', handleTableAction);
 
         // Setup recherche
         setupSearch();
@@ -266,13 +271,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="text-sm">${user.createdAt}</td>
                 <td class="text-right">
                     <div class="flex justify-end items-center gap-2 w-full">
-                        <button onclick="window.location.href='/admin/users/${user.id}/view'" class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
+                        <button data-action="view" data-user-id="${user.id}" class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-eye"></i>
                         </button>
-                        <button onclick="window.location.href='/admin/users/${user.id}/edit'" class="btn btn-sm btn-outline btn-accent w-[38.25px] h-[32px] pt-[2px]">
+                        <button data-action="edit" data-user-id="${user.id}" class="btn btn-sm btn-outline btn-accent w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-pen-to-square"></i>
                         </button>
-                        <button onclick="openDeleteUserModal('${user.id}', '${user.login}')" class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px]">
+                        <button data-action="delete" data-user-id="${user.id}" data-user-login="${user.login}" class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-trash-can"></i>
                         </button>
                     </div>
@@ -323,6 +328,29 @@ document.addEventListener('DOMContentLoaded', () => {
             // Si on a déjà une recherche, on recharge
             state.offset = 0;
             loadUsers();
+        }
+    }
+
+    function handleTableAction(e) {
+        const button = e.target.closest('[data-action]');
+        if (!button) {
+            return;
+        }
+
+        const action = button.getAttribute('data-action');
+        const userId = button.getAttribute('data-user-id');
+
+        switch (action) {
+            case 'view':
+                window.location.href = `/admin/users/${userId}/view`;
+                break;
+            case 'edit':
+                window.location.href = `/admin/users/${userId}/edit`;
+                break;
+            case 'delete':
+                const userLogin = button.getAttribute('data-user-login');
+                openDeleteUserModal(userId, userLogin);
+                break;
         }
     }
 
