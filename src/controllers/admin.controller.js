@@ -24,6 +24,50 @@ const logDir = path.resolve(__dirname, '../../logs');
 const archiveDir = path.join(logDir, 'archives');
 
 /**
+ * Compte le nombre de lignes dans un fichier
+ * @param {string} filePath - Chemin du fichier
+ * @returns {Promise<number>} Nombre de lignes
+ */
+const countFileLines = async (filePath) => {
+    try {
+        const content = await fs.readFile(filePath, 'utf8');
+        if (!content.trim()) {
+            return 0;
+        }
+        return content.trim().split('\n').length;
+    } catch {
+        return 0;
+    }
+};
+
+/**
+ * Compte récursivement les fichiers dans un dossier
+ * @param {string} dirPath - Chemin du dossier
+ * @returns {Promise<number>} Nombre de fichiers
+ */
+const countFilesRecursive = async (dirPath) => {
+    try {
+        await fs.access(dirPath);
+    } catch {
+        return 0;
+    }
+
+    let count = 0;
+    const items = await fs.readdir(dirPath, { withFileTypes: true });
+
+    for (const item of items) {
+        const itemPath = path.join(dirPath, item.name);
+        if (item.isDirectory()) {
+            count += await countFilesRecursive(itemPath);
+        } else if (item.isFile()) {
+            count++;
+        }
+    }
+
+    return count;
+};
+
+/**
  * Page d'administration
  */
 export const admin = async (req, res) => {
@@ -38,13 +82,62 @@ export const admin = async (req, res) => {
             entries: 0,
         };
 
+        let activityStats = {
+            connectedUsers: 0,
+            errorsCount: 0,
+            todaySites: 0,
+            todayForms: 0,
+            totalFiles: 0,
+        };
+
+        // Début de la journée (minuit)
+        const todayStart = dayjs().startOf('day').toDate();
+
+        // Stats communes à tous les rôles - Utilisateurs connectés
+        try {
+            const nowTimestamp = Math.floor(Date.now() / 1000);
+
+            const sessions = await models.sequelize.query(`SELECT data FROM sessions WHERE expires > :now`, {
+                replacements: { now: nowTimestamp },
+                type: models.Sequelize.QueryTypes.SELECT,
+            });
+
+            // Parser les sessions et compter les utilisateurs uniques connectés
+            const connectedUserIds = new Set();
+            for (const session of sessions) {
+                try {
+                    const sessionData = JSON.parse(session.data);
+                    // L'utilisateur est stocké dans session.user.id (pas passport)
+                    if (sessionData?.user?.id) {
+                        connectedUserIds.add(sessionData.user.id);
+                    }
+                } catch {
+                    // Session invalide, ignorer
+                }
+            }
+            activityStats.connectedUsers = connectedUserIds.size;
+        } catch (err) {
+            console.error('Error counting connected users:', err);
+            activityStats.connectedUsers = 0;
+        }
+
+        // Nombre d'erreurs dans error.log
+        const errorLogPath = path.join(logDir, 'error.log');
+        activityStats.errorsCount = await countFileLines(errorLogPath);
+
+        // Nombre total de fichiers uploadés
+        const uploadsDir = path.resolve(__dirname, '../../storage/uploads');
+        activityStats.totalFiles = await countFilesRecursive(uploadsDir);
+
         if (userRole === 'super_admin') {
             // Super admin voit tout
-            const [usersCount, sitesCount, formsCount, entriesCount] = await Promise.all([
+            const [usersCount, sitesCount, formsCount, entriesCount, todaySites, todayForms] = await Promise.all([
                 models.User.count(),
                 models.Site.count(),
                 models.Form.count(),
                 models.Inbox.count(),
+                models.Site.count({ where: { createdAt: { [models.Op.gte]: todayStart } } }),
+                models.Form.count({ where: { createdAt: { [models.Op.gte]: todayStart } } }),
             ]);
 
             stats = {
@@ -53,6 +146,9 @@ export const admin = async (req, res) => {
                 forms: formsCount,
                 entries: entriesCount,
             };
+
+            activityStats.todaySites = todaySites;
+            activityStats.todayForms = todayForms;
         } else if (userRole === 'owner') {
             // Owner voit uniquement ses données
 
@@ -72,19 +168,37 @@ export const admin = async (req, res) => {
             // Formulaires des sites de l'owner
             let formsCount = 0;
             let entriesCount = 0;
+            let todaySites = 0;
+            let todayForms = 0;
 
             if (siteIds.length > 0) {
-                formsCount = await models.Form.count({
-                    where: { fk_id_site: { [models.Op.in]: siteIds } },
-                });
+                const [formsCountResult, formsAll, todaySitesResult, todayFormsResult] = await Promise.all([
+                    models.Form.count({
+                        where: { fk_id_site: { [models.Op.in]: siteIds } },
+                    }),
+                    models.Form.findAll({
+                        where: { fk_id_site: { [models.Op.in]: siteIds } },
+                        attributes: ['id'],
+                    }),
+                    models.Site.count({
+                        where: {
+                            id: { [models.Op.in]: siteIds },
+                            createdAt: { [models.Op.gte]: todayStart },
+                        },
+                    }),
+                    models.Form.count({
+                        where: {
+                            fk_id_site: { [models.Op.in]: siteIds },
+                            createdAt: { [models.Op.gte]: todayStart },
+                        },
+                    }),
+                ]);
 
-                // Entrées des formulaires de ses sites
-                const forms = await models.Form.findAll({
-                    where: { fk_id_site: { [models.Op.in]: siteIds } },
-                    attributes: ['id'],
-                });
-                const formIds = forms.map((f) => f.id);
+                formsCount = formsCountResult;
+                todaySites = todaySitesResult;
+                todayForms = todayFormsResult;
 
+                const formIds = formsAll.map((f) => f.id);
                 if (formIds.length > 0) {
                     entriesCount = await models.Inbox.count({
                         where: { fk_id_form: { [models.Op.in]: formIds } },
@@ -98,11 +212,15 @@ export const admin = async (req, res) => {
                 forms: formsCount,
                 entries: entriesCount,
             };
+
+            activityStats.todaySites = todaySites;
+            activityStats.todayForms = todayForms;
         }
 
         res.render('admin/index', {
             layout: 'admin',
             stats,
+            activityStats,
         });
     } catch (err) {
         console.error('admin error:', err);

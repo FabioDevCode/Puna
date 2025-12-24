@@ -1,21 +1,8 @@
 {{#slot "title"}}
-    <h3 class="font-inter">Administration</h3>
+    <h3 class="font-inter">
+        Vue d'ensemble
+    </h3>
 {{/slot}}
-
-<!-- Vue d'ensemble -->
-<div class="col-span-2 md:col-span-6 lg:col-span-12">
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-2xl">
-                <i class="fa-solid fa-chart-bar"></i>
-                Vue d'ensemble
-            </h2>
-            <p class="text-neutral-content">
-                Bienvenue dans l'espace d'administration de Puna.
-            </p>
-        </div>
-    </div>
-</div>
 
 <!-- Statistiques rapides -->
 <div class="col-span-2 md:col-span-2 lg:col-span-3">
@@ -69,6 +56,61 @@
         </div>
     </div>
 </div>
+
+<!-- Statistiques d'activité -->
+<div class="col-span-2 md:col-span-2 lg:col-span-3">
+    <div class="stats shadow-xl w-full">
+        <div class="stat">
+            <div class="stat-figure text-success">
+                <i class="fa-solid fa-circle text-sm animate-pulse"></i>
+            </div>
+            <div class="stat-title">En ligne</div>
+            <div class="stat-value text-success">{{activityStats.connectedUsers}}</div>
+            <div class="stat-desc">Utilisateurs connectés</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-span-2 md:col-span-2 lg:col-span-3">
+    <div class="stats shadow-xl w-full">
+        <div class="stat">
+            <div class="stat-figure text-error">
+                <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
+            </div>
+            <div class="stat-title">Erreurs</div>
+            <div class="stat-value text-error">{{activityStats.errorsCount}}</div>
+            <div class="stat-desc">Logs du jour</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-span-2 md:col-span-2 lg:col-span-3">
+    <div class="stats shadow-xl w-full">
+        <div class="stat">
+            <div class="stat-figure text-info">
+                {{!-- <i class="fa-solid fa-calendar-plus text-3xl"></i> --}}
+                <i class="fa-regular fa-calendar-plus text-3xl"></i>
+            </div>
+            <div class="stat-title">Créés aujourd'hui</div>
+            <div class="stat-value text-info">{{activityStats.todaySites}} / {{activityStats.todayForms}}</div>
+            <div class="stat-desc">Sites / Formulaires</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-span-2 md:col-span-2 lg:col-span-3">
+    <div class="stats shadow-xl w-full">
+        <div class="stat">
+            <div class="stat-figure text-warning">
+                <i class="fa-regular fa-folder-open text-3xl"></i>
+            </div>
+            <div class="stat-title">Fichiers</div>
+            <div class="stat-value text-warning">{{activityStats.totalFiles}}</div>
+            <div class="stat-desc">Total uploadés</div>
+        </div>
+    </div>
+</div>
+
 
 
 
