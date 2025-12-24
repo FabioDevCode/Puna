@@ -1,0 +1,142 @@
+{{#slot "title"}}
+    <h3 class="font-inter">Logs</h3>
+{{/slot}}
+
+{{#slot "buttons"}}
+    <button id="btn-refresh" class="btn btn-sm btn-outline">
+        <i class="fa-solid fa-sync"></i>
+        Actualiser
+    </button>
+{{/slot}}
+
+<div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12">
+    <!-- Filtres -->
+    <div class="card bg-base-100 shadow-sm">
+        <div class="card-body p-4">
+            <div class="flex flex-wrap gap-4 items-end">
+                <!-- Sélecteur de date -->
+                <div class="form-control w-full max-w-xs">
+                    <label class="label">
+                        <span class="label-text font-medium">Date</span>
+                    </label>
+                    <select id="select-date" class="select select-bordered select-sm w-full">
+                        <option value="today" selected>Aujourd'hui</option>
+                        {{#each archives}}
+                            <option value="{{this.date}}">{{this.label}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <!-- Sélecteur de type -->
+                <div class="form-control w-full max-w-xs">
+                    <label class="label">
+                        <span class="label-text font-medium">Type</span>
+                    </label>
+                    <select id="select-type" class="select select-bordered select-sm w-full">
+                        <option value="app" selected>Application</option>
+                        <option value="api">API</option>
+                        <option value="audit">Audit</option>
+                        <option value="error">Erreurs</option>
+                    </select>
+                </div>
+
+                <!-- Recherche -->
+                <div class="form-control w-full max-w-xs">
+                    <label class="label">
+                        <span class="label-text font-medium">Rechercher</span>
+                    </label>
+                    <div class="join">
+                        <input type="text" id="input-search" placeholder="Mot-clé..."
+                        class="input input-bordered input-sm join-item w-full" />
+                        <button id="btn-search" class="btn btn-sm btn-neutral join-item">
+                            <i class="fa-solid fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Plage horaire -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Plage horaire</span>
+                    </label>
+                    <div class="join">
+                        <input type="time" id="input-time-from"
+                        class="input input-bordered input-sm join-item w-28"
+                        title="Heure de début" />
+                        <span class="join-item flex items-center px-2 bg-base-200 text-sm">à</span>
+                        <input type="time" id="input-time-to"
+                        class="input input-bordered input-sm join-item w-28"
+                        title="Heure de fin" />
+                    </div>
+                </div>
+
+                <!-- Compteur -->
+                <div class="flex items-center gap-2 ml-auto">
+                    <span class="badge badge-neutral" id="log-count">0 entrées</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Affichage des logs -->
+    <div class="card bg-base-100 shadow-sm">
+        <div class="card-body p-0">
+            <!-- Loading -->
+            <div id="logs-loading" class="hidden p-8 text-center">
+                <span class="loading loading-spinner loading-lg"></span>
+                <p class="mt-2 text-sm text-neutral-content">Chargement des logs...</p>
+            </div>
+
+            <!-- Erreur -->
+            <div id="logs-error" class="hidden p-8 text-center">
+                <i class="fa-solid fa-exclamation-triangle text-4xl text-warning mb-2"></i>
+                <p class="text-sm text-neutral-content" id="logs-error-message">Erreur lors du chargement</p>
+            </div>
+
+            <!-- Logs vides -->
+            <div id="logs-empty" class="hidden p-8 text-center">
+                <i class="fa-solid fa-inbox text-4xl text-neutral-content/50 mb-2"></i>
+                <p class="text-sm text-neutral-content">Aucun log trouvé</p>
+            </div>
+
+            <!-- Table des logs -->
+            <div id="logs-table-container" class="overflow-x-auto rounded-2xl">
+                <table class="table table-sm table-zebra">
+                    <thead class="bg-base-100">
+                        <tr>
+                            <th class="w-28">Heure</th>
+                            <th class="w-28">Niveau</th>
+                            <th>Message</th>
+                            <th class="w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-tbody">
+                        <!-- Logs injectés par JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal détails du log -->
+<dialog id="modal-log-detail" class="modal">
+    <div class="modal-box max-w-4xl">
+        <h3 class="font-bold text-lg mb-4">
+            <i class="fa-solid fa-file-alt mr-2"></i>
+            Détails du log
+        </h3>
+        <pre id="log-detail-content" class="bg-base-200 p-4 rounded-lg overflow-x-auto text-sm max-h-96"></pre>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-sm">Fermer</button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<script src="/js/admin_logs.js"></script>
+

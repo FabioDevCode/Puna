@@ -1,0 +1,392 @@
+/**
+ * Admin Logs Viewer
+ * Gestion du visualiseur de logs pour l'administration
+ */
+
+(function () {
+    'use strict';
+
+    // ========================================================================
+    // STATE
+    // ========================================================================
+
+    const state = {
+        date: 'today',
+        type: 'app',
+        search: '',
+        timeFrom: '',
+        timeTo: '',
+        loading: false,
+        logs: [],
+    };
+
+    // ========================================================================
+    // DOM ELEMENTS
+    // ========================================================================
+
+    const elements = {
+        selectDate: document.getElementById('select-date'),
+        selectType: document.getElementById('select-type'),
+        inputSearch: document.getElementById('input-search'),
+        inputTimeFrom: document.getElementById('input-time-from'),
+        inputTimeTo: document.getElementById('input-time-to'),
+        btnSearch: document.getElementById('btn-search'),
+        btnRefresh: document.getElementById('btn-refresh'),
+        logCount: document.getElementById('log-count'),
+        logsLoading: document.getElementById('logs-loading'),
+        logsError: document.getElementById('logs-error'),
+        logsErrorMessage: document.getElementById('logs-error-message'),
+        logsEmpty: document.getElementById('logs-empty'),
+        logsTableContainer: document.getElementById('logs-table-container'),
+        logsTbody: document.getElementById('logs-tbody'),
+        modalLogDetail: document.getElementById('modal-log-detail'),
+        logDetailContent: document.getElementById('log-detail-content'),
+    };
+
+    // ========================================================================
+    // UTILITIES
+    // ========================================================================
+
+    /**
+     * Formate un timestamp en heure lisible
+     * @param {number} timestamp - Timestamp en millisecondes
+     * @returns {string} Heure formatée
+     */
+    function formatTime(timestamp) {
+        if (!timestamp) {
+            return '-';
+        }
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+        });
+    }
+
+    /**
+     * Retourne la classe CSS du badge selon le niveau de log
+     * @param {number|string} level - Niveau du log
+     * @returns {string} Classes CSS du badge
+     */
+    function getLevelBadgeClass(level) {
+        const levelNum = typeof level === 'string' ? parseInt(level, 10) : level;
+
+        switch (levelNum) {
+            case 10: // trace
+                return 'w-max badge badge-xs';
+            case 20: // debug
+                return 'w-max badge badge-xs badge-ghost';
+            case 30: // info
+                return 'w-max badge badge-xs badge-info';
+            case 40: // warn
+                return 'w-max badge badge-xs badge-warning';
+            case 50: // error
+                return 'w-max badge badge-xs badge-error';
+            case 60: // fatal
+                return 'w-max badge badge-xs badge-error';
+            default:
+        }
+    }
+
+    /**
+     * Retourne le label du niveau de log
+     * @param {number|string} level - Niveau du log
+     * @returns {string} Label du niveau
+     */
+    function getLevelLabel(level) {
+        const levelNum = typeof level === 'string' ? parseInt(level, 10) : level;
+
+        switch (levelNum) {
+            case 10:
+                return 'TRACE';
+            case 20:
+                return 'DEBUG';
+            case 30:
+                return 'INFO';
+            case 40:
+                return 'WARN';
+            case 50:
+                return 'ERROR';
+            case 60:
+                return 'FATAL';
+            default:
+                return String(level);
+        }
+    }
+
+    /**
+     * Extrait le message principal d'une entrée de log
+     * @param {Object} log - Entrée de log
+     * @returns {string} Message
+     */
+    function extractMessage(log) {
+        if (log.msg) {
+            return log.msg;
+        }
+        if (log.message) {
+            return log.message;
+        }
+        if (log.raw) {
+            return log.raw;
+        }
+
+        // Extraire les champs pertinents
+        const relevantFields = ['method', 'url', 'statusCode', 'responseTime', 'action', 'user'];
+        const parts = [];
+
+        for (const field of relevantFields) {
+            if (log[field] !== undefined) {
+                parts.push(`${field}: ${log[field]}`);
+            }
+        }
+
+        return parts.length > 0 ? parts.join(' | ') : JSON.stringify(log).substring(0, 100);
+    }
+
+    /**
+     * Échappe les caractères HTML
+     * @param {string} str - Chaîne à échapper
+     * @returns {string} Chaîne échappée
+     */
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ========================================================================
+    // UI UPDATES
+    // ========================================================================
+
+    /**
+     * Affiche l'état de chargement
+     */
+    function showLoading() {
+        elements.logsLoading.classList.remove('hidden');
+        elements.logsError.classList.add('hidden');
+        elements.logsEmpty.classList.add('hidden');
+        elements.logsTableContainer.classList.add('hidden');
+    }
+
+    /**
+     * Affiche une erreur
+     * @param {string} message - Message d'erreur
+     */
+    function showError(message) {
+        elements.logsLoading.classList.add('hidden');
+        elements.logsError.classList.remove('hidden');
+        elements.logsEmpty.classList.add('hidden');
+        elements.logsTableContainer.classList.add('hidden');
+        elements.logsErrorMessage.textContent = message;
+    }
+
+    /**
+     * Affiche l'état vide
+     */
+    function showEmpty() {
+        elements.logsLoading.classList.add('hidden');
+        elements.logsError.classList.add('hidden');
+        elements.logsEmpty.classList.remove('hidden');
+        elements.logsTableContainer.classList.add('hidden');
+    }
+
+    /**
+     * Affiche la table des logs
+     */
+    function showTable() {
+        elements.logsLoading.classList.add('hidden');
+        elements.logsError.classList.add('hidden');
+        elements.logsEmpty.classList.add('hidden');
+        elements.logsTableContainer.classList.remove('hidden');
+    }
+
+    /**
+     * Met à jour le compteur
+     * @param {number} count - Nombre d'entrées
+     */
+    function updateCount(count) {
+        elements.logCount.textContent = `${count} entrée${count !== 1 ? 's' : ''}`;
+    }
+
+    /**
+     * Rend les logs dans la table
+     * @param {Array} logs - Liste des logs
+     */
+    function renderLogs(logs) {
+        if (logs.length === 0) {
+            showEmpty();
+            updateCount(0);
+            return;
+        }
+
+        const html = logs
+            .map((log, index) => {
+                const time = formatTime(log.time);
+                const level = log.level || '-';
+                const levelClass = getLevelBadgeClass(level);
+                const levelLabel = getLevelLabel(level);
+                const message = escapeHtml(extractMessage(log));
+
+                return `
+                <tr>
+                    <td class="font-mono text-xs">${time}</td>
+                    <td><span class="${levelClass}">${levelLabel}</span></td>
+                    <td class="truncate max-w-md" title="${escapeHtml(message)}">${message}</td>
+                    <td>
+                        <button class="btn btn-xs btn-ghost" data-action="view-detail" data-index="${index}">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            })
+            .join('');
+
+        elements.logsTbody.innerHTML = html;
+        showTable();
+        updateCount(logs.length);
+    }
+
+    // ========================================================================
+    // API CALLS
+    // ========================================================================
+
+    /**
+     * Charge les logs depuis l'API
+     */
+    async function loadLogs() {
+        if (state.loading) {
+            return;
+        }
+
+        state.loading = true;
+        showLoading();
+
+        try {
+            const params = new URLSearchParams({
+                date: state.date,
+                type: state.type,
+            });
+
+            if (state.search) {
+                params.set('search', state.search);
+            }
+            if (state.timeFrom) {
+                params.set('timeFrom', state.timeFrom);
+            }
+            if (state.timeTo) {
+                params.set('timeTo', state.timeTo);
+            }
+
+            const response = await fetch(`/admin/logs/read?${params}`);
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Erreur lors du chargement');
+            }
+
+            const data = await response.json();
+            state.logs = data.lines || [];
+            renderLogs(state.logs);
+        } catch (error) {
+            console.error('Erreur chargement logs:', error);
+            showError(error.message);
+        } finally {
+            state.loading = false;
+        }
+    }
+
+    // ========================================================================
+    // EVENT HANDLERS
+    // ========================================================================
+
+    /**
+     * Gère le changement de date
+     */
+    function handleDateChange() {
+        state.date = elements.selectDate.value;
+        loadLogs();
+    }
+
+    /**
+     * Gère le changement de type
+     */
+    function handleTypeChange() {
+        state.type = elements.selectType.value;
+        loadLogs();
+    }
+
+    /**
+     * Gère la recherche
+     */
+    function handleSearch() {
+        state.search = elements.inputSearch.value.trim();
+        state.timeFrom = elements.inputTimeFrom.value;
+        state.timeTo = elements.inputTimeTo.value;
+        loadLogs();
+    }
+
+    /**
+     * Gère la touche Entrée dans le champ de recherche
+     * @param {KeyboardEvent} event
+     */
+    function handleSearchKeypress(event) {
+        if (event.key === 'Enter') {
+            handleSearch();
+        }
+    }
+
+    /**
+     * Gère le clic sur le bouton de détail
+     * @param {number} index - Index du log dans state.logs
+     */
+    function showLogDetail(index) {
+        const log = state.logs[index];
+        if (!log) {
+            return;
+        }
+
+        const formatted = JSON.stringify(log, null, 2);
+        elements.logDetailContent.textContent = formatted;
+        elements.modalLogDetail.showModal();
+    }
+
+    /**
+     * Gère les clics sur la table (délégation)
+     * @param {MouseEvent} event
+     */
+    function handleTableClick(event) {
+        const button = event.target.closest('[data-action="view-detail"]');
+        if (button) {
+            const index = parseInt(button.dataset.index, 10);
+            showLogDetail(index);
+        }
+    }
+
+    // ========================================================================
+    // INITIALIZATION
+    // ========================================================================
+
+    function init() {
+        // Event listeners
+        elements.selectDate.addEventListener('change', handleDateChange);
+        elements.selectType.addEventListener('change', handleTypeChange);
+        elements.btnSearch.addEventListener('click', handleSearch);
+        elements.inputSearch.addEventListener('keypress', handleSearchKeypress);
+        elements.inputTimeFrom.addEventListener('change', handleSearch);
+        elements.inputTimeTo.addEventListener('change', handleSearch);
+        elements.btnRefresh.addEventListener('click', loadLogs);
+        elements.logsTbody.addEventListener('click', handleTableClick);
+
+        // Chargement initial
+        loadLogs();
+    }
+
+    // Démarrage
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();

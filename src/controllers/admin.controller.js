@@ -1,4 +1,9 @@
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import dayjs from 'dayjs';
+import * as tar from 'tar';
+import { logger } from '../config/logger.js';
 import models from '../models/index.js';
 import { verifyPassword } from '../services/auth.service.js';
 import { getAvailableSites } from '../services/site.service.js';
@@ -12,6 +17,11 @@ import {
     getUserWithRelations,
     updateUserAdmin,
 } from '../services/user.service.js';
+
+// Chemins pour les logs
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const logDir = path.resolve(__dirname, '../../logs');
+const archiveDir = path.join(logDir, 'archives');
 
 /**
  * Page d'administration
@@ -374,5 +384,213 @@ export const adminSettings = async (req, res) => {
     } catch (err) {
         console.error('adminSettings error:', err);
         res.redirect('/admin');
+    }
+};
+
+// ============================================================================
+// LOGS VIEWER
+// ============================================================================
+
+const LOG_TYPES = ['app', 'api', 'audit', 'error'];
+
+/**
+ * Formate une date pour l'affichage dans le sélecteur
+ * @param {string} dateStr - Date au format YYYY-MM-DD
+ * @returns {string} Date formatée
+ */
+const formatDateLabel = (dateStr) => {
+    if (dateStr === 'today') {
+        return "Aujourd'hui";
+    }
+    return dateStr; // Format YYYY-MM-DD déjà présent
+};
+
+/**
+ * Liste les archives disponibles dans le dossier archives
+ * @returns {Promise<Array>} Liste des archives avec date et label
+ */
+const listArchives = async () => {
+    try {
+        await fs.access(archiveDir);
+    } catch {
+        return [];
+    }
+
+    const files = await fs.readdir(archiveDir);
+    const archives = files
+        .filter((f) => f.endsWith('-archive-log.tar.gz'))
+        .map((f) => {
+            const dateStr = f.replace('-archive-log.tar.gz', '');
+            return {
+                filename: f,
+                date: dateStr,
+                label: formatDateLabel(dateStr),
+            };
+        })
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+    return archives;
+};
+
+/**
+ * Extrait et lit un fichier de log depuis une archive tar.gz
+ * @param {string} archiveFilename - Nom du fichier archive
+ * @param {string} logType - Type de log (app, api, audit, error)
+ * @returns {Promise<string>} Contenu du fichier de log
+ */
+const extractLogFromArchive = async (archiveFilename, logType) => {
+    const archivePath = path.join(archiveDir, archiveFilename);
+    const logFilename = `${logType}.log`;
+
+    try {
+        await fs.access(archivePath);
+    } catch {
+        throw new Error(`Archive non trouvée: ${archiveFilename}`);
+    }
+
+    return new Promise((resolve, reject) => {
+        const chunks = [];
+
+        tar.t({
+            file: archivePath,
+            onReadEntry: (entry) => {
+                if (entry.path === logFilename) {
+                    entry.on('data', (chunk) => chunks.push(chunk));
+                    entry.on('end', () => {
+                        resolve(Buffer.concat(chunks).toString('utf8'));
+                    });
+                } else {
+                    entry.resume();
+                }
+            },
+        })
+            .then(() => {
+                if (chunks.length === 0) {
+                    resolve('');
+                }
+            })
+            .catch(reject);
+    });
+};
+
+/**
+ * Page du visualiseur de logs
+ */
+export const logsViewer = async (req, res) => {
+    try {
+        const archives = await listArchives();
+
+        res.render('admin/logs/viewer', {
+            layout: 'admin',
+            logTypes: LOG_TYPES,
+            archives,
+        });
+    } catch (err) {
+        logger.error({ err }, 'logsViewer error');
+        res.redirect('/admin');
+    }
+};
+
+/**
+ * API: Lecture des logs (aujourd'hui ou archive)
+ */
+export const readLogs = async (req, res) => {
+    try {
+        const { date = 'today', type = 'app', search = '', timeFrom = '', timeTo = '' } = req.query;
+
+        if (!LOG_TYPES.includes(type)) {
+            return res.status(400).json({ error: 'Type de log invalide' });
+        }
+
+        let content = '';
+
+        if (date === 'today') {
+            // Lecture du fichier de log actuel
+            const logPath = path.join(logDir, `${type}.log`);
+            try {
+                content = await fs.readFile(logPath, 'utf8');
+            } catch {
+                content = '';
+            }
+        } else {
+            // Extraction depuis une archive
+            const archiveFilename = `${date}-archive-log.tar.gz`;
+            try {
+                content = await extractLogFromArchive(archiveFilename, type);
+            } catch (err) {
+                return res.status(404).json({ error: err.message });
+            }
+        }
+
+        // Parsing des lignes JSON et filtrage
+        const lines = content
+            .split('\n')
+            .filter((line) => line.trim())
+            .map((line) => {
+                try {
+                    return JSON.parse(line);
+                } catch {
+                    return { raw: line, time: Date.now() };
+                }
+            });
+
+        // Filtrage par recherche si spécifié
+        let filteredLines = lines;
+        if (search) {
+            const searchLower = search.toLowerCase();
+            filteredLines = filteredLines.filter((line) => {
+                const lineStr = JSON.stringify(line).toLowerCase();
+                return lineStr.includes(searchLower);
+            });
+        }
+
+        // Filtrage par plage horaire
+        if (timeFrom || timeTo) {
+            filteredLines = filteredLines.filter((line) => {
+                if (!line.time) {
+                    return false;
+                }
+                const logDate = new Date(line.time);
+                const logTimeStr = logDate.toTimeString().slice(0, 5); // HH:MM
+
+                if (timeFrom && logTimeStr < timeFrom) {
+                    return false;
+                }
+                if (timeTo && logTimeStr > timeTo) {
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        // Tri par temps décroissant (plus récent en premier)
+        filteredLines.sort((a, b) => {
+            const timeA = a.time || 0;
+            const timeB = b.time || 0;
+            return timeB - timeA;
+        });
+
+        res.json({
+            date,
+            type,
+            count: filteredLines.length,
+            lines: filteredLines,
+        });
+    } catch (err) {
+        logger.error({ err }, 'readLogs error');
+        res.status(500).json({ error: 'Erreur lors de la lecture des logs' });
+    }
+};
+
+/**
+ * API: Liste des archives disponibles
+ */
+export const getArchives = async (req, res) => {
+    try {
+        const archives = await listArchives();
+        res.json({ archives });
+    } catch (err) {
+        logger.error({ err }, 'getArchives error');
+        res.status(500).json({ error: 'Erreur lors de la récupération des archives' });
     }
 };

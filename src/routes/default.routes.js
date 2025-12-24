@@ -60,6 +60,11 @@ router.get('/admin/users/:id/edit', isConnected, roleAccess(['super_admin', 'own
 router.post('/admin/users/:id/update', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminUpdateUser);
 router.get('/admin/settings', isConnected, roleAccess(['super_admin']), adminCtl.adminSettings);
 
+// Logs Viewer (super_admin uniquement)
+router.get('/admin/logs', isConnected, roleAccess(['super_admin']), adminCtl.logsViewer);
+router.get('/admin/logs/read', isConnected, roleAccess(['super_admin']), adminCtl.readLogs);
+router.get('/admin/logs/archives', isConnected, roleAccess(['super_admin']), adminCtl.getArchives);
+
 router.get('/site/all', isConnected, actionAccess('site', 'read'), dashboardCtl.allSite);
 router.get('/site/:id/view', isConnected, actionAccess('site', 'read'), siteCtl.showSite);
 
