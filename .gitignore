@@ -14,7 +14,7 @@ storage/
 migrations/**/**
 migrations/
 # Logs
-logs/
+./logs/
 *.log
 *.log.*
 *.gz

@@ -12,10 +12,11 @@
 
     const state = {
         date: 'today',
-        type: 'app',
+        type: 'error',
         search: '',
         timeFrom: '',
         timeTo: '',
+        sortOrder: 'desc', // 'desc' = plus récent en premier, 'asc' = plus ancien en premier
         loading: false,
         logs: [],
     };
@@ -24,24 +25,32 @@
     // DOM ELEMENTS
     // ========================================================================
 
-    const elements = {
-        selectDate: document.getElementById('select-date'),
-        selectType: document.getElementById('select-type'),
-        inputSearch: document.getElementById('input-search'),
-        inputTimeFrom: document.getElementById('input-time-from'),
-        inputTimeTo: document.getElementById('input-time-to'),
-        btnSearch: document.getElementById('btn-search'),
-        btnRefresh: document.getElementById('btn-refresh'),
-        logCount: document.getElementById('log-count'),
-        logsLoading: document.getElementById('logs-loading'),
-        logsError: document.getElementById('logs-error'),
-        logsErrorMessage: document.getElementById('logs-error-message'),
-        logsEmpty: document.getElementById('logs-empty'),
-        logsTableContainer: document.getElementById('logs-table-container'),
-        logsTbody: document.getElementById('logs-tbody'),
-        modalLogDetail: document.getElementById('modal-log-detail'),
-        logDetailContent: document.getElementById('log-detail-content'),
-    };
+    let elements = {};
+
+    /**
+     * Initialise les références aux éléments DOM
+     */
+    function initElements() {
+        elements = {
+            selectDate: document.getElementById('select-date'),
+            selectType: document.getElementById('select-type'),
+            inputSearch: document.getElementById('input-search'),
+            inputTimeFrom: document.getElementById('input-time-from'),
+            inputTimeTo: document.getElementById('input-time-to'),
+            btnSearch: document.getElementById('btn-search'),
+            btnToggleOrder: document.getElementById('btn-toggle-order'),
+            btnRefresh: document.getElementById('btn-refresh'),
+            logCount: document.getElementById('log-count'),
+            logsLoading: document.getElementById('logs-loading'),
+            logsError: document.getElementById('logs-error'),
+            logsErrorMessage: document.getElementById('logs-error-message'),
+            logsEmpty: document.getElementById('logs-empty'),
+            logsTableContainer: document.getElementById('logs-table-container'),
+            logsTbody: document.getElementById('logs-tbody'),
+            modalLogDetail: document.getElementById('modal-log-detail'),
+            logDetailContent: document.getElementById('log-detail-content'),
+        };
+    }
 
     // ========================================================================
     // UTILITIES
@@ -220,7 +229,14 @@
             return;
         }
 
-        const html = logs
+        // Trier selon l'ordre sélectionné
+        const sortedLogs = [...logs].sort((a, b) => {
+            const timeA = a.time ? new Date(a.time).getTime() : 0;
+            const timeB = b.time ? new Date(b.time).getTime() : 0;
+            return state.sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
+        });
+
+        const html = sortedLogs
             .map((log, index) => {
                 const time = formatTime(log.time);
                 const level = log.level || '-';
@@ -328,6 +344,15 @@
     }
 
     /**
+     * Gère le basculement de l'ordre de tri
+     */
+    function handleToggleOrder() {
+        state.sortOrder = state.sortOrder === 'desc' ? 'asc' : 'desc';
+        // Re-render sans recharger
+        renderLogs(state.logs);
+    }
+
+    /**
      * Gère la touche Entrée dans le champ de recherche
      * @param {KeyboardEvent} event
      */
@@ -369,6 +394,9 @@
     // ========================================================================
 
     function init() {
+        // Initialiser les éléments DOM
+        initElements();
+
         // Event listeners
         elements.selectDate.addEventListener('change', handleDateChange);
         elements.selectType.addEventListener('change', handleTypeChange);
@@ -376,6 +404,7 @@
         elements.inputSearch.addEventListener('keypress', handleSearchKeypress);
         elements.inputTimeFrom.addEventListener('change', handleSearch);
         elements.inputTimeTo.addEventListener('change', handleSearch);
+        elements.btnToggleOrder.addEventListener('click', handleToggleOrder);
         elements.btnRefresh.addEventListener('click', loadLogs);
         elements.logsTbody.addEventListener('click', handleTableClick);
 

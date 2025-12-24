@@ -33,25 +33,11 @@
                         <span class="label-text font-medium">Type</span>
                     </label>
                     <select id="select-type" class="select select-bordered select-sm w-full">
-                        <option value="app" selected>Application</option>
+                        <option value="app">Application</option>
                         <option value="api">API</option>
                         <option value="audit">Audit</option>
-                        <option value="error">Erreurs</option>
+                        <option value="error" selected>Erreurs</option>
                     </select>
-                </div>
-
-                <!-- Recherche -->
-                <div class="form-control w-full max-w-xs">
-                    <label class="label">
-                        <span class="label-text font-medium">Rechercher</span>
-                    </label>
-                    <div class="join">
-                        <input type="text" id="input-search" placeholder="Mot-clé..."
-                        class="input input-bordered input-sm join-item w-full" />
-                        <button id="btn-search" class="btn btn-sm btn-neutral join-item">
-                            <i class="fa-solid fa-search"></i>
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Plage horaire -->
@@ -70,12 +56,37 @@
                     </div>
                 </div>
 
-                <!-- Compteur -->
-                <div class="flex items-center gap-2 ml-auto">
-                    <span class="badge badge-neutral" id="log-count">0 entrées</span>
+                <!-- Recherche -->
+                <div class="form-control w-full max-w-xs">
+                    <label class="label">
+                        <span class="label-text font-medium">Rechercher</span>
+                    </label>
+                    <div class="join">
+                        <input type="text" id="input-search" placeholder="Mot-clé..."
+                        class="input input-bordered input-sm join-item w-full" />
+                        <button id="btn-search" class="btn btn-sm btn-neutral join-item">
+                            <i class="fa-solid fa-search"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Bouton tri ordre -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">Ordre</span>
+                    </label>
+                    <button id="btn-toggle-order" class="btn btn-sm btn-outline" title="Inverser l'ordre">
+                        <i class="fa-solid fa-arrow-right-arrow-left rotate-90"></i>
+                    </button>
+                </div>
+
             </div>
         </div>
+    </div>
+
+    <!-- Compteur -->
+    <div class="flex items-center gap-2 ml-auto">
+        <span class="badge badge-neutral" id="log-count">0 entrées</span>
     </div>
 
     <!-- Affichage des logs -->
@@ -139,4 +150,5 @@
 </dialog>
 
 <script src="/js/admin_logs.js"></script>
+
 
