@@ -28,8 +28,81 @@ const archiveDir = path.join(logDir, 'archives');
  */
 export const admin = async (req, res) => {
     try {
+        const userId = req.session.user?.id;
+        const userRole = req.session.user?.role;
+
+        let stats = {
+            users: 0,
+            sites: 0,
+            forms: 0,
+            entries: 0,
+        };
+
+        if (userRole === 'super_admin') {
+            // Super admin voit tout
+            const [usersCount, sitesCount, formsCount, entriesCount] = await Promise.all([
+                models.User.count(),
+                models.Site.count(),
+                models.Form.count(),
+                models.Inbox.count(),
+            ]);
+
+            stats = {
+                users: usersCount,
+                sites: sitesCount,
+                forms: formsCount,
+                entries: entriesCount,
+            };
+        } else if (userRole === 'owner') {
+            // Owner voit uniquement ses données
+
+            // Utilisateurs créés par lui
+            const usersCount = await models.User.count({
+                where: { created_by: userId },
+            });
+
+            // Sites rattachés à l'owner
+            const userSites = await models.SiteUser.findAll({
+                where: { fk_id_user: userId },
+                attributes: ['fk_id_site'],
+            });
+            const siteIds = userSites.map((su) => su.fk_id_site);
+            const sitesCount = siteIds.length;
+
+            // Formulaires des sites de l'owner
+            let formsCount = 0;
+            let entriesCount = 0;
+
+            if (siteIds.length > 0) {
+                formsCount = await models.Form.count({
+                    where: { fk_id_site: { [models.Op.in]: siteIds } },
+                });
+
+                // Entrées des formulaires de ses sites
+                const forms = await models.Form.findAll({
+                    where: { fk_id_site: { [models.Op.in]: siteIds } },
+                    attributes: ['id'],
+                });
+                const formIds = forms.map((f) => f.id);
+
+                if (formIds.length > 0) {
+                    entriesCount = await models.Inbox.count({
+                        where: { fk_id_form: { [models.Op.in]: formIds } },
+                    });
+                }
+            }
+
+            stats = {
+                users: usersCount,
+                sites: sitesCount,
+                forms: formsCount,
+                entries: entriesCount,
+            };
+        }
+
         res.render('admin/index', {
             layout: 'admin',
+            stats,
         });
     } catch (err) {
         console.error('admin error:', err);
