@@ -4,6 +4,7 @@ import { authApiKeyAccess } from './middlewares/authApiKeyAccess.js';
 import inspectArchive from './middlewares/inspectArchive.js';
 import moveFilesToUploads from './middlewares/moveFilesToUploads.js';
 import { multipartUpload } from './middlewares/multipartUpload.js';
+import { formRateLimiter } from './middlewares/rateLimiter.js';
 import updateFormFileKeys from './middlewares/updateFormFileKeys.js';
 import { updateFormTemplate } from './middlewares/updateFormTemplate.js';
 import validateUpload from './middlewares/validateUpload.js';
@@ -14,6 +15,7 @@ const router = express.Router();
 router.post(
     '/send/:code',
     authApiKeyAccess,
+    formRateLimiter,
     multipartUpload,
     validateUpload,
     inspectArchive,
