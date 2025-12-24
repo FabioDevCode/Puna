@@ -165,7 +165,26 @@ Liste des tâches à réaliser pour améliorer le projet.
 - [x] Supprimer fichier `keys.json` (utiliser uniquement `.env`)
 - [x] Ajouter validation des variables d'environnement au démarrage
 - [x] Implémenter `helmet.js` pour sécuriser les headers
-- [ ] Ajouter rate limiting sur les routes API
+- [x] **Rate limiting sur API** ✅ (24 décembre 2025)
+    - [x] Installer express-rate-limit
+    - [x] Créer middleware `formRateLimiter` avec limite par formulaire
+    - [x] Configuration : 30 requêtes/minute par défaut (configurable via env)
+    - [x] KeyGenerator basé sur siteId + formCode pour limites granulaires
+    - [x] Variables d'env : RATE_LIMIT_FORM_MAX, RATE_LIMIT_FORM_WINDOW_MS
+    - [x] Headers RateLimit-* standards dans les réponses
+    - [x] Log d'avertissement quand limite atteinte
+    - [x] Documentation complète (API_RATE_LIMITING_STRATEGIES.md)
+- [x] **Validation des limites de payload API** ✅ (24 décembre 2025)
+    - [x] MAX_FILE_SIZE : 10 Mo par fichier
+    - [x] MAX_TOTAL_SIZE : 50 Mo total (tous fichiers)
+    - [x] MAX_FILES : 10 fichiers max par requête
+    - [x] MAX_FIELDS : 40 champs JSON max
+    - [x] MAX_FIELD_SIZE : 10000 caractères par champ
+    - [x] Middleware validateTotalSize pour taille totale fichiers
+    - [x] Middleware validateFieldSizes pour longueur champs texte
+    - [x] HTTP 413 avec messages détaillés si limites dépassées
+    - [x] Nettoyage auto des fichiers temporaires en cas d'échec
+    - [x] Variables d'env : API_MAX_FILE_SIZE, API_MAX_TOTAL_SIZE, API_MAX_FILES, API_MAX_FIELDS, API_MAX_FIELD_SIZE
 - [ ] **Configurer CORS avec stratégie hybride**
     - [ ] Installer package `cors` : `npm install cors`
     - [ ] Créer fichier `src/config/cors.config.js`
@@ -301,7 +320,7 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ---
 
-## 🚀 Améliorations Fonctionnelles
+### 🚀 Améliorations Fonctionnelles
 
 ### 🔔 Système de Notifications (Toastify)
 - [x] Intégrer Toastify JS pour notifications toast
@@ -394,6 +413,27 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Télécharger un fichier de log
     - [ ] Supprimer manuellement des logs anciens
     - [ ] Graphiques de statistiques (erreurs par jour, etc.)
+
+### 🧹 Nettoyage automatique des fichiers
+- [x] **Suppression auto des uploads lors de suppression Form/Site** ✅ (24 décembre 2025)
+    - [x] Supprimer dossier `uploads/{site.domain}/{form.name}/` quand Form supprimé
+    - [x] Supprimer dossier `uploads/{site.domain}/` quand Site supprimé
+    - [x] Utiliser fs.rm() avec options recursive et force
+    - [x] Gestion d'erreurs et logs pour traçabilité
+    - [x] Import fs/promises et path dans services
+    - [x] Implémenté dans form.service.js et site.service.js
+
+### 📊 Statistiques et Dashboard
+- [x] **Statistiques d'activité dans panel admin** ✅ (24 décembre 2025)
+    - [x] Carte "Utilisateurs connectés" (comptage sessions actives)
+    - [x] Carte "Erreurs" (comptage lignes error.log)
+    - [x] Carte "Créés aujourd'hui" (Sites + Forms du jour)
+    - [x] Carte "Fichiers uploadés" (comptage récursif storage/uploads)
+    - [x] Fonction countFileLines() pour compter lignes de fichier
+    - [x] Fonction countFilesRecursive() pour compter fichiers
+    - [x] Parsing sessions pour extraire users connectés
+    - [x] Visible pour roles super_admin et owner
+    - [x] Mise à jour layout admin overview (8 cartes au lieu de 4)
 
 ### 📤 Export CSV
 - [x] Implémenter exports CSV avec fast-csv
@@ -507,6 +547,22 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ### ✅ Récemment complété
 
+- ✅ **Rate limiting API** (24 décembre 2025)
+    - ✅ Middleware formRateLimiter : 30 req/min par formulaire
+    - ✅ Configuration via RATE_LIMIT_FORM_MAX et RATE_LIMIT_FORM_WINDOW_MS
+    - ✅ KeyGenerator avec siteId + formCode
+    - ✅ Documentation complète des stratégies (7 approches détaillées)
+- ✅ **Validation payload API** (24 décembre 2025)
+    - ✅ Limites configurables : fichiers (10 Mo), total (50 Mo), champs (40), field size (10000 chars)
+    - ✅ Middleware validateTotalSize et validateFieldSizes
+    - ✅ HTTP 413 avec erreurs détaillées
+- ✅ **Nettoyage automatique uploads** (24 décembre 2025)
+    - ✅ Suppression dossiers forms et sites lors de deletion
+    - ✅ Gestion d'erreurs et logs
+- ✅ **Statistiques d'activité admin** (24 décembre 2025)
+    - ✅ 4 nouvelles cartes : connectés, erreurs, créations jour, fichiers
+    - ✅ Fonctions countFileLines() et countFilesRecursive()
+    - ✅ Parsing sessions pour comptage utilisateurs
 - ✅ **Système de notifications Toastify** (14 décembre 2025)
     - ✅ Plugin Toastify.js intégré (CSS + JS)
     - ✅ Fonction `Toast()` wrapper pour usage simplifié
@@ -547,4 +603,4 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ---
 
-**Dernière mise à jour :** 13 décembre 2025
+**Dernière mise à jour :** 24 décembre 2025
