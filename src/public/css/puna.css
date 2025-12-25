@@ -149,8 +149,16 @@ h3 {
 }
 
 .badge-xs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: .75rem;
     width: .75rem;
+    padding-top: 1px;
+}
+
+.badge-outline {
+    border: 1px solid black;
 }
 
 .badge_role {
@@ -161,30 +169,37 @@ h3 {
     text-wrap: nowrap;
     background-color: #101E26;
     color: white;
+    border: 1px solid #101E26;
 }
 
 .badge_owner {
     text-wrap: nowrap;
     background-color: #2F6EA9;
     color: whitesmoke;
+    border: 1px solid #2F6EA9;
 }
 
 .badge_editor {
     text-wrap: nowrap;
     background-color: #CFE3F5;
     color: #0075C3;
+    border: 1px solid #0075C3;
+
 }
 
 .badge_viewer {
     text-wrap: nowrap;
     background-color: #E3CEE4;
     color: #6E0075;
+    border: 1px solid #6E0075;
 }
 
 .badge_beta {
     text-wrap: nowrap;
     background-color: #FFBE00;
     color: rgb(30, 30, 30);
+    border: 1px solid rgb(30, 30, 30);
+
 }
 
 /* Style de base pour tous les badges */

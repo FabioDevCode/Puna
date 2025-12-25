@@ -40,6 +40,22 @@
                     </select>
                 </div>
 
+                <!-- Sélecteur de niveau -->
+                <div class="form-control w-full max-w-xs">
+                    <label class="label">
+                        <span class="label-text font-medium">Niveau</span>
+                    </label>
+                    <select id="select-level" class="select select-bordered select-sm w-full">
+                        <option value="" selected>Tous</option>
+                        <option value="10">Trace</option>
+                        <option value="20">Debug</option>
+                        <option value="30">Info</option>
+                        <option value="40">Warn</option>
+                        <option value="50">Error</option>
+                        <option value="60">Fatal</option>
+                    </select>
+                </div>
+
                 <!-- Plage horaire -->
                 <div class="form-control">
                     <label class="label">
@@ -117,6 +133,7 @@
                         <tr>
                             <th class="w-28">Heure</th>
                             <th class="w-28">Niveau</th>
+                            <th class="w-20">Status</th>
                             <th>Message</th>
                             <th class="w-10"></th>
                         </tr>
@@ -150,5 +167,6 @@
 </dialog>
 
 <script src="/js/admin_logs.js"></script>
+
 
 

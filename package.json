@@ -59,6 +59,7 @@
 		"multer": "^2.0.2",
 		"node-cron": "^4.2.1",
 		"node-stream-zip": "^1.15.0",
+		"nodemailer": "^7.0.12",
 		"passport": "^0.7.0",
 		"passport-local": "^1.0.0",
 		"pino": "^10.1.0",

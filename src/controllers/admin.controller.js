@@ -687,7 +687,7 @@ export const logsViewer = async (req, res) => {
  */
 export const readLogs = async (req, res) => {
     try {
-        const { date = 'today', type = 'app', search = '', timeFrom = '', timeTo = '' } = req.query;
+        const { date = 'today', type = 'app', search = '', timeFrom = '', timeTo = '', level = '' } = req.query;
 
         if (!LOG_TYPES.includes(type)) {
             return res.status(400).json({ error: 'Type de log invalide' });
@@ -733,6 +733,12 @@ export const readLogs = async (req, res) => {
                 const lineStr = JSON.stringify(line).toLowerCase();
                 return lineStr.includes(searchLower);
             });
+        }
+
+        // Filtrage par niveau si spécifié
+        if (level) {
+            const levelNum = parseInt(level, 10);
+            filteredLines = filteredLines.filter((line) => line.level === levelNum);
         }
 
         // Filtrage par plage horaire

@@ -13,6 +13,7 @@
     const state = {
         date: 'today',
         type: 'error',
+        level: '', // Filtre par niveau (vide = tous)
         search: '',
         timeFrom: '',
         timeTo: '',
@@ -35,6 +36,7 @@
             selectDate: document.getElementById('select-date'),
             selectType: document.getElementById('select-type'),
             inputSearch: document.getElementById('input-search'),
+            selectLevel: document.getElementById('select-level'),
             inputTimeFrom: document.getElementById('input-time-from'),
             inputTimeTo: document.getElementById('input-time-to'),
             btnSearch: document.getElementById('btn-search'),
@@ -83,17 +85,17 @@
 
         switch (levelNum) {
             case 10: // trace
-                return 'w-max badge badge-xs';
+                return 'w-max badge badge-xs badge-outline';
             case 20: // debug
-                return 'w-max badge badge-xs badge-ghost';
+                return 'w-max badge badge-xs badge-outline badge-ghost';
             case 30: // info
-                return 'w-max badge badge-xs badge-info';
+                return 'w-max badge badge-xs badge-outline badge-info';
             case 40: // warn
-                return 'w-max badge badge-xs badge-warning';
+                return 'w-max badge badge-xs badge-outline badge-warning';
             case 50: // error
-                return 'w-max badge badge-xs badge-error';
+                return 'w-max badge badge-xs badge-outline badge-error';
             case 60: // fatal
-                return 'w-max badge badge-xs badge-error';
+                return 'w-max badge badge-xs badge-outline badge-error';
             default:
         }
     }
@@ -122,6 +124,34 @@
             default:
                 return String(level);
         }
+    }
+
+    /**
+     * Retourne la classe CSS du badge selon le status HTTP
+     * @param {number|string} statusCode - Code de status HTTP
+     * @returns {string} Classes CSS du badge
+     */
+    function getStatusBadgeClass(statusCode) {
+        if (statusCode === '-') {
+            return 'font-mono text-xs text-base-content/50';
+        }
+
+        const code = typeof statusCode === 'string' ? parseInt(statusCode, 10) : statusCode;
+
+        if (code >= 200 && code < 300) {
+            return 'w-max badge badge-xs badge-success';
+        }
+        if (code >= 300 && code < 400) {
+            return 'w-max badge badge-xs badge-info';
+        }
+        if (code >= 400 && code < 500) {
+            return 'w-max badge badge-xs badge-warning';
+        }
+        if (code >= 500) {
+            return 'w-max badge badge-xs badge-error';
+        }
+
+        return 'w-max badge badge-xs';
     }
 
     /**
@@ -242,12 +272,15 @@
                 const level = log.level || '-';
                 const levelClass = getLevelBadgeClass(level);
                 const levelLabel = getLevelLabel(level);
+                const statusCode = log.res?.statusCode || log.statusCode || '-';
+                const statusClass = getStatusBadgeClass(statusCode);
                 const message = escapeHtml(extractMessage(log));
 
                 return `
                 <tr>
                     <td class="font-mono text-xs">${time}</td>
                     <td><span class="${levelClass}">${levelLabel}</span></td>
+                    <td><span class="${statusClass}">${statusCode}</span></td>
                     <td class="truncate max-w-md" title="${escapeHtml(message)}">${message}</td>
                     <td>
                         <button class="btn btn-xs btn-ghost" data-action="view-detail" data-index="${index}">
@@ -294,6 +327,9 @@
             if (state.timeTo) {
                 params.set('timeTo', state.timeTo);
             }
+            if (state.level) {
+                params.set('level', state.level);
+            }
 
             const response = await fetch(`/admin/logs/read?${params}`);
 
@@ -330,6 +366,14 @@
      */
     function handleTypeChange() {
         state.type = elements.selectType.value;
+        loadLogs();
+    }
+
+    /**
+     * Gère le changement de niveau
+     */
+    function handleLevelChange() {
+        state.level = elements.selectLevel.value;
         loadLogs();
     }
 
@@ -400,6 +444,7 @@
         // Event listeners
         elements.selectDate.addEventListener('change', handleDateChange);
         elements.selectType.addEventListener('change', handleTypeChange);
+        elements.selectLevel.addEventListener('change', handleLevelChange);
         elements.btnSearch.addEventListener('click', handleSearch);
         elements.inputSearch.addEventListener('keypress', handleSearchKeypress);
         elements.inputTimeFrom.addEventListener('change', handleSearch);
