@@ -42,7 +42,15 @@ const HTML_VOID_ELEMENTS = new Set([
 ]);
 
 function formatHandlebars(content) {
+    // Vérifier si le fichier original se termine par un saut de ligne
+    const endsWithNewline = content.endsWith('\n');
+
+    // Supprimer les lignes vides finales créées par split
     const lines = content.split('\n');
+    while (lines.length > 0 && lines[lines.length - 1] === '') {
+        lines.pop();
+    }
+
     const formatted = [];
     let indentLevel = 0;
     let pendingTagOpen = false; // Balise qui a commencé mais n'est pas terminée
@@ -171,7 +179,8 @@ function formatHandlebars(content) {
         indentLevel = Math.max(0, indentLevel + adjustAfter);
     }
 
-    return formatted.join('\n') + '\n';
+    // Ajouter le saut de ligne final seulement si l'original en avait un
+    return formatted.join('\n') + (endsWithNewline ? '\n' : '');
 }
 
 async function formatFile(filePath) {
