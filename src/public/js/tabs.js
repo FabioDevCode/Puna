@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 document.addEventListener('DOMContentLoaded', () => {
     function pad2(n) {
         return String(n).padStart(2, '0');
@@ -726,10 +727,19 @@ document.addEventListener('DOMContentLoaded', () => {
                                     dateInput.id = 'modal_filter_date';
                                     dateInput.dataset.key = 'createdAt';
                                     dateInput.name = 'filter[createdAt]';
+                                    dateInput.flatpickr = 'date';
                                     dateInput.className = 'input input-bordered w-full input-sm';
                                     if (currentFilters && currentFilters.createdAt) {
                                         dateInput.value = formatDateYYYYMMDD(currentFilters.createdAt);
                                     }
+
+                                    flatpickr(dateInput, {
+                                        appendTo: document.querySelector('#modal_filter'),
+                                        dateFormat: 'Y-m-d',
+                                        locale: 'fr',
+                                        disableMobile: false,
+                                    });
+
                                     rightDateWrap.appendChild(dateInput);
                                     modalFilterValues.appendChild(rightDateWrap);
                                 }
@@ -754,6 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         input.type = 'text';
                                         input.dataset.key = k;
                                         input.name = `filter[${k}]`;
+                                        input.placeholder = activeTpl[k] || k;
                                         input.className = 'input input-bordered w-full input-sm';
                                         if (currentFilters && typeof currentFilters[k] !== 'undefined') {
                                             input.value = currentFilters[k];

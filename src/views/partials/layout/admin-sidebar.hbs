@@ -30,17 +30,17 @@
             </li>
             {{#roleIs roles='super_admin'}}
                 <li>
-                    <a href="/admin/logs"
-                    class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                        <i class="fa-solid fa-list-ul"></i>
-                        Logs
-                    </a>
-                </li>
-                <li>
                     <a href="/admin/settings"
                     class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                         <i class="fa-solid fa-gears"></i>
                         Paramètres
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/logs"
+                    class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
+                        <i class="fa-solid fa-list-ul"></i>
+                        Logs
                     </a>
                 </li>
             {{/roleIs}}
