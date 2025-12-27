@@ -17,6 +17,7 @@
 		"format:hbs": "node scripts/format-hbs.js \"src/views/**/*.hbs\"",
 		"logs:clean": "node scripts/clean-logs.js",
 		"logs:stats": "node scripts/logs-stats.js",
+		"logs:rotate": "node scripts/rotate-logs.js",
 		"prepare": "husky"
 	},
 	"lint-staged": {

@@ -586,12 +586,22 @@ const LOG_TYPES = ['app', 'api', 'audit', 'error'];
 
 /**
  * Formate une date pour l'affichage dans le sélecteur
- * @param {string} dateStr - Date au format YYYY-MM-DD
+ * @param {string} dateStr - Date au format YYYY-MM-DD ou YYYY-MM-DD-HHmmss
+ * @param {boolean} isManual - Indique si c'est une archive manuelle
  * @returns {string} Date formatée
  */
-const formatDateLabel = (dateStr) => {
+const formatDateLabel = (dateStr, isManual = false) => {
     if (dateStr === 'today') {
         return "Aujourd'hui";
+    }
+    // Pour les archives manuelles, afficher la date avec l'heure et un indicateur
+    if (isManual) {
+        // Format: YYYY-MM-DD-HHmmss -> YYYY-MM-DD HH:mm ⚙
+        const match = dateStr.match(/^(\d{4}-\d{2}-\d{2})-(\d{2})(\d{2})(\d{2})$/);
+        if (match) {
+            return `${match[1]} ${match[2]}:${match[3]} ⚙`;
+        }
+        return `${dateStr} ⚙`;
     }
     return dateStr; // Format YYYY-MM-DD déjà présent
 };
@@ -608,17 +618,32 @@ const listArchives = async () => {
     }
 
     const files = await fs.readdir(archiveDir);
-    const archives = files
-        .filter((f) => f.endsWith('-archive-log.tar.gz'))
-        .map((f) => {
+    const archives = [];
+
+    for (const f of files) {
+        // Archive quotidienne automatique: YYYY-MM-DD-archive-log.tar.gz
+        if (f.endsWith('-archive-log.tar.gz')) {
             const dateStr = f.replace('-archive-log.tar.gz', '');
-            return {
+            archives.push({
                 filename: f,
                 date: dateStr,
-                label: formatDateLabel(dateStr),
-            };
-        })
-        .sort((a, b) => b.date.localeCompare(a.date));
+                label: formatDateLabel(dateStr, false),
+                isManual: false,
+            });
+        } else if (f.endsWith('-manual.tar.gz')) {
+            // Archive manuelle: YYYY-MM-DD-HHmmss-manual.tar.gz
+            const dateTimeStr = f.replace('-manual.tar.gz', '');
+            archives.push({
+                filename: f,
+                date: dateTimeStr,
+                label: formatDateLabel(dateTimeStr, true),
+                isManual: true,
+            });
+        }
+    }
+
+    // Trier par date décroissante (plus récent en premier)
+    archives.sort((a, b) => b.date.localeCompare(a.date));
 
     return archives;
 };
@@ -704,8 +729,17 @@ export const readLogs = async (req, res) => {
                 content = '';
             }
         } else {
-            // Extraction depuis une archive
-            const archiveFilename = `${date}-archive-log.tar.gz`;
+            // Extraction depuis une archive - déterminer le nom du fichier
+            let archiveFilename;
+
+            // Vérifier si c'est une archive manuelle (format: YYYY-MM-DD-HHmmss)
+            if (/^\d{4}-\d{2}-\d{2}-\d{6}$/.test(date)) {
+                archiveFilename = `${date}-manual.tar.gz`;
+            } else {
+                // Archive quotidienne (format: YYYY-MM-DD)
+                archiveFilename = `${date}-archive-log.tar.gz`;
+            }
+
             try {
                 content = await extractLogFromArchive(archiveFilename, type);
             } catch (err) {
