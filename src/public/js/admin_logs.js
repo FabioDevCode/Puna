@@ -57,25 +57,10 @@
     }
 
     // ========================================================================
-    // UTILITIES
+    // UTILITIES (imports depuis core/utils.js)
     // ========================================================================
 
-    /**
-     * Formate un timestamp en heure lisible
-     * @param {number} timestamp - Timestamp en millisecondes
-     * @returns {string} Heure formatée
-     */
-    function formatTime(timestamp) {
-        if (!timestamp) {
-            return '-';
-        }
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString('fr-FR', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-        });
-    }
+    const { formatTime, escapeHtml } = window.PunaUtils;
 
     /**
      * Retourne la classe CSS du badge selon le niveau de log
@@ -183,17 +168,6 @@
         }
 
         return parts.length > 0 ? parts.join(' | ') : JSON.stringify(log).substring(0, 100);
-    }
-
-    /**
-     * Échappe les caractères HTML
-     * @param {string} str - Chaîne à échapper
-     * @returns {string} Chaîne échappée
-     */
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
     }
 
     // ========================================================================

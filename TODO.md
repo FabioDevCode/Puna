@@ -72,40 +72,65 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] `export.controller.js` (exports Excel/ZIP)
     - [x] `admin.controller.js` (administration utilisateurs)
 
-- [ ] **Réorganiser structure JavaScript front-end (`src/public/js/`)** (Priorité moyenne)
-    - [ ] Créer structure modulaire :
+- [x] **Réorganiser structure JavaScript front-end (`src/public/js/`)** ✅ (27 décembre 2025)
+    - [x] Créer `core/utils.js` avec fonctions utilitaires partagées :
+        - [x] `pad2(n)` - Padding 2 chiffres
+        - [x] `escapeHtml(str)` - Protection XSS
+        - [x] `formatDateTime(value)` - Format HTML date+heure
+        - [x] `formatDateYYYYMMDD(value)` - Format ISO pour inputs
+        - [x] `formatTime(timestamp)` - Format HH:MM:SS
+    - [x] Regrouper scripts admin dans `admin/` :
+        - [x] `admin/logs.js` (anciennement admin_logs.js)
+        - [x] `admin/users.js` (anciennement admin_users.js)
+        - [x] `admin/user-edit.js` (anciennement admin_user_edit.js)
+        - [x] `admin/sidebar.js` (anciennement admin_sidebar.js)
+    - [x] Regrouper scripts graphiques dans `charts/` :
+        - [x] `charts/inbox-counts.js`
+        - [x] `charts/inbox-heatmap.js`
+        - [x] `charts/inbox-percentages.js`
+        - [x] `charts/repartition-site.js`
+        - [x] `charts/top-forms.js`
+        - [x] `charts/top-site-radial.js`
+    - [x] Mettre à jour fichiers pour utiliser `window.PunaUtils` :
+        - [x] `tabs.js` → utilise `formatDateTime`, `formatDateYYYYMMDD`
+        - [x] `admin/logs.js` → utilise `formatTime`, `escapeHtml`
+        - [x] `search.js` → utilise `escapeHtml`
+    - [x] Mettre à jour 11 templates Handlebars avec nouveaux chemins
+    - [x] Structure finale implémentée :
         ```
         src/public/js/
-        ├── core/           # Fonctions utilitaires globales
-        │   ├── api.js      # Appels API centralisés
-        │   ├── utils.js    # Helpers JS
-        │   └── events.js   # Event bus/dispatcher
-        ├── components/     # Composants réutilisables
-        │   ├── modal.js
-        │   ├── toast.js
-        │   └── datepicker.js
-        ├── pages/          # Scripts spécifiques par page
-        │   ├── dashboard/
-        │   │   ├── index.js
-        │   │   └── charts.js
-        │   ├── sites/
-        │   │   ├── list.js
-        │   │   └── show.js
-        │   ├── inbox/
-        │   │   └── show.js
-        │   └── admin/
-        │       ├── users.js
-        │       └── settings.js
-        └── vendors/        # Librairies tierces locales
+        ├── core/                # Utilitaires partagés
+        │   └── utils.js         # 5 fonctions mutualisées (PunaUtils)
+        ├── admin/               # Scripts administration
+        │   ├── logs.js
+        │   ├── users.js
+        │   ├── user-edit.js
+        │   └── sidebar.js
+        ├── charts/              # Scripts graphiques/statistiques
+        │   ├── inbox-counts.js
+        │   ├── inbox-heatmap.js
+        │   ├── inbox-percentages.js
+        │   ├── repartition-site.js
+        │   ├── top-forms.js
+        │   └── top-site-radial.js
+        ├── download_zip.js      # Téléchargement ZIP
+        ├── export_csv.js        # Export CSV
+        ├── export_excel.js      # Export Excel
+        ├── left_menu.js         # Menu latéral
+        ├── mobile_menu.js       # Menu mobile
+        ├── modal-handlers.js    # Gestion modales (CSP-safe)
+        ├── puna.js              # Wrapper Toast()
+        ├── revoke_tokens.js     # Révocation tokens
+        ├── search.js            # Recherche dashboard
+        ├── tabs.js              # Onglets inbox (~1000 lignes)
+        ├── toast-flash.js       # Flash messages
+        └── token.js             # Copie token
         ```
-    - [ ] Migrer les fichiers existants vers nouvelle structure
-    - [ ] **🔮 Optionnel/Futur** : Build system front-end (si le projet grandit)
-        - [ ] Évaluer besoin : ~20 fichiers JS → 1-3 bundles
-        - [ ] Choisir entre Webpack ou Vite
-        - [ ] Configuration bundling + minification
-        - [ ] Source maps pour développement
-        - [ ] Hot reload automatique
-        - [ ] Note : Pas nécessaire actuellement, architecture actuelle suffisante
+    - [ ] **🔮 Améliorations futures** (optionnel, si le projet grandit) :
+        - [ ] Refactorer `tabs.js` (1000+ lignes) en modules plus petits
+        - [ ] Ajouter `core/api.js` pour centraliser les appels fetch
+        - [ ] Build system (Webpack/Vite) si besoin de bundling
+        - [ ] Note : Pas nécessaire actuellement, architecture suffisante
 
 - [x] **Créer couche `services/` pour la logique base de données**
     - [x] Déplacer toute logique DB depuis controllers vers services
@@ -539,14 +564,20 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 1. **Documentation VuePress** - Guides utilisateur, dev, auto-hébergement
 2. **Site web vitrine Nuxt** - Landing page + formulaire beta
-3. **Restructurer JS front-end** - Architecture modulaire (optionnel : build system)
-4. **Tests automatisés** - Garantir la qualité du code
-5. **Docker support** - Faciliter le déploiement
-6. **CI/CD** - Automatiser les workflows
-7. **Internationalisation FR/EN** - À faire en dernier
+3. **Tests automatisés** - Garantir la qualité du code
+4. **Docker support** - Faciliter le déploiement
+5. **CI/CD** - Automatiser les workflows
+6. **Internationalisation FR/EN** - À faire en dernier
 
 ### ✅ Récemment complété
 
+- ✅ **Réorganisation JavaScript front-end** (27 décembre 2025)
+    - ✅ Création `core/utils.js` avec 5 fonctions mutualisées (PunaUtils)
+    - ✅ Regroupement scripts admin dans `admin/` (4 fichiers)
+    - ✅ Regroupement scripts charts dans `charts/` (6 fichiers)
+    - ✅ Migration de `tabs.js`, `admin/logs.js`, `search.js` vers PunaUtils
+    - ✅ Mise à jour 11 templates Handlebars
+    - ✅ Suppression code dupliqué (escapeHtml, formatDateTime, etc.)
 - ✅ **Rate limiting API** (24 décembre 2025)
     - ✅ Middleware formRateLimiter : 30 req/min par formulaire
     - ✅ Configuration via RATE_LIMIT_FORM_MAX et RATE_LIMIT_FORM_WINDOW_MS
@@ -603,4 +634,4 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ---
 
-**Dernière mise à jour :** 24 décembre 2025
+**Dernière mise à jour :** 27 décembre 2025

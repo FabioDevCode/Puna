@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Import des utilitaires depuis core/utils.js
+    const { escapeHtml } = window.PunaUtils;
+
     // Collect all site cards and remember original order
     const allSites = Array.from(document.querySelectorAll('.dash-site'));
     allSites.forEach((el, idx) => {
@@ -124,14 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 addSearchBadge(term);
             }
         });
-    }
-
-    // Helper: escape simple html to prevent injection in badges
-    function escapeHtml(str) {
-        return String(str).replace(
-            /[&<>"'`]/g,
-            (s) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#x60;' })[s]
-        );
     }
 
     function removeBadges() {

@@ -1,44 +1,7 @@
 /* eslint-disable no-undef */
 document.addEventListener('DOMContentLoaded', () => {
-    function pad2(n) {
-        return String(n).padStart(2, '0');
-    }
-
-    function formatDateTime(value) {
-        if (!value && value !== 0) {
-            return ' - ';
-        }
-        try {
-            const d = value instanceof Date ? value : new Date(value);
-            if (Number.isNaN(d.getTime())) {
-                return String(value);
-            }
-            return `
-                <div class="flex flex-wrap gap-1">
-                    <p class="w-max">${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}&nbsp;</p>
-                    <p class="w-max">${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}</p>
-                </div>
-            `;
-        } catch (e) {
-            return String(value);
-        }
-    }
-
-    // Format a date value as YYYY-MM-DD for the date input
-    function formatDateYYYYMMDD(value) {
-        if (!value && value !== 0) {
-            return '';
-        }
-        try {
-            const d = value instanceof Date ? value : new Date(value);
-            if (Number.isNaN(d.getTime())) {
-                return String(value);
-            }
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        } catch (e) {
-            return String(value);
-        }
-    }
+    // Utilise les fonctions utilitaires depuis core/utils.js
+    const { formatDateTime, formatDateYYYYMMDD } = window.PunaUtils;
 
     const tabLists = document.querySelectorAll('.tabs');
     const tableActions = document.getElementById('tableActions');
