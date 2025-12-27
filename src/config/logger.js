@@ -148,7 +148,7 @@ if (env === 'development' && logToConsole) {
                 colorize: true,
                 translateTime: 'yyyy-mm-dd HH:MM:ss.l',
                 ignore: 'pid,hostname,req,res,responseTime',
-                messageFormat: '{msg} - {req.url}',
+                messageFormat: '{req.url} - {msg} - {res.statusCode}',
                 singleLine: true,
             },
         }),

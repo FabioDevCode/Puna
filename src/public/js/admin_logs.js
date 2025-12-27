@@ -40,6 +40,8 @@
             inputTimeFrom: document.getElementById('input-time-from'),
             inputTimeTo: document.getElementById('input-time-to'),
             btnSearch: document.getElementById('btn-search'),
+            btnApplyFilters: document.getElementById('btn-apply-filters'),
+            btnResetFilters: document.getElementById('btn-reset-filters'),
             btnToggleOrder: document.getElementById('btn-toggle-order'),
             btnRefresh: document.getElementById('btn-refresh'),
             logCount: document.getElementById('log-count'),
@@ -274,6 +276,7 @@
                 const levelLabel = getLevelLabel(level);
                 const statusCode = log.res?.statusCode || log.statusCode || '-';
                 const statusClass = getStatusBadgeClass(statusCode);
+                const reqUrl = log.req?.url || log.url || '-';
                 const message = escapeHtml(extractMessage(log));
 
                 return `
@@ -281,6 +284,7 @@
                     <td class="font-mono text-xs">${time}</td>
                     <td><span class="${levelClass}">${levelLabel}</span></td>
                     <td><span class="${statusClass}">${statusCode}</span></td>
+                    <td class="font-mono text-xs truncate max-w-48" title="${escapeHtml(reqUrl)}">${escapeHtml(reqUrl)}</td>
                     <td class="truncate max-w-md" title="${escapeHtml(message)}">${message}</td>
                     <td>
                         <button class="btn btn-xs btn-ghost" data-action="view-detail" data-index="${index}">
@@ -354,36 +358,38 @@
     // ========================================================================
 
     /**
-     * Gère le changement de date
+     * Applique tous les filtres et charge les logs
      */
-    function handleDateChange() {
+    function applyFilters() {
         state.date = elements.selectDate.value;
-        loadLogs();
-    }
-
-    /**
-     * Gère le changement de type
-     */
-    function handleTypeChange() {
         state.type = elements.selectType.value;
-        loadLogs();
-    }
-
-    /**
-     * Gère le changement de niveau
-     */
-    function handleLevelChange() {
         state.level = elements.selectLevel.value;
-        loadLogs();
-    }
-
-    /**
-     * Gère la recherche
-     */
-    function handleSearch() {
         state.search = elements.inputSearch.value.trim();
         state.timeFrom = elements.inputTimeFrom.value;
         state.timeTo = elements.inputTimeTo.value;
+        loadLogs();
+    }
+
+    /**
+     * Réinitialise tous les filtres à leurs valeurs par défaut
+     */
+    function resetFilters() {
+        // Réinitialiser le state
+        state.date = 'today';
+        state.type = 'error';
+        state.level = '';
+        state.search = '';
+        state.timeFrom = '';
+        state.timeTo = '';
+
+        // Réinitialiser les inputs
+        elements.selectDate.value = 'today';
+        elements.selectType.value = 'error';
+        elements.selectLevel.value = '';
+        elements.inputSearch.value = '';
+        elements.inputTimeFrom.value = '';
+        elements.inputTimeTo.value = '';
+
         loadLogs();
     }
 
@@ -397,12 +403,12 @@
     }
 
     /**
-     * Gère la touche Entrée dans le champ de recherche
+     * Gère la touche Entrée dans un champ de filtre
      * @param {KeyboardEvent} event
      */
-    function handleSearchKeypress(event) {
+    function handleFilterKeypress(event) {
         if (event.key === 'Enter') {
-            handleSearch();
+            applyFilters();
         }
     }
 
@@ -441,17 +447,18 @@
         // Initialiser les éléments DOM
         initElements();
 
-        // Event listeners
-        elements.selectDate.addEventListener('change', handleDateChange);
-        elements.selectType.addEventListener('change', handleTypeChange);
-        elements.selectLevel.addEventListener('change', handleLevelChange);
-        elements.btnSearch.addEventListener('click', handleSearch);
-        elements.inputSearch.addEventListener('keypress', handleSearchKeypress);
-        elements.inputTimeFrom.addEventListener('change', handleSearch);
-        elements.inputTimeTo.addEventListener('change', handleSearch);
+        // Event listeners - Boutons d'action
+        elements.btnApplyFilters.addEventListener('click', applyFilters);
+        elements.btnResetFilters.addEventListener('click', resetFilters);
+        elements.btnSearch.addEventListener('click', applyFilters);
         elements.btnToggleOrder.addEventListener('click', handleToggleOrder);
         elements.btnRefresh.addEventListener('click', loadLogs);
         elements.logsTbody.addEventListener('click', handleTableClick);
+
+        // Event listeners - Touche Entrée dans les champs
+        elements.inputSearch.addEventListener('keypress', handleFilterKeypress);
+        elements.inputTimeFrom.addEventListener('keypress', handleFilterKeypress);
+        elements.inputTimeTo.addEventListener('keypress', handleFilterKeypress);
 
         // Chargement initial
         loadLogs();

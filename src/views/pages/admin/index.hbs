@@ -61,19 +61,6 @@
 <div class="col-span-2 md:col-span-3 lg:col-span-3">
     <div class="stats shadow-xl w-full">
         <div class="stat">
-            <div class="stat-figure text-success">
-                <i class="fa-solid fa-circle text-sm animate-pulse"></i>
-            </div>
-            <div class="stat-title">En ligne</div>
-            <div class="stat-value text-success">{{activityStats.connectedUsers}}</div>
-            <div class="stat-desc">Utilisateurs connectés</div>
-        </div>
-    </div>
-</div>
-
-<div class="col-span-2 md:col-span-3 lg:col-span-3">
-    <div class="stats shadow-xl w-full">
-        <div class="stat">
             <div class="stat-figure text-error">
                 <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
             </div>
@@ -84,11 +71,10 @@
     </div>
 </div>
 
-<div class="col-span-2 md:col-span-3 lg:col-span-6">
+<div class="col-span-2 md:col-span-3 lg:col-span-5">
     <div class="stats shadow-xl w-full">
         <div class="stat">
             <div class="stat-figure text-info">
-                {{!-- <i class="fa-solid fa-calendar-plus text-3xl"></i> --}}
                 <i class="fa-regular fa-calendar-plus text-3xl"></i>
             </div>
             <div class="stat-title">Créés aujourd'hui</div>
@@ -98,7 +84,7 @@
     </div>
 </div>
 
-<div class="col-span-2 md:col-span-3 lg:col-span-3">
+<div class="col-span-2 md:col-span-3 lg:col-span-4">
     <div class="stats shadow-xl w-full">
         <div class="stat">
             <div class="stat-figure text-warning">
@@ -110,6 +96,20 @@
         </div>
     </div>
 </div>
+
+<div class="col-span-2 md:col-span-3 lg:col-span-3">
+    <div class="stats shadow-xl w-full">
+        <div class="stat">
+            <div class="stat-figure text-success">
+                <i class="fa-solid fa-circle text-sm animate-pulse"></i>
+            </div>
+            <div class="stat-title">En ligne</div>
+            <div class="stat-value text-success">{{activityStats.connectedUsers}}</div>
+            <div class="stat-desc">Utilisateurs connectés</div>
+        </div>
+    </div>
+</div>
+
 
 
 
