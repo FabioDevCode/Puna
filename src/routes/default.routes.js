@@ -8,6 +8,7 @@ import * as inboxCtl from '../controllers/inbox.controller.js';
 import * as siteCtl from '../controllers/site.controller.js';
 import { isConnected, isConnectDash } from '../helpers/authHelper.js';
 import { actionAccess, roleAccess } from '../middlewares/checkAccess.js';
+import { loginRateLimiter, firstLoginRateLimiter } from '../middlewares/loginRateLimiter.js';
 
 const router = express.Router();
 
@@ -28,8 +29,8 @@ router.get('/dp-login', isConnectDash, dashboardCtl.dpLogin);
 router.get('/dp-first-connexion', isConnectDash, dashboardCtl.dpFirstCo);
 
 router.get('/dp-logout', authCtl.dpLogout);
-router.post('/dp-first-co', authCtl.dpFirstCoPost);
-router.post('/dp-connect', authCtl.dpConnect);
+router.post('/dp-first-co', firstLoginRateLimiter, authCtl.dpFirstCoPost);
+router.post('/dp-connect', loginRateLimiter, authCtl.dpConnect);
 
 // CONNECTED ==============================================================
 router.get('/dashboard', isConnected, dashboardCtl.dashboard);
