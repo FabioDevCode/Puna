@@ -1,0 +1,90 @@
+.flatpickr-next-month:hover svg {
+    fill: #569FF7;
+}
+
+/* Conteneur global du plugin */
+.flatpickr-custom-container {
+	width: 300px;
+	padding-bottom: 5px;
+}
+
+/* Conteneur du plugin */
+.flatpickr-year-select {
+	padding: 8px;
+    /* padding-top: 2px; */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	box-sizing: border-box;
+}
+
+/* Navigation */
+.flatpickr-year-select .year-nav {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	align-items: center;
+	gap: 8px;
+}
+
+/* Boutons navigation */
+.flatpickr-year-select .year-nav-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 34px;
+    width: 34px;
+	/* padding: 4px 8px; */
+	font-size: 14px;
+	/* background-color: #e5e7eb; */
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.flatpickr-year-select .year-nav-btn svg {
+    color: black;
+    height: 14px;
+}
+
+.flatpickr-year-select .year-nav-btn:hover svg {
+    fill: #569FF7;
+}
+
+/* Grille de boutons */
+.flatpickr-year-select .year-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
+	width: 100%;
+}
+
+/* Boutons d'année */
+.flatpickr-year-select .year-button {
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+	padding: 6px 12px;
+	/* border: 1px solid #d1d5db; */
+    border-radius: 60px;
+	background-color: #ffffff;
+	color: #111827;
+	font-size: 14px;
+	text-align: center;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.flatpickr-year-select .year-button.actual {
+	border: 1px solid #959EA9;
+}
+
+/* Bouton actif */
+.flatpickr-year-select .year-button:hover,
+.flatpickr-year-select .year-button.active {
+	background-color: #569FF7;
+	color: white;
+	border-color: #569FF7;
+}
