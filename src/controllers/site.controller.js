@@ -21,9 +21,11 @@ export const createSite = async (req, res) => {
             },
             userId
         );
+        res.flash('success', 'Site créé avec succès.');
         return res.redirect(`/site/${site.id}/view`);
     } catch (err) {
-        return res.redirect('/error');
+        res.flash('error', 'Erreur lors de la création du site.');
+        return res.redirect('/site/all');
     }
 };
 
@@ -68,11 +70,14 @@ export const deleteSite = async (req, res) => {
         const result = await deleteSiteWithForms(siteId, userId, userRole, confirm_domain);
 
         if (result.success) {
+            res.flash('success', 'Site supprimé avec succès.');
             return res.redirect('/site/all');
         } else {
+            res.flash('warning', result.error || 'Le nom de domaine ne correspond pas.');
             return res.redirect(`/site/${siteId}/view`);
         }
     } catch (err) {
+        res.flash('error', 'Erreur lors de la suppression du site.');
         return res.redirect('/dashboard');
     }
 };

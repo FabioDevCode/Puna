@@ -46,6 +46,7 @@ export const dpFirstCoPost = async (req, res) => {
             ip,
         });
 
+        res.flash('success', 'Compte activé ! Vous pouvez maintenant vous connecter.');
         return res.redirect('/dp-login');
     } catch (err) {
         auditLogger.error({

@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updatePagination();
         } catch (error) {
             console.error('Erreur chargement users:', error);
-            // Afficher erreur dans le tableau ?
+            Toast({ text: 'Erreur lors du chargement des utilisateurs.', type: 'error' });
         } finally {
             state.isLoading = false;
             elements.loading.classList.add('none');

@@ -361,12 +361,15 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Persister les messages entre redirections
     - [x] Créer guides : `FLASH_MESSAGES_GUIDE.md` et `FLASH_MESSAGES_MIGRATION.md`
     - [x] Route de test `/test-flash` pour valider le système
-- [ ] **Migration progressive des controllers** (15 routes identifiées)
+- [x] **Migration progressive des controllers** ✅ **TERMINÉ** (29 décembre 2025)
     - [x] Phase 0: Test et validation (route `/test-flash`)
-    - [ ] Phase 1: auth.controller.js (3 routes - Priorité haute)
-    - [ ] Phase 2: site.controller.js + form.controller.js (5 routes - Priorité haute)
-    - [ ] Phase 3: inbox.controller.js (1 route - Priorité moyenne)
-    - [ ] Phase 4: admin.controller.js (6 routes - Priorité moyenne)
+    - [x] Phase 1: auth.controller.js (dpFirstCoPost avec flash success)
+    - [x] Phase 2: site.controller.js (createSite, deleteSite) + form.controller.js (createForm, deleteForm)
+    - [x] Phase 3: inbox.controller.js (deleteInbox avec flash success/error)
+    - [x] Phase 4: admin.controller.js (adminCreateUser, adminDeleteUser, adminUpdateUser avec flash)
+    - [x] **Bonus JS client** : token.js, revoke_tokens.js, admin/users.js, tabs.js (copie code)
+    - [x] **Total : 8 méthodes serveur + 4 scripts client migrés**
+    - ℹ️ Note : dpLogout non implémenté (session détruite avant flash)
 - [ ] **Support i18n pour les messages flash** (À faire lors de la migration)
     - [ ] Utiliser `req.__()` pour traduire les messages
     - [ ] Créer clés de traduction dans `src/locales/fr.json` et `en.json`
@@ -594,7 +597,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - ✅ 4 nouvelles cartes : connectés, erreurs, créations jour, fichiers
     - ✅ Fonctions countFileLines() et countFilesRecursive()
     - ✅ Parsing sessions pour comptage utilisateurs
-- ✅ **Système de notifications Toastify** (14 décembre 2025)
+- ✅ **Système de notifications Toastify** (14-29 décembre 2025)
     - ✅ Plugin Toastify.js intégré (CSS + JS)
     - ✅ Fonction `Toast()` wrapper pour usage simplifié
     - ✅ Middleware `flashMessages.js` pour messages de session
@@ -604,7 +607,16 @@ Liste des tâches à réaliser pour améliorer le projet.
     - ✅ Persistance entre redirections via session
     - ✅ Guides complets créés (FLASH_MESSAGES_GUIDE.md + MIGRATION.md)
     - ✅ Route de test `/test-flash` fonctionnelle
-    - ⏳ Migration controllers en cours (1/15 routes, dpConnect déjà fait)
+    - ✅ **Migration complète** : 8 méthodes serveur + 4 scripts JS client
+        - ✅ admin.controller.js (3 méthodes)
+        - ✅ site.controller.js (2 méthodes)
+        - ✅ form.controller.js (2 méthodes)
+        - ✅ inbox.controller.js (1 méthode)
+        - ✅ auth.controller.js (1 méthode : dpFirstCoPost)
+        - ✅ token.js (copie token avec toast)
+        - ✅ revoke_tokens.js (révocation avec toast, remplacement alert)
+        - ✅ admin/users.js (erreur chargement avec toast)
+        - ✅ tabs.js (copie code formulaire avec toast)
 - ✅ **Validation variables d'environnement** (13 décembre 2025)
     - ✅ Helper `env.validator.js` pour vérification au démarrage
     - ✅ Validation présence, format, sécurité des clés

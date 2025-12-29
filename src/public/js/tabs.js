@@ -1011,11 +1011,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // temporary feedback: change button text/icon like token.js but without green color
                 const old = copyBtn.innerHTML;
                 copyBtn.innerHTML = '<i class="fas fa-check"></i> Code copié';
+                Toast({ text: 'Code copié dans le presse-papier.', type: 'success' });
                 setTimeout(() => {
                     copyBtn.innerHTML = old;
                 }, 1200);
             } catch (err) {
                 console.error(err);
+                Toast({ text: 'Erreur lors de la copie du code.', type: 'error' });
             }
         });
     }

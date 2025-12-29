@@ -390,12 +390,14 @@ export const adminCreateUser = async (req, res) => {
 
         // Validation basique
         if (!login || !email || !role) {
+            res.flash('warning', 'Veuillez remplir tous les champs obligatoires.');
             return res.redirect('/admin/users');
         }
 
         // Vérifier si l'utilisateur existe déjà via le service
         const exists = await userExists(email, login);
         if (exists) {
+            res.flash('error', 'Un utilisateur avec cet email ou login existe déjà.');
             return res.redirect('/admin/users');
         }
 
@@ -414,9 +416,11 @@ export const adminCreateUser = async (req, res) => {
             await assignUserToSites(newUser.id, siteIds);
         }
 
+        res.flash('success', 'Utilisateur créé avec succès.');
         res.redirect('/admin/users');
     } catch (err) {
         console.error('adminCreateUser error:', err);
+        res.flash('error', "Erreur lors de la création de l'utilisateur.");
         res.redirect('/admin/users');
     }
 };
@@ -431,27 +435,31 @@ export const adminDeleteUser = async (req, res) => {
 
         // Validation basique
         if (!user_id || !password) {
+            res.flash('warning', 'Données manquantes pour la suppression.');
             return res.redirect('/admin/users');
         }
 
         // Vérifier le mot de passe de l'utilisateur connecté
         const currentUser = await models.User.findByPk(currentUserId);
         if (!currentUser) {
+            res.flash('error', 'Session invalide.');
             return res.redirect('/admin/users');
         }
 
         const isPasswordValid = await verifyPassword(password, currentUser.password);
         if (!isPasswordValid) {
-            // TODO: Flash message "Mot de passe incorrect"
+            res.flash('error', 'Mot de passe incorrect.');
             return res.redirect('/admin/users');
         }
 
         // Supprimer l'utilisateur et ses relations via le service
         await deleteUserWithRelations(user_id);
 
+        res.flash('success', 'Utilisateur supprimé.');
         res.redirect('/admin/users');
     } catch (err) {
         console.error('adminDeleteUser error:', err);
+        res.flash('error', "Erreur lors de la suppression de l'utilisateur.");
         res.redirect('/admin/users');
     }
 };
@@ -535,6 +543,7 @@ export const adminUpdateUser = async (req, res) => {
 
         // Validation basique
         if (!login || !email || !role) {
+            res.flash('warning', 'Veuillez remplir tous les champs obligatoires.');
             return res.redirect(`/admin/users/${userId}/edit`);
         }
 
@@ -557,9 +566,11 @@ export const adminUpdateUser = async (req, res) => {
         const siteIds = sites ? (Array.isArray(sites) ? sites : [sites]) : [];
         await updateUserSiteAssignments(userId, siteIds);
 
+        res.flash('success', 'Utilisateur mis à jour.');
         res.redirect('/admin/users');
     } catch (err) {
         console.error('adminUpdateUser error:', err);
+        res.flash('error', "Erreur lors de la mise à jour de l'utilisateur.");
         res.redirect(`/admin/users/${req.params.id}/edit`);
     }
 };
