@@ -280,33 +280,8 @@ Liste des tâches à réaliser pour améliorer le projet.
 ## 🌐 Marketing & Communication
 
 ### 🌐 Site Web de Présentation (Landing Page)
-- [ ] **Créer site vitrine pour Puna avec Nuxt.js**
-    - [ ] Setup projet Nuxt 3 (SSR)
-    - [ ] Structure du site :
-        - [ ] **Page d'accueil**
-            - [ ] Hero section avec accroche
-            - [ ] Présentation du produit (problème/solution)
-            - [ ] Features principales avec icônes
-            - [ ] Screenshots/démos de l'application
-            - [ ] Témoignages (quand disponibles)
-            - [ ] CTA "Rejoindre la Beta"
-        - [ ] **Page Features**
-            - [ ] Liste détaillée des fonctionnalités
-            - [ ] Comparaison avec solutions existantes
-            - [ ] Cas d'usage
-        - [ ] **Page Pricing** (pour future version SaaS)
-            - [ ] Plans gratuit/pro/entreprise
-            - [ ] Tableau comparatif
-        - [ ] **Page Documentation**
-            - [ ] Lien vers docs VuePress
-            - [ ] Guide de démarrage rapide
-        - [ ] **Page À propos**
-            - [ ] Vision du projet
-            - [ ] Open source commitment
-        - [ ] **Page Beta**
-            - [ ] Formulaire d'inscription beta
-            - [ ] Avantages beta testeurs
-            - [ ] Roadmap publique
+- [x] **Créer site vitrine pour Puna avec Nuxt.js**
+    - [x] Setup projet Nuxt 4 (SSR)
 
     - [ ] **Formulaire Beta avec intégration Puna**
         - [ ] Créer formulaire Nuxt (nom, email, entreprise, use case)
@@ -318,18 +293,12 @@ Liste des tâches à réaliser pour améliorer le projet.
         - [ ] Page de remerciement après soumission
         - [ ] Stocker dans formulaire "Beta Signups" sur Puna
 
-    - [ ] Design & UX
-        - [ ] Design moderne et responsive
+    - [x] Design & UX
+        - [x] Design moderne et responsive
         - [ ] Dark mode
         - [ ] Animations Nuxt (transitions, scroll)
         - [ ] SEO optimisé (meta tags, sitemap, schema.org)
         - [ ] Performance (Lighthouse 90+)
-
-    - [ ] Déploiement
-        - [ ] Héberger sur Vercel/Netlify
-        - [ ] Domaine personnalisé (puna.app ?)
-        - [ ] Analytics (Plausible ou similar)
-        - [ ] Monitoring erreurs
 
 ### 🌐 Open Source
 
@@ -428,16 +397,13 @@ Liste des tâches à réaliser pour améliorer le projet.
         - [ ] `logUserCreated()` / `logRoleChanged()` dans admin.controller.js
     - [ ] Ajouter contexte aux logs (userId, siteId, formId, IP, etc.)
     - [ ] Tester et valider les logs générés
-- [ ] **Rotation automatique des logs** (À faire)
-    - [ ] Option 1 : Configurer logrotate système (Linux/macOS)
-    - [ ] Option 2 : Créer script cron avec rotation personnalisée
-    - [ ] Option 3 : Ré-évaluer alternatives pino-roll compatibles ESM
-    - [ ] Actuellement : Nettoyage manuel avec `npm run logs:clean`
-- [ ] **Interface admin pour visualiser les logs** (Futur)
-    - [ ] Route `/admin/logs` (super_admin uniquement)
-    - [ ] Liste des fichiers de logs avec taille/date
-    - [ ] Viewer de logs avec pagination et coloration syntaxique
-    - [ ] Filtres : niveau, date, recherche texte, utilisateur
+- [x] **Rotation automatique des logs** (À faire)
+    - [x] Créer script cron avec rotation personnalisée
+    - [x] Actuellement : Nettoyage manuel avec `npm run logs:clean`
+- [x] **Interface admin pour visualiser les logs** (Futur)
+    - [x] Route `/admin/logs` (super_admin uniquement)
+    - [x] Liste des fichiers de logs avec taille/date
+    - [x] Filtres : recherche texte, etc
     - [ ] Télécharger un fichier de log
     - [ ] Supprimer manuellement des logs anciens
     - [ ] Graphiques de statistiques (erreurs par jour, etc.)
@@ -519,8 +485,6 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Helpers Handlebars pour boutons conditionnels
     - [x] Support des rôles : super_admin, owner, beta, editor, viewer
 - [x] Ajouter pagination sur toutes les listes
-- [ ] Implémenter recherche avancée
-- [ ] Système de backup automatique
 
 ---
 
@@ -540,9 +504,6 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] `vuepress` (documentation)
     - [ ] 🔮 **Optionnel/Futur** : `webpack` ou `vite` (bundler JS front-end, si besoin)
 - [ ] Documenter tous les scripts npm
-- [ ] Projet Nuxt séparé pour site vitrine :
-    - [ ] Setup git submodule ou repo séparé
-    - [ ] Configuration déploiement Vercel/Netlify
 
 ---
 
@@ -646,4 +607,4 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ---
 
-**Dernière mise à jour :** 27 décembre 2025
+**Dernière mise à jour :** 29 décembre 2025
