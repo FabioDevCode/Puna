@@ -11,6 +11,7 @@ src/api/Puna/**/*
 src/api/Puna/burno.json
 storage/**/**
 storage/
+Puna/
 migrations/**/**
 migrations/
 # Logs

@@ -12,16 +12,6 @@ import { loginRateLimiter, firstLoginRateLimiter } from '../middlewares/loginRat
 
 const router = express.Router();
 
-// Route de test pour les flash messages
-router.get('/test-flash', (req, res) => {
-    res.flash('puna', 'Ceci est un message Puna');
-    res.flash('success', 'Ceci est un message de succès');
-    res.flash('info', "Ceci est un message d'information");
-    res.flash('warning', 'Ceci est un avertissement');
-    res.flash('error', 'Ceci est une erreur');
-    return res.redirect('/');
-});
-
 router.get('/error', dashboardCtl.error);
 router.get('/', isConnected, dashboardCtl.rootRedirect);
 
@@ -32,7 +22,7 @@ router.get('/dp-logout', authCtl.dpLogout);
 router.post('/dp-first-co', firstLoginRateLimiter, authCtl.dpFirstCoPost);
 router.post('/dp-connect', loginRateLimiter, authCtl.dpConnect);
 
-// CONNECTED ==============================================================
+// CONNECTED ========================================================================
 router.get('/dashboard', isConnected, dashboardCtl.dashboard);
 
 router.get('/stats/inbox-counts', isConnected, dashboardCtl.getInboxCounts);
@@ -65,9 +55,9 @@ router.get('/admin/logs', isConnected, roleAccess(['super_admin']), adminCtl.log
 router.get('/admin/logs/read', isConnected, roleAccess(['super_admin']), adminCtl.readLogs);
 router.get('/admin/logs/archives', isConnected, roleAccess(['super_admin']), adminCtl.getArchives);
 
+// Site
 router.get('/site/all', isConnected, actionAccess('site', 'read'), dashboardCtl.allSite);
 router.get('/site/:id/view', isConnected, actionAccess('site', 'read'), siteCtl.showSite);
-
 router.get(
     '/site/:id/token',
     isConnected,
@@ -82,19 +72,19 @@ router.put(
     actionAccess('site', 'update'),
     siteCtl.revokeSiteTokens
 );
-
 router.post('/create-site', isConnected, actionAccess('site', 'create'), siteCtl.createSite);
 router.post('/delete-site/:id', isConnected, actionAccess('site', 'delete'), siteCtl.deleteSite);
 
+// Site
 router.post('/create-form', isConnected, actionAccess('form', 'create'), formCtl.createForm);
 router.post('/delete-form', isConnected, actionAccess('form', 'delete'), formCtl.deleteForm);
-
 router.get('/form/:id/inbox', isConnected, actionAccess('form', 'read'), formCtl.getFormInbox);
 router.post('/form/:id/columns', isConnected, actionAccess('form', 'update'), formCtl.updateFormColumns);
 router.post('/form/:id/template', isConnected, actionAccess('form', 'update'), formCtl.updateFormTemplateSave);
 router.get('/form/:id/export-excel', isConnected, actionAccess('form', 'read'), exportCtl.exportFormToExcel);
 router.get('/form/:id/export-csv', isConnected, actionAccess('form', 'read'), exportCtl.exportFormToCSV);
 
+// Inbox
 router.get('/inbox/:id/view', isConnected, actionAccess('inbox', 'read'), inboxCtl.showInbox);
 router.post('/inbox/:id/delete', isConnected, actionAccess('inbox', 'delete'), inboxCtl.deleteInbox);
 router.get('/inbox/:inboxId/download/:filename', isConnected, actionAccess('inbox', 'read'), inboxCtl.downloadFile);

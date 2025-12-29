@@ -1,6 +1,0 @@
-{
-    "ignore": ["node_modules", ".git"],
-    "name": "Bruno",
-    "type": "collection",
-    "version": "1"
-}
