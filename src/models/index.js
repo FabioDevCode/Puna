@@ -12,9 +12,6 @@ const sequelize = new Sequelize(db_config.database, db_config.user, db_config.pa
     dialect: db_config.dialect,
     port: db_config.port,
     logging: false,
-    dialectOptions: {
-        multipleStatements: true,
-    },
     define: {
         timestamps: true,
     },
