@@ -25,69 +25,9 @@
 
 ---
 
-## 🔴 Corrections BLOQUANTES avant mise en beta
+## 🔴 Corrections BLOQUANTES restantes
 
-### 1. Injection SQL — `multipleStatements: true`
-
-**Fichier** : `src/models/index.js` (ligne 16)
-
-```js
-dialectOptions: {
-    multipleStatements: true,
-}
-```
-
-**Risque** : Permet les stacked queries et amplifie massivement tout risque d'injection SQL.
-
-**Correction** : Supprimer `multipleStatements: true` sauf besoin spécifique documenté.
-
----
-
-### 2. Injection SQL dans les filtres inbox
-
-**Fichier** : `src/services/inbox.service.js` (ligne ~288)
-
-```js
-Sequelize.literal(`'$.${key}'`);
-```
-
-**Risque** : La clé `key` provient des filtres utilisateur et est injectée directement dans un `Sequelize.literal()` — c'est une **injection SQL**.
-
-**Correction** : Valider que `key` ne contient que `[a-zA-Z0-9_]` avant de l'utiliser.
-
-```js
-// Exemple de validation
-const SAFE_KEY_REGEX = /^[a-zA-Z0-9_]+$/;
-if (!SAFE_KEY_REGEX.test(key)) {
-    continue; // Ignorer les clés invalides
-}
-```
-
----
-
-### 3. Path traversal dans le téléchargement de fichiers
-
-**Fichier** : `src/services/inbox.service.js` (lignes 488 et 595)
-
-```js
-const filePath = path.join(uploadDir, filename);
-```
-
-**Risque** : Le `filename` n'est pas vérifié contre les traversées de chemin (`../../etc/passwd`).
-
-**Correction** : Vérifier que le chemin résolu reste dans le répertoire attendu.
-
-```js
-const filePath = path.join(uploadDir, filename);
-const resolvedPath = path.resolve(filePath);
-if (!resolvedPath.startsWith(path.resolve(uploadDir))) {
-    return { success: false, error: 'Nom de fichier invalide' };
-}
-```
-
----
-
-### 4. Clé API statique en dur
+### 1. Clé API statique en dur
 
 **Fichier** : `src/api/v1/middlewares/authApiKeyAccess.js` (ligne 9)
 
@@ -112,29 +52,7 @@ const isValid =
 
 ---
 
-### 5. Fuite de `err.message` vers le client
-
-**Fichiers concernés** :
-
-- `src/api/v1/handlers/default.handler.js` (ligne 25) : `error: err.message`
-- `src/api/v1/middlewares/authApiKeyAccess.js` (ligne 60) : `error: err.message`
-
-**Risque** : Fuite d'informations internes (stack traces, messages Sequelize, chemins fichiers).
-
-**Correction** : Remplacer par un message générique et logger l'erreur côté serveur.
-
-```js
-// Avant
-return res.status(500).json({ success: false, error: err.message });
-
-// Après
-logger.error(err);
-return res.status(500).json({ success: false, error: 'Internal server error' });
-```
-
----
-
-### 6. Pas de protection CSRF
+### 2. Pas de protection CSRF
 
 **Statut** : Confirmé absent (mentionné dans `TODO.md` et `SECURITY.md` comme à implémenter).
 
@@ -157,28 +75,6 @@ const { doubleCsrfProtection, generateToken } = doubleCsrf({
 
 // Appliquer aux routes web (pas API)
 app.use(doubleCsrfProtection);
-```
-
----
-
-### 7. Pas de gestion `uncaughtException` / `unhandledRejection`
-
-**Fichier** : `server.js`
-
-**Risque** : Un crash silencieux en production = interruption de service sans trace.
-
-**Correction** :
-
-```js
-process.on('uncaughtException', (err) => {
-    console.error('UNCAUGHT EXCEPTION:', err);
-    process.exit(1);
-});
-
-process.on('unhandledRejection', (reason) => {
-    console.error('UNHANDLED REJECTION:', reason);
-    process.exit(1);
-});
 ```
 
 ---
@@ -218,18 +114,30 @@ process.on('unhandledRejection', (reason) => {
 
 ## ✅ Verdict
 
-> **Oui, le projet peut partir en beta après correction des 7 points bloquants + intégration ClamAV.**
+> **Oui, le projet peut partir en beta après correction des 2 points bloquants restants + intégration ClamAV.**
 
-Les fondations sont solides et sérieuses. Les corrections 1 à 5 sont rapides (quelques heures).
-Les corrections 6 (CSRF) et 7 (crash handlers) prendront un peu plus de temps mais restent raisonnables.
+Des 7 corrections bloquantes identifiées, **5 sont déjà implémentées** :
+
+- ✅ Désactivation `multipleStatements`
+- ✅ Sécurisation filtres SQL inbox
+- ✅ Protection path traversal
+- ✅ Masquage `err.message`
+- ✅ Crash handlers avec Pino logging
+
+Il reste à faire :
+
+- Externaliser la clé API
+- Implémenter CSRF
+
+Les fondations sont solides. Les 2 corrections restantes (API key + CSRF) prennent ~1 heure au total.
 
 ### Checklist pré-beta
 
-- [ ] Désactiver `multipleStatements: true` dans `src/models/index.js`
-- [ ] Valider les clés de filtre dans `src/services/inbox.service.js`
-- [ ] Ajouter la protection path traversal dans `src/services/inbox.service.js`
+- [x] Désactiver `multipleStatements: true` dans `src/models/index.js`
+- [x] Valider les clés de filtre dans `src/services/inbox.service.js`
+- [x] Ajouter la protection path traversal dans `src/services/inbox.service.js`
+- [x] Remplacer `err.message` par des messages génériques dans les réponses API
+- [x] Ajouter les handlers `uncaughtException` / `unhandledRejection` dans `server.js`
 - [ ] Externaliser la clé API dans une variable d'environnement
-- [ ] Remplacer `err.message` par des messages génériques dans les réponses API
 - [ ] Implémenter la protection CSRF pour les routes web
-- [ ] Ajouter les handlers `uncaughtException` / `unhandledRejection`
 - [ ] Intégrer ClamAV pour l'analyse antivirus des fichiers uploadés
