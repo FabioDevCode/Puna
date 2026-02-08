@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { apiLogger } from '../../../config/logger.js';
 import models from '../../../models/index.js';
 import { decryptObject } from '../../../utils/crypto.js';
 
@@ -57,6 +58,7 @@ export async function authApiKeyAccess(req, res, next) {
 
         return next();
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        apiLogger.error({ error: err.message, stack: err.stack }, 'Error in authApiKeyAccess');
+        return res.status(500).json({ error: 'Internal server error' });
     }
 }

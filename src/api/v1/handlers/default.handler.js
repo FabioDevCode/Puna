@@ -1,3 +1,4 @@
+import { apiLogger } from '../../../config/logger.js';
 import models from '../../../models/index.js';
 
 export async function sendHandler(req, res) {
@@ -22,6 +23,7 @@ export async function sendHandler(req, res) {
 
         return res.status(200).json({ success: true });
     } catch (err) {
-        return res.status(500).json({ success: false, error: err.message });
+        apiLogger.error({ error: err.message, stack: err.stack }, 'Error in sendHandler');
+        return res.status(500).json({ success: false, error: 'Internal server error' });
     }
 }
