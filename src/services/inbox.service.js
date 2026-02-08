@@ -482,12 +482,22 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
 
         // Delete physical files
         const uploadDir = path.join(process.cwd(), 'storage', 'uploads', site.domain);
+        const resolvedUploadDir = path.resolve(uploadDir);
+
         for (const key of fileKeys) {
             const value = contentObj[key];
             if (value) {
                 const filenames = Array.isArray(value) ? value : [value];
                 for (const filename of filenames) {
                     const filePath = path.join(uploadDir, filename);
+                    const resolvedPath = path.resolve(filePath);
+
+                    // Vérifier path traversal
+                    if (!resolvedPath.startsWith(resolvedUploadDir)) {
+                        console.error(`Path traversal attempt detected: ${filename}`);
+                        continue;
+                    }
+
                     try {
                         if (fs.existsSync(filePath)) {
                             fs.unlinkSync(filePath);
@@ -595,6 +605,13 @@ export async function verifyFileAccessAndGetPath(inboxId, filename, userId, user
 
         const uploadDir = path.join(process.cwd(), 'storage', 'uploads', site.domain);
         const filePath = path.join(uploadDir, filename);
+        const resolvedPath = path.resolve(filePath);
+        const resolvedUploadDir = path.resolve(uploadDir);
+
+        // Vérifier path traversal
+        if (!resolvedPath.startsWith(resolvedUploadDir)) {
+            return { success: false, error: 'Nom de fichier invalide' };
+        }
 
         if (!fs.existsSync(filePath)) {
             return { success: false, error: 'Fichier physique introuvable' };
