@@ -1,10 +1,6 @@
-/**
- * Service de gestion des soumissions (inbox)
- * Gère les opérations CRUD sur les soumissions de formulaires
- */
-
 import fs from 'node:fs';
 import path from 'node:path';
+import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import models from '../models/index.js';
 import { getSiteWhereCondition } from './access.service.js';
@@ -268,10 +264,16 @@ export async function getSubmissionsByFormWithFilters(formId, filters = {}, limi
     // Si des filtres sont fournis, construire les conditions dynamiques
     if (filters && typeof filters === 'object' && Object.keys(filters).length > 0) {
         const conditions = [];
+        const SAFE_KEY_REGEX = /^[a-zA-Z0-9_]+$/;
 
         for (const [key, value] of Object.entries(filters)) {
             // Ignorer les valeurs vides
             if (value === null || typeof value === 'undefined' || String(value).trim() === '') {
+                continue;
+            }
+
+            if (key !== 'createdAt' && !SAFE_KEY_REGEX.test(key)) {
+                // Skip unsafe keys to prevent SQL injection in JSON path
                 continue;
             }
 
@@ -320,7 +322,7 @@ export async function getSubmissionsByFormWithFilters(formId, filters = {}, limi
         return {
             id: r.id,
             content: parsed,
-            createdAt: r.createdAt,
+            createdAt: new dayjs(r.createdAt).format('YYYY-MM-DD HH:mm'),
         };
     });
 
