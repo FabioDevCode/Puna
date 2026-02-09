@@ -24,16 +24,17 @@ domain="puna.fr"
         </h2>
         <p class="mb-2">Pour supprimer ce site, veuillez saisir <b>{{domain}}</b>&nbsp;:</p>
         <form id="formDeleteSite_{{id}}" action="/delete-site/{{id}}" method="post" class="flex flex-col gap-4">
-            <input id="confirm_domain_{{id}}" type="text" name="confirm_domain"
-            class="input input-sm input-bordered w-full" placeholder="{{domain}}" required />
+            <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+        <input id="confirm_domain_{{id}}" type="text" name="confirm_domain"
+        class="input input-sm input-bordered w-full" placeholder="{{domain}}" required />
+    </form>
+    <div class="modal-action mt-4">
+        <form method="dialog">
+            <button class="btn btn-sm">Annuler</button>
         </form>
-        <div class="modal-action mt-4">
-            <form method="dialog">
-                <button class="btn btn-sm">Annuler</button>
-            </form>
-            <button id="btnConfirmDelete_{{id}}" class="btn btn-sm btn-error" type="submit" form="formDeleteSite_{{id}}"
-            disabled="">Confirmer la suppression</button>
-    </div>
+        <button id="btnConfirmDelete_{{id}}" class="btn btn-sm btn-error" type="submit" form="formDeleteSite_{{id}}"
+        disabled="">Confirmer la suppression</button>
+</div>
 </div>
 </dialog>
 

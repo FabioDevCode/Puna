@@ -21,9 +21,10 @@ id=site.id
         <p class="py-1 text-sm text-muted">50 caractères maximum.</p>
 
         <form id="formCreateForm_{{id}}" action="/create-form" method="post" class="flex flex-col mt-2 gap-4">
-            <input type="hidden" name="fk_id_site" value="{{id}}" />
-        <input type="text" name="name" class="input input-sm input-bordered w-full" placeholder="Contact" maxlength="50" required="" />
-    <p id="create_form_msg_{{id}}" class="text-sm text-error hidden">Un formulaire avec ce nom existe déjà.</p>
+            <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+        <input type="hidden" name="fk_id_site" value="{{id}}" />
+    <input type="text" name="name" class="input input-sm input-bordered w-full" placeholder="Contact" maxlength="50" required="" />
+<p id="create_form_msg_{{id}}" class="text-sm text-error hidden">Un formulaire avec ce nom existe déjà.</p>
 </form>
 <div class="modal-action mt-4">
     <form method="dialog">

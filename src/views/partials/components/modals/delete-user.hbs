@@ -10,15 +10,16 @@
         </p>
 
         <form id="formDeleteUser" action="" method="post" class="flex flex-col gap-4">
-            <input type="hidden" name="user_id" id="user_delete_id" value="" />
+            <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+        <input type="hidden" name="user_id" id="user_delete_id" value="" />
 
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text font-semibold">Confirmez avec votre mot de passe <span
-                class="text-error">*</span></span>
-    </label>
-    <input type="password" id="delete_user_password" name="password" placeholder="Votre mot de passe"
-    class="input input-sm input-bordered w-full" autocomplete="current-password" required />
+    <div class="form-control w-full">
+        <label class="label">
+            <span class="label-text font-semibold">Confirmez avec votre mot de passe <span
+            class="text-error">*</span></span>
+</label>
+<input type="password" id="delete_user_password" name="password" placeholder="Votre mot de passe"
+class="input input-sm input-bordered w-full" autocomplete="current-password" required />
 </div>
 </form>
 

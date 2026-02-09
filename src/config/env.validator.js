@@ -17,6 +17,7 @@ const REQUIRED_VARS = {
     KEV: 'AES encryption key',
     KIV: 'AES initialization vector',
     SESSION_SECRET: 'Express session secret',
+    CSRF_SECRET: 'CSRF protection secret key',
 
     // Application
     PORT: 'Server port number',
@@ -156,7 +157,7 @@ function validateSecurityKeys(warnings) {
     const MIN_KEY_LENGTH = 32;
 
     // Vérifier la longueur des clés de sécurité
-    const securityKeys = ['KEY_TK', 'KEV', 'KIV', 'SESSION_SECRET'];
+    const securityKeys = ['KEY_TK', 'KEV', 'KIV', 'SESSION_SECRET', 'CSRF_SECRET'];
 
     securityKeys.forEach((key) => {
         if (process.env[key] && process.env[key].length < MIN_KEY_LENGTH) {

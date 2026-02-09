@@ -8,14 +8,15 @@
     </h2>
 
     <form action="/dp-connect" method="post" class="flex flex-col gap-4 w-full">
-        <label class="input input-sm input-bordered flex items-center gap-2">
-            <i class="fas fa-user" style="color: #6C7179; font-size: 1rem;"></i>
-            <input name="login" type="text" class="grow" placeholder="Login" maxlength="50" />
-    </label>
-
+        <input type="hidden" name="_csrf" value="{{csrfToken}}" />
     <label class="input input-sm input-bordered flex items-center gap-2">
-        <i class="fas fa-key" style="color: #6C7179; font-size: 1rem;"></i>
-        <input name="password" type="password" class="grow" placeholder="Password" maxlength="100" />
+        <i class="fas fa-user" style="color: #6C7179; font-size: 1rem;"></i>
+        <input name="login" type="text" class="grow" placeholder="Login" maxlength="50" />
+</label>
+
+<label class="input input-sm input-bordered flex items-center gap-2">
+    <i class="fas fa-key" style="color: #6C7179; font-size: 1rem;"></i>
+    <input name="password" type="password" class="grow" placeholder="Password" maxlength="100" />
 </label>
 
 <button class="btn btn-secondary btn-sm">

@@ -15,7 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const resp = await fetch(`/site/${siteId}/revoke-tokens`, {
                     method: 'PUT',
                     credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    },
                 });
                 const json = await resp.json().catch(() => ({}));
                 if (!resp.ok || !json.success) {

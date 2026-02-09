@@ -52,33 +52,6 @@ const isValid =
 
 ---
 
-### 2. Pas de protection CSRF
-
-**Statut** : Confirmé absent (mentionné dans `TODO.md` et `SECURITY.md` comme à implémenter).
-
-**Risque** : Pour une app avec formulaires POST et sessions cookie, un attaquant peut forger des requêtes depuis un site tiers.
-
-**Correction** : Implémenter un token CSRF avec `csrf-csrf` ou équivalent.
-
-```bash
-npm install csrf-csrf
-```
-
-```js
-import { doubleCsrf } from 'csrf-csrf';
-
-const { doubleCsrfProtection, generateToken } = doubleCsrf({
-    getSecret: () => process.env.CSRF_SECRET,
-    cookieName: 'x-csrf-token',
-    cookieOptions: { sameSite: 'lax', secure: process.env.NODE_ENV === 'production' },
-});
-
-// Appliquer aux routes web (pas API)
-app.use(doubleCsrfProtection);
-```
-
----
-
 ## 🟡 Corrections RECOMMANDÉES (priorité haute)
 
 | #   | Problème                                                                                             | Fichier                                        | Impact |
@@ -96,40 +69,40 @@ app.use(doubleCsrfProtection);
 
 ## 📊 Score par domaine
 
-| Domaine                      | Note    | Commentaire                                             |
-| ---------------------------- | ------- | ------------------------------------------------------- |
-| Architecture & Structure     | 🟢 9/10 | Excellente organisation                                 |
-| Authentification & Sessions  | 🟢 8/10 | Solide, bien implémentée                                |
-| RBAC & Contrôle d'accès      | 🟢 8/10 | Matrice complète et fonctionnelle                       |
-| Upload & Validation fichiers | 🟢 8/10 | Magic bytes, anti-spoofing, zip-bomb                    |
-| Sanitization XSS             | 🟡 7/10 | Bonne base, manque limite de profondeur                 |
-| Protection injection SQL     | 🔴 3/10 | `multipleStatements` + `Sequelize.literal()` non validé |
-| Protection path traversal    | 🔴 4/10 | Pas de validation dans `verifyFileAccessAndGetPath`     |
-| Gestion d'erreurs            | 🟡 5/10 | Fuites `err.message`, pas de crash handlers             |
-| CSRF                         | 🔴 0/10 | Non implémenté                                          |
-| Logging & Audit              | 🟢 8/10 | Pino structuré, rotation, audit trail                   |
-| Rate Limiting                | 🟡 6/10 | Fonctionnel en mono-instance seulement                  |
+| Domaine                      | Note    | Commentaire                                                                    |
+| ---------------------------- | ------- | ------------------------------------------------------------------------------ |
+| Architecture & Structure     | 🟢 9/10 | Excellente organisation                                                        |
+| Authentification & Sessions  | 🟢 8/10 | Solide, bien implémentée                                                       |
+| RBAC & Contrôle d'accès      | 🟢 8/10 | Matrice complète et fonctionnelle                                              |
+| Upload & Validation fichiers | 🟢 8/10 | Magic bytes, anti-spoofing, zip-bomb                                           |
+| Sanitization XSS             | 🟡 7/10 | Bonne base, manque limite de profondeur                                        |
+| Protection injection SQL     | � 8/10  | `multipleStatements` désactivé + `Sequelize.literal()` validé                  |
+| Protection path traversal    | � 8/10  | Validation ajoutée dans `verifyFileAccessAndGetPath` et `deleteInboxWithFiles` |
+| Gestion d'erreurs            | � 8/10  | Messages masqués + crash handlers Pino                                         |
+| CSRF                         | � 8/10  | Implémenté (Double Submit Cookie)                                              |
+| Logging & Audit              | 🟢 8/10 | Pino structuré, rotation, audit trail                                          |
+| Rate Limiting                | 🟡 6/10 | Fonctionnel en mono-instance seulement                                         |
 
 ---
 
 ## ✅ Verdict
 
-> **Oui, le projet peut partir en beta après correction des 2 points bloquants restants + intégration ClamAV.**
+> **Oui, le projet peut partir en beta après correction du dernier point bloquant + intégration ClamAV.**
 
-Des 7 corrections bloquantes identifiées, **5 sont déjà implémentées** :
+Des 7 corrections bloquantes identifiées, **6 sont déjà implémentées** :
 
 - ✅ Désactivation `multipleStatements`
 - ✅ Sécurisation filtres SQL inbox
 - ✅ Protection path traversal
 - ✅ Masquage `err.message`
 - ✅ Crash handlers avec Pino logging
+- ✅ Protection CSRF (Double Submit Cookie)
 
 Il reste à faire :
 
 - Externaliser la clé API
-- Implémenter CSRF
 
-Les fondations sont solides. Les 2 corrections restantes (API key + CSRF) prennent ~1 heure au total.
+Les fondations sont solides. La dernière correction bloquante (API key) prend ~10 minutes.
 
 ### Checklist pré-beta
 
@@ -138,6 +111,6 @@ Les fondations sont solides. Les 2 corrections restantes (API key + CSRF) prenne
 - [x] Ajouter la protection path traversal dans `src/services/inbox.service.js`
 - [x] Remplacer `err.message` par des messages génériques dans les réponses API
 - [x] Ajouter les handlers `uncaughtException` / `unhandledRejection` dans `server.js`
+- [x] Implémenter la protection CSRF pour les routes web
 - [ ] Externaliser la clé API dans une variable d'environnement
-- [ ] Implémenter la protection CSRF pour les routes web
 - [ ] Intégrer ClamAV pour l'analyse antivirus des fichiers uploadés

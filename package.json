@@ -43,6 +43,7 @@
 		"console-stamp": "^3.1.2",
 		"cookie-parser": "^1.4.7",
 		"crypto-js": "^4.2.0",
+		"csrf-csrf": "^4.0.3",
 		"dayjs": "^1.11.18",
 		"exceljs": "^4.4.0",
 		"express": "^5.1.0",

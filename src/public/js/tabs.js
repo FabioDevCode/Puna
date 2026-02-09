@@ -120,7 +120,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const resp = await fetch(`/form/${activeFormId}/columns`, {
                     method: 'POST',
                     credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    },
                     body: JSON.stringify({ columns: payload }),
                 });
                 const json = await resp.json().catch(() => ({}));

@@ -19,6 +19,7 @@ import { logger, apiLogger } from './config/logger.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
+import { csrfProtection, csrfTokenInjector } from './middlewares/csrf.js';
 import flashMessages from './middlewares/flashMessages.js';
 import { injectUserRole } from './middlewares/injectUserRole.js';
 import sanitizeAll from './middlewares/sanitize.js';
@@ -139,8 +140,12 @@ app.use(passport.session());
 // Flash messages - doit être après la session
 app.use(flashMessages);
 
-// 🆕 injectUserRole APRÈS session et passport
+// injectUserRole APRÈS session et passport
 app.use(injectUserRole);
+
+// Protection CSRF - doit être après session, cookieParser et passport
+app.use(csrfProtection);
+app.use(csrfTokenInjector);
 
 // Middleware pour rendre les données de session disponibles dans toutes les vues
 app.use((req, res, next) => {
@@ -165,5 +170,17 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 await initAdminUSer();
 await routes(app);
 await api(app);
+
+// Gestionnaire d'erreur CSRF — redirige avec un flash au lieu d'un 403 brut
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        logger.warn({ url: req.originalUrl, method: req.method }, 'CSRF token invalide');
+        if (typeof res.flash === 'function') {
+            res.flash('error', 'Session expirée ou jeton invalide. Veuillez réessayer.');
+        }
+        return res.redirect('back');
+    }
+    next(err);
+});
 
 export default app;
