@@ -283,11 +283,11 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ## 📊 Logging & Monitoring
 
-- [ ] Améliorer système de logs
-    - [ ] Remplacer `console.log` par un logger (pino/winston)
-    - [ ] Logs structurés
-    - [ ] Niveaux de logs configurables
-- [ ] Ajouter monitoring des erreurs
+- [x] Améliorer système de logs
+    - [x] Remplacer `console.log` par un logger (pino/winston)
+    - [x] Logs structurés
+    - [x] Niveaux de logs configurables
+- [x] Ajouter monitoring des erreurs
 
 ---
 
@@ -533,13 +533,12 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] `npm run format` (tous les fichiers)
     - [x] `npm run lint:fix` (correction ESLint)
     - [ ] `npm run build` (production)
-    - [ ] `npm run logs:clean` (nettoyage logs anciens)
+    - [x] `npm run logs:clean` (nettoyage logs anciens)
 - [ ] Packages à installer :
     - [ ] `cors` (configuration CORS hybride)
     - [ ] `clamscan` (scanner antivirus ClamAV)
     - [ ] `vuepress` (documentation)
     - [x] `csrf-csrf` (protection CSRF Double Submit Cookie) ✅
-    - [ ] 🔮 **Optionnel/Futur** : `webpack` ou `vite` (bundler JS front-end, si besoin)
 - [ ] Documenter tous les scripts npm
 
 ---
