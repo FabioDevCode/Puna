@@ -16,6 +16,7 @@ Liste des tâches à réaliser pour améliorer le projet.
 - [ ] Créer CHANGELOG.md (historique des versions)
 
 ### 📚 Documentation VuePress
+
 - [ ] **Mettre en place VuePress pour documentation complète**
     - [ ] Installer VuePress dans dossier `docs/`
     - [ ] Configurer `.vuepress/config.js`
@@ -160,6 +161,10 @@ Liste des tâches à réaliser pour améliorer le projet.
 - [ ] Peupler dossier `middlewares/`
     - [x] `checkAccess.js` (vérification des permissions)
     - [x] `injectUserRole.js` (injection du rôle utilisateur)
+    - [x] `csrf.js` (protection CSRF Double Submit Cookie)
+    - [x] `flashMessages.js` (messages flash en session)
+    - [x] `loginRateLimiter.js` (rate limiting login/first-login)
+    - [x] `sanitize.js` (sanitisation XSS globale)
     - [ ] **`errorHandler.middleware.js`** - Gestion centralisée des erreurs
         - [ ] Créer classes d'erreur personnalisées (`src/utils/errors.js`)
             - [ ] `NotFoundError` (404)
@@ -196,7 +201,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Configuration : 30 requêtes/minute par défaut (configurable via env)
     - [x] KeyGenerator basé sur siteId + formCode pour limites granulaires
     - [x] Variables d'env : RATE_LIMIT_FORM_MAX, RATE_LIMIT_FORM_WINDOW_MS
-    - [x] Headers RateLimit-* standards dans les réponses
+    - [x] Headers RateLimit-\* standards dans les réponses
     - [x] Log d'avertissement quand limite atteinte
     - [x] Documentation complète (API_RATE_LIMITING_STRATEGIES.md)
 - [x] **Validation des limites de payload API** ✅ (24 décembre 2025)
@@ -227,6 +232,26 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Tester avec formulaires clients sur domaines externes
     - [ ] Documenter configuration dans SECURITY.md
 - [ ] Ajouter validation/sanitization des entrées utilisateur
+- [x] **Protection CSRF (Double Submit Cookie)** ✅ (9 février 2026)
+    - [x] Installer `csrf-csrf` (v4.0.3)
+    - [x] Créer middleware `src/middlewares/csrf.js`
+    - [x] Pattern Double Submit Cookie avec HMAC + session ID
+    - [x] Cookie `__csrf` (httpOnly, sameSite lax, secure en prod)
+    - [x] Injection `{{csrfToken}}` dans tous les templates Handlebars
+    - [x] Champ hidden `_csrf` dans les 12 formulaires POST
+    - [x] Meta tag `csrf-token` dans `head.hbs` pour AJAX
+    - [x] Header `x-csrf-token` dans `revoke_tokens.js` et `tabs.js`
+    - [x] Gestionnaire d'erreur CSRF avec flash message + redirect
+    - [x] Exclusion des routes API/send (auth par Bearer token)
+    - [x] Variable d'environnement `CSRF_SECRET` ajoutée à `env.validator.js`
+- [x] **Audit de sécurité beta readiness** ✅ (9 février 2026)
+    - [x] Désactivation `multipleStatements: true` dans Sequelize (`src/models/index.js`)
+    - [x] Validation regex clés de filtre JSON dans `inbox.service.js` (anti SQL injection)
+    - [x] Protection path traversal renforcée (`path.resolve` + `startsWith`) dans `inbox.service.js`
+    - [x] Masquage `err.message` dans réponses API (message générique + log Pino)
+    - [x] Graceful shutdown dans `server.js` (uncaughtException/unhandledRejection)
+    - [x] Rapport d'audit créé (`AUDIT_BETA_READINESS.md`)
+    - [ ] Externaliser clé API (`authApiKeyAccess.js` → `process.env.API_KEY`)
 
 ---
 
@@ -280,6 +305,7 @@ Liste des tâches à réaliser pour améliorer le projet.
 ## 🌐 Marketing & Communication
 
 ### 🌐 Site Web de Présentation (Landing Page)
+
 - [x] **Créer site vitrine pour Puna avec Nuxt.js**
     - [x] Setup projet Nuxt 4 (SSR)
 
@@ -317,6 +343,7 @@ Liste des tâches à réaliser pour améliorer le projet.
 ### 🚀 Améliorations Fonctionnelles
 
 ### 🔔 Système de Notifications (Toastify)
+
 - [x] Intégrer Toastify JS pour notifications toast
     - [x] Ajouter plugin dans public/ (toastify.js + toastify.css)
     - [x] Créer fonction `Toast()` dans puna.js pour usage simplifié
@@ -343,6 +370,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Utiliser `req.__()` pour traduire les messages
     - [ ] Créer clés de traduction dans `src/locales/fr.json` et `en.json`
     - [ ] Exemples d'implémentation :
+
         ```javascript
         // ✅ Avec traduction i18n
         res.flash('success', req.__('site.created.success', domain));
@@ -364,10 +392,12 @@ Liste des tâches à réaliser pour améliorer le projet.
             }
         }
         ```
+
     - [ ] Créer fichier `FLASH_MESSAGES_I18N.md` avec guide de traduction
     - [ ] Documenter structure des clés i18n par entité (site, form, user, inbox)
 
 ### 📊 Amélioration des Logs (Pino)
+
 - [x] **Infrastructure Pino complète** ✅ (14 décembre 2025)
     - [x] Créer `src/config/logger.js` avec 4 loggers (app, api, error, audit)
     - [x] Niveaux de logs : trace, debug, info, warn, error, fatal
@@ -409,6 +439,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Graphiques de statistiques (erreurs par jour, etc.)
 
 ### 🧹 Nettoyage automatique des fichiers
+
 - [x] **Suppression auto des uploads lors de suppression Form/Site** ✅ (24 décembre 2025)
     - [x] Supprimer dossier `uploads/{site.domain}/{form.name}/` quand Form supprimé
     - [x] Supprimer dossier `uploads/{site.domain}/` quand Site supprimé
@@ -418,6 +449,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Implémenté dans form.service.js et site.service.js
 
 ### 📊 Statistiques et Dashboard
+
 - [x] **Statistiques d'activité dans panel admin** ✅ (24 décembre 2025)
     - [x] Carte "Utilisateurs connectés" (comptage sessions actives)
     - [x] Carte "Erreurs" (comptage lignes error.log)
@@ -430,6 +462,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Mise à jour layout admin overview (8 cartes au lieu de 4)
 
 ### 📤 Export CSV
+
 - [x] Implémenter exports CSV avec fast-csv
     - [x] Ajouter bouton "Export CSV" sur toutes les listes
     - [x] Route `/export/csv/:entity` (sites, forms, inbox, users)
@@ -442,6 +475,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [x] Respect des permissions (viewer peut exporter ses données)
 
 ### 🛡️ Sécurité des fichiers (ClamAV)
+
 - [ ] Intégrer ClamAV pour scan antivirus
     - [ ] Installer `clamscan` npm package
     - [ ] Variable d'env `CLAMAV_ENABLED=true/false`
@@ -459,6 +493,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] Statistiques : scans effectués, menaces détectées
 
 ### 🌍 Internationalisation (i18n)
+
 - [ ] **Ajouter support multilingue FR/EN**
     - [ ] Utiliser package `i18n` déjà installé
     - [ ] Créer fichiers de traduction :
@@ -478,6 +513,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] **À faire en dernier** (priorité basse)
 
 ### Autres améliorations
+
 - [x] Améliorer gestion des permissions
     - [x] Système ACL complet (actionCan, roleIs helpers)
     - [x] Middleware d'injection du rôle utilisateur
@@ -502,6 +538,7 @@ Liste des tâches à réaliser pour améliorer le projet.
     - [ ] `cors` (configuration CORS hybride)
     - [ ] `clamscan` (scanner antivirus ClamAV)
     - [ ] `vuepress` (documentation)
+    - [x] `csrf-csrf` (protection CSRF Double Submit Cookie) ✅
     - [ ] 🔮 **Optionnel/Futur** : `webpack` ou `vite` (bundler JS front-end, si besoin)
 - [ ] Documenter tous les scripts npm
 
@@ -518,11 +555,13 @@ Liste des tâches à réaliser pour améliorer le projet.
 ### ⚡ Important (Court terme)
 
 1. ~~**Créer couche services**~~ ✅ **TERMINÉ** - 4 controllers migrés (export, form, inbox, site)
-2. **Système de Toasts (Toastify)** - Migration flash messages (15 routes)
+2. ~~**Système de Toasts (Toastify)**~~ ✅ **TERMINÉ** - Migration flash messages complète
 3. **Logger Pino** - Migration controllers vers helpers Pino
 4. **CORS hybride** - Configuration API publiques vs routes authentifiées
-5. **Rate limiting** - Protection contre les abus API
+5. ~~**Rate limiting**~~ ✅ **TERMINÉ** - Login + API protégés
 6. **ClamAV** - Scanner antivirus pour fichiers uploadés
+7. ~~**Protection CSRF**~~ ✅ **TERMINÉ** - Double Submit Cookie avec csrf-csrf
+8. **Externaliser clé API** - Variable d'environnement + comparaison à temps constant
 
 ### 💡 À planifier (Moyen/Long terme)
 
@@ -535,6 +574,16 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ### ✅ Récemment complété
 
+- ✅ **Audit de sécurité & corrections bloquantes** (9 février 2026)
+    - ✅ Protection CSRF implémentée (csrf-csrf, Double Submit Cookie)
+    - ✅ 12 formulaires + 2 scripts AJAX protégés
+    - ✅ Désactivation `multipleStatements` Sequelize
+    - ✅ Validation clés de filtre JSON (SAFE_KEY_REGEX anti SQL injection)
+    - ✅ Path traversal renforcé (resolve + startsWith)
+    - ✅ Masquage err.message dans API (message générique + log Pino)
+    - ✅ Graceful shutdown (uncaughtException/unhandledRejection)
+    - ✅ 6/7 corrections bloquantes terminées
+    - ✅ Rapport `AUDIT_BETA_READINESS.md` créé
 - ✅ **Réorganisation JavaScript front-end** (27 décembre 2025)
     - ✅ Création `core/utils.js` avec 5 fonctions mutualisées (PunaUtils)
     - ✅ Regroupement scripts admin dans `admin/` (4 fichiers)
@@ -607,4 +656,4 @@ Liste des tâches à réaliser pour améliorer le projet.
 
 ---
 
-**Dernière mise à jour :** 29 décembre 2025
+**Dernière mise à jour :** 9 février 2026

@@ -12,9 +12,11 @@ Ce document décrit les mesures de sécurité mises en place dans Puna, ainsi qu
 - [Sécurité HTTP (Helmet.js)](#-sécurité-http-helmetjs)
 - [Upload de fichiers](#-upload-de-fichiers)
 - [Protection contre les injections](#-protection-contre-les-injections)
+- [Protection CSRF](#️-protection-csrf)
 - [Gestion des secrets](#-gestion-des-secrets)
 - [Rate Limiting](#-rate-limiting)
 - [Audit & Logs](#-audit--logs)
+- [Gestion des erreurs critiques](#-gestion-des-erreurs-critiques)
 - [Reporter une vulnérabilité](#-reporter-une-vulnérabilité)
 - [Checklist de sécurité](#-checklist-de-sécurité)
 
@@ -34,15 +36,17 @@ Puna implémente une approche de sécurité **multi-couches** pour protéger les
 
 ### Technologies de sécurité
 
-| Technologie | Usage | Version |
-|-------------|-------|---------|
-| **bcrypt** | Hachage des mots de passe | ^6.0.0 |
-| **jsonwebtoken** | Tokens API JWT | ^9.0.2 |
-| **helmet** | Headers HTTP sécurisés | ^8.1.0 |
-| **xss** | Sanitization XSS | ^1.0.15 |
-| **sanitize-filename** | Validation noms de fichiers | ^1.6.3 |
-| **sequelize** | ORM (prévention SQL injection) | ^6.37.7 |
-| **crypto-js** | Chiffrement AES | ^4.2.0 |
+| Technologie            | Usage                                  | Version |
+| ---------------------- | -------------------------------------- | ------- |
+| **bcrypt**             | Hachage des mots de passe              | ^6.0.0  |
+| **jsonwebtoken**       | Tokens API JWT                         | ^9.0.2  |
+| **helmet**             | Headers HTTP sécurisés                 | ^8.1.0  |
+| **xss**                | Sanitization XSS                       | ^1.0.15 |
+| **sanitize-filename**  | Validation noms de fichiers            | ^1.6.3  |
+| **sequelize**          | ORM (prévention SQL injection)         | ^6.37.7 |
+| **crypto-js**          | Chiffrement AES                        | ^4.2.0  |
+| **csrf-csrf**          | Protection CSRF (Double Submit Cookie) | ^4.0.3  |
+| **express-rate-limit** | Rate limiting login & API              | ^7.x    |
 
 ---
 
@@ -62,6 +66,7 @@ const isValid = await bcrypt.compare(password, user.password);
 ```
 
 **Protection contre :**
+
 - ✅ Rainbow tables
 - ✅ Brute force (salt unique par utilisateur)
 - ✅ Stockage en clair
@@ -71,22 +76,21 @@ const isValid = await bcrypt.compare(password, user.password);
 Les API publiques (`/send/:code`) utilisent des **tokens JWT** pour l'authentification.
 
 **Caractéristiques :**
+
 - Signature HMAC SHA-256
 - Expiration configurable
 - Payload minimal (ID site, ID formulaire)
 - Clé secrète dans `.env` (`KEY_TK`)
 
 **Génération :**
+
 ```javascript
 import jwt from 'jsonwebtoken';
-const token = jwt.sign(
-    { siteId, formId },
-    process.env.KEY_TK,
-    { expiresIn: '365d' }
-);
+const token = jwt.sign({ siteId, formId }, process.env.KEY_TK, { expiresIn: '365d' });
 ```
 
 **Validation :**
+
 - Middleware `authApiKeyAccess` vérifie la signature
 - Token invalide → 401 Unauthorized
 - Token expiré → 401 Unauthorized
@@ -96,33 +100,38 @@ const token = jwt.sign(
 Les routes authentifiées (`/dashboard`, `/admin`, etc.) utilisent des **sessions** stockées en MySQL.
 
 **Configuration :**
+
 ```javascript
 import session from 'express-session';
 import MySQLStoreConstructor from 'express-mysql-session';
 
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // true en production avec HTTPS
-        httpOnly: true, // Prévient XSS
-        maxAge: 43200000 // 12 heures
-    },
-    store: mysqlStore // Persistance en base
-}));
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: false, // true en production avec HTTPS
+            httpOnly: true, // Prévient XSS
+            maxAge: 43200000, // 12 heures
+        },
+        store: mysqlStore, // Persistance en base
+    })
+);
 ```
 
 **Protection contre :**
+
 - ✅ Session fixation (cookie régénéré à chaque login)
 - ✅ Session hijacking (httpOnly cookie)
-- ✅ CSRF (validation à implémenter)
+- ✅ CSRF (Double Submit Cookie — voir section dédiée)
 
 ### Première connexion obligatoire
 
 Lors de la création d'un compte, l'utilisateur **doit** se connecter avec son mot de passe temporaire et le changer.
 
 **Workflow :**
+
 1. Admin crée un utilisateur → mot de passe temporaire généré
 2. Utilisateur reçoit ses identifiants
 3. Première connexion → redirection forcée vers changement de mot de passe
@@ -140,24 +149,24 @@ Puna implémente un système d'autorisation **granulaire** avec 5 rôles et des 
 
 ### Hiérarchie des rôles
 
-| Rôle | Niveau | Description |
-|------|--------|-------------|
-| `super_admin` | 5 | Accès total (admin utilisateurs, paramètres) |
-| `owner` | 4 | Propriétaire de sites, gestion utilisateurs |
-| `beta` | 3 | Testeur beta avec privilèges étendus |
-| `editor` | 2 | Édition de contenu |
-| `viewer` | 1 | Lecture seule |
+| Rôle          | Niveau | Description                                  |
+| ------------- | ------ | -------------------------------------------- |
+| `super_admin` | 5      | Accès total (admin utilisateurs, paramètres) |
+| `owner`       | 4      | Propriétaire de sites, gestion utilisateurs  |
+| `beta`        | 3      | Testeur beta avec privilèges étendus         |
+| `editor`      | 2      | Édition de contenu                           |
+| `viewer`      | 1      | Lecture seule                                |
 
 ### Permissions par entité
 
 Les permissions sont vérifiées sur 4 entités principales :
 
-| Entité | Actions | Description |
-|--------|---------|-------------|
-| **site** | create, read, update, delete | Gestion des sites |
-| **form** | create, read, update, delete | Gestion des formulaires |
-| **inbox** | read, delete | Consultation/suppression des soumissions |
-| **user** | manage | Administration des utilisateurs |
+| Entité    | Actions                      | Description                              |
+| --------- | ---------------------------- | ---------------------------------------- |
+| **site**  | create, read, update, delete | Gestion des sites                        |
+| **form**  | create, read, update, delete | Gestion des formulaires                  |
+| **inbox** | read, delete                 | Consultation/suppression des soumissions |
+| **user**  | manage                       | Administration des utilisateurs          |
 
 ### Middlewares de protection
 
@@ -165,12 +174,7 @@ Les permissions sont vérifiées sur 4 entités principales :
 
 ```javascript
 // Route accessible uniquement par super_admin et owner
-router.get(
-    '/admin/users',
-    isConnected,
-    roleAccess(['super_admin', 'owner']),
-    adminCtl.adminUsers
-);
+router.get('/admin/users', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminUsers);
 ```
 
 **Fichier :** `src/middlewares/checkAccess.js`
@@ -179,15 +183,11 @@ router.get(
 
 ```javascript
 // Route nécessitant permission 'read' sur 'form'
-router.get(
-    '/form/:id/inbox',
-    isConnected,
-    actionAccess('form', 'read'),
-    formCtl.getFormInbox
-);
+router.get('/form/:id/inbox', isConnected, actionAccess('form', 'read'), formCtl.getFormInbox);
 ```
 
 **Logique :**
+
 1. Récupère le rôle de l'utilisateur
 2. Charge les permissions depuis `src/config/permissions.js`
 3. Vérifie si l'action est autorisée pour ce rôle
@@ -205,7 +205,7 @@ Les permissions sont également vérifiées côté front-end pour masquer les bo
 {{/actionCan}}
 
 {{#roleIs role='super_admin'}}
-    <a href="/admin">Administration</a>
+    <a href='/admin'>Administration</a>
 {{/roleIs}}
 ```
 
@@ -234,22 +234,24 @@ Helmet.js configure automatiquement les **headers HTTP de sécurité** pour prot
 ### Configuration hybride
 
 **Routes API publiques** (`/api/*`, `/send/*`) → **Helmet léger**
+
 - CSP désactivé (ne bloque pas les appels cross-origin)
 - Headers sécurisés mais non restrictifs
 
 **Routes web authentifiées** (`/dashboard`, `/admin`, etc.) → **Helmet complet**
+
 - Content Security Policy (CSP) strict
 - Protection contre XSS, clickjacking, etc.
 
 ### Headers configurés
 
-| Header | Valeur | Protection |
-|--------|--------|-----------|
-| `X-Content-Type-Options` | nosniff | Force le respect du Content-Type |
-| `X-Frame-Options` | DENY | Empêche l'intégration en iframe (clickjacking) |
-| `X-XSS-Protection` | 0 | Désactivé (CSP fait le job) |
-| `Content-Security-Policy` | [voir ci-dessous] | Limite les sources de contenu |
-| `Strict-Transport-Security` | max-age=31536000 | Force HTTPS (prod uniquement) |
+| Header                      | Valeur            | Protection                                     |
+| --------------------------- | ----------------- | ---------------------------------------------- |
+| `X-Content-Type-Options`    | nosniff           | Force le respect du Content-Type               |
+| `X-Frame-Options`           | DENY              | Empêche l'intégration en iframe (clickjacking) |
+| `X-XSS-Protection`          | 0                 | Désactivé (CSP fait le job)                    |
+| `Content-Security-Policy`   | [voir ci-dessous] | Limite les sources de contenu                  |
+| `Strict-Transport-Security` | max-age=31536000  | Force HTTPS (prod uniquement)                  |
 
 ### Content Security Policy (CSP)
 
@@ -296,11 +298,11 @@ L'upload de fichiers est **hautement sécurisé** avec validation multi-niveaux.
 import multer from 'multer';
 
 const upload = multer({
-    dest: 'storage/tmp/',           // Dossier temporaire
+    dest: 'storage/tmp/', // Dossier temporaire
     limits: {
         fileSize: 10 * 1024 * 1024, // 10 MB par fichier
-        files: 10                    // Max 10 fichiers
-    }
+        files: 10, // Max 10 fichiers
+    },
 });
 ```
 
@@ -309,15 +311,26 @@ const upload = multer({
 #### 1. Types autorisés (whitelist)
 
 Extensions validées :
+
 ```javascript
 const ALLOWED_EXTENSIONS = [
-    'png', 'jpg', 'jpeg', 'webp',                // Images
-    'pdf', 'doc', 'docx', 'odt',                 // Documents
-    'txt', 'xls', 'xlsx', 'csv'                  // Tableurs & Texte
+    'png',
+    'jpg',
+    'jpeg',
+    'webp', // Images
+    'pdf',
+    'doc',
+    'docx',
+    'odt', // Documents
+    'txt',
+    'xls',
+    'xlsx',
+    'csv', // Tableurs & Texte
 ];
 ```
 
 **Validation :**
+
 - Extension dans la whitelist
 - Content-Type du header HTTP
 - Magic bytes du fichier (avec `file-type`)
@@ -335,6 +348,7 @@ const safeName = sanitize(originalName);
 ```
 
 **Protection contre :**
+
 - ✅ Path traversal
 - ✅ XSS dans les noms de fichiers
 - ✅ Caractères spéciaux problématiques
@@ -352,6 +366,7 @@ const finalName = `${timestamp}_${random}_${sanitizedName}`;
 ```
 
 **Structure :**
+
 ```
 storage/
 ├── tmp/                          # Temporaire (nettoyé)
@@ -373,6 +388,7 @@ Multer → validateUpload → moveFiles → saveInbox
 ```
 
 **Fichiers :**
+
 - `src/api/v1/middlewares/multipartUpload.js`
 - `src/api/v1/middlewares/validateUpload.js`
 - `src/api/v1/middlewares/moveFilesToUploads.js`
@@ -388,21 +404,36 @@ Multer → validateUpload → moveFiles → saveInbox
 ```javascript
 // ✅ SÉCURISÉ - Paramètres échappés par Sequelize
 const user = await models.User.findOne({
-    where: { email: userInput }
+    where: { email: userInput },
 });
 
 // ❌ DANGEREUX - Requête SQL brute (à éviter)
-const user = await sequelize.query(
-    `SELECT * FROM users WHERE email = '${userInput}'`
-);
+const user = await sequelize.query(`SELECT * FROM users WHERE email = '${userInput}'`);
 ```
 
 **Bonnes pratiques :**
+
 - ✅ Toujours utiliser les méthodes Sequelize (`findOne`, `create`, etc.)
 - ✅ Si requête brute nécessaire, utiliser les paramètres `replacements`
 - ✅ Valider les entrées utilisateur avant requête
+- ✅ `multipleStatements: false` dans la configuration Sequelize (désactivé explicitement)
 
-**Fichiers :** Tous les fichiers dans `src/models/`, `src/services/`
+#### Protection des filtres dynamiques
+
+Les filtres dynamiques JSON dans `inbox.service.js` utilisent `Sequelize.literal()`. Pour éviter l'injection via les noms de clés, une validation regex est appliquée :
+
+```javascript
+const SAFE_KEY_REGEX = /^[a-zA-Z0-9_]+$/;
+
+for (const [key, value] of Object.entries(jsonFilters)) {
+    if (!SAFE_KEY_REGEX.test(key)) {
+        throw new Error(`Invalid filter key: ${key}`);
+    }
+    // Seules les clés alphanumériques sont acceptées dans Sequelize.literal()
+}
+```
+
+**Fichiers :** `src/models/`, `src/services/`
 
 ### XSS (Cross-Site Scripting)
 
@@ -428,7 +459,7 @@ Object.keys(req.body).forEach((key) => {
 Content Security Policy bloque l'exécution de scripts non autorisés :
 
 ```javascript
-scriptSrc: ["'self'", "cdn.jsdelivr.net"]  // Seuls ces domaines autorisés
+scriptSrc: ["'self'", 'cdn.jsdelivr.net']; // Seuls ces domaines autorisés
 ```
 
 #### Échappement Handlebars
@@ -436,10 +467,10 @@ scriptSrc: ["'self'", "cdn.jsdelivr.net"]  // Seuls ces domaines autorisés
 Les templates Handlebars échappent automatiquement les variables :
 
 ```handlebars
-{{!-- ✅ Échappé automatiquement --}}
+{{! ✅ Échappé automatiquement }}
 <p>{{userInput}}</p>
 
-{{!-- ❌ Non échappé (à utiliser avec précaution) --}}
+{{! ❌ Non échappé (à utiliser avec précaution) }}
 <p>{{{userInput}}}</p>
 ```
 
@@ -454,18 +485,125 @@ import sanitize from 'sanitize-filename';
 const safePath = sanitize(userInput);
 ```
 
-**Protection supplémentaire :**
-- Validation que le fichier est bien dans `storage/uploads/`
-- Vérification de l'existence avec `fs.existsSync`
-- Résolution des chemins avec `path.resolve`
+**Protection supplémentaire avec vérification canonique :**
+
+```javascript
+// Résolution du chemin absolu et vérification du préfixe
+const resolvedPath = path.resolve(uploadsDir, siteDomain, formName, fileName);
+const expectedPrefix = path.resolve(uploadsDir);
+
+if (!resolvedPath.startsWith(expectedPrefix)) {
+    throw new Error('Path traversal attempt detected');
+}
+```
+
+Cette double vérification est appliquée dans :
+
+- **`deleteInboxWithFiles()`** — Avant suppression de fichiers
+- **`verifyFileAccessAndGetPath()`** — Avant téléchargement de fichiers
 
 **Fichiers :**
+
 - `src/helpers/file.helpers.js`
-- `src/controllers/inbox.controller.js`
+- `src/services/inbox.service.js`
 
 ---
 
-## 🔑 Gestion des secrets
+## �️ Protection CSRF
+
+### Double Submit Cookie Pattern
+
+Puna utilise le package **csrf-csrf** pour protéger toutes les routes web contre les attaques CSRF.
+
+**Principe :**
+
+1. Le serveur génère un token CSRF et le stocke dans un cookie (`__csrf`)
+2. Le même token est injecté dans les formulaires via un champ hidden `_csrf`
+3. Lors d'un POST, le middleware compare la valeur du cookie et celle du body/header
+4. Si les valeurs ne correspondent pas → **403 Forbidden**
+
+**Configuration :**
+
+```javascript
+import { doubleCsrf } from 'csrf-csrf';
+
+const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
+    getSecret: () => process.env.CSRF_SECRET,
+    getSessionIdentifier: (req) => req.session?.id ?? '',
+    cookieName: '__csrf',
+    cookieOptions: {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+    },
+    getCsrfTokenFromRequest: (req) => {
+        return req.body?._csrf || req.headers['x-csrf-token'];
+    },
+});
+```
+
+**Fichier :** `src/middlewares/csrf.js`
+
+### Routes protégées
+
+| Type             | Routes                       | Protection                            |
+| ---------------- | ---------------------------- | ------------------------------------- |
+| Formulaires HTML | Toutes les routes POST web   | Champ hidden `_csrf`                  |
+| Requêtes AJAX    | PUT/POST depuis le dashboard | Header `x-csrf-token`                 |
+| API publiques    | `/api/*`, `/send/*`          | **Exclues** (authentification Bearer) |
+
+### Injection dans les templates
+
+Le middleware `csrfTokenInjector` rend le token disponible dans tous les templates Handlebars :
+
+```handlebars
+{{! Formulaires HTML }}
+<form method='post' action='/dp-connect'>
+    <input type='hidden' name='_csrf' value='{{csrfToken}}' />
+    ...
+</form>
+
+{{! Requêtes AJAX (via meta tag dans head.hbs) }}
+<meta name='csrf-token' content='{{csrfToken}}' />
+```
+
+```javascript
+// JavaScript client — ajout du header pour requêtes AJAX
+fetch('/api/endpoint', {
+    method: 'POST',
+    headers: {
+        'x-csrf-token': document.querySelector('meta[name="csrf-token"]')?.content || '',
+    },
+});
+```
+
+### Gestion des erreurs CSRF
+
+Un gestionnaire d'erreur dédié redirige l'utilisateur avec un message flash en cas de token invalide ou expiré :
+
+```javascript
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        logger.warn({ url: req.originalUrl, method: req.method }, 'CSRF token invalide');
+        res.flash('error', 'Session expirée ou jeton invalide. Veuillez réessayer.');
+        return res.redirect('back');
+    }
+    next(err);
+});
+```
+
+**Protection contre :**
+
+- ✅ Cross-Site Request Forgery
+- ✅ Requêtes POST non autorisées depuis des sites tiers
+- ✅ L'attaquant ne peut pas lire le cookie `httpOnly`
+
+**Variable d'environnement requise :** `CSRF_SECRET` (min. 32 caractères)
+
+---
+
+## �🔑 Gestion des secrets
 
 ### Variables d'environnement
 
@@ -476,6 +614,7 @@ const safePath = sanitize(userInput);
 KEY_TK="your_secure_key_tk_here"           # JWT signing key
 KEV="your_secure_encryption_key_here"     # AES encryption key
 KIV="your_secure_initialization_vector"   # AES IV
+CSRF_SECRET="your_csrf_secret_min_32_chars" # CSRF token signing
 
 # Session
 SESSION_SECRET="your_secure_session_key"
@@ -493,18 +632,14 @@ Les données sensibles peuvent être chiffrées avec AES-256 :
 import CryptoJS from 'crypto-js';
 
 // Chiffrement
-const encrypted = CryptoJS.AES.encrypt(
-    data,
-    CryptoJS.enc.Utf8.parse(process.env.KEV),
-    { iv: CryptoJS.enc.Utf8.parse(process.env.KIV) }
-);
+const encrypted = CryptoJS.AES.encrypt(data, CryptoJS.enc.Utf8.parse(process.env.KEV), {
+    iv: CryptoJS.enc.Utf8.parse(process.env.KIV),
+});
 
 // Déchiffrement
-const decrypted = CryptoJS.AES.decrypt(
-    encrypted,
-    CryptoJS.enc.Utf8.parse(process.env.KEV),
-    { iv: CryptoJS.enc.Utf8.parse(process.env.KIV) }
-);
+const decrypted = CryptoJS.AES.decrypt(encrypted, CryptoJS.enc.Utf8.parse(process.env.KEV), {
+    iv: CryptoJS.enc.Utf8.parse(process.env.KIV),
+});
 ```
 
 **Fichier :** `src/utils/crypto.js`
@@ -527,52 +662,54 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
 ```
 
----
-
 ## 🚦 Rate Limiting
 
-### ⚠️ À implémenter
+### ✅ Implémenté
 
-Le rate limiting n'est **pas encore** implémenté dans Puna. C'est une priorité haute.
+Le rate limiting est implémenté avec **express-rate-limit** sur les routes sensibles.
 
-### Plan d'implémentation
+### Routes protégées
 
-**Package recommandé :** `express-rate-limit`
+| Route               | Limite     | Fenêtre    | Description                              |
+| ------------------- | ---------- | ---------- | ---------------------------------------- |
+| `POST /dp-connect`  | 5 requêtes | 15 minutes | Login                                    |
+| `POST /dp-first-co` | 3 requêtes | 15 minutes | Première connexion                       |
+| `POST /send/:code`  | 30 req/min | 1 minute   | API soumission formulaire (configurable) |
+
+### Configuration
 
 ```javascript
 import rateLimit from 'express-rate-limit';
 
-// Rate limiter pour routes sensibles
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5,                    // 5 tentatives max
-    message: 'Trop de tentatives, réessayez plus tard'
+// Login rate limiter
+const loginRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: 'Trop de tentatives, réessayez dans 15 minutes',
 });
 
-// Appliquer sur login
-app.post('/dp-connect', authLimiter, authCtl.dpConnect);
-
-// Rate limiter pour API publique
-const apiLimiter = rateLimit({
-    windowMs: 60 * 1000,       // 1 minute
-    max: 60,                   // 60 requêtes/min
-    keyGenerator: (req) => req.headers['x-api-key'] || req.ip
+// API rate limiter (configurable via env)
+const formRateLimiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_FORM_WINDOW_MS || '60000'),
+    max: parseInt(process.env.RATE_LIMIT_FORM_MAX || '30'),
+    keyGenerator: (req) => `${req.params.siteId}_${req.params.formCode}`,
 });
-
-app.use('/api', apiLimiter);
 ```
 
-### Routes prioritaires
+**Variables d'environnement :**
 
-1. **Login** (`/dp-connect`) → 5 tentatives / 15 min
-2. **Création de compte** → 3 tentatives / heure
-3. **API publique** (`/send/:code`) → 60 requêtes / min
-4. **Exports** (Excel, CSV, ZIP) → 10 requêtes / 5 min
+- `RATE_LIMIT_FORM_MAX` — Requêtes max par fenêtre (défaut : 30)
+- `RATE_LIMIT_FORM_WINDOW_MS` — Fenêtre en ms (défaut : 60000)
 
-### Stockage recommandé
+**Fichiers :**
 
-- **Développement :** Mémoire (par défaut)
-- **Production :** Redis (partagé entre instances)
+- `src/middlewares/loginRateLimiter.js`
+- `src/api/v1/middlewares/rateLimiter.js`
+
+### Stockage
+
+- **Actuellement :** MemoryStore (mono-instance)
+- **Production multi-instances :** Migrer vers Redis (`rate-limit-redis`)
 
 ---
 
@@ -619,7 +756,7 @@ const httpLogger = pinoHttp({
         if (res.statusCode >= 500) return 'error';
         if (res.statusCode >= 400) return 'warn';
         return 'info';
-    }
+    },
 });
 ```
 
@@ -682,7 +819,13 @@ npm run logs:stats
 **Production :** JSON structuré pour parsing et analyse
 
 ```json
-{"level":30,"time":1702566123456,"msg":"request completed","req":{"url":"/dashboard","method":"GET"},"res":{"statusCode":200}}
+{
+    "level": 30,
+    "time": 1702566123456,
+    "msg": "request completed",
+    "req": { "url": "/dashboard", "method": "GET" },
+    "res": { "statusCode": 200 }
+}
 ```
 
 **Développement :** Format lisible avec pino-pretty (configurable)
@@ -717,6 +860,7 @@ options: {
 L'infrastructure Pino est **en place** mais les `console.log` dans les controllers ne sont **pas encore migrés**.
 
 **À faire :**
+
 - [ ] Remplacer `console.log()` par `logger.info()`
 - [ ] Remplacer `console.error()` par `errorLogger.error()`
 - [ ] Utiliser les helpers dans controllers (`logAction`, `logAuthSuccess`, etc.)
@@ -726,23 +870,71 @@ L'infrastructure Pino est **en place** mais les `console.log` dans les controlle
 
 ### Événements à logger (sécurité)
 
-| Événement | Niveau | Informations |
-|-----------|--------|--------------|
-| Login réussi | info | userId, IP, timestamp |
-| Login échoué | warn | email, IP, raison |
-| Tentatives multiples | error | IP, nombre de tentatives |
-| Création d'utilisateur | info | userId créé, par qui |
-| Changement de mot de passe | info | userId, IP |
-| Révocation de token | warn | siteId, formId, userId |
-| Upload de fichier | info | userId, filename, size, type |
-| Fichier rejeté | warn | userId, filename, raison |
-| Suppression de données | warn | entity, entityId, userId |
-| Erreur 403 Forbidden | warn | userId, route, raison |
-| Erreur 500 | error | stack trace, route, userId |
+| Événement                  | Niveau | Informations                 |
+| -------------------------- | ------ | ---------------------------- |
+| Login réussi               | info   | userId, IP, timestamp        |
+| Login échoué               | warn   | email, IP, raison            |
+| Tentatives multiples       | error  | IP, nombre de tentatives     |
+| Création d'utilisateur     | info   | userId créé, par qui         |
+| Changement de mot de passe | info   | userId, IP                   |
+| Révocation de token        | warn   | siteId, formId, userId       |
+| Upload de fichier          | info   | userId, filename, size, type |
+| Fichier rejeté             | warn   | userId, filename, raison     |
+| Suppression de données     | warn   | entity, entityId, userId     |
+| Erreur 403 Forbidden       | warn   | userId, route, raison        |
+| Erreur 500                 | error  | stack trace, route, userId   |
 
 ---
 
-## 🐛 Reporter une vulnérabilité
+## � Gestion des erreurs critiques
+
+### Graceful Shutdown
+
+Le serveur gère proprement les exceptions non capturées et les promesses rejetées :
+
+```javascript
+// server.js
+function shutdownAndExit(error) {
+    logger.error(error, 'Critical error - initiating graceful shutdown');
+    server.close(() => {
+        models.sequelize.close().then(() => {
+            logger.info('Database connection closed');
+            process.exit(1);
+        });
+    });
+    setTimeout(() => process.exit(1), 5000); // Force kill après 5s
+}
+
+process.on('uncaughtException', (err) => shutdownAndExit(err));
+process.on('unhandledRejection', (reason) => {
+    const error = reason instanceof Error ? reason : new Error(String(reason));
+    shutdownAndExit(error);
+});
+```
+
+**Protection contre :**
+
+- ✅ Crash silencieux sans log
+- ✅ Connexions DB laissées ouvertes
+- ✅ Requêtes en cours non terminées
+
+### Masquage des erreurs serveur
+
+Les messages d'erreur internes ne sont **jamais** exposés aux utilisateurs :
+
+```javascript
+// ✅ Réponse API — message générique
+res.status(500).json({ error: 'Internal server error' });
+
+// Log interne avec détails complets (Pino)
+apiLogger.error({ err, siteId, formId }, 'Handler error');
+```
+
+**Fichiers :** `src/api/v1/handlers/`, `src/api/v1/middlewares/authApiKeyAccess.js`
+
+---
+
+## �🐛 Reporter une vulnérabilité
 
 ### Divulgation responsable
 
@@ -757,11 +949,11 @@ Si vous découvrez une vulnérabilité de sécurité dans Puna, merci de nous la
 1. **Email :** Envoyez un email à **security@puna.io** (à créer)
 2. **Objet :** "Security Vulnerability Report - [TITRE COURT]"
 3. **Contenu :**
-   - Description détaillée de la vulnérabilité
-   - Étapes pour reproduire
-   - Impact potentiel
-   - Version affectée
-   - Preuve de concept (si applicable)
+    - Description détaillée de la vulnérabilité
+    - Étapes pour reproduire
+    - Impact potentiel
+    - Version affectée
+    - Preuve de concept (si applicable)
 
 ### Délai de réponse
 
@@ -772,6 +964,7 @@ Si vous découvrez une vulnérabilité de sécurité dans Puna, merci de nous la
 ### Reconnaissance
 
 Les chercheurs en sécurité qui signalent des vulnérabilités de manière responsable seront crédités dans :
+
 - Le fichier `SECURITY.md`
 - Les notes de version (CHANGELOG)
 - Un "Hall of Fame" (optionnel)
@@ -782,25 +975,31 @@ Les chercheurs en sécurité qui signalent des vulnérabilités de manière resp
 
 ### Développement
 
-- [ ] Toutes les entrées utilisateur sont validées
-- [ ] Aucun secret en dur dans le code
-- [ ] `.env` dans `.gitignore`
-- [ ] Permissions vérifiées sur chaque route
+- [x] Toutes les entrées utilisateur sont validées (XSS, SQL, path traversal)
+- [x] Aucun secret en dur dans le code
+- [x] `.env` dans `.gitignore`
+- [x] Permissions vérifiées sur chaque route (RBAC)
+- [x] Protection CSRF sur toutes les routes web
+- [x] Rate limiting sur login et API
+- [x] Graceful shutdown (uncaughtException/unhandledRejection)
+- [x] Messages d'erreur masqués (pas de fuite d'info)
 - [ ] Tests de régression après modifications
 
 ### Avant mise en production
 
-- [ ] Changer **tous** les secrets (KEY_TK, KEV, KIV, SESSION_SECRET)
+- [ ] Changer **tous** les secrets (KEY_TK, KEV, KIV, SESSION_SECRET, CSRF_SECRET)
 - [ ] Activer HTTPS (certificat SSL/TLS)
 - [ ] `NODE_ENV=production` dans `.env`
 - [ ] `HELMET_STRICT_TRANSPORT=true` dans `.env`
 - [ ] Configurer le reverse proxy (Nginx, Apache)
-- [ ] Rate limiting activé
-- [ ] Logs de sécurité configurés
+- [x] Rate limiting activé
+- [x] Logs de sécurité configurés (Pino structuré)
 - [ ] Backups automatiques configurés
 - [ ] Monitoring des erreurs (Sentry, etc.)
 - [ ] Tester sur securityheaders.com
 - [ ] Audit de sécurité (npm audit, Snyk)
+- [ ] Intégrer ClamAV pour scan antivirus des uploads
+- [ ] Externaliser la clé API (variable d'environnement)
 
 ### Maintenance continue
 
@@ -844,20 +1043,22 @@ curl -I https://yourdomain.com | grep -E "X-|Content-Security"
 
 ## 📝 Historique des changements
 
-| Date | Version | Changements |
-|------|---------|-------------|
-| 2025-12-13 | 1.0 | Création initiale de SECURITY.md |
-| 2025-12-13 | 1.1 | Ajout Helmet.js configuration |
+| Date       | Version | Changements                                                                                                                       |
+| ---------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 2025-12-13 | 1.0     | Création initiale de SECURITY.md                                                                                                  |
+| 2025-12-13 | 1.1     | Ajout Helmet.js configuration                                                                                                     |
+| 2026-02-09 | 2.0     | Ajout CSRF (csrf-csrf), rate limiting, path traversal renforcé, SQL injection protection, graceful shutdown, masquage err.message |
 
 ---
 
-**Dernière mise à jour :** 13 décembre 2025
+**Dernière mise à jour :** 9 février 2026
 
 **Contact sécurité :** ...
 
 ---
 
 Pour toute question sur la sécurité de Puna, consultez également :
+
 - [README.md](README.md) - Documentation générale
 - [TODO.md](TODO.md) - Roadmap des améliorations de sécurité
 - [HELMET_INTEGRATION_TODO.md](HELMET_INTEGRATION_TODO.md) - Détails Helmet.js
