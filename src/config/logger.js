@@ -137,22 +137,27 @@ const appStream = pino.destination({
 
 streams.push({ level, stream: appStream });
 
-// En développement, ajouter la console avec formatage lisible (sauf si LOG_TO_CONSOLE=false)
+// Ajouter la console avec formatage lisible si LOG_TO_CONSOLE=true (défaut: true en dev, false en prod)
 const logToConsole = process.env.LOG_TO_CONSOLE !== 'false';
-if (env === 'development' && logToConsole) {
-    streams.push({
-        level,
-        stream: pino.transport({
-            target: 'pino-pretty',
-            options: {
-                colorize: true,
-                translateTime: 'yyyy-mm-dd HH:MM:ss.l',
-                ignore: 'pid,hostname,req,res,responseTime',
-                messageFormat: '{req.url} - {msg} - {res.statusCode}',
-                singleLine: true,
-            },
-        }),
-    });
+if (logToConsole) {
+    try {
+        streams.push({
+            level,
+            stream: pino.transport({
+                target: 'pino-pretty',
+                options: {
+                    colorize: true,
+                    translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+                    ignore: 'pid,hostname,req,res,responseTime',
+                    messageFormat: '{req.url} - {msg} - {res.statusCode}',
+                    singleLine: true,
+                },
+            }),
+        });
+    } catch {
+        // pino-pretty absent (container Docker sans devDependencies) — on continue sans console
+        console.warn('[logger] pino-pretty unavailable, console stream disabled.');
+    }
 }
 
 // 2. api.log - Logs API uniquement
@@ -180,13 +185,13 @@ const auditStream = pino.destination({
 // LOGGERS
 // ============================================
 
-// Logger principal (app.log) - avec console en dev
+// Logger principal (app.log) - avec console si LOG_TO_CONSOLE=true
 export const logger = pino(
     {
         level: level,
         timestamp: pino.stdTimeFunctions.isoTime,
     },
-    env === 'development' ? pino.multistream(streams) : appStream
+    pino.multistream(streams)
 );
 
 // Logger API (api.log)
