@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import { apiLogger } from '../../../config/logger.js';
 import models from '../../../models/index.js';
@@ -5,9 +6,17 @@ import { decryptObject } from '../../../utils/crypto.js';
 
 export async function authApiKeyAccess(req, res, next) {
     try {
-        // 1) Check X-KEY-PUNA header
+        // 1) Check X-KEY-PUNA header — comparaison à temps constant (protection timing attack)
         const apiKey = req.headers['x-key-puna'];
-        if (!apiKey || apiKey !== 'puna') {
+        const expectedKey = process.env.API_KEY;
+
+        const isValidKey =
+            expectedKey &&
+            apiKey &&
+            apiKey.length === expectedKey.length &&
+            crypto.timingSafeEqual(Buffer.from(apiKey), Buffer.from(expectedKey));
+
+        if (!isValidKey) {
             return res.status(401).json({ error: 'Invalid API key' });
         }
 

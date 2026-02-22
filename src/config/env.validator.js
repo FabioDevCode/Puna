@@ -18,6 +18,7 @@ const REQUIRED_VARS = {
     KIV: 'AES initialization vector',
     SESSION_SECRET: 'Express session secret',
     CSRF_SECRET: 'CSRF protection secret key',
+    API_KEY: 'API key for X-KEY-PUNA header authentication',
 
     // Application
     PORT: 'Server port number',
@@ -157,7 +158,7 @@ function validateSecurityKeys(warnings) {
     const MIN_KEY_LENGTH = 32;
 
     // Vérifier la longueur des clés de sécurité
-    const securityKeys = ['KEY_TK', 'KEV', 'KIV', 'SESSION_SECRET', 'CSRF_SECRET'];
+    const securityKeys = ['KEY_TK', 'KEV', 'KIV', 'SESSION_SECRET', 'CSRF_SECRET', 'API_KEY'];
 
     securityKeys.forEach((key) => {
         if (process.env[key] && process.env[key].length < MIN_KEY_LENGTH) {
@@ -171,6 +172,7 @@ function validateSecurityKeys(warnings) {
         'your_secure_encryption_key_here',
         'your_secure_initialization_vector_here',
         'your_secure_session_key_here',
+        'your_secure_api_key_here',
         'your_password',
     ];
 
