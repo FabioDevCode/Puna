@@ -7,8 +7,10 @@ import { errorLogger } from '../config/logger.js';
  * Intercepte tout ce qui est passé à next(err).
  *
  * Comportement :
- * - Routes /api/* → réponse JSON
- * - Routes web    → flash message + redirect /dashboard
+ * - Routes /api/*  → réponse JSON
+ * - Routes web 5xx → render errors/500
+ * - Routes web 404 → render errors/404
+ * - Routes web 4xx → flash message + redirect /dashboard
  */
 export function errorHandler(err, req, res, _next) {
     // Si les headers sont déjà envoyés (ex: streaming), on ne peut plus rien faire
@@ -40,14 +42,20 @@ export function errorHandler(err, req, res, _next) {
     }
 
     // ── Réponse pour les routes web ─────────────────────────────────────────
-    const flashMessage =
-        statusCode >= 500 ? 'Une erreur inattendue est survenue.' : err.message || 'Une erreur est survenue.';
+    // 5xx : page d’erreur dédiée
+    if (statusCode >= 500) {
+        return res.status(statusCode).render('errors/500', { layout: false });
+    }
 
+    // 404 : page not found dédiée
+    if (statusCode === 404) {
+        return res.status(404).render('errors/404', { layout: false });
+    }
+
+    // Autres 4xx (400/401/403) : flash message + redirect
+    const flashMessage = err.message || 'Une erreur est survenue.';
     if (typeof res.flash === 'function') {
         res.flash('error', flashMessage);
     }
-
-    // Redirection contextuelle : revenir en arrière si possible, sinon dashboard
-    const fallback = '/dashboard';
-    return res.redirect(fallback);
+    return res.redirect('/dashboard');
 }

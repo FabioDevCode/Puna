@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="fantasy">
+    <head>
+        {{> layout/head}}
+        <style>
+            #error_body {
+            background-image: url('/img/sprinkle_puna.svg');
+            background-position: center;
+            background-repeat: repeat;
+            background-size: contain;
+            }
+
+            h1 {
+            font-size: 2em !important;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700 !important;
+            }
+        </style>
+    </head>
+    <body id="error_body" class="flex justify-center items-center h-screen min-h-screen w-screen min-w-screen">
+        <div class="flex flex-col text-base-100 items-center gap-8 bg-secondary p-12 rounded-2xl shadow-xl" style="width: 660px;">
+            <p class="text-8xl font-black opacity-30">500</p>
+            <h1>Erreur serveur</h1>
+            <p class="text-center opacity-80">
+                Une erreur inattendue est survenue côté serveur.<br />
+            L'équipe a été notifiée. Réessayez dans quelques instants.
+        </p>
+        <div class="flex gap-4">
+            <a href="/dashboard" class="btn btn-wide">Tableau de bord</a>
+        </div>
+    </div>
+</body>
+</html>

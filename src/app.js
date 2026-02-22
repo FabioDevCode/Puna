@@ -178,6 +178,15 @@ await initAdminUSer();
 await routes(app);
 await api(app);
 
+// Middleware 404 — aucune route ne correspond
+// Doit être placé après toutes les routes, avant les gestionnaires d'erreur
+app.use((req, res) => {
+    if (req.originalUrl.startsWith('/api/')) {
+        return res.status(404).json({ error: 'Route not found' });
+    }
+    return res.status(404).render('errors/404', { layout: false });
+});
+
 // Gestionnaire d'erreur CSRF — redirige avec un flash au lieu d'un 403 brut
 app.use((err, req, res, next) => {
     if (err.code === 'EBADCSRFTOKEN') {
