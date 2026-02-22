@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { errorLogger } from '../config/logger.js';
 import { getFileTypeInfo } from '../helpers/file.helpers.js';
 import { getInboxForDisplay, deleteInboxWithFiles, verifyFileAccessAndGetPath } from '../services/inbox.service.js';
 
@@ -65,7 +66,7 @@ export const showInbox = async (req, res) => {
             formattedDate,
         });
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, inboxId, userId }, 'showInbox error');
         res.redirect('/dashboard');
     }
 };
@@ -92,7 +93,7 @@ export const deleteInbox = async (req, res) => {
         const result = await deleteInboxWithFiles(inboxId, userId, userRole);
 
         if (!result.success) {
-            console.error(result.error);
+            errorLogger.warn({ error: result.error, inboxId, userId }, 'deleteInbox service returned error');
             res.flash('error', 'Erreur lors de la suppression.');
             return res.redirect('/dashboard');
         }
@@ -100,7 +101,7 @@ export const deleteInbox = async (req, res) => {
         res.flash('success', 'Entrée supprimée.');
         res.redirect(`/site/${siteId}/view`);
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, inboxId, userId }, 'deleteInbox error');
         res.flash('error', 'Erreur lors de la suppression.');
         res.redirect('/dashboard');
     }
@@ -127,14 +128,14 @@ export const downloadFile = async (req, res) => {
         // Send file for download
         res.download(result.filePath, originalFilename, (err) => {
             if (err) {
-                console.error('Download error:', err);
+                errorLogger.error({ err, inboxId, filename }, 'downloadFile error');
                 if (!res.headersSent) {
                     res.status(500).json({ error: 'Error downloading file' });
                 }
             }
         });
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, inboxId, filename }, 'downloadFile server error');
         return res.status(500).json({ error: 'Server error' });
     }
 };

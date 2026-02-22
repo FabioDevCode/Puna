@@ -22,6 +22,7 @@ import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
 import { csrfProtection, csrfTokenInjector } from './middlewares/csrf.js';
+import { errorHandler } from './middlewares/errorHandler.middleware.js';
 import flashMessages from './middlewares/flashMessages.js';
 import { injectUserRole } from './middlewares/injectUserRole.js';
 import sanitizeAll from './middlewares/sanitize.js';
@@ -188,5 +189,9 @@ app.use((err, req, res, next) => {
     }
     next(err);
 });
+
+// Gestionnaire d'erreurs global — doit être le dernier middleware
+// Intercepte tout next(err) non géré en amont
+app.use(errorHandler);
 
 export default app;

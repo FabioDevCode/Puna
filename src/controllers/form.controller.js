@@ -1,3 +1,4 @@
+import { errorLogger } from '../config/logger.js';
 import {
     createForm as createFormService,
     deleteForm as deleteFormService,
@@ -132,7 +133,7 @@ export const getFormInbox = async (req, res) => {
 
         return res.json(data);
     } catch (err) {
-        console.error('getFormInbox error:', err);
+        errorLogger.error({ err, formId, userId: req.session?.user?.id }, 'getFormInbox error');
         return res.status(500).json({ error: 'Server error' });
     }
 };
@@ -171,7 +172,7 @@ export const updateFormColumns = async (req, res) => {
 
         return res.json({ success: true, columns: cols });
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, formId, userId: req.session?.user?.id }, 'updateFormColumns error');
         return res.status(500).json({ error: 'Server error' });
     }
 };

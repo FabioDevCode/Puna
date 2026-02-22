@@ -1,3 +1,4 @@
+import { errorLogger } from '../config/logger.js';
 import {
     getSitesWithCounts,
     getGlobalStatsFromSites,
@@ -45,7 +46,7 @@ export const getTopFroms = async (req, res) => {
         const items = await getTopForms(userId, days);
         return res.json({ days, items });
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'getTopFroms error');
         return res.status(500).json({ error: 'Server error' });
     }
 };
@@ -61,7 +62,7 @@ export const getTopSiteForms = async (req, res) => {
         const result = await getTopSiteWithForms(userId, days);
         return res.json(result);
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'getTopSiteForms error');
         return res.status(500).json({ error: 'Server error' });
     }
 };
@@ -78,7 +79,7 @@ export const getInboxCounts = async (req, res) => {
         const result = await getInboxCountsByDay(userId, days);
         return res.json({ ...result, days });
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxCounts error');
         return res.status(500).json({ error: 'Server error' });
     }
 };
@@ -94,7 +95,7 @@ export const getInboxPercentages = async (req, res) => {
         const result = await getInboxPercentagesDetailed(userId, userRole);
         return res.json(result);
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxPercentages error');
         return res.status(500).json({ error: 'Server error' });
     }
 };
@@ -109,7 +110,7 @@ export const getInboxCountsBySite = async (req, res) => {
         const result = await getInboxCountsBySiteService(userId);
         return res.json(result);
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxCountsBySite error');
         return res.status(500).json({ error: 'Server error' });
     }
 };
@@ -127,7 +128,7 @@ export const getInboxHeatmap = async (req, res) => {
         const result = await getInboxHeatmapService(userId, userRole, days);
         return res.json(result);
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxHeatmap error');
         return res.status(500).json({ error: 'Server error' });
     }
 };

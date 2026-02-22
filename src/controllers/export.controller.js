@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { errorLogger } from '../config/logger.js';
 import {
     getInboxWithFiles,
     createZipArchive,
@@ -42,7 +43,7 @@ export const downloadInboxZip = async (req, res) => {
 
         // Gérer les erreurs de l'archive
         archive.on('error', (err) => {
-            console.error('Archive error:', err);
+            errorLogger.error({ err, inboxId, userId }, 'downloadInboxZip archive error');
             if (!res.headersSent) {
                 res.status(500).json({ error: 'Error creating archive' });
             }
@@ -52,7 +53,7 @@ export const downloadInboxZip = async (req, res) => {
         archive.pipe(res);
         await archive.finalize();
     } catch (err) {
-        console.error('downloadInboxZip error:', err);
+        errorLogger.error({ err, inboxId, userId }, 'downloadInboxZip error');
         if (!res.headersSent) {
             return res.status(500).json({ error: 'Server error' });
         }
@@ -120,7 +121,7 @@ export const exportFormToExcel = async (req, res) => {
         await workbook.xlsx.write(res);
         res.end();
     } catch (err) {
-        console.error('exportFormToExcel error:', err);
+        errorLogger.error({ err, formId, userId }, 'exportFormToExcel error');
         if (!res.headersSent) {
             return res.status(500).json({ error: 'Server error' });
         }
@@ -191,7 +192,7 @@ export const exportFormToCSV = async (req, res) => {
         res.write(csvData);
         res.end();
     } catch (err) {
-        console.error('exportFormToCSV error:', err);
+        errorLogger.error({ err, formId, userId }, 'exportFormToCSV error');
         if (!res.headersSent) {
             return res.status(500).json({ error: 'Server error' });
         }
@@ -231,7 +232,7 @@ export const exportAllSubmissionsToCSV = async (req, res) => {
         res.write(csvData);
         res.end();
     } catch (err) {
-        console.error('exportAllSubmissionsToCSV error:', err);
+        errorLogger.error({ err, userId }, 'exportAllSubmissionsToCSV error');
         if (!res.headersSent) {
             return res.status(500).json({ error: 'Server error' });
         }

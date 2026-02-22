@@ -1,5 +1,5 @@
 import passport from 'passport';
-import { auditLogger } from '../config/logger.js';
+import { auditLogger, errorLogger } from '../config/logger.js';
 import { findUserByLogin, activateUserAccount } from '../services/auth.service.js';
 import { updateLastConnection } from '../services/user.service.js';
 
@@ -85,7 +85,7 @@ export const dpConnect = (req, res) => {
             // Mettre à jour last_connection via le service
             await updateLastConnection(user.id);
         } catch (e) {
-            console.error('Failed to update last_connection for user', user && user.id, e);
+            errorLogger.error({ err: e, userId: user?.id }, 'Failed to update last_connection');
         }
 
         // Log de la connexion réussie

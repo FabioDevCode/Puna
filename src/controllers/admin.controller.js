@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dayjs from 'dayjs';
 import * as tar from 'tar';
-import { logger } from '../config/logger.js';
+import { logger, errorLogger } from '../config/logger.js';
 import models from '../models/index.js';
 import { verifyPassword } from '../services/auth.service.js';
 import { getAvailableSites } from '../services/site.service.js';
@@ -117,7 +117,7 @@ export const admin = async (req, res) => {
             }
             activityStats.connectedUsers = connectedUserIds.size;
         } catch (err) {
-            console.error('Error counting connected users:', err);
+            errorLogger.error({ err, userId: req.session?.user?.id }, 'Error counting connected users');
             activityStats.connectedUsers = 0;
         }
 
@@ -223,7 +223,7 @@ export const admin = async (req, res) => {
             activityStats,
         });
     } catch (err) {
-        console.error('admin error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'admin error');
         res.redirect('/dashboard');
     }
 };
@@ -244,7 +244,7 @@ export const adminUsers = async (req, res) => {
             sites,
         });
     } catch (err) {
-        console.error('adminUsers error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUsers error');
         res.redirect('/admin');
     }
 };
@@ -286,7 +286,7 @@ export const adminUsersList = async (req, res) => {
             offset,
         });
     } catch (err) {
-        console.error('adminUsersList error:', err);
+        errorLogger.error({ err }, 'adminUsersList error');
         res.status(500).json({ error: 'Erreur serveur' });
     }
 };
@@ -343,7 +343,7 @@ export const adminUsersExportExcel = async (req, res) => {
         await workbook.xlsx.write(res);
         res.end();
     } catch (err) {
-        console.error('adminUsersExportExcel error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUsersExportExcel error');
         res.status(500).json({ error: "Erreur lors de l'export" });
     }
 };
@@ -375,7 +375,7 @@ export const adminUsersExportCSV = async (req, res) => {
         res.write(csvData);
         res.end();
     } catch (err) {
-        console.error('adminUsersExportCSV error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUsersExportCSV error');
         res.status(500).json({ error: "Erreur lors de l'export" });
     }
 };
@@ -419,7 +419,7 @@ export const adminCreateUser = async (req, res) => {
         res.flash('success', 'Utilisateur créé avec succès.');
         res.redirect('/admin/users');
     } catch (err) {
-        console.error('adminCreateUser error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminCreateUser error');
         res.flash('error', "Erreur lors de la création de l'utilisateur.");
         res.redirect('/admin/users');
     }
@@ -458,7 +458,7 @@ export const adminDeleteUser = async (req, res) => {
         res.flash('success', 'Utilisateur supprimé.');
         res.redirect('/admin/users');
     } catch (err) {
-        console.error('adminDeleteUser error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminDeleteUser error');
         res.flash('error', "Erreur lors de la suppression de l'utilisateur.");
         res.redirect('/admin/users');
     }
@@ -487,7 +487,7 @@ export const adminViewUser = async (req, res) => {
             user,
         });
     } catch (err) {
-        console.error('adminViewUser error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminViewUser error');
         res.redirect('/admin/users');
     }
 };
@@ -528,7 +528,7 @@ export const adminEditUser = async (req, res) => {
             sites: sitesWithAssignment,
         });
     } catch (err) {
-        console.error('adminEditUser error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminEditUser error');
         res.redirect('/admin/users');
     }
 };
@@ -569,7 +569,7 @@ export const adminUpdateUser = async (req, res) => {
         res.flash('success', 'Utilisateur mis à jour.');
         res.redirect('/admin/users');
     } catch (err) {
-        console.error('adminUpdateUser error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUpdateUser error');
         res.flash('error', "Erreur lors de la mise à jour de l'utilisateur.");
         res.redirect(`/admin/users/${req.params.id}/edit`);
     }
@@ -584,7 +584,7 @@ export const adminSettings = async (req, res) => {
             layout: 'admin',
         });
     } catch (err) {
-        console.error('adminSettings error:', err);
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminSettings error');
         res.redirect('/admin');
     }
 };
