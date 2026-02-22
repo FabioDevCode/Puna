@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
+import { logger, errorLogger } from '../config/logger.js';
 import models from '../models/index.js';
 import { encryptObject } from '../utils/crypto.js';
 import stringUtils from '../utils/string.js';
@@ -406,9 +407,9 @@ export async function deleteSiteWithForms(siteId, userId, userRole, confirmDomai
         const siteUploadPath = path.join(uploadsDir, site.domain);
         try {
             await fs.rm(siteUploadPath, { recursive: true, force: true });
-            console.log(`Dossier supprimé: ${siteUploadPath}`);
+            logger.info({ path: siteUploadPath }, 'Dossier site supprimé');
         } catch (err) {
-            console.error(`Erreur lors de la suppression du dossier ${siteUploadPath}:`, err);
+            errorLogger.error({ err, path: siteUploadPath }, 'Erreur suppression dossier site');
         }
 
         // Supprimer tous les formulaires associés
@@ -419,7 +420,7 @@ export async function deleteSiteWithForms(siteId, userId, userRole, confirmDomai
 
         return { success: true };
     } catch (err) {
-        console.error('Erreur lors de la suppression du site:', err);
+        errorLogger.error({ err, siteId }, 'Erreur suppression site');
         return { success: false, error: 'Erreur serveur lors de la suppression' };
     }
 }
@@ -459,7 +460,7 @@ export async function generateSiteToken(siteId, userId, userRole) {
 
         return { success: true, token };
     } catch (err) {
-        console.error('Erreur lors de la génération du token:', err);
+        errorLogger.error({ err, siteId }, 'Erreur génération token');
         return { success: false, error: 'Erreur serveur lors de la génération du token' };
     }
 }
@@ -488,7 +489,7 @@ export async function revokeSiteTokens(siteId, userId, userRole) {
 
         return { success: true, control_code: newControlCode };
     } catch (err) {
-        console.error('Erreur lors de la révocation des tokens:', err);
+        errorLogger.error({ err, siteId }, 'Erreur révocation tokens');
         return { success: false, error: 'Erreur serveur lors de la révocation des tokens' };
     }
 }

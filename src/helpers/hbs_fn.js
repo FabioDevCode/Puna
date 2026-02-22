@@ -21,8 +21,11 @@ export default {
         typeof str === 'string' ? str.toLowerCase() : '';
     },
 
+    // Helper Handlebars debug — log dans la console (développement uniquement)
     log: (context) => {
-        console.log(context);
+        if (process.env.NODE_ENV !== 'production') {
+            console.log('[HBS_DEBUG]', context);
+        }
         return;
     },
 

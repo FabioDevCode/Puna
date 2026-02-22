@@ -1,3 +1,4 @@
+import { errorLogger } from '../../../config/logger.js';
 import models from '../../../models/index.js';
 
 export async function updateFormFileKeys(req, res, next) {
@@ -92,13 +93,13 @@ export async function updateFormFileKeys(req, res, next) {
             }
         } catch (e) {
             // do not block on best-effort injection
-            console.error('updateFormFileKeys inject error:', e);
+            errorLogger.error({ err: e }, 'updateFormFileKeys inject error');
         }
 
         return next();
     } catch (err) {
         // Do not block the request on bookkeeping errors
-        console.error('updateFormFileKeys error:', err);
+        errorLogger.error({ err }, 'updateFormFileKeys error');
         return next();
     }
 }

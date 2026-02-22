@@ -1,3 +1,4 @@
+import { errorLogger } from '../config/logger.js';
 import models from '../models/index.js';
 
 export const initAdminUSer = async () => {
@@ -14,6 +15,6 @@ export const initAdminUSer = async () => {
             });
         }
     } catch (err) {
-        console.error(err);
+        errorLogger.error({ err }, 'initAdminUser error');
     }
 };

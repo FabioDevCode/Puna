@@ -13,6 +13,7 @@
  * ================================================================
  */
 
+import { auditLogger } from '../config/logger.js';
 import { can, hasRole } from '../config/permissions.js';
 
 /**
@@ -33,24 +34,30 @@ export function actionAccess(entity, action) {
         // Vérifier que l'utilisateur est connecté
         const user = req.session?.user;
         if (!user) {
-            console.warn('[actionAccess] No user in session');
+            auditLogger.warn({ path: req.path, method: req.method }, 'actionAccess: no user in session');
             return res.redirect('/dp-login');
         }
 
         const userRole = user.role;
         if (!userRole) {
-            console.warn(`[actionAccess] User ${user.id} has no role`);
+            auditLogger.warn({ userId: user.id }, 'actionAccess: user has no role');
             return res.redirect('/dp-login');
         }
 
         // Vérifier la permission
         if (!can(userRole, entity, action)) {
-            console.warn(`[actionAccess] Permission denied: ${userRole} cannot ${action} ${entity}`, {
-                userId: user.id,
-                userLogin: user.login,
-                path: req.path,
-                method: req.method,
-            });
+            auditLogger.warn(
+                {
+                    userId: user.id,
+                    userLogin: user.login,
+                    userRole,
+                    entity,
+                    action,
+                    path: req.path,
+                    method: req.method,
+                },
+                'actionAccess: permission denied'
+            );
 
             // Retourner 403 Forbidden
             return res.status(403).render('pages/errors/403', {
@@ -84,24 +91,29 @@ export function roleAccess(allowedRoles) {
         // Vérifier que l'utilisateur est connecté
         const user = req.session?.user;
         if (!user) {
-            console.warn('[roleAccess] No user in session');
+            auditLogger.warn({ path: req.path, method: req.method }, 'roleAccess: no user in session');
             return res.redirect('/dp-login');
         }
 
         const userRole = user.role;
         if (!userRole) {
-            console.warn(`[roleAccess] User ${user.id} has no role`);
+            auditLogger.warn({ userId: user.id }, 'roleAccess: user has no role');
             return res.redirect('/dp-login');
         }
 
         // Vérifier que le rôle est dans la liste autorisée
         if (!hasRole(userRole, allowedRoles)) {
-            console.warn(`[roleAccess] Role not allowed: ${userRole} not in [${allowedRoles.join(', ')}]`, {
-                userId: user.id,
-                userLogin: user.login,
-                path: req.path,
-                method: req.method,
-            });
+            auditLogger.warn(
+                {
+                    userId: user.id,
+                    userLogin: user.login,
+                    userRole,
+                    allowedRoles,
+                    path: req.path,
+                    method: req.method,
+                },
+                'roleAccess: role not allowed'
+            );
 
             // Retourner 403 Forbidden
             return res.status(403).render('pages/errors/403', {
@@ -208,8 +220,8 @@ export function logAccess(resourceType = null) {
             logData.resourceType = resourceType;
         }
 
-        // Log en format structuré (JSON) pour faciliter l'analyse
-        console.log('[ACCESS_LOG]', JSON.stringify(logData));
+        // Log en format structuré via auditLogger
+        auditLogger.info(logData, 'access_log');
 
         // TODO: Stocker en BDD pour audit trail permanent
         // await models.AccessLog.create(logData);

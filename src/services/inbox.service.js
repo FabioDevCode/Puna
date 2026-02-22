@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
+import { errorLogger, auditLogger } from '../config/logger.js';
 import models from '../models/index.js';
 import { getSiteWhereCondition } from './access.service.js';
 
@@ -494,7 +495,7 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
 
                     // Vérifier path traversal
                     if (!resolvedPath.startsWith(resolvedUploadDir)) {
-                        console.error(`Path traversal attempt detected: ${filename}`);
+                        auditLogger.warn({ filename }, 'Path traversal attempt detected');
                         continue;
                     }
 
@@ -503,7 +504,7 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
                             fs.unlinkSync(filePath);
                         }
                     } catch (err) {
-                        console.error(`Erreur lors de la suppression du fichier ${filename}:`, err.message);
+                        errorLogger.error({ err, filename }, 'Erreur suppression fichier inbox');
                     }
                 }
             }
@@ -514,7 +515,7 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
 
         return { success: true, message: 'Soumission et fichiers supprimés avec succès' };
     } catch (err) {
-        console.error('Erreur lors de la suppression de la soumission:', err);
+        errorLogger.error({ err }, 'Erreur suppression soumission inbox');
         return { success: false, error: 'Erreur serveur lors de la suppression' };
     }
 }
@@ -619,7 +620,7 @@ export async function verifyFileAccessAndGetPath(inboxId, filename, userId, user
 
         return { success: true, filePath };
     } catch (err) {
-        console.error('Erreur lors de la vérification du fichier:', err);
+        errorLogger.error({ err, inboxId, filename }, 'Erreur vérification fichier inbox');
         return { success: false, error: 'Erreur serveur lors de la vérification du fichier' };
     }
 }

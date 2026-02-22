@@ -1,4 +1,5 @@
 import path from 'path';
+import { errorLogger } from '../../../config/logger.js';
 import { finalPathFor, sanitizeFileName, moveFile, removeFile } from '../../../helpers/upload_utils.js';
 
 export default async function moveFilesToUploads(req, res, next) {
@@ -29,17 +30,17 @@ export default async function moveFilesToUploads(req, res, next) {
             try {
                 await removeFile(f.path);
             } catch (e) {
-                console.error(e);
+                errorLogger.error({ err: e }, 'moveFilesToUploads cleanup tmp error');
             }
             if (f && f.finalPath) {
                 try {
                     await removeFile(f.finalPath);
                 } catch (e) {
-                    console.error(e);
+                    errorLogger.error({ err: e }, 'moveFilesToUploads cleanup final error');
                 }
             }
         }
-        console.error('moveFilesToUploads error:', err);
+        errorLogger.error({ err }, 'moveFilesToUploads error');
         return res.status(500).json({ success: false, error: 'file move error' });
     }
 }

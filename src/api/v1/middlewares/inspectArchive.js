@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import StreamZip from 'node-stream-zip';
+import { errorLogger } from '../../../config/logger.js';
 
 const EXECUTABLE_EXTS = ['.exe', '.dll', '.scr', '.bat', '.com', '.cmd', '.js', '.sh'];
 
@@ -103,7 +104,7 @@ export default async function inspectArchive(req, res, next) {
                             if (lower.endsWith(ex)) {
                                 await zip.close();
                                 await fs.unlink(f.path).catch((e) => {
-                                    console.error(e);
+                                    errorLogger.error({ err: e, path: f.path }, 'Failed to cleanup archive file');
                                 });
                                 return res
                                     .status(400)
@@ -129,11 +130,11 @@ export default async function inspectArchive(req, res, next) {
                     try {
                         await zip.close();
                     } catch (e) {
-                        console.error(e);
+                        errorLogger.error({ err: e }, 'Failed to close zip stream');
                     }
                     // if zip cannot be read safely, reject
                     await fs.unlink(f.path).catch((e) => {
-                        console.error(e);
+                        errorLogger.error({ err: e, path: f.path }, 'Failed to cleanup archive file');
                     });
                     return res.status(400).json({ error: 'Archive could not be inspected and is rejected' });
                 }
@@ -147,7 +148,7 @@ export default async function inspectArchive(req, res, next) {
             try {
                 await fs.unlink(toDel.path);
             } catch (e) {
-                console.error(e);
+                errorLogger.error({ err: e, path: toDel.path }, 'Failed to cleanup archive file');
             }
         }
         return res.status(500).json({ error: 'Archive inspection failed' });

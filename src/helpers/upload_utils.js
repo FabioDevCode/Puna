@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { errorLogger } from '../config/logger.js';
 
 export function ensureDir(dir) {
     return fs.mkdir(dir, { recursive: true });
@@ -27,6 +28,6 @@ export async function removeFile(p) {
     try {
         await fs.unlink(p);
     } catch (e) {
-        console.error(e);
+        errorLogger.error({ err: e, path: p }, 'removeFile error');
     }
 }

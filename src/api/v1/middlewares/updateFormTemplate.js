@@ -1,3 +1,4 @@
+import { errorLogger } from '../../../config/logger.js';
 import models from '../../../models/index.js';
 
 export async function updateFormTemplate(req, res, next) {
@@ -95,7 +96,7 @@ export async function updateFormTemplate(req, res, next) {
         return next();
     } catch (err) {
         // don't block the API on template bookkeeping - log and continue
-        console.error('updateFormTemplate error:', err);
+        errorLogger.error({ err }, 'updateFormTemplate error');
         return next();
     }
 }

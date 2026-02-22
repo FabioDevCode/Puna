@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileTypeFromFile } from 'file-type';
+import { errorLogger } from '../../../config/logger.js';
 
 const ALLOWED = (process.env.ALLOWED_EXTENSIONS || '.png,.jpg,.jpeg,.webp,.pdf,.doc,.docx,.odt,.txt,.xls,.xlsx,.csv')
     .split(',')
@@ -106,7 +107,7 @@ export default async function validateUpload(req, res, next) {
                     try {
                         await fs.unlink(toDel.path);
                     } catch (e) {
-                        console.error(e);
+                        errorLogger.error({ err: e, path: toDel.path }, 'Failed to cleanup uploaded file');
                     }
                 }
                 return res.status(400).json({ error: 'One file per field allowed' });
@@ -115,7 +116,7 @@ export default async function validateUpload(req, res, next) {
             const nameExt = extFromName(f.originalname);
             if (!ALLOWED.includes(nameExt)) {
                 await fs.unlink(f.path).catch((e) => {
-                    console.error(e);
+                    errorLogger.error({ err: e, path: f.path }, 'Failed to cleanup uploaded file');
                 });
                 return res.status(400).json({ error: `Extension not allowed: ${nameExt}` });
             }
@@ -127,7 +128,7 @@ export default async function validateUpload(req, res, next) {
                 // detected type must match declared extension
                 if (detectedExt !== nameExt) {
                     await fs.unlink(f.path).catch((e) => {
-                        console.error(e);
+                        errorLogger.error({ err: e, path: f.path }, 'Failed to cleanup uploaded file');
                     });
                     return res.status(400).json({ error: `File content does not match extension for ${f.fieldname}` });
                 }
@@ -152,14 +153,14 @@ export default async function validateUpload(req, res, next) {
                 } else {
                     // Unknown/undetectable content for this extension -> reject
                     await fs.unlink(f.path).catch((e) => {
-                        console.error(e);
+                        errorLogger.error({ err: e, path: f.path }, 'Failed to cleanup uploaded file');
                     });
                     return res.status(400).json({ error: `Unable to verify file content for ${f.fieldname}` });
                 }
 
                 if (!headerValid) {
                     await fs.unlink(f.path).catch((e) => {
-                        console.error(e);
+                        errorLogger.error({ err: e, path: f.path }, 'Failed to cleanup uploaded file');
                     });
                     return res.status(400).json({ error: `File content does not match extension for ${f.fieldname}` });
                 }
@@ -174,7 +175,7 @@ export default async function validateUpload(req, res, next) {
             try {
                 await fs.unlink(toDel.path);
             } catch (e) {
-                console.error(e);
+                errorLogger.error({ err: e, path: toDel.path }, 'Failed to cleanup uploaded file');
             }
         }
         return res.status(500).json({ error: 'Upload validation failed' });

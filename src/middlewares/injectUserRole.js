@@ -12,6 +12,7 @@
  * Date: 2 décembre 2025
  * ================================================================
  */
+import { logger } from '../config/logger.js';
 
 /**
  * Middleware pour injecter les informations utilisateur dans req et res.locals
@@ -130,11 +131,7 @@ export function getUser(req) {
  */
 export function requireAuth(req, res, next) {
     if (!req.session || !req.session.user) {
-        console.warn('[requireAuth] User not authenticated', {
-            path: req.path,
-            method: req.method,
-            ip: req.ip,
-        });
+        logger.warn({ path: req.path, method: req.method, ip: req.ip }, 'requireAuth: user not authenticated');
         return res.redirect('/dp-login');
     }
 

@@ -17,7 +17,7 @@ import api from './api/index.js';
 import { corsApiPublic } from './config/cors.config.js';
 import database from './config/database.js';
 import { helmetMiddleware } from './config/helmet.config.js';
-import { logger, apiLogger } from './config/logger.js';
+import { logger, apiLogger, errorLogger } from './config/logger.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
@@ -104,10 +104,10 @@ consoleStamp(console, {
 await models.sequelize
     .sync()
     .then(() => {
-        console.log('Database & tables updated !');
+        logger.info('Database & tables updated');
     })
     .catch((err) => {
-        console.error('Error sync database:', err);
+        errorLogger.error({ err }, 'Error sync database');
     });
 
 app.disable('x-powered-by');

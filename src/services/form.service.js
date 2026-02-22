@@ -7,6 +7,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Op } from 'sequelize';
+import { logger, errorLogger } from '../config/logger.js';
 import models from '../models/index.js';
 import stringUtils from '../utils/string.js';
 import { getSiteWhereCondition } from './access.service.js';
@@ -195,9 +196,9 @@ export async function deleteForm(formId) {
 
         try {
             await fs.rm(formUploadPath, { recursive: true, force: true });
-            console.log(`Dossier supprimé: ${formUploadPath}`);
+            logger.info({ path: formUploadPath }, 'Dossier formulaire supprimé');
         } catch (err) {
-            console.error(`Erreur lors de la suppression du dossier ${formUploadPath}:`, err);
+            errorLogger.error({ err, path: formUploadPath }, 'Erreur suppression dossier formulaire');
         }
     }
 

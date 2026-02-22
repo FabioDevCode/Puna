@@ -1,4 +1,5 @@
 import rateLimit from 'express-rate-limit';
+import { apiLogger } from '../../../config/logger.js';
 
 // Configuration depuis les variables d'environnement
 const RATE_LIMIT_FORM_MAX = parseInt(process.env.RATE_LIMIT_FORM_MAX, 10) || 30;
@@ -35,8 +36,9 @@ export const formRateLimiter = rateLimit({
     skipFailedRequests: false,
     handler: (req, res, next, options) => {
         // Log pour monitoring
-        console.warn(
-            `[RATE_LIMIT] Formulaire ${req.params.code} - Limite atteinte (${RATE_LIMIT_FORM_MAX}/${RATE_LIMIT_FORM_WINDOW_MS}ms)`
+        apiLogger.warn(
+            { formCode: req.params.code, max: RATE_LIMIT_FORM_MAX, windowMs: RATE_LIMIT_FORM_WINDOW_MS },
+            'Rate limit atteint'
         );
 
         res.status(429).json(options.message);

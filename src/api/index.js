@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { logger, errorLogger } from '../config/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,10 +35,10 @@ export default async (app) => {
                 if (apiRouter) {
                     app.use(routePath, apiRouter);
                 } else {
-                    console.error(`Error: This API file ${file} does not export a router.`);
+                    logger.warn({ file }, 'API file does not export a router');
                 }
             } catch (err) {
-                console.error(`Error loading API from ${file}: ${err.message}`);
+                errorLogger.error({ err, file }, 'Error loading API file');
             }
         }
     }
