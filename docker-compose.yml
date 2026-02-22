@@ -1,0 +1,85 @@
+# docker-compose.yml
+# Démarrage : docker compose up -d
+# Arrêt     : docker compose down
+# Logs app  : docker compose logs -f app
+# Rebuild   : docker compose up -d --build
+
+services:
+    # ─────────────────────────────────────────
+    # Application Node.js — Puna
+    # ─────────────────────────────────────────
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: puna_app
+        restart: unless-stopped
+
+        # Variables d'environnement chargées depuis .env
+        # ⚠️  Sur le serveur, s'assurer que DB_IP=db (nom du service ci-dessous)
+        env_file:
+            - .env
+
+        ports:
+            # Exposé uniquement sur localhost du VPS → Caddy s'en charge
+            - '127.0.0.1:3022:3022'
+
+        volumes:
+            # Persistance des fichiers uploadés
+            - ./storage:/app/storage
+            # Persistance des logs applicatifs
+            - ./logs:/app/logs
+
+        depends_on:
+            db:
+                condition: service_healthy
+
+        networks:
+            - puna_net
+
+    # ─────────────────────────────────────────
+    # Base de données — MariaDB
+    # ─────────────────────────────────────────
+    db:
+        image: mariadb:11
+        container_name: puna_db
+        restart: unless-stopped
+
+        environment:
+            MARIADB_ROOT_PASSWORD: ${DB_PWD}
+            MARIADB_DATABASE: ${DB_NAME}
+            MARIADB_USER: ${DB_USER}
+            MARIADB_PASSWORD: ${DB_PWD}
+
+        volumes:
+            # Volume nommé Docker : données MariaDB persistantes
+            - puna_db_data:/var/lib/mysql
+
+        # MariaDB N'est PAS exposé à l'extérieur du VPS
+        # L'app y accède via le réseau Docker interne (host: db, port: 3306)
+        expose:
+            - '3306'
+
+        healthcheck:
+            test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 60s
+
+        networks:
+            - puna_net
+
+# ─────────────────────────────────────────
+# Volumes nommés
+# ─────────────────────────────────────────
+volumes:
+    puna_db_data:
+        driver: local
+
+# ─────────────────────────────────────────
+# Réseau interne isolé
+# ─────────────────────────────────────────
+networks:
+    puna_net:
+        driver: bridge
