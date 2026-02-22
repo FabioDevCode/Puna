@@ -2,6 +2,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import consoleStamp from 'console-stamp';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone.js';
 import utc from 'dayjs/plugin/utc.js';
@@ -13,6 +14,7 @@ import i18n from 'i18n';
 import passport from 'passport';
 import pinoHttp from 'pino-http';
 import api from './api/index.js';
+import { corsApiPublic } from './config/cors.config.js';
 import database from './config/database.js';
 import { helmetMiddleware } from './config/helmet.config.js';
 import { logger, apiLogger } from './config/logger.js';
@@ -37,6 +39,10 @@ const app = express();
 // Sécurité: HTTP headers avec Helmet.js
 // Doit être appliqué en premier, avant tous les autres middlewares
 app.use(helmetMiddleware);
+
+// CORS — uniquement pour les routes API publiques (/api/*)
+// Les routes web n'ont pas de CORS (same-origin, protégées par sessions + CSRF)
+app.use('/api', cors(corsApiPublic));
 
 // Trust proxy si derrière un reverse proxy (Nginx, Apache, etc.)
 app.set('trust proxy', 1);
