@@ -1,5 +1,6 @@
 import http from 'node:http';
 import app from './src/app.js';
+import { registerCronJobs } from './src/config/cron.js';
 import { validateEnv } from './src/config/env.validator.js';
 import { logger } from './src/config/logger.js';
 import models from './src/models/index.js';
@@ -11,7 +12,8 @@ const PORT = process.env.PORT || 3022;
 const server = http.createServer(app);
 
 server.listen(PORT, () => {
-    console.log(`Puna started on : ${PORT} `);
+    logger.info({ port: PORT }, `Puna started on port ${PORT}`);
+    registerCronJobs();
 });
 
 /**
