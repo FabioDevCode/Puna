@@ -1,0 +1,31 @@
+# Dépendances — seront installées dans l'image via npm ci
+node_modules/
+
+# Fichiers d'environnement — ne jamais inclure dans l'image
+.env
+.env.*
+!.env.example
+
+# Données runtime — montées via volumes Docker
+storage/
+logs/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Dev tools & CI
+.git/
+.gitignore
+.husky/
+.eslintrc*
+.prettierrc*
+eslint.config.*
+prettier.config.*
+
+# Documentation
+*.md
+
+# Bruno (tests API locaux uniquement)
+Puna/

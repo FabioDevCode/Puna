@@ -1,7 +1,7 @@
+.project_docs
 .vscode
 .env
 .DS_Store
-.dockerignore
 node_modules
 node_modules/*
 package-lock.json
