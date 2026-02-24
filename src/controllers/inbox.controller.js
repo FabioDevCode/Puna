@@ -99,7 +99,7 @@ export const deleteInbox = async (req, res) => {
         }
 
         res.flash('success', 'Entrée supprimée.');
-        res.redirect(`/site/${siteId}/view`);
+        res.redirect(`/site/${siteId}/view?f=${data.form.name}`);
     } catch (err) {
         errorLogger.error({ err, inboxId, userId }, 'deleteInbox error');
         res.flash('error', 'Erreur lors de la suppression.');

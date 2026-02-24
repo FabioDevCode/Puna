@@ -28,7 +28,7 @@ export const createForm = async (req, res) => {
         await createFormService({ name, fk_id_site });
 
         res.flash('success', 'Formulaire créé avec succès.');
-        return res.redirect(`/site/${fk_id_site}/view`);
+        return res.redirect(`/site/${fk_id_site}/view?f=${name}`);
     } catch (err) {
         res.flash('error', 'Erreur lors de la création du formulaire.');
         return res.redirect('/dashboard');
