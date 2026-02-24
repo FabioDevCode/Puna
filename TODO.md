@@ -197,7 +197,7 @@ main (protégée — PR only)
 | 8   | **Reset mot de passe**            | ⬜     | Avec `nodemailer` (déjà dans les deps)                                     |
 | 9   | **Splitter admin.controller.js**  | ⬜     | 3 sous-controllers : admin, adminUsers, adminLogs (voir plan ci-dessous)   |
 | 10  | **ESLint 9 flat config**          | ⬜     | Migrer `.eslintrc` → `eslint.config.js` (voir plan ci-dessous)             |
-| 11  | **Migrer CryptoJS → node:crypto** | ⬜     | Remplacer la dépendance externe par le module natif (voir plan ci-dessous) |
+| 11  | **Migrer CryptoJS → node:crypto** | ✅     | Remplacer la dépendance externe par le module natif (voir plan ci-dessous) |
 | 12  | **Version 1.0.0-beta.1**          | ⬜     | Changer `0.0.1` dans package.json                                          |
 
 ### Détail #9 — Plan de découpage admin.controller.js (839 lignes → 3 fichiers)

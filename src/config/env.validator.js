@@ -149,6 +149,18 @@ function validateFormats(errors, _warnings) {
             errors.push('  ❌ HELMET_STRICT_TRANSPORT must be "true" or "false"');
         }
     }
+
+    // KEV doit être une chaîne hex de 64 caractères (32 bytes pour AES-256)
+    const kev = process.env.KEV;
+    if (kev && (!/^[0-9a-f]+$/i.test(kev) || kev.length !== 64)) {
+        errors.push('  ❌ KEV must be a 64-char hex string (32 bytes for AES-256)');
+    }
+
+    // KIV doit être une chaîne hex de 32 caractères (16 bytes pour AES IV)
+    const kiv = process.env.KIV;
+    if (kiv && (!/^[0-9a-f]+$/i.test(kiv) || kiv.length !== 32)) {
+        errors.push('  ❌ KIV must be a 32-char hex string (16 bytes for AES IV)');
+    }
 }
 
 /**
@@ -157,8 +169,8 @@ function validateFormats(errors, _warnings) {
 function validateSecurityKeys(warnings) {
     const MIN_KEY_LENGTH = 32;
 
-    // Vérifier la longueur des clés de sécurité
-    const securityKeys = ['KEY_TK', 'KEV', 'KIV', 'SESSION_SECRET', 'CSRF_SECRET', 'API_KEY'];
+    // Vérifier la longueur des clés de sécurité (KEV et KIV sont validés par format hex dans validateFormats)
+    const securityKeys = ['KEY_TK', 'SESSION_SECRET', 'CSRF_SECRET'];
 
     securityKeys.forEach((key) => {
         if (process.env[key] && process.env[key].length < MIN_KEY_LENGTH) {
