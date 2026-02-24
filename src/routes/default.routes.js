@@ -1,5 +1,5 @@
 import express from 'express';
-import * as adminCtl from '../controllers/admin.controller.js';
+import * as adminCtl from '../controllers/admin/index.js';
 import * as authCtl from '../controllers/auth.controller.js';
 import * as dashboardCtl from '../controllers/dashboard.controller.js';
 import * as exportCtl from '../controllers/export.controller.js';
