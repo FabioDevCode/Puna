@@ -10,6 +10,9 @@
 	"scripts": {
 		"dev": "node --env-file=.env --watch server.js",
 		"start": "node --env-file=.env server.js",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"format": "prettier --write \"**/*.{js,json}\" && node scripts/format-hbs.js \"src/views/**/*.hbs\"",
@@ -75,6 +78,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.3",
+		"@vitest/coverage-v8": "^4.0.18",
 		"eslint": "^9.39.3",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-import-x": "^4.16.1",
@@ -87,7 +91,9 @@
 		"lint-staged": "^16.2.7",
 		"pino-pretty": "^13.1.3",
 		"prettier": "^3.7.1",
-		"prettier-plugin-handlebars": "^0.0.1"
+		"prettier-plugin-handlebars": "^0.0.1",
+		"supertest": "^7.2.2",
+		"vitest": "^4.0.18"
 	},
 	"overrides": {
 		"minimatch": "^10.2.1"
