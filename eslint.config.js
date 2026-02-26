@@ -101,6 +101,16 @@ export default [
         },
     },
 
+    // Override pour les fichiers de test (Vitest globals)
+    {
+        files: ['tests/**/*.test.js'],
+        languageOptions: {
+            globals: {
+                ...globals.vitest,
+            },
+        },
+    },
+
     // Prettier en dernier (désactive les règles de formatage conflictuelles)
     prettierConfig,
 
