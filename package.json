@@ -74,23 +74,22 @@
 		"xss": "^1.0.15"
 	},
 	"devDependencies": {
-		"eslint": "^8.57.1",
+		"@eslint/js": "^10.0.1",
+		"eslint": "^9.39.3",
 		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-import": "^2.32.0",
-		"eslint-plugin-jsonc": "^2.21.0",
-		"eslint-plugin-prettier": "^5.5.4",
+		"eslint-plugin-import-x": "^4.16.1",
+		"eslint-plugin-jsonc": "^2.21.1",
+		"eslint-plugin-prettier": "^5.5.5",
 		"glob": "^13.0.0",
+		"globals": "^17.3.0",
 		"husky": "^9.1.7",
-		"jsonc-eslint-parser": "^2.4.1",
+		"jsonc-eslint-parser": "^2.4.2",
 		"lint-staged": "^16.2.7",
 		"pino-pretty": "^13.1.3",
 		"prettier": "^3.7.1",
 		"prettier-plugin-handlebars": "^0.0.1"
 	},
 	"overrides": {
-		"minimatch": "^10.2.1",
-		"eslint-plugin-import": {
-			"minimatch": "^3.1.2"
-		}
+		"minimatch": "^10.2.1"
 	}
 }
