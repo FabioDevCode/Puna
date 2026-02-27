@@ -150,6 +150,22 @@ function validateFormats(errors, _warnings) {
         }
     }
 
+    // CLAMAV_ENABLED doit être true ou false (si défini)
+    if (process.env.CLAMAV_ENABLED) {
+        const clamEnabled = process.env.CLAMAV_ENABLED.toLowerCase();
+        if (clamEnabled !== 'true' && clamEnabled !== 'false') {
+            errors.push('  ❌ CLAMAV_ENABLED must be "true" or "false"');
+        }
+    }
+
+    // CLAMAV_PORT doit être un nombre valide (si défini)
+    if (process.env.CLAMAV_PORT) {
+        const clamPort = parseInt(process.env.CLAMAV_PORT);
+        if (isNaN(clamPort) || clamPort < 1 || clamPort > 65535) {
+            errors.push('  ❌ CLAMAV_PORT must be a valid port number (1-65535)');
+        }
+    }
+
     // KEV doit être une chaîne hex de 64 caractères (32 bytes pour AES-256)
     const kev = process.env.KEV;
     if (kev && (!/^[0-9a-f]+$/i.test(kev) || kev.length !== 64)) {
@@ -216,6 +232,17 @@ function validateDockerConfig(warnings) {
             '  ⚠️  Running in Docker: DB_IP is set to localhost.' +
                 '\n     Consider using the Docker service name (e.g., "db") instead.'
         );
+    }
+
+    // Si ClamAV est activé et que le host est localhost dans Docker
+    if (process.env.CLAMAV_ENABLED === 'true') {
+        const clamHost = process.env.CLAMAV_HOST || '127.0.0.1';
+        if (clamHost === 'localhost' || clamHost === '127.0.0.1') {
+            warnings.push(
+                '  ⚠️  Running in Docker: CLAMAV_HOST is set to localhost.' +
+                    '\n     Consider using the Docker service name (e.g., "clamav") instead.'
+            );
+        }
     }
 }
 

@@ -70,11 +70,41 @@ services:
         networks:
             - puna_net
 
+    # ─────────────────────────────────────────
+    # Antivirus — ClamAV (scan des fichiers uploadés)
+    # ─────────────────────────────────────────
+    clamav:
+        image: clamav/clamav:1.4
+        container_name: puna_clamav
+        restart: unless-stopped
+
+        # Accès en lecture aux fichiers uploadés pour pouvoir les scanner
+        volumes:
+            - ./storage:/app/storage:ro
+            # Persistance des bases de signatures (évite de retélécharger à chaque restart)
+            - puna_clamav_data:/var/lib/clamav
+
+        # clamd écoute sur le port 3310 (TCP) — accessible uniquement dans le réseau Docker
+        expose:
+            - '3310'
+
+        healthcheck:
+            test: ['CMD', 'clamdcheck']
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 120s
+
+        networks:
+            - puna_net
+
 # ─────────────────────────────────────────
 # Volumes nommés
 # ─────────────────────────────────────────
 volumes:
     puna_db_data:
+        driver: local
+    puna_clamav_data:
         driver: local
 
 # ─────────────────────────────────────────

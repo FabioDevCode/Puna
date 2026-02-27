@@ -5,6 +5,7 @@ import inspectArchive from './middlewares/inspectArchive.js';
 import moveFilesToUploads from './middlewares/moveFilesToUploads.js';
 import { multipartUpload } from './middlewares/multipartUpload.js';
 import { formRateLimiter } from './middlewares/rateLimiter.js';
+import scanUpload from './middlewares/scanUpload.js';
 import updateFormFileKeys from './middlewares/updateFormFileKeys.js';
 import { updateFormTemplate } from './middlewares/updateFormTemplate.js';
 import validateUpload from './middlewares/validateUpload.js';
@@ -19,6 +20,7 @@ router.post(
     multipartUpload,
     validateUpload,
     inspectArchive,
+    scanUpload,
     moveFilesToUploads,
     updateFormFileKeys,
     sanitizeRequestBody,

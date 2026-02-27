@@ -1,6 +1,6 @@
 # TODO Puna — Feuille de route
 
-> Mis à jour le 23 février 2026
+> Mis à jour le 27 février 2026
 
 ---
 
@@ -8,11 +8,11 @@
 
 | #   | Tâche                              | Statut | Détail                                                        |
 | --- | ---------------------------------- | ------ | ------------------------------------------------------------- |
-| 1   | **Installer Vitest + supertest**   | ⬜     | Framework de test natif ESM + tests HTTP Express              |
-| 2   | **Tests unitaires**                | ⬜     | `utils/`, `helpers/`, `config/permissions.js`                 |
-| 3   | **Tests d'intégration API**        | ⬜     | Pipeline `POST /api/v1/send/:code` (auth, upload, validation) |
-| 4   | **Tests d'intégration routes web** | ⬜     | Auth (login/logout), RBAC (403/401), dashboard                |
-| 5   | **Tests middlewares**              | ⬜     | sanitize, checkAccess, loginRateLimiter                       |
+| 1   | **Installer Vitest + supertest**   | ✅     | Framework de test natif ESM + tests HTTP Express              |
+| 2   | **Tests unitaires**                | ✅     | `utils/`, `helpers/`, `config/permissions.js`                 |
+| 3   | **Tests d'intégration API**        | ✅     | Pipeline `POST /api/v1/send/:code` (auth, upload, validation) |
+| 4   | **Tests d'intégration routes web** | ✅     | Auth (login/logout), RBAC (403/401), dashboard                |
+| 5   | **Tests middlewares**              | ✅     | sanitize, checkAccess, loginRateLimiter                       |
 | 6   | **CI GitHub Actions**              | ⬜     | Workflow : lint → test + couverture + badges sur push/PR      |
 | 7   | **Stratégie de branches**          | ⬜     | `main` (protégée) + `develop` + `feature/*` + `release/*`     |
 
