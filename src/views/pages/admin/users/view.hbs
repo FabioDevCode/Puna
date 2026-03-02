@@ -8,107 +8,160 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-    <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-outline btn-accent gap-2">
+    <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-warning">
         <i class="fa-solid fa-pen-to-square"></i>
-        Modifier
+        Modifier l'utilisateur
     </a>
 {{/slot}}
 
-<!-- Card: Détails utilisateur -->
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-2xl">
-                <i class="fa-solid fa-user text-neutral mr-2"></i>
-                {{user.login}}
-            </h2>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade-in">
+        <!-- Colonne gauche: Profil résumé -->
+        <div class="col-span-1">
+            <div class="card bg-base-100 shadow-sm border border-base-200">
+                <div class="card-body items-center text-center">
+                    <h2 class="card-title text-2xl font-bold mb-1">
+                        {{user.login}}
+                    </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <!-- Login -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Login</span>
-                    </label>
-                    <input type="text" value="{{user.login}}" class="input input-sm input-bordered w-full" disabled="">
-                </div>
-
-                <!-- Email -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Email</span>
-                    </label>
-                    <input type="text" value="{{user.email}}" class="input input-sm input-bordered w-full" disabled="">
-                </div>
-
-                <!-- Rôle -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Rôle</span>
-                    </label>
-                    <input type="text" value="{{user.role}}" class="input input-sm input-bordered w-full" disabled="">
-                </div>
-
-                <!-- Statut -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Statut</span>
-                    </label>
-                    <div class="pt-1">
-                        {{#if user.enabled}}
-                            <span class="badge badge-success">Activé</span>
+                    <p class="text-base-content/60 font-medium mb-3">
+                        {{#if user.email}}
+                            {{user.email}}
                         {{else}}
-                            <span class="badge badge-error">Désactivé</span>
+                            <span class="italic text-base-content/40">
+                                &nbsp;
+                            </span>
                         {{/if}}
+                    </p>
+
+                    <div class="flex gap-2 justify-center mb-6">
+                        <span class="badge badge-outline badge_role badge_{{user.role}} badge-lg">
+                            {{user.role}}
+                        </span>
+
+                        <span class="badge_s_{{user.status}} profil_badge">
+                            {{user.status}}
+                        </span>
                     </div>
-                </div>
 
-                <!-- Dernière connexion -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Dernière connexion</span>
-                    </label>
-                    <input type="text" value="{{#if user.last_connection}}{{user.last_connection}}{{else}}N/A{{/if}}"
-                    class="input input-sm input-bordered w-full {{#unless user.last_connection}}text-neutral-content{{/unless}}"
-                    disabled="">
-                </div>
+                    <div class="w-full border-t border-base-200 my-2"></div>
 
-                <!-- Créé par -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Créé par</span>
-                    </label>
-                    <input type="text" value="{{#if user.creator}}{{user.creator.login}}{{else}}N/A{{/if}}"
-                    class="input input-sm input-bordered w-full {{#unless user.creator}}text-neutral-content{{/unless}}"
-                    disabled="">
-                </div>
-
-                <!-- Créé le -->
-                <div class="form-control w-full md:col-span-2">
-                    <label class="label">
-                        <span class="label-text font-semibold">Créé le</span>
-                    </label>
-                    <input type="text" value="{{user.createdAt}}" class="input input-sm input-bordered w-full" disabled="">
-                </div>
-
-                <!-- Sites assignés -->
-                <div class="form-control w-full md:col-span-2">
-                    <label class="label">
-                        <span class="label-text font-semibold">Sites assignés</span>
-                    </label>
-                    <div class="flex flex-wrap gap-2">
-                        {{#if user.siteassignments}}
-                            {{#each user.siteassignments}}
-                                <span class="badge badge-lg badge-outline bg-neutral">
-                                    {{this.site.domain}}
-                                </span>
+                    <div class="w-full flex justify-between items-center text-sm mt-3">
+                        <span class="text-base-content/50 font-medium">
+                            Dernière connexion
+                        </span>
+                        <span class="font-semibold text-base-content/80">
+                            {{#if user.last_connection}}
+                                {{user.last_connection}}
                             {{else}}
-                                <span class="text-neutral-content">Aucun site assigné</span>
-                            {{/each}}
-                        {{else}}
-                            <span class="text-neutral-content">Aucun site assigné</span>
-                        {{/if}}
+                                <span class="italic text-base-content/40">
+                                    Jamais
+                                </span>
+                            {{/if}}
+                        </span>
+                    </div>
+                    <div class="w-full flex justify-between items-center text-sm mt-3">
+                        <span class="text-base-content/50 font-medium">
+                            Création
+                        </span>
+                        <span class="font-semibold text-base-content/80">
+                            {{user.createdAt}}
+                        </span>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Colonne droite: Détails -->
+        <div class="col-span-1 lg:col-span-2 space-y-6">
+            <!-- Informations détaillées -->
+            <div class="card bg-base-100 shadow-sm border border-base-200">
+                <div class="card-body">
+                    <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
+                        Informations du compte
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                        <div class="group">
+                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                                Identifiant (Login)
+                            </span>
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-xl px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
+                                {{user.login}}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                                Adresse Email
+                            </span>
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-xl px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
+                                {{#if user.email}}
+                                    {{user.email}}
+                                {{else}}
+                                    &nbsp;
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                                Rôle Système
+                            </span>
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-xl px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
+                                {{user.role}}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                                Créé par
+                            </span>
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-xl px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
+                                {{#if user.creator}}
+                                    {{user.creator.login}}
+                                {{else}}
+                                    <span class="italic text-base-content/40">Système</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sites assignés -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 col-span-1 lg:col-span-3">
+            <div class="card-body">
+                <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
+                    Sites assignés
+                </h3>
+
+                {{#if user.siteassignments}}
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {{#each user.siteassignments}}
+                            <div class="flex items-center gap-4 bg-base-200/80 p-3.5 rounded-xl border border-base-200 cursor-default">
+                                <div class="bg-base-100 shadow-sm w-8 h-8 rounded-md flex items-center justify-center text-neutral text-sm">
+                                    <i class="fa-solid fa-network-wired"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-bold text-sm text-base-content truncate">
+                                        {{this.site.domain}}
+                                    </p>
+                                </div>
+                            </div>
+                        {{/each}}
+                    </div>
+                {{else}}
+                    <div class="flex flex-col items-center justify-center py-10 px-4 bg-base-200/30 rounded-2xl border-2 border-dashed border-base-300">
+                        <div class="bg-base-200 text-base-content/30 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl">
+                            <i class="fa-solid fa-link-slash"></i>
+                        </div>
+                        <h4 class="text-base-content/80 font-bold mb-1">
+                            Aucun site assigné
+                        </h4>
+                        <p class="text-base-content/50 text-sm font-medium text-center">
+                            Cet utilisateur n'a pas encore accès à des sites web.
+                        </p>
+                    </div>
+                {{/if}}
             </div>
         </div>
     </div>
