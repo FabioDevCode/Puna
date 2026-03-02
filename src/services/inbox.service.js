@@ -3,6 +3,7 @@ import path from 'node:path';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { errorLogger, auditLogger } from '../config/logger.js';
+import { finalPathFor } from '../helpers/upload_utils.js';
 import models from '../models/index.js';
 import { getSiteWhereCondition } from './access.service.js';
 
@@ -429,7 +430,7 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
         const includeOptions = {
             model: models.Form,
             as: 'form',
-            attributes: ['id', 'name', 'file_keys', 'fk_id_site'],
+            attributes: ['id', 'name', 'code', 'file_keys', 'fk_id_site'],
             include: [
                 {
                     model: models.Site,
@@ -482,19 +483,19 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
         }
 
         // Delete physical files
-        const uploadDir = path.join(process.cwd(), 'storage', 'uploads', site.domain);
-        const resolvedUploadDir = path.resolve(uploadDir);
+        const baseDir = process.env.UPLOADS_DIR || path.join(process.cwd(), 'storage', 'uploads');
+        const resolvedBase = path.resolve(baseDir);
 
         for (const key of fileKeys) {
             const value = contentObj[key];
             if (value) {
                 const filenames = Array.isArray(value) ? value : [value];
                 for (const filename of filenames) {
-                    const filePath = path.join(uploadDir, filename);
+                    const { path: filePath } = finalPathFor(site, form, filename);
                     const resolvedPath = path.resolve(filePath);
 
                     // Vérifier path traversal
-                    if (!resolvedPath.startsWith(resolvedUploadDir)) {
+                    if (!resolvedPath.startsWith(resolvedBase)) {
                         auditLogger.warn({ filename }, 'Path traversal attempt detected');
                         continue;
                     }
@@ -535,7 +536,7 @@ export async function verifyFileAccessAndGetPath(inboxId, filename, userId, user
         const includeOptions = {
             model: models.Form,
             as: 'form',
-            attributes: ['id', 'file_keys', 'fk_id_site'],
+            attributes: ['id', 'name', 'code', 'file_keys', 'fk_id_site'],
             include: [
                 {
                     model: models.Site,
@@ -604,13 +605,13 @@ export async function verifyFileAccessAndGetPath(inboxId, filename, userId, user
             return { success: false, error: 'Fichier introuvable dans cette soumission' };
         }
 
-        const uploadDir = path.join(process.cwd(), 'storage', 'uploads', site.domain);
-        const filePath = path.join(uploadDir, filename);
+        const { path: filePath } = finalPathFor(site, form, filename);
         const resolvedPath = path.resolve(filePath);
-        const resolvedUploadDir = path.resolve(uploadDir);
+        const baseDir = process.env.UPLOADS_DIR || path.join(process.cwd(), 'storage', 'uploads');
+        const resolvedBase = path.resolve(baseDir);
 
         // Vérifier path traversal
-        if (!resolvedPath.startsWith(resolvedUploadDir)) {
+        if (!resolvedPath.startsWith(resolvedBase)) {
             return { success: false, error: 'Nom de fichier invalide' };
         }
 

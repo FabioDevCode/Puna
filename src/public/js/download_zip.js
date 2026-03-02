@@ -1,6 +1,6 @@
 /**
  * Download ZIP - Download all files as ZIP archive
- * Handles the modal and iframe download mechanism
+ * Uses fetch + Blob to avoid CSP frame-src restrictions
  */
 (function () {
     'use strict';
@@ -31,28 +31,40 @@
                 return;
             }
 
-            // Create a hidden iframe to trigger download
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = `/inbox/${inboxId}/download-zip`;
-            iframe.setAttribute('data-temp-download', 'true');
-            document.body.appendChild(iframe);
+            try {
+                const response = await fetch(`/inbox/${inboxId}/download-zip`);
 
-            // Close modal after download starts (1 second)
-            setTimeout(() => {
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                // Extract filename from Content-Disposition header if present
+                const disposition = response.headers.get('Content-Disposition');
+                let filename = `inbox_${inboxId}_documents.zip`;
+                if (disposition) {
+                    const match = disposition.match(/filename="?([^";\n]+)"?/i);
+                    if (match) filename = match[1];
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                console.error('ZIP download error:', err);
+            } finally {
                 try {
                     modal.close();
-                    // Clean up iframe
-                    const tempIframes = document.querySelectorAll('iframe[data-temp-download]');
-                    tempIframes.forEach((frame) => {
-                        if (frame.parentNode) {
-                            frame.parentNode.removeChild(frame);
-                        }
-                    });
                 } catch (err) {
                     console.error('Error closing modal:', err);
                 }
-            }, 1000);
+            }
         });
     }
 

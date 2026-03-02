@@ -8,6 +8,7 @@ import archiver from 'archiver';
 import dayjs from 'dayjs';
 import ExcelJS from 'exceljs';
 import { format } from 'fast-csv';
+import { finalPathFor } from '../helpers/upload_utils.js';
 import models from '../models/index.js';
 import { getSiteWhereCondition } from './access.service.js';
 
@@ -69,12 +70,15 @@ export async function getInboxWithFiles(inboxId, userId, userRole) {
         fileKeys = [];
     }
 
+    const files = collectFiles(site.toJSON(), form.toJSON(), contentObj, fileKeys, finalPathFor);
+
     return {
         inbox: inbox.toJSON(),
         form: form.toJSON(),
         site: site.toJSON(),
         contentObj,
         fileKeys,
+        files,
     };
 }
 
@@ -124,7 +128,6 @@ export function createZipArchive(files) {
         archive.file(file.path, { name: file.name });
     }
 
-    archive.finalize();
     return archive;
 }
 
