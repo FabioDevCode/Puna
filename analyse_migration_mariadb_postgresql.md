@@ -182,6 +182,10 @@ La fonction `buildRelations()` utilise les méthodes Sequelize standard (`belong
 
 ## 4. Requêtes SQL brutes (`.query`)
 
+### Note importante : casse des identifiants dans les requêtes brutes
+
+> ⚠️ **PostgreSQL est sensible à la casse des identifiants.** Les identifiants non quotés sont convertis en minuscules. Sequelize génère les noms de colonnes en camelCase par défaut (ex. `createdAt`, `updatedAt`) et les entoure de guillemets doubles dans le DDL. Dans les requêtes SQL brutes, il est recommandé d'utiliser `"createdAt"` (avec guillemets doubles) pour garantir la compatibilité. Cette remarque s'applique à **toutes les requêtes** listées ci-dessous.
+
 ### Inventaire des requêtes
 
 6 requêtes SQL brutes ont été identifiées dans le projet :
@@ -201,7 +205,7 @@ ORDER BY cnt DESC
 LIMIT 5
 ```
 - ✅ **Compatible PostgreSQL** : Syntaxe SQL standard. `BETWEEN`, `JOIN`, `GROUP BY`, `ORDER BY`, `LIMIT` sont identiques.
-- ⚠️ **Attention** : La colonne `createdAt` doit conserver son nom exact (respect de la casse). PostgreSQL est sensible à la casse pour les identifiants entre guillemets. Sequelize génère les noms de colonnes en camelCase par défaut, ce qui implique que les colonnes sont créées avec des guillemets (`"createdAt"`). Dans les requêtes brutes, il est recommandé d'utiliser `"createdAt"` (avec guillemets doubles) pour garantir la compatibilité.
+- ⚠️ `createdAt` nécessite des guillemets doubles (voir note ci-dessus).
 
 **Requête 2 — `getTopSiteWithForms` (lignes 112-122)**
 ```sql
