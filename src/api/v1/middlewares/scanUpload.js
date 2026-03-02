@@ -5,6 +5,10 @@
  * Scanne les fichiers uploadés via le daemon ClamAV (clamd).
  * Activé uniquement si CLAMAV_ENABLED=true dans .env.
  *
+ * Modes de connexion (auto-détecté) :
+ *   - Socket Unix : CLAMAV_SOCKET défini → connexion locale (natif macOS/Linux)
+ *   - TCP          : CLAMAV_HOST + CLAMAV_PORT → connexion réseau (Docker)
+ *
  * Placement dans la pipeline :
  *   multipartUpload → validateUpload → inspectArchive → [scanUpload] → moveFilesToUploads
  *
@@ -21,6 +25,7 @@ import { apiLogger, errorLogger } from '../../../config/logger.js';
 import { removeFile } from '../../../helpers/upload_utils.js';
 
 const CLAMAV_ENABLED = process.env.CLAMAV_ENABLED === 'true';
+const CLAMAV_SOCKET = process.env.CLAMAV_SOCKET || '';
 const CLAMAV_HOST = process.env.CLAMAV_HOST || '127.0.0.1';
 const CLAMAV_PORT = parseInt(process.env.CLAMAV_PORT, 10) || 3310;
 
@@ -29,6 +34,7 @@ let clamInstance = null;
 
 /**
  * Initialise le client ClamAV (lazy — uniquement au premier appel)
+ * Socket Unix si CLAMAV_SOCKET est défini, sinon TCP (host:port).
  * @returns {Promise<NodeClam>}
  */
 async function getClamInstance() {
@@ -36,21 +42,33 @@ async function getClamInstance() {
         return clamInstance;
     }
 
+    const useSocket = CLAMAV_SOCKET.length > 0;
+
+    const clamdscanConfig = useSocket
+        ? {
+              socket: CLAMAV_SOCKET,
+              timeout: 30000,
+              localFallback: false,
+              active: true,
+          }
+        : {
+              host: CLAMAV_HOST,
+              port: CLAMAV_PORT,
+              timeout: 30000,
+              localFallback: false,
+              active: true,
+          };
+
     clamInstance = await new NodeClam().init({
         removeInfected: false, // On gère la suppression nous-mêmes
         quarantineInfected: false,
         debugMode: false,
-        clamdscan: {
-            host: CLAMAV_HOST,
-            port: CLAMAV_PORT,
-            timeout: 30000, // 30 secondes max par scan
-            localFallback: false,
-            active: true,
-        },
+        clamdscan: clamdscanConfig,
         preference: 'clamdscan',
     });
 
-    apiLogger.info({ host: CLAMAV_HOST, port: CLAMAV_PORT }, 'ClamAV client initialized');
+    const connInfo = useSocket ? { socket: CLAMAV_SOCKET } : { host: CLAMAV_HOST, port: CLAMAV_PORT };
+    apiLogger.info(connInfo, 'ClamAV client initialized');
 
     return clamInstance;
 }

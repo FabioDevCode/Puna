@@ -6,7 +6,7 @@ import { logger } from './src/config/logger.js';
 import models from './src/models/index.js';
 
 // Valider les variables d'environnement AVANT tout le reste
-validateEnv();
+await validateEnv();
 
 const PORT = process.env.PORT || 3022;
 const server = http.createServer(app);

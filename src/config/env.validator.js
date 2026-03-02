@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import net from 'node:net';
 
 /**
  * Variables d'environnement obligatoires
@@ -53,10 +54,44 @@ function isRunningInDocker() {
 }
 
 /**
+ * Ping un service ClamAV via socket Unix ou TCP
+ * @param {Object} options - { socket } ou { host, port }
+ * @param {number} [timeout=3000] - Timeout en ms
+ * @returns {Promise<boolean>} true si le service répond PONG
+ */
+function pingClamAV({ socket, host, port }, timeout = 3000) {
+    return new Promise((resolve) => {
+        const connectOpts = socket ? { path: socket } : { host, port };
+        const client = net.createConnection(connectOpts);
+
+        const timer = setTimeout(() => {
+            client.destroy();
+            resolve(false);
+        }, timeout);
+
+        client.once('connect', () => {
+            client.write('PING\n');
+        });
+
+        client.once('data', (data) => {
+            clearTimeout(timer);
+            client.destroy();
+            resolve(data.toString().trim() === 'PONG');
+        });
+
+        client.once('error', () => {
+            clearTimeout(timer);
+            client.destroy();
+            resolve(false);
+        });
+    });
+}
+
+/**
  * Valide les variables d'environnement au démarrage
  * @throws {Error} Si des variables obligatoires manquent ou sont invalides
  */
-export function validateEnv() {
+export async function validateEnv() {
     const errors = [];
     const warnings = [];
 
@@ -89,9 +124,22 @@ export function validateEnv() {
         validateDockerConfig(warnings);
     }
 
-    // 5. Afficher les résultats
+    // 5. Afficher les résultats des validations statiques
     if (errors.length > 0) {
         console.error('\n❌ Configuration Error: Invalid environment variables\n');
+        errors.forEach((err) => console.error(err));
+        console.error('\nPlease fix the issues above.\n');
+        process.exit(1);
+    }
+
+    // 6. Vérifier la connectivité ClamAV (si activé)
+    if (process.env.CLAMAV_ENABLED === 'true') {
+        await validateClamAVConnectivity(errors);
+    }
+
+    // 7. Résultat final
+    if (errors.length > 0) {
+        console.error('\n❌ Configuration Error: Service connectivity check failed\n');
         errors.forEach((err) => console.error(err));
         console.error('\nPlease fix the issues above.\n');
         process.exit(1);
@@ -104,6 +152,52 @@ export function validateEnv() {
     }
 
     console.log('✅ Environment variables validated successfully\n');
+}
+
+/**
+ * Vérifie que le daemon ClamAV est accessible
+ * - Si socket + host sont configurés → au moins un doit répondre
+ * - Si un seul est configuré → celui-ci doit répondre
+ */
+async function validateClamAVConnectivity(errors) {
+    const socketPath = (process.env.CLAMAV_SOCKET || '').trim();
+    const host = (process.env.CLAMAV_HOST || '').trim();
+    const port = parseInt(process.env.CLAMAV_PORT, 10) || 3310;
+
+    const hasSocket = socketPath.length > 0;
+    const hasHost = host.length > 0;
+
+    // Aucun mode configuré (déjà géré dans validateFormats, mais sécurité supplémentaire)
+    if (!hasSocket && !hasHost) {
+        return;
+    }
+
+    console.log('🦠 Checking ClamAV connectivity...');
+
+    const results = [];
+
+    if (hasSocket) {
+        const ok = await pingClamAV({ socket: socketPath });
+        results.push({ mode: 'socket', target: socketPath, ok });
+        console.log(ok ? `  ✅ Socket ${socketPath} → PONG` : `  ❌ Socket ${socketPath} → no response`);
+    }
+
+    if (hasHost) {
+        const ok = await pingClamAV({ host, port });
+        results.push({ mode: 'tcp', target: `${host}:${port}`, ok });
+        console.log(ok ? `  ✅ TCP ${host}:${port} → PONG` : `  ❌ TCP ${host}:${port} → no response`);
+    }
+
+    const anyOk = results.some((r) => r.ok);
+
+    if (!anyOk) {
+        const targets = results.map((r) => `${r.mode} (${r.target})`).join(', ');
+        errors.push(
+            `  ❌ CLAMAV_ENABLED is "true" but the daemon is unreachable: ${targets}` +
+                '\n     Make sure clamd is running and the socket/host is correct.' +
+                '\n     To skip antivirus scanning, set CLAMAV_ENABLED=false.'
+        );
+    }
 }
 
 /**
@@ -156,6 +250,19 @@ function validateFormats(errors, _warnings) {
         if (clamEnabled !== 'true' && clamEnabled !== 'false') {
             errors.push('  ❌ CLAMAV_ENABLED must be "true" or "false"');
         }
+
+        // Si ClamAV est activé, au moins un mode de connexion doit être configuré
+        if (clamEnabled === 'true') {
+            const hasSocket = process.env.CLAMAV_SOCKET && process.env.CLAMAV_SOCKET.trim().length > 0;
+            const hasHost = process.env.CLAMAV_HOST && process.env.CLAMAV_HOST.trim().length > 0;
+
+            if (!hasSocket && !hasHost) {
+                errors.push(
+                    '  ❌ CLAMAV_ENABLED is "true" but no connection is configured.' +
+                        '\n     Set CLAMAV_SOCKET (Unix socket) or CLAMAV_HOST + CLAMAV_PORT (TCP).'
+                );
+            }
+        }
     }
 
     // CLAMAV_PORT doit être un nombre valide (si défini)
@@ -163,6 +270,14 @@ function validateFormats(errors, _warnings) {
         const clamPort = parseInt(process.env.CLAMAV_PORT);
         if (isNaN(clamPort) || clamPort < 1 || clamPort > 65535) {
             errors.push('  ❌ CLAMAV_PORT must be a valid port number (1-65535)');
+        }
+    }
+
+    // CLAMAV_SOCKET doit être un chemin absolu (si défini)
+    if (process.env.CLAMAV_SOCKET) {
+        const clamSocket = process.env.CLAMAV_SOCKET;
+        if (!clamSocket.startsWith('/')) {
+            errors.push('  ❌ CLAMAV_SOCKET must be an absolute path (e.g., /tmp/clamd.socket)');
         }
     }
 
