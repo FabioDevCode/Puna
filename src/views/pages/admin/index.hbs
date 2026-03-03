@@ -58,7 +58,20 @@
 </div>
 
 <!-- Statistiques d'activité -->
-<div class="col-span-2 md:col-span-3 lg:col-span-4">
+<div class="col-span-2 md:col-span-3 lg:col-span-6">
+    <div class="stats shadow-xl w-full">
+        <div class="stat">
+            <div class="stat-figure text-success">
+                <i class="fa-solid fa-circle text-sm animate-pulse"></i>
+            </div>
+            <div class="stat-title">En ligne</div>
+            <div class="stat-value text-success">{{activityStats.connectedUsers}}</div>
+            <div class="stat-desc">Utilisateurs connectés</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-span-2 md:col-span-3 lg:col-span-6">
     <div class="stats shadow-xl w-full">
         <div class="stat">
             <div class="stat-figure text-error">
@@ -66,12 +79,12 @@
             </div>
             <div class="stat-title">Erreurs</div>
             <div class="stat-value text-error">{{activityStats.errorsCount}}</div>
-            <div class="stat-desc">Logs du jour</div>
+            <div class="stat-desc">Logs</div>
         </div>
     </div>
 </div>
 
-<div class="col-span-2 md:col-span-3 lg:col-span-4">
+<div class="col-span-2 md:col-span-3 lg:col-span-6">
     <div class="stats shadow-xl w-full">
         <div class="stat">
             <div class="stat-figure text-info">
@@ -84,7 +97,7 @@
     </div>
 </div>
 
-<div class="col-span-2 md:col-span-3 lg:col-span-4">
+<div class="col-span-2 md:col-span-3 lg:col-span-6">
     <div class="stats shadow-xl w-full">
         <div class="stat">
             <div class="stat-figure text-warning">
@@ -93,19 +106,6 @@
             <div class="stat-title">Fichiers</div>
             <div class="stat-value text-warning">{{activityStats.totalFiles}}</div>
             <div class="stat-desc">Total uploadés</div>
-        </div>
-    </div>
-</div>
-
-<div class="col-span-2 md:col-span-3 lg:col-span-3">
-    <div class="stats shadow-xl w-full">
-        <div class="stat">
-            <div class="stat-figure text-success">
-                <i class="fa-solid fa-circle text-sm animate-pulse"></i>
-            </div>
-            <div class="stat-title">En ligne</div>
-            <div class="stat-value text-success">{{activityStats.connectedUsers}}</div>
-            <div class="stat-desc">Utilisateurs connectés</div>
         </div>
     </div>
 </div>
