@@ -121,8 +121,12 @@ h2 {
 }
 
 h3 {
-    font-size: 1.8rem !important;
+    font-size: 1.6rem !important;
     font-weight: 800 !important;
+}
+
+h3.font-inter {
+    min-width: max-content;
 }
 
 .btn-neutral {

@@ -52,6 +52,10 @@ export default {
         return JSON.stringify(context);
     },
 
+    eq: function (a, b) {
+        return a === b;
+    },
+
     /**
      * Helper pour vérifier si l'utilisateur peut faire une action
      * Usage: {{#actionCan entity="site" action="create"}}...{{/actionCan}}

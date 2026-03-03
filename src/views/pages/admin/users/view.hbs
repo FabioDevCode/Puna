@@ -10,7 +10,9 @@
 {{#slot "buttons"}}
     <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-warning">
         <i class="fa-solid fa-pen-to-square"></i>
-        Modifier l'utilisateur
+        <span class="hidden md:flex">
+            Modifier l'utilisateur
+        </span>
     </a>
 {{/slot}}
 
@@ -18,8 +20,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade-in">
         <!-- Colonne gauche: Profil résumé -->
         <div class="col-span-1">
-            <div class="card bg-base-100 shadow-sm border border-base-200">
-                <div class="card-body items-center text-center">
+            <div class="card bg-base-100 shadow-xl border border-base-200">
+                <div class="card-body items-center text-center p-6">
                     <h2 class="card-title text-2xl font-bold mb-1">
                         {{user.login}}
                     </h2>
@@ -75,8 +77,8 @@
         <!-- Colonne droite: Détails -->
         <div class="col-span-1 lg:col-span-2 space-y-6">
             <!-- Informations détaillées -->
-            <div class="card bg-base-100 shadow-sm border border-base-200">
-                <div class="card-body">
+            <div class="card bg-base-100 shadow-xl border border-base-200">
+                <div class="card-body p-6">
                     <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
                         Informations du compte
                     </h3>
@@ -86,7 +88,7 @@
                             <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
                                 Identifiant (Login)
                             </span>
-                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-xl px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
                                 {{user.login}}
                             </div>
                         </div>
@@ -94,7 +96,7 @@
                             <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
                                 Adresse Email
                             </span>
-                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-xl px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
                                 {{#if user.email}}
                                     {{user.email}}
                                 {{else}}
@@ -106,7 +108,7 @@
                             <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
                                 Rôle Système
                             </span>
-                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-xl px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
                                 {{user.role}}
                             </div>
                         </div>
@@ -114,7 +116,7 @@
                             <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
                                 Créé par
                             </span>
-                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-xl px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
                                 {{#if user.creator}}
                                     {{user.creator.login}}
                                 {{else}}
@@ -128,39 +130,47 @@
         </div>
 
         <!-- Sites assignés -->
-        <div class="card bg-base-100 shadow-sm border border-base-200 col-span-1 lg:col-span-3">
-            <div class="card-body">
+        <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
+            <div class="card-body p-6">
                 <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
                     Sites assignés
                 </h3>
 
-                {{#if user.siteassignments}}
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {{#each user.siteassignments}}
-                            <div class="flex items-center gap-4 bg-base-200/80 p-3.5 rounded-xl border border-base-200 cursor-default">
-                                <div class="bg-base-100 shadow-sm w-8 h-8 rounded-md flex items-center justify-center text-neutral text-sm">
-                                    <i class="fa-solid fa-network-wired"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-bold text-sm text-base-content truncate">
-                                        {{this.site.domain}}
-                                    </p>
-                                </div>
-                            </div>
-                        {{/each}}
-                    </div>
-                {{else}}
-                    <div class="flex flex-col items-center justify-center py-10 px-4 bg-base-200/30 rounded-2xl border-2 border-dashed border-base-300">
-                        <div class="bg-base-200 text-base-content/30 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl">
-                            <i class="fa-solid fa-link-slash"></i>
-                        </div>
-                        <h4 class="text-base-content/80 font-bold mb-1">
-                            Aucun site assigné
-                        </h4>
-                        <p class="text-base-content/50 text-sm font-medium text-center">
-                            Cet utilisateur n'a pas encore accès à des sites web.
+                {{#if (eq user.role "super_admin")}}
+                    <div class="flex flex-col items-center justify-center p-6 bg-neutral/10 rounded-lg border border-neutral">
+                        <p class="text-neutral text-md font-medium text-center">
+                            Un <b>super_admin</b> accède à tous les sites web.
                         </p>
                     </div>
+                {{else}}
+                    {{#if user.siteassignments}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {{#each user.siteassignments}}
+                                <div class="flex items-center gap-4 bg-base-200/80 p-3.5 rounded-lg border border-base-200 cursor-default">
+                                    <div class="bg-base-100 shadow-sm w-8 h-8 rounded-md flex items-center justify-center text-neutral text-sm">
+                                        <i class="fa-solid fa-network-wired"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-bold text-sm text-base-content truncate">
+                                            {{this.site.domain}}
+                                        </p>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <div class="flex flex-col items-center justify-center py-10 px-4 bg-base-200/30 rounded-lg border-2 border-dashed border-base-300">
+                            <div class="bg-base-200 text-base-content/30 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl">
+                                <i class="fa-solid fa-link-slash"></i>
+                            </div>
+                            <h4 class="text-base-content/80 font-bold mb-1">
+                                Aucun site assigné
+                            </h4>
+                            <p class="text-base-content/50 text-sm font-medium text-center">
+                                Cet utilisateur n'a pas encore accès à des sites web.
+                            </p>
+                        </div>
+                    {{/if}}
                 {{/if}}
             </div>
         </div>
