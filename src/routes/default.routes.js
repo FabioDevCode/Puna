@@ -48,7 +48,7 @@ router.post('/admin/users/delete', isConnected, roleAccess(['super_admin', 'owne
 router.get('/admin/users/:id/view', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminViewUser);
 router.get('/admin/users/:id/edit', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminEditUser);
 router.post('/admin/users/:id/update', isConnected, roleAccess(['super_admin', 'owner']), adminCtl.adminUpdateUser);
-router.get('/admin/settings', isConnected, roleAccess(['super_admin']), adminCtl.adminSettings);
+// router.get('/admin/settings', isConnected, roleAccess(['super_admin']), adminCtl.adminSettings);
 
 // Logs Viewer (super_admin uniquement)
 router.get('/admin/logs', isConnected, roleAccess(['super_admin']), adminCtl.logsViewer);
