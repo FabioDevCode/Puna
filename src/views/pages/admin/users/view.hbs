@@ -8,12 +8,25 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-    <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-warning">
-        <i class="fa-solid fa-pen-to-square"></i>
+    {{#roleIs roles='super_admin,owner'}}
+        {{#actionCan entity='user' action='update'}}
+            <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-warning">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span class="hidden md:flex">
+                    Modifier l'utilisateur
+                </span>
+            </a>
+        {{/actionCan}}
+    {{/roleIs}}
+
+    <button id="deleteUserBtn" class="btn btn-sm btn-error btn-outline"
+    data-user-id="{{user.id}}" data-user-login="{{user.login}}">
+        <i class="far fa-trash-alt"></i>
         <span class="hidden md:flex">
-            Modifier l'utilisateur
+            Supprimer cet utilisateur
         </span>
-    </a>
+    </button>
+
 {{/slot}}
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
@@ -176,3 +189,7 @@
         </div>
     </div>
 </div>
+
+{{> components/modals/delete-user }}
+
+<script src="/js/admin/user-view.js"></script>
