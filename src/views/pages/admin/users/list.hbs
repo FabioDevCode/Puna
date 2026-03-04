@@ -5,10 +5,16 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-    <button id="btn-create-user" class="btn btn-sm btn-secondary gap-2">
-        <i class="fa-solid fa-plus"></i>
-        Nouvel utilisateur
-    </button>
+
+    {{#roleIs roles='super_admin,owner'}}
+        {{#actionCan entity='user' action='create'}}
+            <button id="btn-create-user" class="btn btn-sm btn-secondary gap-2">
+                <i class="fa-solid fa-plus"></i>
+                Nouvel utilisateur
+            </button>
+        {{/actionCan}}
+    {{/roleIs}}
+
 {{/slot}}
 
 

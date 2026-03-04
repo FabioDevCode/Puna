@@ -19,14 +19,17 @@
         {{/actionCan}}
     {{/roleIs}}
 
-    <button id="deleteUserBtn" class="btn btn-sm btn-error btn-outline"
-    data-user-id="{{user.id}}" data-user-login="{{user.login}}">
-        <i class="far fa-trash-alt"></i>
-        <span class="hidden md:flex">
-            Supprimer cet utilisateur
-        </span>
-    </button>
-
+    {{#roleIs roles='super_admin,owner'}}
+        {{#actionCan entity='user' action='delete'}}
+            <button id="deleteUserBtn" class="btn btn-sm btn-error btn-outline"
+            data-user-id="{{user.id}}" data-user-login="{{user.login}}">
+                <i class="far fa-trash-alt"></i>
+                <span class="hidden md:flex">
+                    Supprimer cet utilisateur
+                </span>
+            </button>
+        {{/actionCan}}
+    {{/roleIs}}
 {{/slot}}
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
