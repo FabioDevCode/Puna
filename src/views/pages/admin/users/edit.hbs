@@ -9,171 +9,177 @@
 
 <!-- Card: Édition utilisateur -->
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-2xl">
-                <i class="fa-solid fa-user-edit text-neutral mr-2"></i>
-                {{user.login}}
-            </h2>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade-in">
+        <!-- Colonne gauche: Profil résumé -->
+        <div class="col-span-1">
+            <div class="card bg-base-100 shadow-xl border border-base-200">
+                <div class="card-body items-center text-center p-6">
+                    <h2 class="card-title text-2xl font-bold mb-1">
+                        {{user.login}}
+                    </h2>
 
-            <form action="/admin/users/{{user.id}}/update" method="POST" class="flex flex-col gap-0">
-                <input type="hidden" name="_csrf" value="{{csrfToken}}" />
-            <input type="hidden" name="clear_password" id="clear_password_field" value="false">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <!-- Login -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Login <span class="text-error">*</span></span>
-                    </label>
-                    <input type="text" name="login" value="{{user.login}}"
-                    class="input input-sm input-bordered w-full" required>
-                </div>
-
-                <!-- Email -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Email <span class="text-error">*</span></span>
-                    </label>
-                    <input type="email" name="email" value="{{user.email}}"
-                    class="input input-sm input-bordered w-full" required>
-                </div>
-
-                <!-- Rôle -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Rôle <span class="text-error">*</span></span>
-                    </label>
-                    <select name="role" id="roleSelect" class="select select-sm select-bordered w-full" required>
-                        <option value="viewer">Viewer (Lecture seule)</option>
-                        <option value="editor">Editor (Peut modifier)</option>
-                        <option value="owner">Owner (Propriétaire)</option>
-                        <option value="beta">Beta Tester</option>
-                    </select>
-                    <script>
-                        document.getElementById('roleSelect').value = '{{user.role}}';
-                    </script>
-                </div>
-
-                <!-- Activé (Bouton pour désactiver) -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Statut</span>
-                    </label>
-                    <div class="flex items-center gap-3">
-                        {{#if user.enabled}}
-                            <span class="badge badge-success">Activé</span>
-                            <button type="button" id="disableUserBtn" class="btn btn-sm btn-error btn-outline">
-                                <i class="fa-solid fa-ban"></i>
-                                Désactiver
-                            </button>
+                    <p class="text-base-content/60 font-medium mb-3">
+                        {{#if user.email}}
+                            {{user.email}}
                         {{else}}
-                            <span class="badge badge-error mt-1">Désactivé</span>
+                            <span class="italic text-base-content/40">
+                                &nbsp;
+                            </span>
                         {{/if}}
+                    </p>
+
+                    <div class="flex gap-2 justify-center mb-6">
+                        <span class="badge badge-outline badge_role badge_{{user.role}} badge-lg">
+                            {{user.role}}
+                        </span>
+
+                        <span class="badge_s_{{user.status}} profil_badge">
+                            {{user.status}}
+                        </span>
                     </div>
-                </div>
 
-                <!-- Mot de passe (visuel) -->
-                <div class="form-control w-full md:col-span-2">
-                    <label class="label">
-                        <span class="label-text font-semibold">Mot de passe</span>
-                        <span class="label-text-alt text-primary">Vider le mot de passe désactivera
-                            l'utilisateur</span>
-                    </label>
-                    <div class="flex gap-2">
-                        <input type="password" id="passwordDisplay" value="••••••••••"
-                        class="input input-sm input-bordered flex-1" disabled="">
-                        <button type="button" id="clearPasswordBtn" class="btn btn-sm btn-primary btn-outline">
-                            <i class="fa-solid fa-trash"></i>
-                            Vider le mot de passe
-                        </button>
+                    <div class="w-full border-t border-base-200 my-2"></div>
+
+                    <div class="w-full flex justify-between items-center text-sm mt-3">
+                        <span class="text-base-content/50 font-medium">
+                            Dernière connexion
+                        </span>
+                        <span class="font-semibold text-base-content/80">
+                            {{#if user.last_connection}}
+                                {{user.last_connection}}
+                            {{else}}
+                                <span class="italic text-base-content/40">
+                                    Jamais
+                                </span>
+                            {{/if}}
+                        </span>
                     </div>
-                </div>
-
-                <!-- CHAMPS NON MODIFIABLES -->
-
-                <!-- Dernière connexion (non modifiable) -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Dernière connexion</span>
-                    </label>
-                    <input type="text"
-                    value="{{#if user.last_connection}}{{user.last_connection}}{{else}}N/A{{/if}}"
-                    class="input input-sm input-bordered w-full {{#unless user.last_connection}}text-neutral-content{{/unless}}"
-                    disabled="">
-                </div>
-
-                <!-- Créé par (non modifiable) -->
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text font-semibold">Créé par</span>
-                    </label>
-                    <input type="text" value="{{#if user.creator}}{{user.creator.login}}{{else}}N/A{{/if}}"
-                    class="input input-sm input-bordered w-full {{#unless user.creator}}text-neutral-content{{/unless}}"
-                    disabled="">
-                </div>
-
-                <!-- Créé le (non modifiable) -->
-                <div class="form-control w-full md:col-span-2">
-                    <label class="label">
-                        <span class="label-text font-semibold">Créé le</span>
-                    </label>
-                    <input type="text" value="{{user.createdAt}}" class="input input-sm input-bordered w-full"
-                    disabled="">
-                </div>
-
-                <!-- Sites assignés -->
-                <div class="form-control w-full md:col-span-2">
-                    <label class="label">
-                        <span class="label-text font-semibold">Sites assignés</span>
-                    </label>
-
-                    <!-- Recherche de sites -->
-                    <div class="relative mb-2">
-                        <input type="text" id="siteSearchInput" placeholder="Filtrer les sites..."
-                        class="input input-sm input-bordered w-full pl-8">
-                        <i
-                        class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-content text-xs"></i>
-                </div>
-
-                <!-- Liste des sites (Checkboxes) -->
-                <div id="sitesListContainer"
-                class="border border-base-300 rounded-lg h-48 overflow-y-auto bg-base-100 p-1">
-                    {{#each sites}}
-                        <label
-                        class="cursor-pointer label hover:bg-base-200 rounded-md px-3 py-2 transition-colors justify-start gap-3">
-                            <input type="checkbox" name="sites" value="{{this.id}}"
-                            class="checkbox checkbox-sm checkbox-neutral rounded-md site-checkbox" {{#if
-                            this.isAssigned}}checked{{/if}} />
-                            <span class="label-text flex-1 truncate" title="{{this.domain}}">{{this.domain}}</span>
-                        </label>
-                    {{else}}
-                        <div class="text-center text-neutral text-sm p-8 flex flex-col items-center gap-2">
-                            <i class="fa-solid fa-globe text-2xl opacity-20"></i>
-                            <span>Aucun site disponible</span>
-                        </div>
-                    {{/each}}
-
-                    <!-- Message aucun résultat recherche -->
-                    <div id="noSiteFound" class="hidden text-center text-neutral text-sm p-4">
-                        Aucun site ne correspond à votre recherche
+                    <div class="w-full flex justify-between items-center text-sm mt-3">
+                        <span class="text-base-content/50 font-medium">
+                            Création
+                        </span>
+                        <span class="font-semibold text-base-content/80">
+                            {{user.createdAt}}
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Actions -->
-        <div class="flex justify-end gap-2 mt-4">
-            <a href="/admin/users" class="btn btn-sm">
-                Annuler
-            </a>
-            <button type="submit" class="btn btn-sm btn-secondary">
-                <i class="fa-solid fa-save"></i>
-                Enregistrer
-            </button>
+        <!-- Colonne droite: Détails -->
+        <div class="col-span-1 lg:col-span-2 space-y-6">
+            <!-- Informations détaillées -->
+            <div class="card bg-base-100 shadow-xl border border-base-200">
+                <div class="card-body p-6">
+                    <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
+                        Informations du compte
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                        <div class="group">
+                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                                Identifiant (Login)
+                            </span>
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
+                                {{user.login}}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                                Adresse Email
+                            </span>
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
+                                {{#if user.email}}
+                                    {{user.email}}
+                                {{else}}
+                                    &nbsp;
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                                Rôle Système
+                            </span>
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
+                                {{user.role}}
+                            </div>
+                        </div>
+                        <div class="group">
+                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                                Créé par
+                            </span>
+                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
+                                {{#if user.creator}}
+                                    {{user.creator.login}}
+                                {{else}}
+                                    <span class="italic text-base-content/40">Système</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
-</div>
+
+        <!-- Sites assignés -->
+        <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
+            <div class="card-body p-6">
+                <form action="/admin/users/{{user.id}}/update" method="POST" class="flex flex-col gap-0">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <!-- Sites assignés -->
+                    <div class="form-control w-full md:col-span-2">
+                        <label class="label p-0 mb-5">
+                            <h3 class="text-lg font-bold border-b border-base-200 pb-3 flex items-center gap-2">
+                                Sites assignés
+                            </h3>
+                        </label>
+
+                        <!-- Recherche de sites -->
+                        <div class="relative mb-2">
+                            <input type="text" id="siteSearchInput" placeholder="Filtrer les sites..." class="input input-md input-bordered w-full pl-8">
+                            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-content text-xs"></i>
+                        </div>
+
+                        <!-- Liste des sites (Checkboxes) -->
+                        <div id="sitesListContainer"  class="border border-base-300 rounded-lg h-48 overflow-y-auto bg-base-100 p-1">
+                            {{#each sites}}
+                                <label
+                                class="cursor-pointer label hover:bg-base-200 rounded-md px-3 py-2 transition-colors justify-start gap-3">
+                                    <input type="checkbox" name="sites" value="{{this.id}}"
+                                    class="checkbox checkbox-sm checkbox-neutral rounded-md site-checkbox" {{#if
+                                    this.isAssigned}}checked{{/if}} />
+                                    <span class="label-text flex-1 truncate" title="{{this.domain}}">{{this.domain}}</span>
+                                </label>
+                            {{else}}
+                                <div class="text-center text-neutral text-sm p-8 flex flex-col items-center gap-2">
+                                    <i class="fa-solid fa-globe text-2xl opacity-20"></i>
+                                    <span>Aucun site disponible</span>
+                                </div>
+                            {{/each}}
+
+                            <!-- Message aucun résultat recherche -->
+                            <div id="noSiteFound" class="hidden text-center text-neutral text-sm p-4">
+                                Aucun site ne correspond à votre recherche
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex justify-end gap-2 mt-4">
+                    <a href="/admin/users/{{user.id}}/view" class="btn btn-sm">
+                        Annuler
+                    </a>
+                    <button type="submit" class="btn btn-sm btn-secondary">
+                        <i class="fa-solid fa-save"></i>
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 </div>
 

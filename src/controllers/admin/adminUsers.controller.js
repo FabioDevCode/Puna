@@ -325,35 +325,14 @@ export const adminEditUser = async (req, res) => {
 export const adminUpdateUser = async (req, res) => {
     try {
         const userId = req.params.id;
-        const { login, email, role, sites, clear_password } = req.body;
-
-        // Validation basique
-        if (!login || !email || !role) {
-            res.flash('warning', 'Veuillez remplir tous les champs obligatoires.');
-            return res.redirect(`/admin/users/${userId}/edit`);
-        }
-
-        const updateData = {
-            login,
-            email,
-            role,
-        };
-
-        // Si le mot de passe est vidé, désactiver l'utilisateur
-        if (clear_password === 'true') {
-            updateData.password = null;
-            updateData.status = 'pending';
-        }
-
-        // Mettre à jour l'utilisateur via le service
-        await updateUserAdmin(userId, updateData);
+        const { sites } = req.body;
 
         // Gérer les sites assignés via le service
         const siteIds = sites ? (Array.isArray(sites) ? sites : [sites]) : [];
         await updateUserSiteAssignments(userId, siteIds);
 
         res.flash('success', 'Utilisateur mis à jour.');
-        res.redirect('/admin/users');
+        res.redirect(`/admin/users/${userId}/view`);
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUpdateUser error');
         res.flash('error', "Erreur lors de la mise à jour de l'utilisateur.");

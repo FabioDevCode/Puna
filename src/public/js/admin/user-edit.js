@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const roleSelect = document.getElementById('roleSelect');
-    const clearPasswordBtn = document.getElementById('clearPasswordBtn');
-    const disableUserBtn = document.getElementById('disableUserBtn');
-    const passwordDisplay = document.getElementById('passwordDisplay');
-    const clearPasswordField = document.getElementById('clear_password_field');
     const siteCheckboxes = document.querySelectorAll('.site-checkbox');
     const siteSearchInput = document.getElementById('siteSearchInput');
     const sitesListContainer = document.getElementById('sitesListContainer');
@@ -29,47 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.appendChild(notice);
 
                 setTimeout(() => notice.remove(), 3000);
-            }
-        });
-    }
-
-    // Vider le mot de passe
-    if (clearPasswordBtn) {
-        clearPasswordBtn.addEventListener('click', () => {
-            if (
-                confirm(
-                    "Êtes-vous sûr de vouloir vider le mot de passe ? Cela désactivera automatiquement l'utilisateur."
-                )
-            ) {
-                passwordDisplay.value = '';
-                clearPasswordField.value = 'true';
-
-                // Changer visuellement le bouton
-                clearPasswordBtn.classList.remove('btn-outline');
-                clearPasswordBtn.classList.add('btn-warning');
-                clearPasswordBtn.innerHTML = '<i class="fa-solid fa-check"></i> Mot de passe vidé';
-                clearPasswordBtn.disabled = true;
-
-                // Afficher un avertissement
-                const form = clearPasswordBtn.closest('form');
-                const warning = document.createElement('div');
-                warning.className = 'alert alert-warning mt-4';
-                warning.innerHTML =
-                    '<i class="fa-solid fa-exclamation-triangle mr-2"></i>L\'utilisateur sera désactivé lors de l\'enregistrement';
-                form.insertBefore(warning, form.querySelector('.flex.justify-end'));
-            }
-        });
-    }
-
-    // Bouton désactiver utilisateur
-    if (disableUserBtn) {
-        disableUserBtn.addEventListener('click', () => {
-            if (confirm('Êtes-vous sûr de vouloir désactiver cet utilisateur ?')) {
-                // On vide le mot de passe, ce qui désactivera l'utilisateur
-                clearPasswordField.value = 'true';
-
-                // Submit le formulaire
-                disableUserBtn.closest('form').submit();
             }
         });
     }
