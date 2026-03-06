@@ -8,6 +8,11 @@
         "allowNull": true,
         "type": "STRING"
     },
+    "failed_login_attempts": {
+        "allowNull": false,
+        "defaultValue": 0,
+        "type": "INTEGER"
+    },
     "id": {
         "allowNull": false,
         "primaryKey": true,

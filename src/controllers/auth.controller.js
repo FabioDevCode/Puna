@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { auditLogger, errorLogger } from '../config/logger.js';
-import { findUserByLogin, activateUserAccount } from '../services/auth.service.js';
-import { updateLastConnection } from '../services/user.service.js';
+import { activateUserAccount, findUserByLogin } from '../services/auth.service.js';
+import { incrementFailedAttempts, resetFailedAttempts, updateLastConnection } from '../services/user.service.js';
 
 export const dpFirstCoPost = async (req, res) => {
     const { login, password, confirm_password } = req.body;
@@ -81,8 +81,16 @@ export const dpConnect = (req, res) => {
             let flashMsg = 'Identifiants incorrects.';
             try {
                 const existingUser = await findUserByLogin(login);
-                if (existingUser?.status === 'inactive') {
-                    flashMsg = 'Votre compte est désactivé. Contactez un administrateur.';
+                if (existingUser && existingUser.status !== 'deleted') {
+                    if (existingUser.status === 'suspended') {
+                        flashMsg =
+                            'Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.';
+                    } else if (existingUser.status === 'inactive') {
+                        flashMsg = 'Votre compte est désactivé. Contactez un administrateur.';
+                    } else {
+                        // Increment the failed attempts counter (may trigger auto-suspension)
+                        await incrementFailedAttempts(existingUser.id, existingUser.login, ip);
+                    }
                 }
             } catch (_e) {
                 // ignore — use default message
@@ -90,6 +98,13 @@ export const dpConnect = (req, res) => {
 
             res.flash('error', flashMsg);
             return res.redirect('/dp-login');
+        }
+
+        try {
+            // Reset failed login counter on successful login
+            await resetFailedAttempts(user.id);
+        } catch (e) {
+            errorLogger.error({ err: e, userId: user?.id }, 'Failed to reset failed_login_attempts');
         }
 
         try {
