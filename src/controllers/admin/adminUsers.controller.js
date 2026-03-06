@@ -12,6 +12,7 @@ import {
     deleteUserWithRelations,
     getUserWithRelations,
     updateUserAdmin,
+    changeUserStatus,
 } from '../../services/user.service.js';
 
 /**
@@ -337,5 +338,47 @@ export const adminUpdateUser = async (req, res) => {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUpdateUser error');
         res.flash('error', "Erreur lors de la mise à jour de l'utilisateur.");
         res.redirect(`/admin/users/${req.params.id}/edit`);
+    }
+};
+
+/**
+ * Changement de statut d'un utilisateur (avec audit trail)
+ */
+export const adminChangeUserStatus = async (req, res) => {
+    const targetUserId = req.params.id;
+    try {
+        const { status, reason } = req.body;
+        const admin = req.session.user;
+
+        if (!status) {
+            res.flash('warning', 'Statut manquant.');
+            return res.redirect(`/admin/users/${targetUserId}/view`);
+        }
+
+        await changeUserStatus(
+            targetUserId,
+            status,
+            { userId: admin.id, login: admin.login, role: admin.role },
+            reason || null,
+            'manual',
+            req.ip || null
+        );
+
+        res.flash('success', `Statut mis à jour : ${status}.`);
+        return res.redirect(`/admin/users/${targetUserId}/view`);
+    } catch (err) {
+        if (
+            err.message === 'Cannot change your own status' ||
+            err.message?.startsWith('Owner cannot set status') ||
+            err.message?.startsWith('Cannot change a pending user') ||
+            err.message?.startsWith('Invalid status')
+        ) {
+            res.flash('error', err.message);
+            return res.redirect(`/admin/users/${targetUserId}/view`);
+        }
+
+        errorLogger.error({ err, userId: req.session?.user?.id }, 'adminChangeUserStatus error');
+        res.flash('error', 'Erreur lors du changement de statut.');
+        return res.redirect(`/admin/users/${targetUserId}/view`);
     }
 };

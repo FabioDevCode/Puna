@@ -92,6 +92,13 @@ router.post(
     roleAccess(['super_admin', 'owner']),
     adminCtl.adminUpdateUser
 );
+router.post(
+    '/admin/users/:id/status',
+    isConnected,
+    checkUserStatus,
+    roleAccess(['super_admin', 'owner']),
+    adminCtl.adminChangeUserStatus
+);
 // router.get('/admin/settings', isConnected, roleAccess(['super_admin']), adminCtl.adminSettings);
 
 // Logs Viewer (super_admin uniquement)

@@ -101,6 +101,7 @@ vi.mock('../../../src/controllers/admin/index.js', () => ({
     adminViewUser: vi.fn((_req, res) => res.status(200).end()),
     adminEditUser: vi.fn((_req, res) => res.status(200).end()),
     adminUpdateUser: vi.fn((_req, res) => res.redirect('/admin/users')),
+    adminChangeUserStatus: vi.fn((_req, res) => res.redirect('/admin/users')),
     adminSettings: vi.fn((_req, res) => res.status(200).end()),
     logsViewer: vi.fn((_req, res) => res.status(200).end()),
     readLogs: vi.fn((_req, res) => res.json([])),
