@@ -22,6 +22,8 @@ import flashMessages from '../../../src/middlewares/flashMessages.js';
 import { injectUserRole } from '../../../src/middlewares/injectUserRole.js';
 import models from '../../../src/models/index.js';
 import defaultRouter from '../../../src/routes/default.routes.js';
+import { findUserByLogin } from '../../../src/services/auth.service.js';
+import { getUserStatus } from '../../../src/services/user.service.js';
 
 // ---------------------------------------------------------------------------
 // Mocks — hoisted before all imports by Vitest
@@ -92,6 +94,7 @@ vi.mock('bcrypt', () => ({
 vi.mock('../../../src/services/user.service.js', () => ({
     updateLastConnection: vi.fn().mockResolvedValue(undefined),
     getAllUsers: vi.fn().mockResolvedValue({ users: [], total: 0, totalPages: 1, currentPage: 1 }),
+    getUserStatus: vi.fn().mockResolvedValue('active'),
 }));
 
 vi.mock('../../../src/services/auth.service.js', () => ({
@@ -191,7 +194,8 @@ function buildTestApp() {
     app.use((_req, res, next) => {
         res.render = (view) => {
             const code = res.statusCode && res.statusCode !== 200 ? res.statusCode : 200;
-            res.status(code).send(`<html><body>${view}</body></html>`);
+            const flashes = (res.locals.flashMessages || []).map((f) => f.text).join('\n');
+            res.status(code).send(`<html><body>${view}${flashes ? '\n' + flashes : ''}</body></html>`);
         };
         next();
     });
@@ -253,6 +257,23 @@ describe('auth routes', () => {
             expect(res.status).toBe(302);
             expect(res.headers.location).toContain('/dp-login');
         });
+
+        it('redirects to /dp-login with disabled-account message when user is inactive', async () => {
+            // Passport fails: no active user found
+            vi.mocked(models.User.findOne).mockResolvedValueOnce(null);
+            // findUserByLogin (without status filter) finds the inactive user
+            vi.mocked(findUserByLogin).mockResolvedValueOnce({ ...mockUser, status: 'inactive' });
+
+            const agent = request.agent(app);
+            const postRes = await agent.post('/dp-connect').send({ login: 'testuser', password: 'wrongpassword' });
+
+            expect(postRes.status).toBe(302);
+            expect(postRes.headers.location).toContain('/dp-login');
+
+            // Follow redirect — flash message should appear on the login page
+            const loginPage = await agent.get('/dp-login');
+            expect(loginPage.text).toContain('Votre compte est désactivé. Contactez un administrateur.');
+        });
     });
 
     // -----------------------------------------------------------------------
@@ -279,6 +300,21 @@ describe('auth routes', () => {
 
             expect(res.status).toBe(302);
             expect(res.headers.location).toContain('/dashboard');
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    describe('checkUserStatus — session invalidation', () => {
+        it('redirects to /dp-login when the active session user is deactivated (status → inactive)', async () => {
+            // getUserStatus returns 'inactive' — simulates a user whose account was deactivated
+            // after their session was established (statusCheckedAt defaults to 0, so the TTL
+            // is expired and the DB is checked on this request)
+            vi.mocked(getUserStatus).mockResolvedValueOnce('inactive');
+
+            const res = await request(app).get('/dashboard').set('X-Test-User', JSON.stringify(mockUser));
+
+            expect(res.status).toBe(302);
+            expect(res.headers.location).toContain('/dp-login');
         });
     });
 });

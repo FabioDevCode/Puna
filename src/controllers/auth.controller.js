@@ -77,7 +77,18 @@ export const dpConnect = (req, res) => {
                 reason: err ? 'error' : 'invalid_credentials',
             });
 
-            res.flash('error', 'Identifiants incorrects.');
+            // Identify the reason for failure to provide a more specific message
+            let flashMsg = 'Identifiants incorrects.';
+            try {
+                const existingUser = await findUserByLogin(login);
+                if (existingUser?.status === 'inactive') {
+                    flashMsg = 'Votre compte est désactivé. Contactez un administrateur.';
+                }
+            } catch (_e) {
+                // ignore — use default message
+            }
+
+            res.flash('error', flashMsg);
             return res.redirect('/dp-login');
         }
 
