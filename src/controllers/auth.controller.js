@@ -12,6 +12,20 @@ export const dpFirstCoPost = async (req, res) => {
         const user = await findUserByLogin(login, 'pending');
 
         if (!user) {
+            // Check if user exists but is banned
+            const foundUser = await findUserByLogin(login);
+            if (foundUser && foundUser.status === 'banned') {
+                auditLogger.warn({
+                    action: 'FIRST_LOGIN_FAILED',
+                    ip,
+                    login: login || 'unknown',
+                    reason: 'user_banned',
+                });
+                return res.render('auth/first-login', {
+                    layout: 'auth',
+                    error: 'Votre compte a été banni.',
+                });
+            }
             auditLogger.warn({
                 action: 'FIRST_LOGIN_FAILED',
                 ip,
@@ -82,7 +96,9 @@ export const dpConnect = (req, res) => {
             try {
                 const existingUser = await findUserByLogin(login);
                 if (existingUser && existingUser.status !== 'deleted') {
-                    if (existingUser.status === 'suspended') {
+                    if (existingUser.status === 'banned') {
+                        flashMsg = 'Votre compte a été banni.';
+                    } else if (existingUser.status === 'suspended') {
                         flashMsg =
                             'Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.';
                     } else if (existingUser.status === 'inactive') {

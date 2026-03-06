@@ -491,6 +491,16 @@ export async function changeUserStatus(userId, newStatus, changedBy, reason = nu
         throw new Error(`Owner cannot set status to ${newStatus}`);
     }
 
+    // Only super_admin can un-ban (change from banned status)
+    if (previousStatus === 'banned' && changedBy.role !== 'super_admin') {
+        throw new Error('Only super_admin can un-ban a user');
+    }
+
+    // reason is mandatory when banning
+    if (newStatus === 'banned' && (!reason || !reason.trim())) {
+        throw new Error('Reason is required when banning a user');
+    }
+
     // A pending user can only be set to active, deleted, or banned
     if (previousStatus === 'pending' && !['active', 'deleted', 'banned'].includes(newStatus)) {
         throw new Error(`Cannot change a pending user's status to ${newStatus}`);
