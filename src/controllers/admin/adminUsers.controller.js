@@ -9,7 +9,6 @@ import {
     getAllUsersWithCreator,
     userExists,
     createUserAdmin,
-    deleteUserWithRelations,
     getUserWithRelations,
     updateUserAdmin,
     changeUserStatus,
@@ -239,8 +238,13 @@ export const adminDeleteUser = async (req, res) => {
             return res.redirect('/admin/users');
         }
 
-        // Supprimer l'utilisateur et ses relations via le service
-        await deleteUserWithRelations(user_id);
+        // Soft-supprimer l'utilisateur via le service (audit trail inclus)
+        const changedBy = {
+            userId: currentUserId,
+            login: req.session.user?.login,
+            role: req.session.user?.role,
+        };
+        await changeUserStatus(user_id, 'deleted', changedBy);
 
         res.flash('success', 'Utilisateur supprimé.');
         res.redirect('/admin/users');

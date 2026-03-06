@@ -64,13 +64,7 @@ router.post(
     roleAccess(['super_admin', 'owner']),
     adminCtl.adminCreateUser
 );
-router.post(
-    '/admin/users/delete',
-    isConnected,
-    checkUserStatus,
-    roleAccess(['super_admin', 'owner']),
-    adminCtl.adminDeleteUser
-);
+router.post('/admin/users/delete', isConnected, checkUserStatus, roleAccess(['super_admin']), adminCtl.adminDeleteUser);
 router.get(
     '/admin/users/:id/view',
     isConnected,

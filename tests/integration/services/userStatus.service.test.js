@@ -6,7 +6,13 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import models from '../../../src/models/index.js';
-import { changeUserStatus, incrementFailedAttempts, resetFailedAttempts } from '../../../src/services/user.service.js';
+import {
+    changeUserStatus,
+    deleteUserWithRelations,
+    findUsersWithFilters,
+    incrementFailedAttempts,
+    resetFailedAttempts,
+} from '../../../src/services/user.service.js';
 
 // ---------------------------------------------------------------------------
 // Mocks — vi.mock() is hoisted above imports by Vitest
@@ -27,6 +33,11 @@ vi.mock('../../../src/models/index.js', () => ({
             findByPk: vi.fn(),
             update: vi.fn(),
             increment: vi.fn(),
+            destroy: vi.fn(),
+            findAndCountAll: vi.fn(),
+        },
+        SiteUser: {
+            destroy: vi.fn(),
         },
         sequelize: { sync: vi.fn().mockResolvedValue(undefined) },
         Sequelize: {},
@@ -348,5 +359,108 @@ describe('resetFailedAttempts', () => {
         const result = await resetFailedAttempts('nonexistent-uuid');
 
         expect(result).toBe(false);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// deleteUserWithRelations (soft delete)
+// ---------------------------------------------------------------------------
+
+describe('deleteUserWithRelations', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(models.User.update).mockResolvedValue([1]);
+    });
+
+    it('soft-delete: sets status to deleted and clears password', async () => {
+        const result = await deleteUserWithRelations('target-user-uuid');
+
+        expect(models.User.update).toHaveBeenCalledWith(
+            { status: 'deleted', password: null },
+            { where: { id: 'target-user-uuid' } }
+        );
+        expect(result).toBe(true);
+    });
+
+    it('does NOT call User.destroy (user remains in DB)', async () => {
+        await deleteUserWithRelations('target-user-uuid');
+
+        expect(models.User.destroy).not.toHaveBeenCalled();
+    });
+
+    it('does NOT call SiteUser.destroy (site relations preserved)', async () => {
+        await deleteUserWithRelations('target-user-uuid');
+
+        expect(models.SiteUser.destroy).not.toHaveBeenCalled();
+    });
+
+    it('returns false when user not found', async () => {
+        vi.mocked(models.User.update).mockResolvedValue([0]);
+
+        const result = await deleteUserWithRelations('nonexistent-uuid');
+
+        expect(result).toBe(false);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// findUsersWithFilters (excludes deleted users)
+// ---------------------------------------------------------------------------
+
+describe('findUsersWithFilters', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(models.User.findAndCountAll).mockResolvedValue({ count: 0, rows: [] });
+    });
+
+    it('excludes deleted users by default (Op.ne deleted in where clause)', async () => {
+        const { Op } = await import('sequelize');
+
+        await findUsersWithFilters({ limit: 10, offset: 0 });
+
+        expect(models.User.findAndCountAll).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({
+                    status: { [Op.ne]: 'deleted' },
+                }),
+            })
+        );
+    });
+
+    it('returns empty list when all users are deleted (mock returns none)', async () => {
+        const { users, total } = await findUsersWithFilters();
+
+        expect(users).toEqual([]);
+        expect(total).toBe(0);
+    });
+
+    it('returns only non-deleted users from findAndCountAll result', async () => {
+        const mockUser = {
+            id: 'active-uuid',
+            email: 'active@test.com',
+            login: 'activeuser',
+            role: 'editor',
+            status: 'active',
+            last_connection: null,
+            createdAt: new Date(),
+            created_by: null,
+            toJSON: vi.fn().mockReturnValue({
+                id: 'active-uuid',
+                email: 'active@test.com',
+                login: 'activeuser',
+                role: 'editor',
+                status: 'active',
+                last_connection: null,
+                createdAt: new Date(),
+                created_by: null,
+            }),
+        };
+        vi.mocked(models.User.findAndCountAll).mockResolvedValue({ count: 1, rows: [mockUser] });
+
+        const { users, total } = await findUsersWithFilters();
+
+        expect(total).toBe(1);
+        expect(users).toHaveLength(1);
+        expect(users[0].status).toBe('active');
     });
 });
