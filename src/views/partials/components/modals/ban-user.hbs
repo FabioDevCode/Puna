@@ -1,0 +1,38 @@
+<!-- Modal de bannissement d'utilisateur -->
+<dialog id="modal_ban_user" class="modal">
+    <div class="modal-box w-11/12 md:w-6/12 lg:w-5/12">
+        <h3 class="font-bold text-lg text-error">
+            Bannir cet utilisateur
+        </h3>
+        <p class="py-2">
+            Êtes-vous sûr de vouloir bannir l'utilisateur <strong id="ban_user_login"></strong> ?
+        </p>
+
+        <form id="formBanUser" action="" method="post" class="flex flex-col gap-4">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+        <input type="hidden" name="status" value="banned" />
+
+    <div class="form-control w-full">
+        <label class="label">
+            <span class="label-text font-semibold">Motif du bannissement <span
+            class="text-error">*</span></span>
+</label>
+<textarea id="ban_user_reason" name="reason" placeholder="Indiquez le motif du bannissement..."
+class="textarea textarea-bordered w-full" required></textarea>
+</div>
+</form>
+
+<div class="modal-action mt-4">
+    <form method="dialog">
+        <button class="btn btn-sm">Annuler</button>
+    </form>
+    <button type="submit" form="formBanUser" id="confirmBanUserBtn" class="btn btn-sm btn-error" disabled>
+        <i class="fa-solid fa-ban"></i>
+        Bannir
+    </button>
+</div>
+</div>
+<form method="dialog" class="modal-backdrop">
+    <button>close</button>
+</form>
+</dialog>

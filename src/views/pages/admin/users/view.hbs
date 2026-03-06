@@ -35,168 +35,305 @@
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade-in">
         <div id="status_btn_box" class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
-            {{!-- bouton de status ici --}}
-        </div>
+            {{#unless (eq user.status "deleted")}}
+                <div class="card-body p-4 flex flex-row flex-wrap gap-2 items-center">
 
-        <!-- Colonne gauche: Profil résumé -->
-        <div class="col-span-1">
-            <div class="card bg-base-100 shadow-xl border border-base-200">
-                <div class="card-body items-center text-center p-6">
-                    <h2 class="card-title text-2xl font-bold mb-1">
-                        {{user.login}}
-                    </h2>
+                    {{!--
+                    Note: id="banUserBtn" appears in multiple status blocks below.
+                    Only one block is rendered at a time (mutually exclusive statuses),
+                    so the ID is unique in the DOM at runtime.
+                    --}}
 
-                    <p class="text-base-content/60 font-medium mb-3">
-                        {{#if user.email}}
-                            {{user.email}}
-                        {{else}}
-                            <span class="italic text-base-content/40">
-                                &nbsp;
-                            </span>
-                        {{/if}}
-                    </p>
+                    {{! pending: Bannir + Supprimer — super_admin uniquement }}
+                    {{#if (eq user.status "pending")}}
+                        {{#roleIs roles='super_admin'}}
+                            <button id="banUserBtn" class="btn btn-sm btn-error"
+                            data-user-id="{{user.id}}" data-user-login="{{user.login}}">
+                                <i class="fa-solid fa-ban"></i>
+                                Bannir
+                            </button>
+                            <form method="POST" action="/admin/users/{{user.id}}/status">
+                                <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+                            <input type="hidden" name="status" value="deleted" />
+                        <button type="submit" class="btn btn-sm btn-error btn-outline">
+                            <i class="fa-solid fa-trash-can"></i>
+                            Supprimer
+                        </button>
+                    </form>
+                {{/roleIs}}
+            {{/if}}
 
-                    <div class="flex gap-2 justify-center mb-6">
-                        <span class="badge badge-outline badge_role badge_{{user.role}} badge-lg">
-                            {{user.role}}
-                        </span>
+            {{! active: Désactiver (super_admin+owner), Bannir (super_admin), Supprimer (super_admin) }}
+            {{#if (eq user.status "active")}}
+                {{#roleIs roles='super_admin,owner'}}
+                    <form method="POST" action="/admin/users/{{user.id}}/status">
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+                    <input type="hidden" name="status" value="inactive" />
+                <button type="submit" class="btn btn-sm btn-warning">
+                    <i class="fa-solid fa-pause"></i>
+                    Désactiver
+                </button>
+            </form>
+        {{/roleIs}}
+        {{#roleIs roles='super_admin'}}
+            <button id="banUserBtn" class="btn btn-sm btn-error"
+            data-user-id="{{user.id}}" data-user-login="{{user.login}}">
+                <i class="fa-solid fa-ban"></i>
+                Bannir
+            </button>
+            <form method="POST" action="/admin/users/{{user.id}}/status">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+            <input type="hidden" name="status" value="deleted" />
+        <button type="submit" class="btn btn-sm btn-error btn-outline">
+            <i class="fa-solid fa-trash-can"></i>
+            Supprimer
+        </button>
+    </form>
+{{/roleIs}}
+{{/if}}
 
-                        <span class="badge_s_{{user.status}} profil_badge">
-                            {{user.status}}
-                        </span>
-                    </div>
+{{! inactive: Réactiver (super_admin+owner), Bannir (super_admin), Supprimer (super_admin) }}
+{{#if (eq user.status "inactive")}}
+    {{#roleIs roles='super_admin,owner'}}
+        <form method="POST" action="/admin/users/{{user.id}}/status">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+        <input type="hidden" name="status" value="active" />
+    <button type="submit" class="btn btn-sm btn-success">
+        <i class="fa-solid fa-play"></i>
+        Réactiver
+    </button>
+</form>
+{{/roleIs}}
+{{#roleIs roles='super_admin'}}
+    <button id="banUserBtn" class="btn btn-sm btn-error"
+    data-user-id="{{user.id}}" data-user-login="{{user.login}}">
+        <i class="fa-solid fa-ban"></i>
+        Bannir
+    </button>
+    <form method="POST" action="/admin/users/{{user.id}}/status">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+    <input type="hidden" name="status" value="deleted" />
+<button type="submit" class="btn btn-sm btn-error btn-outline">
+    <i class="fa-solid fa-trash-can"></i>
+    Supprimer
+</button>
+</form>
+{{/roleIs}}
+{{/if}}
 
-                    <div class="w-full border-t border-base-200 my-2"></div>
+{{! suspended: Réactiver, Bannir, Supprimer — super_admin uniquement }}
+{{#if (eq user.status "suspended")}}
+    {{#roleIs roles='super_admin'}}
+        <form method="POST" action="/admin/users/{{user.id}}/status">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+        <input type="hidden" name="status" value="active" />
+    <button type="submit" class="btn btn-sm btn-success">
+        <i class="fa-solid fa-play"></i>
+        Réactiver
+    </button>
+</form>
+<button id="banUserBtn" class="btn btn-sm btn-error"
+data-user-id="{{user.id}}" data-user-login="{{user.login}}">
+    <i class="fa-solid fa-ban"></i>
+    Bannir
+</button>
+<form method="POST" action="/admin/users/{{user.id}}/status">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+<input type="hidden" name="status" value="deleted" />
+<button type="submit" class="btn btn-sm btn-error btn-outline">
+    <i class="fa-solid fa-trash-can"></i>
+    Supprimer
+</button>
+</form>
+{{/roleIs}}
+{{/if}}
 
-                    <div class="w-full flex justify-between items-center text-sm mt-3">
-                        <span class="text-base-content/50 font-medium">
-                            Dernière connexion
-                        </span>
-                        <span class="font-semibold text-base-content/80">
-                            {{#if user.last_connection}}
-                                {{user.last_connection}}
-                            {{else}}
-                                <span class="italic text-base-content/40">
-                                    Jamais
-                                </span>
-                            {{/if}}
-                        </span>
-                    </div>
-                    <div class="w-full flex justify-between items-center text-sm mt-3">
-                        <span class="text-base-content/50 font-medium">
-                            Création
-                        </span>
-                        <span class="font-semibold text-base-content/80">
-                            {{user.createdAt}}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
+{{! banned: Réactiver, Supprimer — super_admin uniquement }}
+{{#if (eq user.status "banned")}}
+    {{#roleIs roles='super_admin'}}
+        <form method="POST" action="/admin/users/{{user.id}}/status">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+        <input type="hidden" name="status" value="active" />
+    <button type="submit" class="btn btn-sm btn-success">
+        <i class="fa-solid fa-play"></i>
+        Réactiver
+    </button>
+</form>
+<form method="POST" action="/admin/users/{{user.id}}/status">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+<input type="hidden" name="status" value="deleted" />
+<button type="submit" class="btn btn-sm btn-error btn-outline">
+    <i class="fa-solid fa-trash-can"></i>
+    Supprimer
+</button>
+</form>
+{{/roleIs}}
+{{/if}}
 
-        <!-- Colonne droite: Détails -->
-        <div class="col-span-1 lg:col-span-2 space-y-6">
-            <!-- Informations détaillées -->
-            <div class="card bg-base-100 shadow-xl border border-base-200">
-                <div class="card-body p-6">
-                    <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
-                        Informations du compte
-                    </h3>
+</div>
+{{/unless}}
+</div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
-                        <div class="group">
-                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
-                                Identifiant (Login)
-                            </span>
-                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
-                                {{user.login}}
-                            </div>
-                        </div>
-                        <div class="group">
-                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
-                                Adresse Email
-                            </span>
-                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
-                                {{#if user.email}}
-                                    {{user.email}}
-                                {{else}}
-                                    &nbsp;
-                                {{/if}}
-                            </div>
-                        </div>
-                        <div class="group">
-                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
-                                Rôle Système
-                            </span>
-                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
-                                {{user.role}}
-                            </div>
-                        </div>
-                        <div class="group">
-                            <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
-                                Créé par
-                            </span>
-                            <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
-                                {{#if user.creator}}
-                                    {{user.creator.login}}
-                                {{else}}
-                                    <span class="italic text-base-content/40">Système</span>
-                                {{/if}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- Colonne gauche: Profil résumé -->
+<div class="col-span-1">
+    <div class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body items-center text-center p-6">
+            <h2 class="card-title text-2xl font-bold mb-1">
+                {{user.login}}
+            </h2>
 
-        <!-- Sites assignés -->
-        <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
-            <div class="card-body p-6">
-                <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
-                    Sites assignés
-                </h3>
-
-                {{#if (eq user.role "super_admin")}}
-                    <div class="flex flex-col items-center justify-center p-6 bg-neutral/10 rounded-lg border border-neutral">
-                        <p class="text-neutral text-md font-medium text-center">
-                            Un <b>super_admin</b> accède à tous les sites web.
-                        </p>
-                    </div>
+            <p class="text-base-content/60 font-medium mb-3">
+                {{#if user.email}}
+                    {{user.email}}
                 {{else}}
-                    {{#if user.siteassignments}}
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {{#each user.siteassignments}}
-                                <div class="flex items-center gap-4 bg-base-200/80 p-3.5 rounded-lg border border-base-200 cursor-default">
-                                    <div class="bg-base-100 shadow-sm w-8 h-8 rounded-md flex items-center justify-center text-neutral text-sm">
-                                        <i class="fa-solid fa-network-wired"></i>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="font-bold text-sm text-base-content truncate">
-                                            {{this.site.domain}}
-                                        </p>
-                                    </div>
-                                </div>
-                            {{/each}}
-                        </div>
-                    {{else}}
-                        <div class="flex flex-col items-center justify-center py-10 px-4 bg-base-200/30 rounded-lg border-2 border-dashed border-base-300">
-                            <div class="bg-base-200 text-base-content/30 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl">
-                                <i class="fa-solid fa-link-slash"></i>
-                            </div>
-                            <h4 class="text-base-content/80 font-bold mb-1">
-                                Aucun site assigné
-                            </h4>
-                            <p class="text-base-content/50 text-sm font-medium text-center">
-                                Cet utilisateur n'a pas encore accès à des sites web.
-                            </p>
-                        </div>
-                    {{/if}}
+                    <span class="italic text-base-content/40">
+                        &nbsp;
+                    </span>
                 {{/if}}
+            </p>
+
+            <div class="flex gap-2 justify-center mb-6">
+                <span class="badge badge-outline badge_role badge_{{user.role}} badge-lg">
+                    {{user.role}}
+                </span>
+
+                <span class="badge_s_{{user.status}} profil_badge">
+                    {{user.status}}
+                </span>
+            </div>
+
+            <div class="w-full border-t border-base-200 my-2"></div>
+
+            <div class="w-full flex justify-between items-center text-sm mt-3">
+                <span class="text-base-content/50 font-medium">
+                    Dernière connexion
+                </span>
+                <span class="font-semibold text-base-content/80">
+                    {{#if user.last_connection}}
+                        {{user.last_connection}}
+                    {{else}}
+                        <span class="italic text-base-content/40">
+                            Jamais
+                        </span>
+                    {{/if}}
+                </span>
+            </div>
+            <div class="w-full flex justify-between items-center text-sm mt-3">
+                <span class="text-base-content/50 font-medium">
+                    Création
+                </span>
+                <span class="font-semibold text-base-content/80">
+                    {{user.createdAt}}
+                </span>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Colonne droite: Détails -->
+<div class="col-span-1 lg:col-span-2 space-y-6">
+    <!-- Informations détaillées -->
+    <div class="card bg-base-100 shadow-xl border border-base-200">
+        <div class="card-body p-6">
+            <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
+                Informations du compte
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                <div class="group">
+                    <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                        Identifiant (Login)
+                    </span>
+                    <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
+                        {{user.login}}
+                    </div>
+                </div>
+                <div class="group">
+                    <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                        Adresse Email
+                    </span>
+                    <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
+                        {{#if user.email}}
+                            {{user.email}}
+                        {{else}}
+                            &nbsp;
+                        {{/if}}
+                    </div>
+                </div>
+                <div class="group">
+                    <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                        Rôle Système
+                    </span>
+                    <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
+                        {{user.role}}
+                    </div>
+                </div>
+                <div class="group">
+                    <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
+                        Créé par
+                    </span>
+                    <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
+                        {{#if user.creator}}
+                            {{user.creator.login}}
+                        {{else}}
+                            <span class="italic text-base-content/40">Système</span>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sites assignés -->
+<div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
+    <div class="card-body p-6">
+        <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
+            Sites assignés
+        </h3>
+
+        {{#if (eq user.role "super_admin")}}
+            <div class="flex flex-col items-center justify-center p-6 bg-neutral/10 rounded-lg border border-neutral">
+                <p class="text-neutral text-md font-medium text-center">
+                    Un <b>super_admin</b> accède à tous les sites web.
+                </p>
+            </div>
+        {{else}}
+            {{#if user.siteassignments}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {{#each user.siteassignments}}
+                        <div class="flex items-center gap-4 bg-base-200/80 p-3.5 rounded-lg border border-base-200 cursor-default">
+                            <div class="bg-base-100 shadow-sm w-8 h-8 rounded-md flex items-center justify-center text-neutral text-sm">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-sm text-base-content truncate">
+                                    {{this.site.domain}}
+                                </p>
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
+            {{else}}
+                <div class="flex flex-col items-center justify-center py-10 px-4 bg-base-200/30 rounded-lg border-2 border-dashed border-base-300">
+                    <div class="bg-base-200 text-base-content/30 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-3xl">
+                        <i class="fa-solid fa-link-slash"></i>
+                    </div>
+                    <h4 class="text-base-content/80 font-bold mb-1">
+                        Aucun site assigné
+                    </h4>
+                    <p class="text-base-content/50 text-sm font-medium text-center">
+                        Cet utilisateur n'a pas encore accès à des sites web.
+                    </p>
+                </div>
+            {{/if}}
+        {{/if}}
+    </div>
+</div>
+</div>
+</div>
+
 {{> components/modals/delete-user }}
+{{> components/modals/ban-user }}
 
 <script src="/js/admin/user-view.js"></script>
