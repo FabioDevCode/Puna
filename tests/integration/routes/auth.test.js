@@ -23,7 +23,7 @@ import { injectUserRole } from '../../../src/middlewares/injectUserRole.js';
 import models from '../../../src/models/index.js';
 import defaultRouter from '../../../src/routes/default.routes.js';
 import { findUserByLogin } from '../../../src/services/auth.service.js';
-import { getUserStatus } from '../../../src/services/user.service.js';
+import { getUserStatus, incrementFailedAttempts, resetFailedAttempts } from '../../../src/services/user.service.js';
 
 // ---------------------------------------------------------------------------
 // Mocks — hoisted before all imports by Vitest
@@ -95,6 +95,8 @@ vi.mock('../../../src/services/user.service.js', () => ({
     updateLastConnection: vi.fn().mockResolvedValue(undefined),
     getAllUsers: vi.fn().mockResolvedValue({ users: [], total: 0, totalPages: 1, currentPage: 1 }),
     getUserStatus: vi.fn().mockResolvedValue('active'),
+    incrementFailedAttempts: vi.fn().mockResolvedValue({ failedAttempts: 1, suspended: false }),
+    resetFailedAttempts: vi.fn().mockResolvedValue(true),
 }));
 
 vi.mock('../../../src/services/auth.service.js', () => ({
@@ -273,6 +275,51 @@ describe('auth routes', () => {
             // Follow redirect — flash message should appear on the login page
             const loginPage = await agent.get('/dp-login');
             expect(loginPage.text).toContain('Votre compte est désactivé. Contactez un administrateur.');
+        });
+
+        it('redirects to /dp-login with suspended-account message when user is suspended', async () => {
+            // Passport fails: no active user found
+            vi.mocked(models.User.findOne).mockResolvedValueOnce(null);
+            // findUserByLogin finds the suspended user
+            vi.mocked(findUserByLogin).mockResolvedValueOnce({ ...mockUser, status: 'suspended' });
+
+            const agent = request.agent(app);
+            const postRes = await agent.post('/dp-connect').send({ login: 'testuser', password: 'wrongpassword' });
+
+            expect(postRes.status).toBe(302);
+            expect(postRes.headers.location).toContain('/dp-login');
+
+            const loginPage = await agent.get('/dp-login');
+            expect(loginPage.text).toContain(
+                'Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.'
+            );
+        });
+
+        it('increments failed_login_attempts counter on login failure for active user', async () => {
+            vi.mocked(models.User.findOne).mockResolvedValueOnce(null);
+            vi.mocked(findUserByLogin).mockResolvedValueOnce({ ...mockUser, status: 'active' });
+
+            await request(app).post('/dp-connect').send({ login: 'testuser', password: 'wrongpassword' });
+
+            expect(incrementFailedAttempts).toHaveBeenCalledWith(mockUser.id, mockUser.login, expect.any(String));
+        });
+
+        it('does NOT increment counter when login fails for suspended user', async () => {
+            vi.mocked(models.User.findOne).mockResolvedValueOnce(null);
+            vi.mocked(findUserByLogin).mockResolvedValueOnce({ ...mockUser, status: 'suspended' });
+
+            await request(app).post('/dp-connect').send({ login: 'testuser', password: 'wrongpassword' });
+
+            expect(incrementFailedAttempts).not.toHaveBeenCalled();
+        });
+
+        it('resets failed_login_attempts counter on successful login', async () => {
+            vi.mocked(models.User.findOne).mockResolvedValueOnce({ ...mockUser });
+            vi.mocked(bcrypt.compare).mockResolvedValueOnce(true);
+
+            await request(app).post('/dp-connect').send({ login: 'testuser', password: 'correctpassword' });
+
+            expect(resetFailedAttempts).toHaveBeenCalledWith(mockUser.id);
         });
     });
 

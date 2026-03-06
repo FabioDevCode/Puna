@@ -369,6 +369,68 @@ export async function updateUserAdmin(userId, updateData) {
 }
 
 /**
+ * Incrémenter le compteur de tentatives de connexion échouées.
+ * Si le compteur atteint le seuil configuré, le statut passe automatiquement
+ * à `suspended` et un log d'audit est émis.
+ * @param {string} userId - ID de l'utilisateur
+ * @param {string} [userLogin] - Login (pour le log)
+ * @param {string|null} [ip=null] - Adresse IP de la tentative
+ * @returns {Promise<{failedAttempts: number, suspended: boolean}>}
+ */
+export async function incrementFailedAttempts(userId, userLogin = null, ip = null) {
+    const maxAttempts = parseInt(process.env.MAX_FAILED_LOGIN_ATTEMPTS || '10', 10);
+
+    await models.User.increment('failed_login_attempts', { where: { id: userId } });
+
+    const user = await models.User.findByPk(userId, {
+        attributes: ['id', 'login', 'status', 'failed_login_attempts'],
+    });
+
+    if (!user) return { failedAttempts: 0, suspended: false };
+
+    const failedAttempts = user.failed_login_attempts;
+    const login = userLogin || user.login;
+    let suspended = false;
+
+    auditLogger.warn({
+        action: 'LOGIN_FAILED_ATTEMPT_COUNT',
+        userId,
+        userLogin: login,
+        failedAttempts,
+        maxAttempts,
+        ip,
+    });
+
+    if (failedAttempts >= maxAttempts && user.status !== 'suspended') {
+        await models.User.update({ status: 'suspended' }, { where: { id: userId } });
+        suspended = true;
+
+        auditLogger.info({
+            action: 'USER_STATUS_CHANGE',
+            marker: '🔄 STATUS_CHANGE',
+            previousStatus: user.status,
+            newStatus: 'suspended',
+            source: 'auto_rate_limit',
+            reason: `Exceeded maximum failed login attempts (${maxAttempts})`,
+            userId,
+            userLogin: login,
+        });
+    }
+
+    return { failedAttempts, suspended };
+}
+
+/**
+ * Réinitialiser le compteur de tentatives de connexion échouées
+ * @param {string} userId - ID de l'utilisateur
+ * @returns {Promise<boolean>} - true si mise à jour réussie
+ */
+export async function resetFailedAttempts(userId) {
+    const [updated] = await models.User.update({ failed_login_attempts: 0 }, { where: { id: userId } });
+    return updated > 0;
+}
+
+/**
  * Mettre à jour la dernière connexion d'un utilisateur
  * @param {string} userId - ID de l'utilisateur
  * @returns {Promise<boolean>} - true si mise à jour réussie
@@ -439,6 +501,11 @@ export async function changeUserStatus(userId, newStatus, changedBy, reason = nu
     // Clear password when deleting
     if (newStatus === 'deleted') {
         updateData.password = null;
+    }
+
+    // Reset failed login attempts when reactivating
+    if (newStatus === 'active') {
+        updateData.failed_login_attempts = 0;
     }
 
     await models.User.update(updateData, { where: { id: userId } });

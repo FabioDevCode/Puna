@@ -1,11 +1,12 @@
 /**
  * @file tests/integration/services/userStatus.service.test.js
- * Integration tests for changeUserStatus service function
+ * Integration tests for changeUserStatus, incrementFailedAttempts,
+ * and resetFailedAttempts service functions
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import models from '../../../src/models/index.js';
-import { changeUserStatus } from '../../../src/services/user.service.js';
+import { changeUserStatus, incrementFailedAttempts, resetFailedAttempts } from '../../../src/services/user.service.js';
 
 // ---------------------------------------------------------------------------
 // Mocks — vi.mock() is hoisted above imports by Vitest
@@ -25,6 +26,7 @@ vi.mock('../../../src/models/index.js', () => ({
         User: {
             findByPk: vi.fn(),
             update: vi.fn(),
+            increment: vi.fn(),
         },
         sequelize: { sync: vi.fn().mockResolvedValue(undefined) },
         Sequelize: {},
@@ -44,6 +46,7 @@ function makeMockUser(overrides = {}) {
         role: 'editor',
         status: 'active',
         password: '$2b$10$mock-hashed-password',
+        failed_login_attempts: 0,
         ...overrides,
     };
     return { ...base, toJSON: vi.fn().mockReturnValue({ ...base }) };
@@ -74,13 +77,28 @@ describe('changeUserStatus', () => {
     });
 
     // -----------------------------------------------------------------------
-    it('inactive → active: restores active status', async () => {
+    it('inactive → active: restores active status and resets failed_login_attempts', async () => {
         vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'inactive' }));
 
         const result = await changeUserStatus('target-user-uuid', 'active', ADMIN_SUPER);
 
-        expect(models.User.update).toHaveBeenCalledWith({ status: 'active' }, { where: { id: 'target-user-uuid' } });
+        expect(models.User.update).toHaveBeenCalledWith(
+            { status: 'active', failed_login_attempts: 0 },
+            { where: { id: 'target-user-uuid' } }
+        );
         expect(result).toEqual({ success: true, previousStatus: 'inactive', newStatus: 'active' });
+    });
+
+    // -----------------------------------------------------------------------
+    it('suspended → active: resets failed_login_attempts to 0', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'suspended' }));
+
+        await changeUserStatus('target-user-uuid', 'active', ADMIN_SUPER);
+
+        expect(models.User.update).toHaveBeenCalledWith(
+            { status: 'active', failed_login_attempts: 0 },
+            { where: { id: 'target-user-uuid' } }
+        );
     });
 
     // -----------------------------------------------------------------------
@@ -164,5 +182,128 @@ describe('changeUserStatus', () => {
                 ip: '127.0.0.1',
             })
         );
+    });
+});
+
+// ---------------------------------------------------------------------------
+// incrementFailedAttempts
+// ---------------------------------------------------------------------------
+
+describe('incrementFailedAttempts', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(models.User.increment).mockResolvedValue([1]);
+        vi.mocked(models.User.update).mockResolvedValue([1]);
+    });
+
+    it('user with 9 failed attempts after increment: status remains active, failedAttempts = 9', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active', failed_login_attempts: 9 }));
+
+        const result = await incrementFailedAttempts('target-user-uuid', 'targetuser', '127.0.0.1');
+
+        expect(models.User.increment).toHaveBeenCalledWith('failed_login_attempts', {
+            where: { id: 'target-user-uuid' },
+        });
+        expect(result.failedAttempts).toBe(9);
+        expect(result.suspended).toBe(false);
+        expect(models.User.update).not.toHaveBeenCalled();
+    });
+
+    it('user with 10 failed attempts after increment: status becomes suspended', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(
+            makeMockUser({ status: 'active', failed_login_attempts: 10 })
+        );
+
+        const result = await incrementFailedAttempts('target-user-uuid', 'targetuser', '127.0.0.1');
+
+        expect(result.failedAttempts).toBe(10);
+        expect(result.suspended).toBe(true);
+        expect(models.User.update).toHaveBeenCalledWith({ status: 'suspended' }, { where: { id: 'target-user-uuid' } });
+    });
+
+    it('logs USER_STATUS_CHANGE audit event when auto-suspending', async () => {
+        const { auditLogger } = await import('../../../src/config/logger.js');
+        vi.mocked(models.User.findByPk).mockResolvedValue(
+            makeMockUser({ status: 'active', failed_login_attempts: 10 })
+        );
+
+        await incrementFailedAttempts('target-user-uuid', 'targetuser', '10.0.0.1');
+
+        expect(auditLogger.info).toHaveBeenCalledWith(
+            expect.objectContaining({
+                action: 'USER_STATUS_CHANGE',
+                marker: '🔄 STATUS_CHANGE',
+                previousStatus: 'active',
+                newStatus: 'suspended',
+                source: 'auto_rate_limit',
+                userId: 'target-user-uuid',
+                userLogin: 'targetuser',
+            })
+        );
+    });
+
+    it('logs LOGIN_FAILED_ATTEMPT_COUNT on every increment', async () => {
+        const { auditLogger } = await import('../../../src/config/logger.js');
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active', failed_login_attempts: 7 }));
+
+        await incrementFailedAttempts('target-user-uuid', 'targetuser', '10.0.0.2');
+
+        expect(auditLogger.warn).toHaveBeenCalledWith(
+            expect.objectContaining({
+                action: 'LOGIN_FAILED_ATTEMPT_COUNT',
+                userId: 'target-user-uuid',
+                userLogin: 'targetuser',
+                failedAttempts: 7,
+                ip: '10.0.0.2',
+            })
+        );
+    });
+
+    it('already suspended: does not update status again', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(
+            makeMockUser({ status: 'suspended', failed_login_attempts: 15 })
+        );
+
+        const result = await incrementFailedAttempts('target-user-uuid', 'targetuser', '127.0.0.1');
+
+        expect(result.suspended).toBe(false);
+        expect(models.User.update).not.toHaveBeenCalled();
+    });
+
+    it('returns {failedAttempts: 0, suspended: false} when user not found', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(null);
+
+        const result = await incrementFailedAttempts('nonexistent-uuid', 'noone', '127.0.0.1');
+
+        expect(result).toEqual({ failedAttempts: 0, suspended: false });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// resetFailedAttempts
+// ---------------------------------------------------------------------------
+
+describe('resetFailedAttempts', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(models.User.update).mockResolvedValue([1]);
+    });
+
+    it('resets failed_login_attempts to 0 on successful login', async () => {
+        const result = await resetFailedAttempts('target-user-uuid');
+
+        expect(models.User.update).toHaveBeenCalledWith(
+            { failed_login_attempts: 0 },
+            { where: { id: 'target-user-uuid' } }
+        );
+        expect(result).toBe(true);
+    });
+
+    it('returns false when user not found', async () => {
+        vi.mocked(models.User.update).mockResolvedValue([0]);
+
+        const result = await resetFailedAttempts('nonexistent-uuid');
+
+        expect(result).toBe(false);
     });
 });
