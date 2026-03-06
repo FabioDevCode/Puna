@@ -4,8 +4,11 @@
  */
 
 import { Op } from 'sequelize';
+import { auditLogger } from '../config/logger.js';
 import models from '../models/index.js';
 import { hashPassword } from './auth.service.js';
+
+const VALID_STATUSES = ['active', 'inactive', 'suspended', 'banned', 'deleted'];
 
 /**
  * Récupérer tous les utilisateurs avec pagination
@@ -387,4 +390,76 @@ export async function getUserStatus(userId) {
     });
 
     return user ? user.status : null;
+}
+
+/**
+ * Changer le statut d'un utilisateur avec audit trail
+ * @param {string} userId - ID de l'utilisateur cible
+ * @param {string} newStatus - Nouveau statut (active, inactive, suspended, banned, deleted)
+ * @param {Object} changedBy - Informations sur l'admin qui effectue le changement
+ * @param {string} changedBy.userId - ID de l'admin
+ * @param {string} changedBy.login - Login de l'admin
+ * @param {string} changedBy.role - Rôle de l'admin
+ * @param {string|null} [reason=null] - Motif (obligatoire pour banned, optionnel sinon)
+ * @param {string} [source='manual'] - Source du changement (manual, auto_rate_limit, auto_cron)
+ * @param {string|null} [ip=null] - Adresse IP de l'admin
+ * @returns {Promise<Object>} - { success, previousStatus, newStatus }
+ */
+export async function changeUserStatus(userId, newStatus, changedBy, reason = null, source = 'manual', ip = null) {
+    if (!VALID_STATUSES.includes(newStatus)) {
+        throw new Error(`Invalid status: ${newStatus}`);
+    }
+
+    if (changedBy.userId === userId) {
+        throw new Error('Cannot change your own status');
+    }
+
+    const user = await models.User.findByPk(userId, {
+        attributes: ['id', 'login', 'status', 'password'],
+    });
+
+    if (!user) {
+        throw new Error(`User not found: ${userId}`);
+    }
+
+    const previousStatus = user.status;
+
+    // Owner can only set active or inactive
+    if (changedBy.role === 'owner' && !['active', 'inactive'].includes(newStatus)) {
+        throw new Error(`Owner cannot set status to ${newStatus}`);
+    }
+
+    // A pending user can only be set to active, deleted, or banned
+    if (previousStatus === 'pending' && !['active', 'deleted', 'banned'].includes(newStatus)) {
+        throw new Error(`Cannot change a pending user's status to ${newStatus}`);
+    }
+
+    const updateData = { status: newStatus };
+
+    // Clear password when deleting
+    if (newStatus === 'deleted') {
+        updateData.password = null;
+    }
+
+    await models.User.update(updateData, { where: { id: userId } });
+
+    auditLogger.info({
+        action: 'USER_STATUS_CHANGE',
+        marker: '🔄 STATUS_CHANGE',
+        userId,
+        userLogin: user.login,
+        previousStatus,
+        newStatus,
+        changedBy: {
+            userId: changedBy.userId,
+            login: changedBy.login,
+            role: changedBy.role,
+        },
+        reason,
+        source,
+        ip,
+        timestamp: new Date().toISOString(),
+    });
+
+    return { success: true, previousStatus, newStatus };
 }
