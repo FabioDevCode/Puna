@@ -119,6 +119,49 @@ describe('changeUserStatus', () => {
     });
 
     // -----------------------------------------------------------------------
+    it('→ banned without reason: throws', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
+
+        await expect(changeUserStatus('target-user-uuid', 'banned', ADMIN_SUPER)).rejects.toThrow(
+            'Reason is required when banning a user'
+        );
+        expect(models.User.update).not.toHaveBeenCalled();
+    });
+
+    // -----------------------------------------------------------------------
+    it('→ banned with empty reason: throws', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
+
+        await expect(changeUserStatus('target-user-uuid', 'banned', ADMIN_SUPER, '   ')).rejects.toThrow(
+            'Reason is required when banning a user'
+        );
+        expect(models.User.update).not.toHaveBeenCalled();
+    });
+
+    // -----------------------------------------------------------------------
+    it('banned → active (debanning): super_admin can un-ban', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'banned' }));
+
+        const result = await changeUserStatus('target-user-uuid', 'active', ADMIN_SUPER, 'Appeal accepted');
+
+        expect(models.User.update).toHaveBeenCalledWith(
+            { status: 'active', failed_login_attempts: 0 },
+            { where: { id: 'target-user-uuid' } }
+        );
+        expect(result).toEqual({ success: true, previousStatus: 'banned', newStatus: 'active' });
+    });
+
+    // -----------------------------------------------------------------------
+    it('banned → active (debanning): owner cannot un-ban', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'banned' }));
+
+        await expect(changeUserStatus('target-user-uuid', 'active', ADMIN_OWNER)).rejects.toThrow(
+            'Only super_admin can un-ban a user'
+        );
+        expect(models.User.update).not.toHaveBeenCalled();
+    });
+
+    // -----------------------------------------------------------------------
     it('→ deleted: clears the password field', async () => {
         vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
 

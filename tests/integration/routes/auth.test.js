@@ -194,10 +194,13 @@ function buildTestApp() {
 
     // Stub res.render so tests need no real Handlebars view engine
     app.use((_req, res, next) => {
-        res.render = (view) => {
+        res.render = (view, data) => {
             const code = res.statusCode && res.statusCode !== 200 ? res.statusCode : 200;
             const flashes = (res.locals.flashMessages || []).map((f) => f.text).join('\n');
-            res.status(code).send(`<html><body>${view}${flashes ? '\n' + flashes : ''}</body></html>`);
+            const errorText = data?.error || '';
+            res.status(code).send(
+                `<html><body>${view}${errorText ? '\n' + errorText : ''}${flashes ? '\n' + flashes : ''}</body></html>`
+            );
         };
         next();
     });
@@ -313,6 +316,21 @@ describe('auth routes', () => {
             expect(incrementFailedAttempts).not.toHaveBeenCalled();
         });
 
+        it('does NOT increment counter and shows ban message when user is banned', async () => {
+            vi.mocked(models.User.findOne).mockResolvedValueOnce(null);
+            vi.mocked(findUserByLogin).mockResolvedValueOnce({ ...mockUser, status: 'banned' });
+
+            const agent = request.agent(app);
+            const postRes = await agent.post('/dp-connect').send({ login: 'testuser', password: 'wrongpassword' });
+
+            expect(postRes.status).toBe(302);
+            expect(postRes.headers.location).toContain('/dp-login');
+            expect(incrementFailedAttempts).not.toHaveBeenCalled();
+
+            const loginPage = await agent.get('/dp-login');
+            expect(loginPage.text).toContain('Votre compte a été banni.');
+        });
+
         it('resets failed_login_attempts counter on successful login', async () => {
             vi.mocked(models.User.findOne).mockResolvedValueOnce({ ...mockUser });
             vi.mocked(bcrypt.compare).mockResolvedValueOnce(true);
@@ -362,6 +380,34 @@ describe('auth routes', () => {
 
             expect(res.status).toBe(302);
             expect(res.headers.location).toContain('/dp-login');
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    describe('POST /dp-first-co', () => {
+        it('shows ban message and does not activate account when pending user is banned', async () => {
+            // First call with 'pending' filter returns null (user has been banned, no longer pending)
+            vi.mocked(findUserByLogin).mockResolvedValueOnce(null);
+            // Second call without filter finds the banned user
+            vi.mocked(findUserByLogin).mockResolvedValueOnce({ ...mockUser, status: 'banned' });
+
+            const res = await request(app)
+                .post('/dp-first-co')
+                .send({ login: 'testuser', password: 'newpassword', confirm_password: 'newpassword' });
+
+            expect(res.status).toBe(200);
+            expect(res.text).toContain('Votre compte a été banni.');
+        });
+
+        it('shows login-unknown message when user does not exist', async () => {
+            vi.mocked(findUserByLogin).mockResolvedValue(null);
+
+            const res = await request(app)
+                .post('/dp-first-co')
+                .send({ login: 'unknown', password: 'newpassword', confirm_password: 'newpassword' });
+
+            expect(res.status).toBe(200);
+            expect(res.text).toContain('Login inconnu.');
         });
     });
 });

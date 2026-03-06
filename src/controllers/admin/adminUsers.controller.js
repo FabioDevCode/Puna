@@ -355,6 +355,11 @@ export const adminChangeUserStatus = async (req, res) => {
             return res.redirect(`/admin/users/${targetUserId}/view`);
         }
 
+        if (status === 'banned' && (!reason || !reason.trim())) {
+            res.flash('warning', 'Un motif est obligatoire pour bannir un utilisateur.');
+            return res.redirect(`/admin/users/${targetUserId}/view`);
+        }
+
         await changeUserStatus(
             targetUserId,
             status,
@@ -369,6 +374,8 @@ export const adminChangeUserStatus = async (req, res) => {
     } catch (err) {
         if (
             err.message === 'Cannot change your own status' ||
+            err.message === 'Reason is required when banning a user' ||
+            err.message === 'Only super_admin can un-ban a user' ||
             err.message?.startsWith('Owner cannot set status') ||
             err.message?.startsWith('Cannot change a pending user') ||
             err.message?.startsWith('Invalid status')
