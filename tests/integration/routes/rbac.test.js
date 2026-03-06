@@ -81,6 +81,13 @@ vi.mock('../../../src/middlewares/loginRateLimiter.js', () => ({
     firstLoginRateLimiter: vi.fn((_req, _res, next) => next()),
 }));
 
+// checkUserStatus calls getUserStatus — return 'active' so the middleware
+// always lets requests through in RBAC tests (status enforcement is tested
+// separately in tests/middlewares/checkUserStatus.test.js).
+vi.mock('../../../src/services/user.service.js', () => ({
+    getUserStatus: vi.fn().mockResolvedValue('active'),
+}));
+
 // Mock all controllers — RBAC tests focus on middleware access control, not
 // controller logic; stub each handler to return a plain 200 for authorised calls.
 vi.mock('../../../src/controllers/admin/index.js', () => ({
