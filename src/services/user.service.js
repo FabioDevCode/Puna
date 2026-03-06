@@ -375,3 +375,16 @@ export async function updateLastConnection(userId) {
 
     return updated > 0;
 }
+
+/**
+ * Récupérer uniquement le statut d'un utilisateur (requête légère)
+ * @param {string} userId - ID de l'utilisateur
+ * @returns {Promise<string|null>} - Statut de l'utilisateur ou null s'il n'existe pas
+ */
+export async function getUserStatus(userId) {
+    const user = await models.User.findByPk(userId, {
+        attributes: ['status'],
+    });
+
+    return user ? user.status : null;
+}
