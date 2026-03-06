@@ -194,14 +194,12 @@ export const rateLimits = {
 export function can(role, entity, action) {
     // Validation des paramètres
     if (!role || !entity || !action) {
-        console.warn('[ACL] Missing parameters:', { role, entity, action });
         return false;
     }
 
     // Vérifier que le rôle existe
     const rolePerms = permissions[role];
     if (!rolePerms) {
-        console.warn(`[ACL] Unknown role: ${role}`);
         return false;
     }
 
