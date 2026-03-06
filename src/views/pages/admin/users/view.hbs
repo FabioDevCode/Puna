@@ -19,7 +19,7 @@
         {{/actionCan}}
     {{/roleIs}}
 
-    {{#roleIs roles='super_admin,owner'}}
+    {{#roleIs roles='super_admin'}}
         {{#actionCan entity='user' action='delete'}}
             <button id="deleteUserBtn" class="btn btn-sm btn-error btn-outline"
             data-user-id="{{user.id}}" data-user-login="{{user.login}}">

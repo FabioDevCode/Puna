@@ -218,7 +218,9 @@ export async function getAllUsersWithCreator(filters = {}) {
 export async function findUsersWithFilters(options = {}) {
     const { limit = 10, offset = 0, search = '', searchField = 'auto' } = options;
 
-    const whereConditions = {};
+    const whereConditions = {
+        status: { [Op.ne]: 'deleted' },
+    };
     const includeCreator = {
         model: models.User,
         as: 'creator',
@@ -336,22 +338,15 @@ export async function userExists(email, login, excludeUserId = null) {
 }
 
 /**
- * Supprimer un utilisateur et ses relations SiteUser
+ * Soft-supprimer un utilisateur (status = 'deleted', password = null)
+ * Les relations SiteUser sont conservées en base pour traçabilité.
  * @param {string} userId - ID de l'utilisateur
- * @returns {Promise<boolean>} - true si suppression réussie
+ * @returns {Promise<boolean>} - true si mise à jour réussie
  */
 export async function deleteUserWithRelations(userId) {
-    // Supprimer d'abord les SiteUser
-    await models.SiteUser.destroy({
-        where: { fk_id_user: userId },
-    });
+    const [updated] = await models.User.update({ status: 'deleted', password: null }, { where: { id: userId } });
 
-    // Puis supprimer l'utilisateur
-    const result = await models.User.destroy({
-        where: { id: userId },
-    });
-
-    return result > 0;
+    return updated > 0;
 }
 
 /**

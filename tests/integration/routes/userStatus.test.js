@@ -293,3 +293,56 @@ describe('POST /admin/users/:id/status', () => {
         expect(res.status).toBe(403);
     });
 });
+
+// ---------------------------------------------------------------------------
+// POST /admin/users/delete — soft delete (super_admin only)
+// ---------------------------------------------------------------------------
+
+describe('POST /admin/users/delete', () => {
+    let app;
+
+    beforeAll(() => {
+        app = buildTestApp();
+    });
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('super_admin can soft-delete a user → 302 redirect to /admin/users', async () => {
+        const res = await request(app)
+            .post('/admin/users/delete')
+            .set('X-Test-User', makeSessionUser('super_admin'))
+            .send({ user_id: 'some-target-user-id', password: 'secret' });
+
+        expect(res.status).toBe(302);
+        expect(res.headers.location).toContain('/admin/users');
+    });
+
+    it('owner → 403 Forbidden (route restricted to super_admin)', async () => {
+        const res = await request(app)
+            .post('/admin/users/delete')
+            .set('X-Test-User', makeSessionUser('owner'))
+            .send({ user_id: 'some-target-user-id', password: 'secret' });
+
+        expect(res.status).toBe(403);
+    });
+
+    it('unauthenticated → redirects to /dp-login', async () => {
+        const res = await request(app)
+            .post('/admin/users/delete')
+            .send({ user_id: 'some-target-user-id', password: 'secret' });
+
+        expect(res.status).toBe(302);
+        expect(res.headers.location).toContain('/dp-login');
+    });
+
+    it('editor role → 403 Forbidden', async () => {
+        const res = await request(app)
+            .post('/admin/users/delete')
+            .set('X-Test-User', makeSessionUser('editor'))
+            .send({ user_id: 'some-target-user-id', password: 'secret' });
+
+        expect(res.status).toBe(403);
+    });
+});
