@@ -4,7 +4,7 @@
     "tabWidth": 4,
     "useTabs": false,
     "trailingComma": "es5",
-    "printWidth": 120,
+    "printWidth": 180,
     "arrowParens": "always",
     "endOfLine": "lf",
     "bracketSpacing": true,
@@ -16,7 +16,7 @@
             "options": {
                 "parser": "glimmer",
                 "singleQuote": false,
-                "printWidth": 120
+                "printWidth": 180
             }
         }
     ]

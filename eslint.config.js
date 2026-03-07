@@ -116,15 +116,6 @@ export default [
 
     // Ignorer les fichiers (remplace .eslintignore)
     {
-        ignores: [
-            'node_modules/',
-            'coverage/',
-            'logs/',
-            'storage/',
-            'Puna/',
-            '**/*.hbs',
-            '**/*.min.js',
-            'src/public/plugins/',
-        ],
+        ignores: ['node_modules/', 'coverage/', 'logs/', 'storage/', 'Puna/', '**/*.hbs', '**/*.min.js', 'src/public/plugins/'],
     },
 ];
