@@ -28,7 +28,7 @@ const STATUS_MESSAGES = {
     inactive: 'Votre compte a été désactivé. Contactez un administrateur.',
     suspended: 'Votre compte est suspendu. Contactez un administrateur.',
     banned: 'Votre compte a été banni.',
-    deleted: 'Compte introuvable.',
+    anonymized: 'Compte introuvable.',
 };
 
 /**
@@ -62,7 +62,7 @@ async function checkUserStatus(req, res, next) {
 
         // Utilisateur inexistant en BDD
         if (status === null) {
-            return invalidateSession(req, res, 'deleted', sessionUser);
+            return invalidateSession(req, res, 'anonymized', sessionUser);
         }
 
         // Statut actif : mettre à jour le timestamp et continuer

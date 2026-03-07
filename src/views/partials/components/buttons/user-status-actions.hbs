@@ -1,0 +1,56 @@
+{{#unless (eq user.status "anonymized")}}
+    <div class="card-body p-4 flex flex-row flex-wrap gap-2 items-center justify-between">
+        <h3 class="font-semibold text-neutral text-sm">
+            Changement de statut
+        </h3>
+
+        <div class="flex flex-row flex-wrap gap-2 items-center">
+            {{! pending: Bannir + Anonymiser — super_admin uniquement }}
+            {{#if (eq user.status "pending")}}
+                {{#roleIs roles='super_admin'}}
+                    {{> components/buttons/status-ban }}
+                    {{> components/buttons/status-anonymize }}
+                {{/roleIs}}
+            {{/if}}
+
+            {{! active: Désactiver (super_admin+owner), Bannir + Anonymiser (super_admin) }}
+            {{#if (eq user.status "active")}}
+                {{#roleIs roles='super_admin,owner'}}
+                    {{> components/buttons/status-deactivate }}
+                {{/roleIs}}
+                {{#roleIs roles='super_admin'}}
+                    {{> components/buttons/status-ban }}
+                    {{> components/buttons/status-anonymize }}
+                {{/roleIs}}
+            {{/if}}
+
+            {{! inactive: Réactiver (super_admin+owner), Bannir + Anonymiser (super_admin) }}
+            {{#if (eq user.status "inactive")}}
+                {{#roleIs roles='super_admin,owner'}}
+                    {{> components/buttons/status-reactivate }}
+                {{/roleIs}}
+                {{#roleIs roles='super_admin'}}
+                    {{> components/buttons/status-ban }}
+                    {{> components/buttons/status-anonymize }}
+                {{/roleIs}}
+            {{/if}}
+
+            {{! suspended: Réactiver, Bannir, Anonymiser — super_admin uniquement }}
+            {{#if (eq user.status "suspended")}}
+                {{#roleIs roles='super_admin'}}
+                    {{> components/buttons/status-reactivate }}
+                    {{> components/buttons/status-ban }}
+                    {{> components/buttons/status-anonymize }}
+                {{/roleIs}}
+            {{/if}}
+
+            {{! banned: Réactiver, Anonymiser — super_admin uniquement }}
+            {{#if (eq user.status "banned")}}
+                {{#roleIs roles='super_admin'}}
+                    {{> components/buttons/status-reactivate }}
+                    {{> components/buttons/status-anonymize }}
+                {{/roleIs}}
+            {{/if}}
+        </div>
+    </div>
+{{/unless}}

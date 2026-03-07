@@ -8,7 +8,7 @@ import { auditLogger } from '../config/logger.js';
 import models from '../models/index.js';
 import { hashPassword } from './auth.service.js';
 
-const VALID_STATUSES = ['active', 'inactive', 'suspended', 'banned', 'deleted'];
+const VALID_STATUSES = ['active', 'inactive', 'suspended', 'banned', 'anonymized'];
 
 /**
  * Récupérer tous les utilisateurs avec pagination
@@ -59,9 +59,7 @@ export async function searchUsers(query, limit = 20) {
  * @returns {Promise<Object|null>} - Utilisateur ou null
  */
 export async function getUserById(userId, includePassword = false) {
-    const attributes = includePassword
-        ? ['id', 'email', 'name', 'role', 'password', 'createdAt', 'updatedAt']
-        : ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'];
+    const attributes = includePassword ? ['id', 'email', 'name', 'role', 'password', 'createdAt', 'updatedAt'] : ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'];
 
     const user = await models.User.findByPk(userId, { attributes });
     return user ? user.toJSON() : null;
@@ -184,10 +182,7 @@ export async function getAllUsersWithCreator(filters = {}) {
     const where = {};
 
     if (filters.search) {
-        where[Op.or] = [
-            { email: { [Op.like]: `%${filters.search}%` } },
-            { login: { [Op.like]: `%${filters.search}%` } },
-        ];
+        where[Op.or] = [{ email: { [Op.like]: `%${filters.search}%` } }, { login: { [Op.like]: `%${filters.search}%` } }];
     }
 
     const users = await models.User.findAll({
@@ -218,9 +213,8 @@ export async function getAllUsersWithCreator(filters = {}) {
 export async function findUsersWithFilters(options = {}) {
     const { limit = 10, offset = 0, search = '', searchField = 'auto' } = options;
 
-    const whereConditions = {
-        status: { [Op.ne]: 'deleted' },
-    };
+    const whereConditions = {};
+
     const includeCreator = {
         model: models.User,
         as: 'creator',
@@ -338,15 +332,23 @@ export async function userExists(email, login, excludeUserId = null) {
 }
 
 /**
- * Soft-supprimer un utilisateur (status = 'deleted', password = null)
+ * Soft-supprimer un utilisateur (status = 'anonymized', password = null)
  * Les relations SiteUser sont conservées en base pour traçabilité.
  * @param {string} userId - ID de l'utilisateur
  * @returns {Promise<boolean>} - true si mise à jour réussie
  */
 export async function deleteUserWithRelations(userId) {
-    const [updated] = await models.User.update({ status: 'deleted', password: null }, { where: { id: userId } });
+    // Supprimer d'abord les SiteUser
+    await models.SiteUser.destroy({
+        where: { fk_id_user: userId },
+    });
 
-    return updated > 0;
+    // Puis supprimer l'utilisateur
+    const result = await models.User.destroy({
+        where: { id: userId },
+    });
+
+    return result > 0;
 }
 
 /**
@@ -452,7 +454,7 @@ export async function getUserStatus(userId) {
 /**
  * Changer le statut d'un utilisateur avec audit trail
  * @param {string} userId - ID de l'utilisateur cible
- * @param {string} newStatus - Nouveau statut (active, inactive, suspended, banned, deleted)
+ * @param {string} newStatus - Nouveau statut (active, inactive, suspended, banned, anonymized)
  * @param {Object} changedBy - Informations sur l'admin qui effectue le changement
  * @param {string} changedBy.userId - ID de l'admin
  * @param {string} changedBy.login - Login de l'admin
@@ -496,16 +498,18 @@ export async function changeUserStatus(userId, newStatus, changedBy, reason = nu
         throw new Error('Reason is required when banning a user');
     }
 
-    // A pending user can only be set to active, deleted, or banned
-    if (previousStatus === 'pending' && !['active', 'deleted', 'banned'].includes(newStatus)) {
+    // A pending user can only be set to active, anonymized, or banned
+    if (previousStatus === 'pending' && !['active', 'anonymized', 'banned'].includes(newStatus)) {
         throw new Error(`Cannot change a pending user's status to ${newStatus}`);
     }
 
     const updateData = { status: newStatus };
 
-    // Clear password when deleting
-    if (newStatus === 'deleted') {
+    // Anonymize user data (RGPD)
+    if (newStatus === 'anonymized') {
         updateData.password = null;
+        updateData.login = `anon_${userId.slice(0, 8)}`;
+        updateData.email = null;
     }
 
     // Reset failed login attempts when reactivating

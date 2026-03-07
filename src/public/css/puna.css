@@ -1,5 +1,5 @@
 * {
-    font-family: "Inter", sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 :root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open])) {
@@ -8,7 +8,7 @@
 
 :root {
     --navbar-height: 4rem;
-    --table-head-bg: #F3F8FC;
+    --table-head-bg: #f3f8fc;
     /* Scrollbar variables */
     /*
     --scrollbar-width: 30px;
@@ -18,7 +18,7 @@
     */
 }
 
-[data-theme="fantasy"] {
+[data-theme='fantasy'] {
     --er: 0.5888 0.2226 30.74;
     --er-focus: 0.5788 0.2226 30.74;
     --erc: 0.9698 0 25.04;
@@ -27,7 +27,7 @@
 
 * {
     scrollbar-width: thin;
-    scrollbar-color: rgb(32, 42, 55, .6) rgb(255, 255, 255, .2);
+    scrollbar-color: rgb(32, 42, 55, 0.6) rgb(255, 255, 255, 0.2);
 }
 
 *::-webkit-scrollbar {
@@ -36,7 +36,7 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, .2);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 ::-webkit-scrollbar-button {
@@ -45,16 +45,16 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgb(32, 42, 55, .6);
+    background: rgb(32, 42, 55, 0.6);
 }
 
 ::selection {
-    background-color: #202A37;
+    background-color: #202a37;
     color: whitesmoke;
 }
 
 #puna {
-    background: linear-gradient(to right, #2F6EA9, #101E26);
+    background: linear-gradient(to right, #2f6ea9, #101e26);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -103,7 +103,7 @@ main {
     overflow: auto;
     overflow-x: hidden !important;
     min-height: max-content;
-    border: 2px solid #DBEAF7;
+    border: 2px solid #dbeaf7;
     border-bottom: 0px solid transparent;
 }
 
@@ -113,7 +113,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: "Bebas Neue", sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
 }
 
 h2 {
@@ -156,8 +156,8 @@ h3.font-inter {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: .75rem;
-    width: .75rem;
+    height: 0.75rem;
+    width: 0.75rem;
     padding-top: 1px;
 }
 
@@ -172,43 +172,41 @@ h3.font-inter {
 
 .badge_super_admin {
     text-wrap: nowrap;
-    background-color: #101E26;
+    background-color: #101e26;
     color: white;
-    border: 1px solid #101E26;
+    border: 1px solid #101e26;
 }
 
 .badge_owner {
     text-wrap: nowrap;
-    background-color: #2F6EA9;
+    background-color: #2f6ea9;
     color: whitesmoke;
-    border: 1px solid #2F6EA9;
+    border: 1px solid #2f6ea9;
 }
 
 .badge_editor {
     text-wrap: nowrap;
-    background-color: #CFE3F5;
-    color: #0075C3;
-    border: 1px solid #0075C3;
-
+    background-color: #cfe3f5;
+    color: #0075c3;
+    border: 1px solid #0075c3;
 }
 
 .badge_viewer {
     text-wrap: nowrap;
-    background-color: #E3CEE4;
-    color: #6E0075;
-    border: 1px solid #6E0075;
+    background-color: #e3cee4;
+    color: #6e0075;
+    border: 1px solid #6e0075;
 }
 
 .badge_beta {
     text-wrap: nowrap;
-    background-color: #FFBE00;
+    background-color: #ffbe00;
     color: rgb(30, 30, 30);
     border: 1px solid rgb(30, 30, 30);
-
 }
 
 /* Style de base pour tous les badges */
-[class^="badge_s_"] {
+[class^='badge_s_'] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -219,60 +217,105 @@ h3.font-inter {
     color: #fff;
 }
 
-[class^="badge_s_"].profil_badge {
-    font-size: .85rem;
+[class^='badge_s_'].profil_badge {
+    font-size: 0.85rem;
     padding: 2px 10px;
 }
 
 /* PENDING – Jaune / Ambre */
 .badge_s_pending {
-    background-color: #FBBF24;
-    color: #78350F;
+    background-color: #fbbf24;
+    color: #78350f;
 }
 
 /* ACTIVE – Vert */
 .badge_s_active {
-    background-color: #10B981;
-    color: #064E3B;
+    background-color: #10b981;
+    color: #064e3b;
 }
 
 /* INACTIVE – Gris */
 .badge_s_inactive {
-    background-color: #9CA3AF;
-    color: #1F2937;
+    background-color: #9ca3af;
+    color: #1f2937;
 }
 
 /* SUSPENDED – Orange foncé */
 .badge_s_suspended {
-    background-color: #F97316;
-    color: #7C2D12;
+    background-color: #f97316;
+    color: #7c2d12;
 }
 
 /* BANNED – Rouge */
 .badge_s_banned {
-    background-color: #EF4444;
-    color: #7F1D1D;
+    background-color: #ef4444;
+    color: #7f1d1d;
 }
 
 /* DELETED – Gris sombre */
 .badge_s_deleted {
-    background-color: #6B7280;
+    background-color: #6b7280;
     color: #111827;
 }
 
+/* DELETED – Gris sombre */
+.badge_s_anonymized {
+    background-color: #b165e7;
+    color: #491a6a;
+}
+
+/* --- Button status --- */
+.btn_status_banned {
+    background-color: #ef4444;
+    color: #461a1a;
+    &:hover {
+        background-color: #ef4444;
+        color: #461a1a;
+    }
+}
+
+.btn_status_inactive {
+    background-color: #9ca3af;
+    color: #1f2937;
+    &:hover {
+        background-color: #9ca3af;
+        color: #1f2937;
+    }
+}
+
+.btn_status_active {
+    background-color: #10b981;
+    color: #123a2f;
+    &:hover {
+        background-color: #10b981;
+        color: #123a2f;
+    }
+}
+
+.btn_status_anonymized {
+    background-color: #b165e7;
+    color: #2d1b3a;
+    &:hover {
+        background-color: #b165e7;
+        color: #2d1b3a;
+    }
+}
+
 .font-bebas {
-    font-family: "Bebas Neue", sans-serif !important;
+    font-family: 'Bebas Neue', sans-serif !important;
 }
 
 .font-inter {
-    font-family: "Inter", sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
 .btn-ghost-gray {
     background-color: var(--btn-ghost-gray, #e5e7eb);
     color: var(--btn-ghost-gray-text, inherit);
     border: 0;
-    transition: background-color 150ms ease, color 150ms ease;
+    transition:
+        background-color 150ms ease,
+        color 150ms ease;
 }
 
 .btn-ghost-gray:hover,
@@ -286,17 +329,16 @@ h3.font-inter {
     transition: all 0.25s ease;
 }
 
-.tabs-boxed :is(.tab-active, [aria-selected=true]):not(.tab-disabled):not([disabled]),
+.tabs-boxed :is(.tab-active, [aria-selected='true']):not(.tab-disabled):not([disabled]),
 .tabs-boxed :is(input:checked) {
     --tw-bg-opacity: 1;
-    background-color: #202A37;
+    background-color: #202a37;
     --tw-text-opacity: 1;
     color: whitesmoke;
 }
 
 @media (hover: hover) {
-
-    .tabs-boxed :is(.tab-active, [aria-selected=true]):not(.tab-disabled):not([disabled]):hover,
+    .tabs-boxed :is(.tab-active, [aria-selected='true']):not(.tab-disabled):not([disabled]):hover,
     .tabs-boxed :is(input:checked):hover {
         --tw-text-opacity: 1;
         color: whitesmoke;
@@ -314,7 +356,7 @@ h3.font-inter {
 .no-activate,
 .no-activate:hover {
     cursor: initial;
-    background-color: #E7E8E7 !important;
+    background-color: #e7e8e7 !important;
 }
 
 .no-activate:active {
@@ -334,7 +376,7 @@ h3.font-inter {
 }
 
 #mobile_menu ul li a.active_mm {
-    border-top: 4px solid #1F2937 !important;
+    border-top: 4px solid #1f2937 !important;
 }
 
 .dash-site div {
@@ -398,7 +440,7 @@ h3.font-inter {
     -webkit-overflow-scrolling: touch;
 }
 
-.app-main>.grid {
+.app-main > .grid {
     height: auto;
 }
 

@@ -212,8 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let roleBadge = '';
             switch (user.role) {
                 case 'super_admin':
-                    roleBadge =
-                        '<span class="badge badge-outline badge_role badge_super_admin badge-sm">Super Admin</span>';
+                    roleBadge = '<span class="badge badge-outline badge_role badge_super_admin badge-sm">Super Admin</span>';
                     break;
                 case 'owner':
                     roleBadge = '<span class="badge badge-outline badge_role badge_owner badge-sm">Owner</span>';
@@ -250,8 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'banned':
                     statusBadge = `<span class="badge_s_banned">${statusLabel}</span>`;
                     break;
-                case 'deleted':
-                    statusBadge = `<span class="badge_s_deleted">${statusLabel}</span>`;
+                case 'anonymized':
+                    statusBadge = `<span class="badge_s_anonymized">${statusLabel}</span>`;
                     break;
                 default:
                     statusBadge = `<span class="badge_s_inactive">${statusLabel}</span>`;

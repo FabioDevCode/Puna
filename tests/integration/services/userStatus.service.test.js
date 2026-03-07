@@ -6,13 +6,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import models from '../../../src/models/index.js';
-import {
-    changeUserStatus,
-    deleteUserWithRelations,
-    findUsersWithFilters,
-    incrementFailedAttempts,
-    resetFailedAttempts,
-} from '../../../src/services/user.service.js';
+import { changeUserStatus, deleteUserWithRelations, findUsersWithFilters, incrementFailedAttempts, resetFailedAttempts } from '../../../src/services/user.service.js';
 
 // ---------------------------------------------------------------------------
 // Mocks — vi.mock() is hoisted above imports by Vitest
@@ -93,10 +87,7 @@ describe('changeUserStatus', () => {
 
         const result = await changeUserStatus('target-user-uuid', 'active', ADMIN_SUPER);
 
-        expect(models.User.update).toHaveBeenCalledWith(
-            { status: 'active', failed_login_attempts: 0 },
-            { where: { id: 'target-user-uuid' } }
-        );
+        expect(models.User.update).toHaveBeenCalledWith({ status: 'active', failed_login_attempts: 0 }, { where: { id: 'target-user-uuid' } });
         expect(result).toEqual({ success: true, previousStatus: 'inactive', newStatus: 'active' });
     });
 
@@ -106,10 +97,7 @@ describe('changeUserStatus', () => {
 
         await changeUserStatus('target-user-uuid', 'active', ADMIN_SUPER);
 
-        expect(models.User.update).toHaveBeenCalledWith(
-            { status: 'active', failed_login_attempts: 0 },
-            { where: { id: 'target-user-uuid' } }
-        );
+        expect(models.User.update).toHaveBeenCalledWith({ status: 'active', failed_login_attempts: 0 }, { where: { id: 'target-user-uuid' } });
     });
 
     // -----------------------------------------------------------------------
@@ -133,9 +121,7 @@ describe('changeUserStatus', () => {
     it('→ banned without reason: throws', async () => {
         vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
 
-        await expect(changeUserStatus('target-user-uuid', 'banned', ADMIN_SUPER)).rejects.toThrow(
-            'Reason is required when banning a user'
-        );
+        await expect(changeUserStatus('target-user-uuid', 'banned', ADMIN_SUPER)).rejects.toThrow('Reason is required when banning a user');
         expect(models.User.update).not.toHaveBeenCalled();
     });
 
@@ -143,9 +129,7 @@ describe('changeUserStatus', () => {
     it('→ banned with empty reason: throws', async () => {
         vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
 
-        await expect(changeUserStatus('target-user-uuid', 'banned', ADMIN_SUPER, '   ')).rejects.toThrow(
-            'Reason is required when banning a user'
-        );
+        await expect(changeUserStatus('target-user-uuid', 'banned', ADMIN_SUPER, '   ')).rejects.toThrow('Reason is required when banning a user');
         expect(models.User.update).not.toHaveBeenCalled();
     });
 
@@ -155,10 +139,7 @@ describe('changeUserStatus', () => {
 
         const result = await changeUserStatus('target-user-uuid', 'active', ADMIN_SUPER, 'Appeal accepted');
 
-        expect(models.User.update).toHaveBeenCalledWith(
-            { status: 'active', failed_login_attempts: 0 },
-            { where: { id: 'target-user-uuid' } }
-        );
+        expect(models.User.update).toHaveBeenCalledWith({ status: 'active', failed_login_attempts: 0 }, { where: { id: 'target-user-uuid' } });
         expect(result).toEqual({ success: true, previousStatus: 'banned', newStatus: 'active' });
     });
 
@@ -166,31 +147,24 @@ describe('changeUserStatus', () => {
     it('banned → active (debanning): owner cannot un-ban', async () => {
         vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'banned' }));
 
-        await expect(changeUserStatus('target-user-uuid', 'active', ADMIN_OWNER)).rejects.toThrow(
-            'Only super_admin can un-ban a user'
-        );
+        await expect(changeUserStatus('target-user-uuid', 'active', ADMIN_OWNER)).rejects.toThrow('Only super_admin can un-ban a user');
         expect(models.User.update).not.toHaveBeenCalled();
     });
 
     // -----------------------------------------------------------------------
-    it('→ deleted: clears the password field', async () => {
+    it('→ anonymized: clears password, anonymizes login and nullifies email', async () => {
         vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
 
-        await changeUserStatus('target-user-uuid', 'deleted', ADMIN_SUPER);
+        await changeUserStatus('target-user-uuid', 'anonymized', ADMIN_SUPER);
 
-        expect(models.User.update).toHaveBeenCalledWith(
-            { status: 'deleted', password: null },
-            { where: { id: 'target-user-uuid' } }
-        );
+        expect(models.User.update).toHaveBeenCalledWith({ status: 'anonymized', password: null, login: 'anon_target-u', email: null }, { where: { id: 'target-user-uuid' } });
     });
 
     // -----------------------------------------------------------------------
     it('self-change: throws when changedBy.userId equals target userId', async () => {
         vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ id: ADMIN_SUPER.userId }));
 
-        await expect(changeUserStatus(ADMIN_SUPER.userId, 'inactive', ADMIN_SUPER)).rejects.toThrow(
-            'Cannot change your own status'
-        );
+        await expect(changeUserStatus(ADMIN_SUPER.userId, 'inactive', ADMIN_SUPER)).rejects.toThrow('Cannot change your own status');
         expect(models.User.update).not.toHaveBeenCalled();
     });
 
@@ -198,17 +172,13 @@ describe('changeUserStatus', () => {
     it('owner cannot ban: throws when owner tries to set banned', async () => {
         vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
 
-        await expect(changeUserStatus('target-user-uuid', 'banned', ADMIN_OWNER)).rejects.toThrow(
-            'Owner cannot set status to banned'
-        );
+        await expect(changeUserStatus('target-user-uuid', 'banned', ADMIN_OWNER)).rejects.toThrow('Owner cannot set status to banned');
         expect(models.User.update).not.toHaveBeenCalled();
     });
 
     // -----------------------------------------------------------------------
     it('invalid status: throws for unrecognised status value', async () => {
-        await expect(changeUserStatus('target-user-uuid', 'unknown_status', ADMIN_SUPER)).rejects.toThrow(
-            'Invalid status: unknown_status'
-        );
+        await expect(changeUserStatus('target-user-uuid', 'unknown_status', ADMIN_SUPER)).rejects.toThrow('Invalid status: unknown_status');
         expect(models.User.findByPk).not.toHaveBeenCalled();
     });
 
@@ -264,9 +234,7 @@ describe('incrementFailedAttempts', () => {
     });
 
     it('user with 10 failed attempts after increment: status becomes suspended', async () => {
-        vi.mocked(models.User.findByPk).mockResolvedValue(
-            makeMockUser({ status: 'active', failed_login_attempts: 10 })
-        );
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active', failed_login_attempts: 10 }));
 
         const result = await incrementFailedAttempts('target-user-uuid', 'targetuser', '127.0.0.1');
 
@@ -277,9 +245,7 @@ describe('incrementFailedAttempts', () => {
 
     it('logs USER_STATUS_CHANGE audit event when auto-suspending', async () => {
         const { auditLogger } = await import('../../../src/config/logger.js');
-        vi.mocked(models.User.findByPk).mockResolvedValue(
-            makeMockUser({ status: 'active', failed_login_attempts: 10 })
-        );
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active', failed_login_attempts: 10 }));
 
         await incrementFailedAttempts('target-user-uuid', 'targetuser', '10.0.0.1');
 
@@ -314,9 +280,7 @@ describe('incrementFailedAttempts', () => {
     });
 
     it('already suspended: does not update status again', async () => {
-        vi.mocked(models.User.findByPk).mockResolvedValue(
-            makeMockUser({ status: 'suspended', failed_login_attempts: 15 })
-        );
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'suspended', failed_login_attempts: 15 }));
 
         const result = await incrementFailedAttempts('target-user-uuid', 'targetuser', '127.0.0.1');
 
@@ -346,10 +310,7 @@ describe('resetFailedAttempts', () => {
     it('resets failed_login_attempts to 0 on successful login', async () => {
         const result = await resetFailedAttempts('target-user-uuid');
 
-        expect(models.User.update).toHaveBeenCalledWith(
-            { failed_login_attempts: 0 },
-            { where: { id: 'target-user-uuid' } }
-        );
+        expect(models.User.update).toHaveBeenCalledWith({ failed_login_attempts: 0 }, { where: { id: 'target-user-uuid' } });
         expect(result).toBe(true);
     });
 
@@ -363,39 +324,42 @@ describe('resetFailedAttempts', () => {
 });
 
 // ---------------------------------------------------------------------------
-// deleteUserWithRelations (soft delete)
+// deleteUserWithRelations (hard delete)
 // ---------------------------------------------------------------------------
 
 describe('deleteUserWithRelations', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(models.User.update).mockResolvedValue([1]);
+        vi.mocked(models.SiteUser.destroy).mockResolvedValue(1);
+        vi.mocked(models.User.destroy).mockResolvedValue(1);
     });
 
-    it('soft-delete: sets status to deleted and clears password', async () => {
+    it('hard-delete: destroys SiteUser relations then the User', async () => {
         const result = await deleteUserWithRelations('target-user-uuid');
 
-        expect(models.User.update).toHaveBeenCalledWith(
-            { status: 'deleted', password: null },
-            { where: { id: 'target-user-uuid' } }
-        );
+        expect(models.SiteUser.destroy).toHaveBeenCalledWith({ where: { fk_id_user: 'target-user-uuid' } });
+        expect(models.User.destroy).toHaveBeenCalledWith({ where: { id: 'target-user-uuid' } });
         expect(result).toBe(true);
     });
 
-    it('does NOT call User.destroy (user remains in DB)', async () => {
+    it('calls SiteUser.destroy before User.destroy', async () => {
+        const callOrder = [];
+        vi.mocked(models.SiteUser.destroy).mockImplementation(async () => {
+            callOrder.push('SiteUser');
+            return 1;
+        });
+        vi.mocked(models.User.destroy).mockImplementation(async () => {
+            callOrder.push('User');
+            return 1;
+        });
+
         await deleteUserWithRelations('target-user-uuid');
 
-        expect(models.User.destroy).not.toHaveBeenCalled();
+        expect(callOrder).toEqual(['SiteUser', 'User']);
     });
 
-    it('does NOT call SiteUser.destroy (site relations preserved)', async () => {
-        await deleteUserWithRelations('target-user-uuid');
-
-        expect(models.SiteUser.destroy).not.toHaveBeenCalled();
-    });
-
-    it('returns false when user not found', async () => {
-        vi.mocked(models.User.update).mockResolvedValue([0]);
+    it('returns false when user not found (User.destroy returns 0)', async () => {
+        vi.mocked(models.User.destroy).mockResolvedValue(0);
 
         const result = await deleteUserWithRelations('nonexistent-uuid');
 
@@ -404,7 +368,7 @@ describe('deleteUserWithRelations', () => {
 });
 
 // ---------------------------------------------------------------------------
-// findUsersWithFilters (excludes deleted users)
+// findUsersWithFilters (returns all users, no status exclusion)
 // ---------------------------------------------------------------------------
 
 describe('findUsersWithFilters', () => {
@@ -413,28 +377,21 @@ describe('findUsersWithFilters', () => {
         vi.mocked(models.User.findAndCountAll).mockResolvedValue({ count: 0, rows: [] });
     });
 
-    it('excludes deleted users by default (Op.ne deleted in where clause)', async () => {
-        const { Op } = await import('sequelize');
-
+    it('does not filter by status (no exclusion)', async () => {
         await findUsersWithFilters({ limit: 10, offset: 0 });
 
-        expect(models.User.findAndCountAll).toHaveBeenCalledWith(
-            expect.objectContaining({
-                where: expect.objectContaining({
-                    status: { [Op.ne]: 'deleted' },
-                }),
-            })
-        );
+        const callArgs = models.User.findAndCountAll.mock.calls[0][0];
+        expect(callArgs.where).toEqual({});
     });
 
-    it('returns empty list when all users are deleted (mock returns none)', async () => {
+    it('returns empty list when no users match', async () => {
         const { users, total } = await findUsersWithFilters();
 
         expect(users).toEqual([]);
         expect(total).toBe(0);
     });
 
-    it('returns only non-deleted users from findAndCountAll result', async () => {
+    it('returns all users from findAndCountAll result', async () => {
         const mockUser = {
             id: 'active-uuid',
             email: 'active@test.com',

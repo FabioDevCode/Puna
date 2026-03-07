@@ -95,12 +95,11 @@ export const dpConnect = (req, res) => {
             let flashMsg = 'Identifiants incorrects.';
             try {
                 const existingUser = await findUserByLogin(login);
-                if (existingUser && existingUser.status !== 'deleted') {
+                if (existingUser && existingUser.status !== 'anonymized') {
                     if (existingUser.status === 'banned') {
                         flashMsg = 'Votre compte a été banni.';
                     } else if (existingUser.status === 'suspended') {
-                        flashMsg =
-                            'Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.';
+                        flashMsg = 'Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.';
                     } else if (existingUser.status === 'inactive') {
                         flashMsg = 'Votre compte est désactivé. Contactez un administrateur.';
                     } else {

@@ -42,6 +42,6 @@
         "allowNull": false,
         "defaultValue": "pending",
         "type": "ENUM",
-        "values": ["pending", "active", "inactive", "suspended", "banned", "deleted"]
+        "values": ["pending", "active", "inactive", "suspended", "banned", "anonymized"]
     }
 }

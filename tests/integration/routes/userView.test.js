@@ -3,7 +3,7 @@
  * Integration tests for GET /admin/users/:id/view — rendered HTML
  *
  * Tests cover button visibility in #status_btn_box based on:
- *   - user.status (pending, active, inactive, suspended, banned, deleted)
+ *   - user.status (pending, active, inactive, suspended, banned, anonymized)
  *   - connected user role (super_admin, owner)
  *
  * Assertions use specific HTML attributes rather than button labels, because
@@ -12,7 +12,7 @@
  *   - Ban trigger button  → id="banUserBtn"
  *   - Deactivate form     → value="inactive"
  *   - Reactivate form     → value="active"
- *   - Soft-delete form    → value="deleted"
+ *   - Anonymize form      → value="anonymized"
  */
 
 import * as path from 'path';
@@ -73,10 +73,10 @@ async function renderView(userStatus, connectedRole) {
 
 describe('user view — status buttons', () => {
     describe('pending status', () => {
-        it('super_admin sees ban button and soft-delete form', async () => {
+        it('super_admin sees ban button and anonymize form', async () => {
             const html = await renderView('pending', 'super_admin');
             expect(html).toContain('id="banUserBtn"');
-            expect(html).toContain('value="deleted"');
+            expect(html).toContain('value="anonymized"');
         });
 
         it('super_admin does not see deactivate or reactivate forms', async () => {
@@ -88,23 +88,23 @@ describe('user view — status buttons', () => {
         it('owner sees no status action forms (pending restricted to super_admin)', async () => {
             const html = await renderView('pending', 'owner');
             expect(html).not.toContain('id="banUserBtn"');
-            expect(html).not.toContain('value="deleted"');
+            expect(html).not.toContain('value="anonymized"');
         });
     });
 
     describe('active status', () => {
-        it('super_admin sees deactivate, ban button and soft-delete forms', async () => {
+        it('super_admin sees deactivate, ban button and anonymize forms', async () => {
             const html = await renderView('active', 'super_admin');
             expect(html).toContain('value="inactive"');
             expect(html).toContain('id="banUserBtn"');
-            expect(html).toContain('value="deleted"');
+            expect(html).toContain('value="anonymized"');
         });
 
-        it('owner sees deactivate form but not ban button or soft-delete form', async () => {
+        it('owner sees deactivate form but not ban button or anonymize form', async () => {
             const html = await renderView('active', 'owner');
             expect(html).toContain('value="inactive"');
             expect(html).not.toContain('id="banUserBtn"');
-            expect(html).not.toContain('value="deleted"');
+            expect(html).not.toContain('value="anonymized"');
         });
 
         it('deactivate form posts status=inactive', async () => {
@@ -114,18 +114,18 @@ describe('user view — status buttons', () => {
     });
 
     describe('inactive status', () => {
-        it('super_admin sees reactivate, ban button and soft-delete forms', async () => {
+        it('super_admin sees reactivate, ban button and anonymize forms', async () => {
             const html = await renderView('inactive', 'super_admin');
             expect(html).toContain('value="active"');
             expect(html).toContain('id="banUserBtn"');
-            expect(html).toContain('value="deleted"');
+            expect(html).toContain('value="anonymized"');
         });
 
-        it('owner sees reactivate form but not ban button or soft-delete form', async () => {
+        it('owner sees reactivate form but not ban button or anonymize form', async () => {
             const html = await renderView('inactive', 'owner');
             expect(html).toContain('value="active"');
             expect(html).not.toContain('id="banUserBtn"');
-            expect(html).not.toContain('value="deleted"');
+            expect(html).not.toContain('value="anonymized"');
         });
 
         it('reactivate form posts status=active', async () => {
@@ -135,51 +135,51 @@ describe('user view — status buttons', () => {
     });
 
     describe('suspended status', () => {
-        it('super_admin sees reactivate, ban button and soft-delete forms', async () => {
+        it('super_admin sees reactivate, ban button and anonymize forms', async () => {
             const html = await renderView('suspended', 'super_admin');
             expect(html).toContain('value="active"');
             expect(html).toContain('id="banUserBtn"');
-            expect(html).toContain('value="deleted"');
+            expect(html).toContain('value="anonymized"');
         });
 
         it('owner sees no status action forms (suspended restricted to super_admin)', async () => {
             const html = await renderView('suspended', 'owner');
             expect(html).not.toContain('value="active"');
             expect(html).not.toContain('id="banUserBtn"');
-            expect(html).not.toContain('value="deleted"');
+            expect(html).not.toContain('value="anonymized"');
         });
     });
 
     describe('banned status', () => {
-        it('super_admin sees reactivate and soft-delete forms but no ban button', async () => {
+        it('super_admin sees reactivate and anonymize forms but no ban button', async () => {
             const html = await renderView('banned', 'super_admin');
             expect(html).toContain('value="active"');
-            expect(html).toContain('value="deleted"');
+            expect(html).toContain('value="anonymized"');
             expect(html).not.toContain('id="banUserBtn"');
         });
 
         it('owner sees no status action forms (banned restricted to super_admin)', async () => {
             const html = await renderView('banned', 'owner');
             expect(html).not.toContain('value="active"');
-            expect(html).not.toContain('value="deleted"');
+            expect(html).not.toContain('value="anonymized"');
         });
     });
 
-    describe('deleted status', () => {
+    describe('anonymized status', () => {
         it('super_admin sees no status action forms', async () => {
-            const html = await renderView('deleted', 'super_admin');
+            const html = await renderView('anonymized', 'super_admin');
             expect(html).not.toContain('value="inactive"');
             expect(html).not.toContain('value="active"');
             expect(html).not.toContain('id="banUserBtn"');
-            expect(html).not.toContain('value="deleted"');
+            expect(html).not.toContain('value="anonymized"');
         });
 
         it('owner sees no status action forms', async () => {
-            const html = await renderView('deleted', 'owner');
+            const html = await renderView('anonymized', 'owner');
             expect(html).not.toContain('value="inactive"');
             expect(html).not.toContain('value="active"');
             expect(html).not.toContain('id="banUserBtn"');
-            expect(html).not.toContain('value="deleted"');
+            expect(html).not.toContain('value="anonymized"');
         });
     });
 
@@ -195,9 +195,9 @@ describe('user view — status buttons', () => {
             expect(html).toContain('data-user-login="testuser"');
         });
 
-        it('soft-delete form posts status=deleted', async () => {
+        it('anonymize form posts status=anonymized', async () => {
             const html = await renderView('active', 'super_admin');
-            expect(html).toContain('value="deleted"');
+            expect(html).toContain('value="anonymized"');
         });
     });
 

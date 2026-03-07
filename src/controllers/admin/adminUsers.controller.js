@@ -10,8 +10,8 @@ import {
     userExists,
     createUserAdmin,
     getUserWithRelations,
-    updateUserAdmin,
     changeUserStatus,
+    deleteUserWithRelations,
 } from '../../services/user.service.js';
 
 /**
@@ -238,13 +238,8 @@ export const adminDeleteUser = async (req, res) => {
             return res.redirect('/admin/users');
         }
 
-        // Soft-supprimer l'utilisateur via le service (audit trail inclus)
-        const changedBy = {
-            userId: currentUserId,
-            login: req.session.user?.login,
-            role: req.session.user?.role,
-        };
-        await changeUserStatus(user_id, 'deleted', changedBy);
+        // Supprimer l'utilisateur et ses relations via le service
+        await deleteUserWithRelations(user_id);
 
         res.flash('success', 'Utilisateur supprimé.');
         res.redirect('/admin/users');
@@ -364,14 +359,7 @@ export const adminChangeUserStatus = async (req, res) => {
             return res.redirect(`/admin/users/${targetUserId}/view`);
         }
 
-        await changeUserStatus(
-            targetUserId,
-            status,
-            { userId: admin.id, login: admin.login, role: admin.role },
-            reason || null,
-            'manual',
-            req.ip || null
-        );
+        await changeUserStatus(targetUserId, status, { userId: admin.id, login: admin.login, role: admin.role }, reason || null, 'manual', req.ip || null);
 
         res.flash('success', `Statut mis à jour : ${status}.`);
         return res.redirect(`/admin/users/${targetUserId}/view`);

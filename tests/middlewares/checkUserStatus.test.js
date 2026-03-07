@@ -104,8 +104,8 @@ describe('checkUserStatus middleware', () => {
         expect(res.flash).toHaveBeenCalledWith('error', 'Votre compte a été banni.');
     });
 
-    it('destroys session and redirects when status is deleted', async () => {
-        mockGetUserStatus.mockResolvedValue('deleted');
+    it('destroys session and redirects when status is anonymized', async () => {
+        mockGetUserStatus.mockResolvedValue('anonymized');
         const req = makeReq();
         const res = makeRes();
         const next = vi.fn();
