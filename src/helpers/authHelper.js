@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
+import checkUserStatus from '../middlewares/checkUserStatus.js';
 import models from '../models/index.js';
 
 export function initializePassport() {
@@ -53,10 +54,17 @@ export function initializePassport() {
 }
 
 export function isConnected(req, res, next) {
-    if (req.session && req.session.user) {
+    if (req.session?.user) {
         return next();
     }
     return res.redirect('/dp-login');
+}
+
+export function requireAuth(req, res, next) {
+    if (!req.session?.user) {
+        return res.redirect('/dp-login');
+    }
+    return checkUserStatus(req, res, next);
 }
 
 export function isConnectDash(req, res, next) {
