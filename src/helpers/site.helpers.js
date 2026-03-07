@@ -51,7 +51,16 @@ export async function getSitesWithCounts(userId, userRole = 'viewer') {
         queryOptions.where = whereCondition;
     }
 
-    const sites = await models.Site.findAll(queryOptions);
+    const sites = await models.Site.findAll({
+        ...queryOptions,
+        include: [
+            {
+                model: models.User,
+                as: 'user',
+                attributes: ['login'],
+            },
+        ],
+    });
 
     const sitesWithCounts = await Promise.all(
         sites.map(async (site) => {
@@ -75,6 +84,7 @@ export async function getSitesWithCounts(userId, userRole = 'viewer') {
             return {
                 id: site.id,
                 domain: site.domain,
+                creatorLogin: site.user?.login || site['user.login'] || null,
                 form: formCount,
                 inbox: inboxCount,
             };

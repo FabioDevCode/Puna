@@ -5,7 +5,26 @@ import {
     generateSiteToken,
     revokeSiteTokens as revokeSiteTokensService,
 } from '../services/site.service.js';
+import { getSitesWithCounts } from '../services/stats.service.js';
 import stringUtils from '../utils/string.js';
+
+/**
+ * Liste de tous les sites (page)
+ */
+export const allSite = async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+        const userRole = req.userRole || req.session.user?.role || 'viewer';
+        const sitesWithCounts = await getSitesWithCounts(userId, userRole);
+
+        res.render('sites/list', {
+            sites: sitesWithCounts,
+        });
+    } catch (err) {
+        console.error(err);
+        res.render('sites/list', {});
+    }
+};
 
 /**
  * Créer un site

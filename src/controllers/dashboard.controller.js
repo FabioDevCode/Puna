@@ -30,6 +30,7 @@ export const dashboard = async (req, res) => {
             stats: getGlobalStatsFromSites(sitesWithCounts),
         });
     } catch (err) {
+        console.error(err);
         res.render('dashboard', {});
     }
 };
@@ -158,21 +159,4 @@ export const dpFirstCo = (req, res) => {
     res.render('auth/first-login', {
         layout: 'auth',
     });
-};
-
-/**
- * Liste de tous les sites (page)
- */
-export const allSite = async (req, res) => {
-    try {
-        const userId = req.session.user?.id;
-        const userRole = req.userRole || req.session.user?.role || 'viewer';
-        const sitesWithCounts = await getSitesWithCounts(userId, userRole);
-
-        res.render('sites/list', {
-            sites: sitesWithCounts,
-        });
-    } catch (err) {
-        res.render('sites/list', {});
-    }
 };

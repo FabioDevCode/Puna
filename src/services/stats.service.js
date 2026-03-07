@@ -325,7 +325,13 @@ export async function getSitesWithCounts(userId, userRole) {
     const sites = await models.Site.findAll({
         where: siteWhere,
         attributes: ['id', 'domain'],
-        raw: true,
+        include: [
+            {
+                model: models.User,
+                as: 'user',
+                attributes: ['login'],
+            },
+        ],
     });
 
     const sitesWithCounts = await Promise.all(
@@ -350,6 +356,7 @@ export async function getSitesWithCounts(userId, userRole) {
             return {
                 id: site.id,
                 domain: site.domain,
+                creatorLogin: site.user?.login || null,
                 form: formCount,
                 inbox: inboxCount,
             };
