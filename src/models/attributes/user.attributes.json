@@ -38,7 +38,7 @@
     },
     "password_reset_token": {
         "allowNull": true,
-        "type": "STRING(64)"
+        "type": "STRING"
     },
     "role": {
         "allowNull": false,
