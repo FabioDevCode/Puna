@@ -177,6 +177,14 @@ describe('changeUserStatus', () => {
     });
 
     // -----------------------------------------------------------------------
+    it('owner cannot act on super_admin: throws when owner targets a super_admin user', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active', role: 'super_admin' }));
+
+        await expect(changeUserStatus('target-user-uuid', 'inactive', ADMIN_OWNER)).rejects.toThrow('Owner cannot change the status of a super_admin');
+        expect(models.User.update).not.toHaveBeenCalled();
+    });
+
+    // -----------------------------------------------------------------------
     it('invalid status: throws for unrecognised status value', async () => {
         await expect(changeUserStatus('target-user-uuid', 'unknown_status', ADMIN_SUPER)).rejects.toThrow('Invalid status: unknown_status');
         expect(models.User.findByPk).not.toHaveBeenCalled();

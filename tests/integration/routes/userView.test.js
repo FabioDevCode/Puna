@@ -67,6 +67,29 @@ async function renderView(userStatus, connectedRole) {
     );
 }
 
+/**
+ * Render view.hbs with a specific target user role and connected role.
+ */
+async function renderViewWithUserRole(userRole, connectedRole, userStatus = 'active') {
+    return hbs.render(
+        path.join(srcDir, 'views/pages/admin/users/view.hbs'),
+        {
+            user: {
+                id: 'test-user-id',
+                login: 'testuser',
+                email: 'test@test.com',
+                role: userRole,
+                status: userStatus,
+                createdAt: '2024-01-01',
+                siteassignments: [],
+            },
+            connectedUser: { id: 'admin-id', role: connectedRole },
+            csrfToken: 'test-csrf-token',
+        },
+        { layout: false }
+    );
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -211,5 +234,30 @@ describe('user view — status buttons', () => {
             const html = await renderView('active', 'super_admin');
             expect(html).toContain('name="reason"');
         });
+    });
+});
+
+describe('user view — owner viewing a super_admin', () => {
+    it('owner does not see the status action box when viewing a super_admin', async () => {
+        const html = await renderViewWithUserRole('super_admin', 'owner');
+        expect(html).not.toContain('id="status_btn_box"');
+    });
+
+    it('owner does not see any status action forms when viewing a super_admin', async () => {
+        const html = await renderViewWithUserRole('super_admin', 'owner');
+        expect(html).not.toContain('value="inactive"');
+        expect(html).not.toContain('value="active"');
+        expect(html).not.toContain('id="banUserBtn"');
+        expect(html).not.toContain('value="anonymized"');
+    });
+
+    it('super_admin sees the status action box when viewing another super_admin', async () => {
+        const html = await renderViewWithUserRole('super_admin', 'super_admin');
+        expect(html).toContain('id="status_btn_box"');
+    });
+
+    it('owner sees the status action box when viewing a non-super_admin active user', async () => {
+        const html = await renderViewWithUserRole('editor', 'owner');
+        expect(html).toContain('id="status_btn_box"');
     });
 });

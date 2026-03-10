@@ -294,6 +294,12 @@ export const adminEditUser = async (req, res) => {
             return res.redirect('/admin/users');
         }
 
+        // Un owner ne peut pas modifier un super_admin
+        if (currentUserRole === 'owner' && user.role === 'super_admin') {
+            res.flash('error', 'Vous ne pouvez pas modifier un super administrateur.');
+            return res.redirect(`/admin/users/${userId}/view`);
+        }
+
         // Récupérer tous les sites disponibles via le service
         const sites = await getAvailableSites(currentUserId, currentUserRole);
 
@@ -325,7 +331,15 @@ export const adminEditUser = async (req, res) => {
 export const adminUpdateUser = async (req, res) => {
     try {
         const userId = req.params.id;
+        const currentUserRole = req.session.user?.role;
         const { sites } = req.body;
+
+        // Un owner ne peut pas modifier un super_admin
+        const targetUser = await getUserWithRelations(userId);
+        if (targetUser && currentUserRole === 'owner' && targetUser.role === 'super_admin') {
+            res.flash('error', 'Vous ne pouvez pas modifier un super administrateur.');
+            return res.redirect(`/admin/users/${userId}/view`);
+        }
 
         // Gérer les sites assignés via le service
         const siteIds = sites ? (Array.isArray(sites) ? sites : [sites]) : [];
@@ -368,6 +382,7 @@ export const adminChangeUserStatus = async (req, res) => {
             err.message === 'Cannot change your own status' ||
             err.message === 'Reason is required when banning a user' ||
             err.message === 'Only super_admin can un-ban a user' ||
+            err.message === 'Owner cannot change the status of a super_admin' ||
             err.message?.startsWith('Owner cannot set status') ||
             err.message?.startsWith('Cannot change a pending user') ||
             err.message?.startsWith('Invalid status')

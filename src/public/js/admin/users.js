@@ -263,6 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // <button data-action="edit" data-user-id="${user.id}" class="btn btn-sm btn-outline btn-accent w-[38.25px] h-[32px] pt-[2px]">
             //     <i class="fa-regular fa-pen-to-square"></i>
             // </button>
+            // <button data-action="delete" data-user-id="${user.id}" data-user-login="${user.login}" class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px]">
+            //     <i class="fa-regular fa-trash-can"></i>
+            // </button>
 
             tr.innerHTML = `
                 <td>${user.login}</td>
@@ -276,9 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="flex justify-end items-center gap-2 w-full">
                         <button data-action="view" data-user-id="${user.id}" class="btn btn-sm btn-outline w-[38.25px] h-[32px] pt-[2px]">
                             <i class="fa-regular fa-eye"></i>
-                        </button>
-                        <button data-action="delete" data-user-id="${user.id}" data-user-login="${user.login}" class="btn btn-sm btn-error btn-outline w-[38.25px] h-[32px] pt-[2px]">
-                            <i class="fa-regular fa-trash-can"></i>
                         </button>
                     </div>
                 </td>

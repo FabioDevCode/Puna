@@ -8,7 +8,7 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-    {{#roleIs roles='super_admin,owner'}}
+    {{#roleIs roles='super_admin'}}
         {{#actionCan entity='user' action='update'}}
             {{#unless (eq user.status "anonymized")}}
                 <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-warning">
@@ -19,6 +19,20 @@
                 </a>
             {{/unless}}
         {{/actionCan}}
+    {{/roleIs}}
+    {{#roleIs roles='owner'}}
+        {{#unless (eq user.role "super_admin")}}
+            {{#actionCan entity='user' action='update'}}
+                {{#unless (eq user.status "anonymized")}}
+                    <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-warning">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span class="hidden md:flex">
+                            Modifier l'utilisateur
+                        </span>
+                    </a>
+                {{/unless}}
+            {{/actionCan}}
+        {{/unless}}
     {{/roleIs}}
 
     {{#roleIs roles='super_admin'}}
@@ -36,11 +50,20 @@
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade-in">
-        {{#roleIs roles='super_admin,owner'}}
+        {{#roleIs roles='super_admin'}}
             {{#unless (eq user.status "anonymized")}}
                 <div id="status_btn_box" class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
                     {{> components/buttons/user-status-actions }}
                 </div>
+            {{/unless}}
+        {{/roleIs}}
+        {{#roleIs roles='owner'}}
+            {{#unless (eq user.role "super_admin")}}
+                {{#unless (eq user.status "anonymized")}}
+                    <div id="status_btn_box" class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
+                        {{> components/buttons/user-status-actions }}
+                    </div>
+                {{/unless}}
             {{/unless}}
         {{/roleIs}}
 

@@ -474,7 +474,7 @@ export async function changeUserStatus(userId, newStatus, changedBy, reason = nu
     }
 
     const user = await models.User.findByPk(userId, {
-        attributes: ['id', 'login', 'status', 'password'],
+        attributes: ['id', 'login', 'role', 'status', 'password'],
     });
 
     if (!user) {
@@ -482,6 +482,11 @@ export async function changeUserStatus(userId, newStatus, changedBy, reason = nu
     }
 
     const previousStatus = user.status;
+
+    // Owner cannot act on a super_admin
+    if (changedBy.role === 'owner' && user.role === 'super_admin') {
+        throw new Error('Owner cannot change the status of a super_admin');
+    }
 
     // Owner can only set active or inactive
     if (changedBy.role === 'owner' && !['active', 'inactive'].includes(newStatus)) {
