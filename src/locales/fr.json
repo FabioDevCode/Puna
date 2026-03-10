@@ -30,6 +30,33 @@
     "misc": {
         "beta_version": "beta-0.0.1"
     },
+    "passwordReset": {
+        "forgot_title": "Mot de passe oublié",
+        "forgot_subtitle": "Entrez votre adresse email pour recevoir un lien de réinitialisation.",
+        "forgot_email_placeholder": "Adresse email",
+        "forgot_submit": "Envoyer le lien",
+        "forgot_success": "Si un compte avec cet email existe, un lien de réinitialisation a été envoyé.",
+        "forgot_back_login": "Retour à la connexion",
+        "reset_title": "Réinitialiser le mot de passe",
+        "reset_subtitle": "Choisissez un nouveau mot de passe.",
+        "reset_password_placeholder": "Nouveau mot de passe",
+        "reset_confirm_placeholder": "Confirmer le mot de passe",
+        "reset_submit": "Réinitialiser",
+        "reset_success": "Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.",
+        "reset_token_invalid": "Le lien de réinitialisation est invalide ou a expiré.",
+        "reset_password_mismatch": "Les mots de passe ne correspondent pas.",
+        "reset_error": "Une erreur est survenue lors de la réinitialisation.",
+        "login_forgot_link": "Mot de passe oublié ?",
+        "mail_disabled": "La fonctionnalité de réinitialisation du mot de passe n'est pas disponible pour le moment.",
+        "rate_limit_forgot": "Trop de demandes. Réessayez dans 15 minutes.",
+        "rate_limit_reset": "Trop de tentatives. Réessayez dans 15 minutes.",
+        "email_subject": "Réinitialisation de votre mot de passe — Puna",
+        "email_greeting": "Bonjour,",
+        "email_body": "Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le lien ci-dessous pour en choisir un nouveau :",
+        "email_button": "Réinitialiser mon mot de passe",
+        "email_expiry": "Ce lien expire dans 1 heure.",
+        "email_ignore": "Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email."
+    },
     "site": {
         "create_help": "253 caractères maximum.",
         "create_title": "Créer un nouveau site",
