@@ -12,7 +12,7 @@
         <ul class="menu p-2 gap-[1px] rounded-lg">
             {{#roleIs roles='super_admin,owner'}}
                 <li>
-                    <a href="/admin" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100">
+                    <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                         <i class="fa-solid fa-sliders"></i>
                         Administration
                     </a>
@@ -39,7 +39,7 @@
     <div class="mt-auto text-sm text-neutral">
         <div class="p-2 mx-2 flex flex-col gap-2 rounded-xl">
             <div class="flex items-center gap-2 select-none">
-                <div class="w-8 h-8 rounded rounded-lg bg-neutral/15 flex justify-center items-center">
+                <div class="w-8 h-8 rounded rounded-lg bg-neutral/10 flex justify-center items-center">
                     <i class="fa-regular fa-user"></i>
                 </div>
                 <p>
@@ -50,7 +50,7 @@
 
         <ul class="menu p-2 gap-[1px]">
             <li>
-                <a href="/dp-logout" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100">
+                <a href="/dp-logout" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100 gap-2 px-3 py-2">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     Se déconnecter
                 </a>
