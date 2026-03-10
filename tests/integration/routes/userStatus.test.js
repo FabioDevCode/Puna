@@ -106,7 +106,6 @@ vi.mock('../../../src/controllers/admin/index.js', () => ({
 vi.mock('../../../src/controllers/dashboard.controller.js', () => ({
     rootRedirect: vi.fn((_req, res) => res.redirect('/dashboard')),
     dashboard: vi.fn((_req, res) => res.status(200).end()),
-    allSite: vi.fn((_req, res) => res.status(200).end()),
     dpLogin: vi.fn((_req, res) => res.status(200).end()),
     dpFirstCo: vi.fn((_req, res) => res.status(200).end()),
     getTopFroms: vi.fn((_req, res) => res.json([])),
@@ -119,6 +118,7 @@ vi.mock('../../../src/controllers/dashboard.controller.js', () => ({
 }));
 
 vi.mock('../../../src/controllers/site.controller.js', () => ({
+    allSite: vi.fn((_req, res) => res.status(200).end()),
     createSite: vi.fn((_req, res) => res.redirect('/site/all')),
     showSite: vi.fn((_req, res) => res.status(200).end()),
     deleteSite: vi.fn((_req, res) => res.redirect('/site/all')),
@@ -245,20 +245,14 @@ describe('POST /admin/users/:id/status', () => {
     });
 
     it('super_admin can change status → 302 to view page', async () => {
-        const res = await request(app)
-            .post(`/admin/users/${TARGET_USER_ID}/status`)
-            .set('X-Test-User', makeSessionUser('super_admin'))
-            .send({ status: 'inactive' });
+        const res = await request(app).post(`/admin/users/${TARGET_USER_ID}/status`).set('X-Test-User', makeSessionUser('super_admin')).send({ status: 'inactive' });
 
         expect(res.status).toBe(302);
         expect(res.headers.location).toContain(`/admin/users/${TARGET_USER_ID}/view`);
     });
 
     it('owner can set inactive → 302 to view page', async () => {
-        const res = await request(app)
-            .post(`/admin/users/${TARGET_USER_ID}/status`)
-            .set('X-Test-User', makeSessionUser('owner'))
-            .send({ status: 'inactive' });
+        const res = await request(app).post(`/admin/users/${TARGET_USER_ID}/status`).set('X-Test-User', makeSessionUser('owner')).send({ status: 'inactive' });
 
         expect(res.status).toBe(302);
         expect(res.headers.location).toContain(`/admin/users/${TARGET_USER_ID}/view`);
@@ -268,10 +262,7 @@ describe('POST /admin/users/:id/status', () => {
         // The roleAccess middleware only restricts by role (super_admin/owner), not by status value.
         // Business logic (owner cannot ban) is enforced inside the controller/service.
         // Here we verify the route itself is accessible by owner (gets to the controller).
-        const res = await request(app)
-            .post(`/admin/users/${TARGET_USER_ID}/status`)
-            .set('X-Test-User', makeSessionUser('owner'))
-            .send({ status: 'banned' });
+        const res = await request(app).post(`/admin/users/${TARGET_USER_ID}/status`).set('X-Test-User', makeSessionUser('owner')).send({ status: 'banned' });
 
         // The mocked controller redirects, so we expect 302
         expect(res.status).toBe(302);
@@ -285,10 +276,7 @@ describe('POST /admin/users/:id/status', () => {
     });
 
     it('editor role → 403 Forbidden', async () => {
-        const res = await request(app)
-            .post(`/admin/users/${TARGET_USER_ID}/status`)
-            .set('X-Test-User', makeSessionUser('editor'))
-            .send({ status: 'inactive' });
+        const res = await request(app).post(`/admin/users/${TARGET_USER_ID}/status`).set('X-Test-User', makeSessionUser('editor')).send({ status: 'inactive' });
 
         expect(res.status).toBe(403);
     });
@@ -310,38 +298,27 @@ describe('POST /admin/users/delete', () => {
     });
 
     it('super_admin can soft-delete a user → 302 redirect to /admin/users', async () => {
-        const res = await request(app)
-            .post('/admin/users/delete')
-            .set('X-Test-User', makeSessionUser('super_admin'))
-            .send({ user_id: 'some-target-user-id', password: 'secret' });
+        const res = await request(app).post('/admin/users/delete').set('X-Test-User', makeSessionUser('super_admin')).send({ user_id: 'some-target-user-id', password: 'secret' });
 
         expect(res.status).toBe(302);
         expect(res.headers.location).toContain('/admin/users');
     });
 
     it('owner → 403 Forbidden (route restricted to super_admin)', async () => {
-        const res = await request(app)
-            .post('/admin/users/delete')
-            .set('X-Test-User', makeSessionUser('owner'))
-            .send({ user_id: 'some-target-user-id', password: 'secret' });
+        const res = await request(app).post('/admin/users/delete').set('X-Test-User', makeSessionUser('owner')).send({ user_id: 'some-target-user-id', password: 'secret' });
 
         expect(res.status).toBe(403);
     });
 
     it('unauthenticated → redirects to /dp-login', async () => {
-        const res = await request(app)
-            .post('/admin/users/delete')
-            .send({ user_id: 'some-target-user-id', password: 'secret' });
+        const res = await request(app).post('/admin/users/delete').send({ user_id: 'some-target-user-id', password: 'secret' });
 
         expect(res.status).toBe(302);
         expect(res.headers.location).toContain('/dp-login');
     });
 
     it('editor role → 403 Forbidden', async () => {
-        const res = await request(app)
-            .post('/admin/users/delete')
-            .set('X-Test-User', makeSessionUser('editor'))
-            .send({ user_id: 'some-target-user-id', password: 'secret' });
+        const res = await request(app).post('/admin/users/delete').set('X-Test-User', makeSessionUser('editor')).send({ user_id: 'some-target-user-id', password: 'secret' });
 
         expect(res.status).toBe(403);
     });

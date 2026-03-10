@@ -111,7 +111,6 @@ vi.mock('../../../src/controllers/admin/index.js', () => ({
 vi.mock('../../../src/controllers/dashboard.controller.js', () => ({
     rootRedirect: vi.fn((_req, res) => res.redirect('/dashboard')),
     dashboard: vi.fn((_req, res) => res.status(200).end()),
-    allSite: vi.fn((_req, res) => res.status(200).end()),
     dpLogin: vi.fn((_req, res) => res.status(200).end()),
     dpFirstCo: vi.fn((_req, res) => res.status(200).end()),
     getTopFroms: vi.fn((_req, res) => res.json([])),
@@ -124,6 +123,7 @@ vi.mock('../../../src/controllers/dashboard.controller.js', () => ({
 }));
 
 vi.mock('../../../src/controllers/site.controller.js', () => ({
+    allSite: vi.fn((_req, res) => res.status(200).end()),
     createSite: vi.fn((_req, res) => res.redirect('/site/all')),
     showSite: vi.fn((_req, res) => res.status(200).end()),
     deleteSite: vi.fn((_req, res) => res.redirect('/site/all')),
@@ -293,20 +293,14 @@ describe('RBAC routes', () => {
     // -----------------------------------------------------------------------
     describe('POST /create-site', () => {
         it('allows beta user to create a site (under volume limit)', async () => {
-            const res = await request(app)
-                .post('/create-site')
-                .set('X-Test-User', makeSessionUser('beta'))
-                .send({ domain: 'beta.example.com' });
+            const res = await request(app).post('/create-site').set('X-Test-User', makeSessionUser('beta')).send({ domain: 'beta.example.com' });
 
             // actionAccess('site', 'create') passes for beta → controller redirect
             expect(res.status).toBe(302);
         });
 
         it('returns 403 for viewer (site:create denied)', async () => {
-            const res = await request(app)
-                .post('/create-site')
-                .set('X-Test-User', makeSessionUser('viewer'))
-                .send({ domain: 'viewer.example.com' });
+            const res = await request(app).post('/create-site').set('X-Test-User', makeSessionUser('viewer')).send({ domain: 'viewer.example.com' });
 
             expect(res.status).toBe(403);
         });
@@ -324,10 +318,7 @@ describe('RBAC routes', () => {
     // -----------------------------------------------------------------------
     describe('POST /delete-site/:id', () => {
         it('returns 403 for editor (site:delete denied)', async () => {
-            const res = await request(app)
-                .post('/delete-site/some-site-id')
-                .set('X-Test-User', makeSessionUser('editor'))
-                .send({ confirm_domain: 'editor.example.com' });
+            const res = await request(app).post('/delete-site/some-site-id').set('X-Test-User', makeSessionUser('editor')).send({ confirm_domain: 'editor.example.com' });
 
             expect(res.status).toBe(403);
         });
