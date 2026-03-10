@@ -32,7 +32,22 @@ const REQUIRED_VARS = {
 const OPTIONAL_VARS = {
     SESSION_MAX_AGE: '43200000',
     HELMET_STRICT_TRANSPORT: 'false',
+    APP_URL: 'http://localhost:3000',
 };
+
+/**
+ * Variables SMTP optionnelles (toutes doivent être présentes pour activer la fonctionnalité mail)
+ * Si absentes ou incomplètes, la feature de reset de mot de passe est désactivée.
+ */
+const SMTP_VARS = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM'];
+
+/**
+ * Indique si la configuration SMTP est complète et que la feature mail est disponible.
+ * @returns {boolean}
+ */
+export function isMailConfigured() {
+    return SMTP_VARS.every((key) => !!process.env[key]);
+}
 
 /**
  * Valeurs autorisées pour certaines variables
@@ -151,6 +166,9 @@ export async function validateEnv() {
         console.warn('');
     }
 
+    // 8. Vérifier la configuration SMTP (optionnelle)
+    validateSmtpConfig();
+
     console.log('✅ Environment variables validated successfully\n');
 }
 
@@ -257,10 +275,7 @@ function validateFormats(errors, _warnings) {
             const hasHost = process.env.CLAMAV_HOST && process.env.CLAMAV_HOST.trim().length > 0;
 
             if (!hasSocket && !hasHost) {
-                errors.push(
-                    '  ❌ CLAMAV_ENABLED is "true" but no connection is configured.' +
-                        '\n     Set CLAMAV_SOCKET (Unix socket) or CLAMAV_HOST + CLAMAV_PORT (TCP).'
-                );
+                errors.push('  ❌ CLAMAV_ENABLED is "true" but no connection is configured.' + '\n     Set CLAMAV_SOCKET (Unix socket) or CLAMAV_HOST + CLAMAV_PORT (TCP).');
             }
         }
     }
@@ -278,6 +293,14 @@ function validateFormats(errors, _warnings) {
         const clamSocket = process.env.CLAMAV_SOCKET;
         if (!clamSocket.startsWith('/')) {
             errors.push('  ❌ CLAMAV_SOCKET must be an absolute path (e.g., /tmp/clamd.socket)');
+        }
+    }
+
+    // SMTP_PORT doit être un nombre valide (si défini)
+    if (process.env.SMTP_PORT) {
+        const smtpPort = parseInt(process.env.SMTP_PORT);
+        if (isNaN(smtpPort) || smtpPort < 1 || smtpPort > 65535) {
+            errors.push('  ❌ SMTP_PORT must be a valid port number (1-65535)');
         }
     }
 
@@ -343,22 +366,41 @@ function validateSecurityKeys(warnings) {
 function validateDockerConfig(warnings) {
     // Si DB_IP est localhost dans Docker, c'est probablement une erreur
     if (process.env.DB_IP === 'localhost' || process.env.DB_IP === '127.0.0.1') {
-        warnings.push(
-            '  ⚠️  Running in Docker: DB_IP is set to localhost.' +
-                '\n     Consider using the Docker service name (e.g., "db") instead.'
-        );
+        warnings.push('  ⚠️  Running in Docker: DB_IP is set to localhost.' + '\n     Consider using the Docker service name (e.g., "db") instead.');
     }
 
     // Si ClamAV est activé et que le host est localhost dans Docker
     if (process.env.CLAMAV_ENABLED === 'true') {
         const clamHost = process.env.CLAMAV_HOST || '127.0.0.1';
         if (clamHost === 'localhost' || clamHost === '127.0.0.1') {
-            warnings.push(
-                '  ⚠️  Running in Docker: CLAMAV_HOST is set to localhost.' +
-                    '\n     Consider using the Docker service name (e.g., "clamav") instead.'
-            );
+            warnings.push('  ⚠️  Running in Docker: CLAMAV_HOST is set to localhost.' + '\n     Consider using the Docker service name (e.g., "clamav") instead.');
         }
     }
+}
+
+/**
+ * Vérifie l'état de la configuration SMTP et avertit si elle est incomplète.
+ * Ne bloque pas le démarrage — la feature mail est simplement désactivée.
+ */
+function validateSmtpConfig() {
+    const presentVars = SMTP_VARS.filter((key) => !!process.env[key]);
+    const missingVars = SMTP_VARS.filter((key) => !process.env[key]);
+
+    if (presentVars.length === 0) {
+        // Aucune var SMTP définie : feature mail désactivée, pas d'avertissement intrusif
+        console.log('📧 Mail feature disabled (no SMTP configuration found)\n');
+        return;
+    }
+
+    if (missingVars.length > 0) {
+        // Config partielle : avertir explicitement
+        console.warn('⚠️  Incomplete SMTP configuration — mail feature is disabled');
+        console.warn(`   Missing variables: ${missingVars.join(', ')}`);
+        console.warn('   All SMTP_* vars must be set to enable password reset emails.\n');
+        return;
+    }
+
+    console.log('📧 SMTP configuration found — mail feature enabled\n');
 }
 
 /**

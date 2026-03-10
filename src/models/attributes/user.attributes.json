@@ -32,6 +32,14 @@
         "allowNull": true,
         "type": "STRING"
     },
+    "password_reset_expires": {
+        "allowNull": true,
+        "type": "DATE"
+    },
+    "password_reset_token": {
+        "allowNull": true,
+        "type": "STRING(64)"
+    },
     "role": {
         "allowNull": false,
         "defaultValue": "viewer",
