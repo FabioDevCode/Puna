@@ -77,6 +77,8 @@ vi.mock('../../../src/models/index.js', () => ({
 vi.mock('../../../src/middlewares/loginRateLimiter.js', () => ({
     loginRateLimiter: vi.fn((_req, _res, next) => next()),
     firstLoginRateLimiter: vi.fn((_req, _res, next) => next()),
+    forgotPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
+    resetPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
 }));
 
 // checkUserStatus calls getUserStatus — always return 'active' so middleware passes
