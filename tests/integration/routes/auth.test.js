@@ -82,6 +82,8 @@ vi.mock('../../../src/models/index.js', () => ({
 vi.mock('../../../src/middlewares/loginRateLimiter.js', () => ({
     loginRateLimiter: vi.fn((_req, _res, next) => next()),
     firstLoginRateLimiter: vi.fn((_req, _res, next) => next()),
+    forgotPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
+    resetPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
 }));
 
 vi.mock('bcrypt', () => ({
@@ -198,9 +200,7 @@ function buildTestApp() {
             const code = res.statusCode && res.statusCode !== 200 ? res.statusCode : 200;
             const flashes = (res.locals.flashMessages || []).map((f) => f.text).join('\n');
             const errorText = data?.error || '';
-            res.status(code).send(
-                `<html><body>${view}${errorText ? '\n' + errorText : ''}${flashes ? '\n' + flashes : ''}</body></html>`
-            );
+            res.status(code).send(`<html><body>${view}${errorText ? '\n' + errorText : ''}${flashes ? '\n' + flashes : ''}</body></html>`);
         };
         next();
     });
@@ -293,9 +293,7 @@ describe('auth routes', () => {
             expect(postRes.headers.location).toContain('/dp-login');
 
             const loginPage = await agent.get('/dp-login');
-            expect(loginPage.text).toContain(
-                'Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.'
-            );
+            expect(loginPage.text).toContain('Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.');
         });
 
         it('increments failed_login_attempts counter on login failure for active user', async () => {
@@ -391,9 +389,7 @@ describe('auth routes', () => {
             // Second call without filter finds the banned user
             vi.mocked(findUserByLogin).mockResolvedValueOnce({ ...mockUser, status: 'banned' });
 
-            const res = await request(app)
-                .post('/dp-first-co')
-                .send({ login: 'testuser', password: 'newpassword', confirm_password: 'newpassword' });
+            const res = await request(app).post('/dp-first-co').send({ login: 'testuser', password: 'newpassword', confirm_password: 'newpassword' });
 
             expect(res.status).toBe(200);
             expect(res.text).toContain('Votre compte a été banni.');
@@ -402,9 +398,7 @@ describe('auth routes', () => {
         it('shows login-unknown message when user does not exist', async () => {
             vi.mocked(findUserByLogin).mockResolvedValue(null);
 
-            const res = await request(app)
-                .post('/dp-first-co')
-                .send({ login: 'unknown', password: 'newpassword', confirm_password: 'newpassword' });
+            const res = await request(app).post('/dp-first-co').send({ login: 'unknown', password: 'newpassword', confirm_password: 'newpassword' });
 
             expect(res.status).toBe(200);
             expect(res.text).toContain('Login inconnu.');

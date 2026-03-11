@@ -5,10 +5,11 @@ import * as dashboardCtl from '../controllers/dashboard.controller.js';
 import * as exportCtl from '../controllers/export.controller.js';
 import * as formCtl from '../controllers/form.controller.js';
 import * as inboxCtl from '../controllers/inbox.controller.js';
+import * as passwordResetCtl from '../controllers/passwordReset.controller.js';
 import * as siteCtl from '../controllers/site.controller.js';
 import { requireAuth, isConnectDash } from '../helpers/authHelper.js';
 import { actionAccess, roleAccess } from '../middlewares/checkAccess.js';
-import { loginRateLimiter, firstLoginRateLimiter } from '../middlewares/loginRateLimiter.js';
+import { loginRateLimiter, firstLoginRateLimiter, forgotPasswordRateLimiter, resetPasswordRateLimiter } from '../middlewares/loginRateLimiter.js';
 
 const router = express.Router();
 
@@ -21,6 +22,12 @@ router.get('/dp-first-connexion', isConnectDash, dashboardCtl.dpFirstCo);
 router.get('/dp-logout', authCtl.dpLogout);
 router.post('/dp-first-co', firstLoginRateLimiter, authCtl.dpFirstCoPost);
 router.post('/dp-connect', loginRateLimiter, authCtl.dpConnect);
+
+// Password Reset
+router.get('/dp-forgot-password', isConnectDash, passwordResetCtl.forgotPasswordGet);
+router.post('/dp-forgot-password', forgotPasswordRateLimiter, passwordResetCtl.forgotPasswordPost);
+router.get('/dp-reset-password/:token', isConnectDash, passwordResetCtl.resetPasswordGet);
+router.post('/dp-reset-password/:token', resetPasswordRateLimiter, passwordResetCtl.resetPasswordPost);
 
 // CONNECTED ========================================================================
 router.get('/dashboard', requireAuth, dashboardCtl.dashboard);
