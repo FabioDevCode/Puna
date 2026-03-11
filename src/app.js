@@ -21,6 +21,7 @@ import { logger, apiLogger, errorLogger } from './config/logger.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUSer } from './helpers/init_admin_user.js';
+import { mailEnabled } from './config/mailer.js';
 import { csrfProtection, csrfTokenInjector } from './middlewares/csrf.js';
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
 import flashMessages from './middlewares/flashMessages.js';
@@ -158,6 +159,12 @@ app.use(csrfTokenInjector);
 app.use((req, res, next) => {
     res.locals.session = req.session;
     res.locals.user = req.session?.user || null;
+    next();
+});
+
+// Inject mailEnabled into all templates
+app.use((req, res, next) => {
+    res.locals.mailEnabled = mailEnabled;
     next();
 });
 
