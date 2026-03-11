@@ -13,7 +13,7 @@ import { hashPassword } from './auth.service.js';
  * Générer un token de réinitialisation de mot de passe
  * @returns {{ rawToken: string, hashedToken: string, expires: Date }}
  */
-function generateResetToken() {
+export function generateResetToken() {
     const rawToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
     const expires = new Date(Date.now() + 60 * 60 * 1000);
