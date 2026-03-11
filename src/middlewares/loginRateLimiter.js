@@ -72,3 +72,67 @@ export const firstLoginRateLimiter = rateLimit({
     // Désactiver la validation IPv6
     validate: { keyGeneratorIpFallback: false },
 });
+
+/**
+ * Rate limiter pour la demande de réinitialisation de mot de passe
+ * Limite à 3 demandes par fenêtre de 15 minutes (anti-énumération d'emails)
+ */
+export const forgotPasswordRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // Fenêtre de 15 minutes
+    max: 3, // Maximum 3 demandes
+    standardHeaders: true,
+    legacyHeaders: false,
+
+    // Compter toutes les requêtes (anti-énumération : on retourne toujours la même réponse)
+    skipSuccessfulRequests: false,
+
+    // Identifier par IP uniquement (l'email peut ne pas exister)
+    keyGenerator: (req) => {
+        return `forgot-pwd:${req.ip}`;
+    },
+
+    handler: (req, res) => {
+        auditLogger.warn({
+            action: 'FORGOT_PASSWORD_RATE_LIMIT_EXCEEDED',
+            ip: req.ip,
+            email: req.body?.email,
+            userAgent: req.get('User-Agent'),
+        });
+
+        res.flash('error', 'Trop de demandes. Réessayez dans 15 minutes.');
+        return res.redirect('/dp-forgot-password');
+    },
+
+    // Désactiver la validation IPv6
+    validate: { keyGeneratorIpFallback: false },
+});
+
+/**
+ * Rate limiter pour la réinitialisation effective du mot de passe
+ * Limite à 5 tentatives par fenêtre de 15 minutes
+ */
+export const resetPasswordRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // Fenêtre de 15 minutes
+    max: 5, // Maximum 5 tentatives
+    standardHeaders: true,
+    legacyHeaders: false,
+
+    // Identifier par IP uniquement
+    keyGenerator: (req) => {
+        return `reset-pwd:${req.ip}`;
+    },
+
+    handler: (req, res) => {
+        auditLogger.warn({
+            action: 'RESET_PASSWORD_RATE_LIMIT_EXCEEDED',
+            ip: req.ip,
+            userAgent: req.get('User-Agent'),
+        });
+
+        res.flash('error', 'Trop de tentatives. Réessayez dans 15 minutes.');
+        return res.redirect('/dp-forgot-password');
+    },
+
+    // Désactiver la validation IPv6
+    validate: { keyGeneratorIpFallback: false },
+});
