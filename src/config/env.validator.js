@@ -33,6 +33,8 @@ const OPTIONAL_VARS = {
     SESSION_MAX_AGE: '43200000',
     HELMET_STRICT_TRANSPORT: 'false',
     APP_URL: 'http://localhost:3000',
+    TOTP_ENABLED: 'false', // Active/désactive la fonctionnalité 2FA globalement
+    TOTP_ISSUER: 'Puna', // Nom affiché dans l'application d'authentification
 };
 
 /**
@@ -40,6 +42,14 @@ const OPTIONAL_VARS = {
  * Si absentes ou incomplètes, la feature de reset de mot de passe est désactivée.
  */
 const SMTP_VARS = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM'];
+
+/**
+ * Indique si la 2FA TOTP est activée globalement.
+ * @returns {boolean}
+ */
+export function isTotpEnabled() {
+    return process.env.TOTP_ENABLED === 'true';
+}
 
 /**
  * Indique si la configuration SMTP est complète et que la feature mail est disponible.
