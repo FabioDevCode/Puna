@@ -4,8 +4,6 @@
 .DS_Store
 node_modules
 node_modules/*
-src/config/database.js
-src/config/keys.json
 src/api/Puna/**/*
 src/api/Puna/burno.json
 storage/**/**
