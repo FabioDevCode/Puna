@@ -41,8 +41,16 @@ async function cleanOldLogs() {
             const stats = await fs.stat(filePath);
             const ageInDays = (now - stats.mtime.getTime()) / (1000 * 60 * 60 * 24);
 
-            // Déterminer le type de log selon le nom du fichier
-            let maxAge = 7; // Par défaut
+            // Déterminer le type de log selon le contenu de l'archive
+            // Formats possibles :
+            //   - YYYY-MM-DD-archive-log.tar.gz (rotation cron, contient tous les logs)
+            //   - YYYY-MM-DD-startup-log.tar.gz (rotation au démarrage)
+            //   - YYYY-MM-DD-startup-2-log.tar.gz (rotation startup avec compteur)
+            //   - YYYY-MM-DD-HHmmss-manual.tar.gz (rotation manuelle)
+            //   - Ancien format par préfixe : error-, api-, audit-, app-
+            // Les archives unifiées contiennent tous les types de logs,
+            // on applique la rétention la plus longue (audit = 90j par défaut)
+            let maxAge = retentionDays.app; // Par défaut
             if (file.startsWith('error-')) {
                 maxAge = retentionDays.error;
             } else if (file.startsWith('api-')) {
@@ -51,6 +59,10 @@ async function cleanOldLogs() {
                 maxAge = retentionDays.audit;
             } else if (file.startsWith('app-')) {
                 maxAge = retentionDays.app;
+            } else if (file.includes('-archive-') || file.includes('-startup-') || file.includes('-startup-log') || file.includes('-manual')) {
+                // Archives unifiées contenant les 4 types de logs :
+                // on utilise la rétention la plus longue pour ne rien perdre
+                maxAge = Math.max(retentionDays.app, retentionDays.api, retentionDays.error, retentionDays.audit);
             }
 
             // Supprimer si trop vieux

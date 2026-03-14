@@ -32,75 +32,10 @@ const env = process.env.NODE_ENV || 'development';
 const { level, appRetention, apiRetention, errorRetention, auditRetention } = config[env];
 
 // ============================================
-// ROTATION QUOTIDIENNE PERSONNALISÉE
+// UTILITAIRES DE ROTATION
 // ============================================
 
-/**
- * Effectue la rotation des logs : archive les 4 fichiers dans une seule archive tar.gz
- * 100% asynchrone pour ne pas bloquer le thread principal
- */
-export async function rotateAllLogs() {
-    try {
-        const now = new Date();
-        const yesterday = new Date(now);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        const dateStr = yesterday.toISOString().split('T')[0]; // Format: 2025-12-24
-        const archiveName = `${dateStr}-archive-log.tar.gz`;
-        const archivePath = path.join(archiveDir, archiveName);
-
-        // Créer le dossier archives s'il n'existe pas (async)
-        try {
-            await fs.access(archiveDir);
-        } catch {
-            await fs.mkdir(archiveDir, { recursive: true });
-        }
-
-        const logFiles = ['app.log', 'api.log', 'error.log', 'audit.log'];
-        const filesToArchive = [];
-
-        // Vérifier quels fichiers existent et ne sont pas vides (async)
-        for (const logFile of logFiles) {
-            const logPath = path.join(logDir, logFile);
-            try {
-                const stats = await fs.stat(logPath);
-                if (stats.size > 0) {
-                    filesToArchive.push(logFile);
-                }
-            } catch {
-                // Fichier n'existe pas, on ignore
-            }
-        }
-
-        if (filesToArchive.length === 0) {
-            logger.debug('Rotation quotidienne : aucun fichier à archiver');
-            return;
-        }
-
-        // Créer l'archive tar.gz (async via tar.create qui retourne une Promise)
-        await tar.create(
-            {
-                gzip: true,
-                file: archivePath,
-                cwd: logDir,
-            },
-            filesToArchive
-        );
-
-        // Vider les fichiers archivés (async)
-        await Promise.all(
-            filesToArchive.map((logFile) => {
-                const logPath = path.join(logDir, logFile);
-                return fs.writeFile(logPath, '');
-            })
-        );
-
-        const archiveStats = await fs.stat(archivePath);
-        logger.info(`Rotation quotidienne effectuée : ${archiveName} (${formatBytes(archiveStats.size)})`);
-    } catch (error) {
-        logger.error({ err: error }, 'Erreur lors de la rotation des logs');
-    }
-}
+const LOG_FILES = ['app.log', 'api.log', 'error.log', 'audit.log'];
 
 /**
  * Formatte les bytes en unités lisibles
@@ -115,11 +50,199 @@ export function formatBytes(bytes) {
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }
 
-// Planifier la rotation quotidienne à minuit (00:00)
-cron.schedule('0 0 * * *', () => {
-    logger.info('Déclenchement de la rotation quotidienne des logs');
-    rotateAllLogs();
-});
+/**
+ * Logique commune d'archivage des fichiers de log.
+ * Crée une archive tar.gz contenant les fichiers non vides puis les vide.
+ *
+ * @param {string} dateStr  - Date à utiliser dans le nom (YYYY-MM-DD)
+ * @param {string} suffix   - Suffixe du nom d'archive ('archive', 'startup', 'manual')
+ * @param {Function} logFn  - Fonction de log ({ info, debug, error } ou console)
+ * @returns {Promise<boolean>} true si une archive a été créée
+ */
+export async function archiveLogs(dateStr, suffix = 'archive', logFn = console) {
+    // Créer le dossier archives s'il n'existe pas
+    try {
+        await fs.access(archiveDir);
+    } catch {
+        await fs.mkdir(archiveDir, { recursive: true });
+    }
+
+    const filesToArchive = [];
+
+    // Vérifier quels fichiers existent et ne sont pas vides
+    for (const logFile of LOG_FILES) {
+        const logPath = path.join(logDir, logFile);
+        try {
+            const stats = await fs.stat(logPath);
+            if (stats.size > 0) {
+                filesToArchive.push(logFile);
+            }
+        } catch {
+            // Fichier n'existe pas, on ignore
+        }
+    }
+
+    if (filesToArchive.length === 0) {
+        logFn.debug?.('Rotation : aucun fichier à archiver') ?? logFn.info?.('[logger] Rotation : aucun fichier à archiver');
+        return false;
+    }
+
+    // Générer un nom d'archive unique (éviter les collisions en cas de redémarrages multiples)
+    let archiveName = `${dateStr}-${suffix}-log.tar.gz`;
+    let archivePath = path.join(archiveDir, archiveName);
+    let counter = 1;
+    while (true) {
+        try {
+            await fs.access(archivePath);
+            // Le fichier existe déjà, incrémenter le compteur
+            counter++;
+            archiveName = `${dateStr}-${suffix}-${counter}-log.tar.gz`;
+            archivePath = path.join(archiveDir, archiveName);
+        } catch {
+            break; // Le fichier n'existe pas, on peut l'utiliser
+        }
+    }
+
+    // Créer l'archive tar.gz
+    await tar.create(
+        {
+            gzip: true,
+            file: archivePath,
+            cwd: logDir,
+        },
+        filesToArchive
+    );
+
+    // SÉCURITÉ : vérifier que l'archive a bien été créée avant de vider les fichiers
+    let archiveStats;
+    try {
+        archiveStats = await fs.stat(archivePath);
+    } catch {
+        const errMsg = `Échec de la rotation : l'archive ${archiveName} n'a pas été créée — les fichiers de log sont conservés intacts`;
+        logFn.error?.(errMsg) ?? console.error(`[logger] ${errMsg}`);
+        return false;
+    }
+
+    // Vider les fichiers archivés (seulement si l'archive existe)
+    await Promise.all(
+        filesToArchive.map((logFile) => {
+            const logPath = path.join(logDir, logFile);
+            return fs.writeFile(logPath, '');
+        })
+    );
+
+    const msg = `Rotation effectuée : ${archiveName} (${formatBytes(archiveStats.size)})`;
+    logFn.info?.(msg) ?? console.info(`[logger] ${msg}`);
+    return true;
+}
+
+// ============================================
+// ROTATION QUOTIDIENNE (CRON MINUIT)
+// ============================================
+
+/**
+ * Effectue la rotation des logs : archive les 4 fichiers dans une seule archive tar.gz
+ * Appelée par le cron à minuit — utilise la date de la veille comme nom d'archive.
+ */
+export async function rotateAllLogs() {
+    try {
+        const now = new Date();
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const dateStr = yesterday.toISOString().split('T')[0];
+
+        await archiveLogs(dateStr, 'archive', logger);
+    } catch (error) {
+        logger.error({ err: error }, 'Erreur lors de la rotation des logs');
+    }
+}
+
+// ============================================
+// ROTATION AU DÉMARRAGE
+// ============================================
+
+/**
+ * Lit la dernière ligne d'un fichier de log et extrait la date (YYYY-MM-DD).
+ * Fallback sur la date de modification du fichier (mtime) si le contenu n'est pas parsable.
+ *
+ * @param {string} filePath - Chemin absolu vers le fichier log
+ * @returns {Promise<string|null>} Date au format 'YYYY-MM-DD' ou null si le fichier est absent/vide
+ */
+export async function getLastLogDate(filePath) {
+    try {
+        const stats = await fs.stat(filePath);
+        if (stats.size === 0) return null;
+
+        const content = await fs.readFile(filePath, 'utf-8');
+        const lines = content.split('\n').filter((l) => l.trim().length > 0);
+        if (lines.length === 0) return null;
+
+        const lastLine = lines[lines.length - 1];
+        try {
+            const parsed = JSON.parse(lastLine);
+            if (parsed.time) {
+                // pino isoTime : "2025-12-23T15:30:00.000Z"
+                return parsed.time.split('T')[0];
+            }
+        } catch {
+            // JSON invalide — fallback mtime
+        }
+
+        // Fallback : date de dernière modification du fichier
+        return stats.mtime.toISOString().split('T')[0];
+    } catch {
+        // Fichier absent
+        return null;
+    }
+}
+
+/**
+ * Vérifie si les logs en cours datent d'un jour précédent.
+ * Si oui, archive les fichiers puis les vide pour repartir proprement.
+ * Appelée AVANT la création des streams Pino (utilise console pour le logging).
+ */
+export async function checkAndRotateOnStartup() {
+    const today = new Date().toISOString().split('T')[0];
+    let mostRecentLogDate = null;
+    let needsRotation = false;
+
+    for (const logFile of LOG_FILES) {
+        const filePath = path.join(logDir, logFile);
+        const logDate = await getLastLogDate(filePath);
+
+        if (logDate && logDate !== today) {
+            needsRotation = true;
+        }
+
+        // Garder la date la plus récente pour nommer l'archive
+        if (logDate && (!mostRecentLogDate || logDate > mostRecentLogDate)) {
+            mostRecentLogDate = logDate;
+        }
+    }
+
+    if (!needsRotation) {
+        console.info('[logger] Logs à jour, pas de rotation nécessaire au démarrage');
+        return false;
+    }
+
+    const archiveDate = mostRecentLogDate || today;
+    console.info(`[logger] Logs datés du ${archiveDate} détectés — rotation au démarrage...`);
+
+    try {
+        return await archiveLogs(archiveDate, 'startup', console);
+    } catch (error) {
+        console.error('[logger] Erreur lors de la rotation au démarrage :', error.message);
+        return false;
+    }
+}
+
+// ============================================
+// ROTATION AU DÉMARRAGE (exécution synchrone avant streams)
+// Ne pas exécuter en environnement de test (Vitest mock tar → pas de vraie archive)
+// ============================================
+if (!process.env.VITEST) {
+    await checkAndRotateOnStartup();
+}
 
 // ============================================
 // STREAMS (destinations des logs avec rotation)
@@ -221,6 +344,12 @@ export const auditLogger = pino(
     auditStream
 );
 
+// Planifier la rotation quotidienne à minuit (00:00)
+cron.schedule('0 0 * * *', () => {
+    logger.info('Déclenchement de la rotation quotidienne des logs');
+    rotateAllLogs();
+});
+
 // Log de démarrage
 logger.info('Logger Pino configuré');
 logger.info(`  Environnement: ${env}`);
@@ -231,4 +360,4 @@ logger.info(`    - app.log: ${appRetention} jours`);
 logger.info(`    - api.log: ${apiRetention} jours`);
 logger.info(`    - error.log: ${errorRetention} jours`);
 logger.info(`    - audit.log: ${auditRetention} jours`);
-logger.info('  Rotation: quotidienne à minuit (archive unique)');
+logger.info('  Rotation: quotidienne à minuit + vérification au démarrage');
