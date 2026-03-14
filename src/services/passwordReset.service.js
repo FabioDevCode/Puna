@@ -76,7 +76,7 @@ export async function createPasswordResetRequest(email) {
               </p>
               <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
                 <tr>
-                  <td style="border-radius:6px;background-color:#4f46e5;">
+                  <td style="border-radius:6px;background-color:#0075c3;">
                     <a href="${resetUrl}"
                        style="display:inline-block;padding:14px 28px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;">
                       Réinitialiser mon mot de passe
