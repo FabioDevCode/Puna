@@ -167,3 +167,35 @@ export const resetPasswordRateLimiter = rateLimit({
     // Désactiver la validation IPv6
     validate: { keyGeneratorIpFallback: false },
 });
+
+/**
+ * Rate limiter pour les actions de configuration 2FA (désactivation, régénération codes)
+ * Ces actions requièrent une vérification de mot de passe — protégées contre la force brute.
+ * Maximum 5 tentatives par fenêtre de 15 minutes.
+ */
+export const twoFaConfigRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+
+    keyGenerator: (req) => {
+        const userId = req.session?.user?.id || 'unknown';
+        return `2fa-config:${req.ip}:${userId}`;
+    },
+
+    handler: (req, res) => {
+        auditLogger.warn({
+            action: '2FA_CONFIG_RATE_LIMIT_EXCEEDED',
+            ip: req.ip,
+            userId: req.session?.user?.id || 'unknown',
+            userAgent: req.get('User-Agent'),
+        });
+
+        res.flash('error', 'Trop de tentatives. Réessayez dans 15 minutes.');
+        return res.redirect('/dashboard');
+    },
+
+    validate: { keyGeneratorIpFallback: false },
+});
