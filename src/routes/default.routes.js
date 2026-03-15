@@ -10,7 +10,14 @@ import * as siteCtl from '../controllers/site.controller.js';
 import * as twoFactorCtl from '../controllers/twoFactor.controller.js';
 import { requireAuth, isConnectDash, requirePending2FA } from '../helpers/authHelper.js';
 import { actionAccess, roleAccess } from '../middlewares/checkAccess.js';
-import { loginRateLimiter, firstLoginRateLimiter, forgotPasswordRateLimiter, resetPasswordRateLimiter, twoFaRateLimiter } from '../middlewares/loginRateLimiter.js';
+import {
+    loginRateLimiter,
+    firstLoginRateLimiter,
+    forgotPasswordRateLimiter,
+    resetPasswordRateLimiter,
+    twoFaRateLimiter,
+    twoFaConfigRateLimiter,
+} from '../middlewares/loginRateLimiter.js';
 
 const router = express.Router();
 
@@ -40,7 +47,7 @@ router.post('/dp-2fa-recovery', twoFaRateLimiter, requirePending2FA, twoFactorCt
 
 // 2FA Configuration (utilisateur connecté)
 router.get('/dp-2fa-setup', requireAuth, twoFactorCtl.dp2faSetupGet);
-router.post('/dp-2fa-setup', requireAuth, twoFactorCtl.dp2faSetupPost);
+router.post('/dp-2fa-setup', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.dp2faSetupPost);
 router.get('/dp-2fa-backup-codes', requireAuth, twoFactorCtl.dp2faBackupCodesGet);
 router.post('/dp-2fa-disable', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.dp2faDisablePost);
 router.post('/dp-2fa-regenerate', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.dp2faRegeneratePost);

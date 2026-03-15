@@ -95,6 +95,52 @@ const token = jwt.sign({ siteId, formId }, process.env.KEY_TK, { expiresIn: '365
 - Token invalide → 401 Unauthorized
 - Token expiré → 401 Unauthorized
 
+### Authentification à deux facteurs (2FA / TOTP)
+
+Puna supporte l'authentification à deux facteurs via le protocole **TOTP (RFC 6238)**, compatible avec les applications mobiles telles que :
+
+- Google Authenticator
+- Authy
+- Microsoft Authenticator
+- 1Password, Bitwarden, etc.
+
+**Activation :**
+
+- La 2FA est activable globalement via la variable d'environnement `TOTP_ENABLED=true`
+- Chaque utilisateur peut activer/désactiver la 2FA depuis le dashboard
+- L'activation génère un QR code scannable + une clé manuelle en base32
+
+**Codes de récupération :**
+
+- 8 codes à usage unique au format `xxxx-xxxx` sont générés lors de l'activation
+- Chaque code est hashé individuellement (bcrypt) avant stockage
+- Les codes hashés sont ensuite chiffrés (AES-256-CBC) en base de données
+- Un code utilisé est supprimé définitivement du tableau
+- Les codes peuvent être régénérés (nécessite le mot de passe)
+
+**Stockage sécurisé :**
+
+| Donnée                | Méthode                                                | Colonne                  |
+| --------------------- | ------------------------------------------------------ | ------------------------ |
+| Secret TOTP           | Chiffré AES-256-CBC (`encryptString`)                  | `user.totp_secret`       |
+| Codes de récupération | Hashés bcrypt + chiffrés AES-256-CBC (`encryptObject`) | `user.totp_backup_codes` |
+| Flag activation       | Booléen en clair                                       | `user.totp_enabled`      |
+
+**Flux de connexion avec 2FA :**
+
+1. L'utilisateur saisit login + mot de passe (Passport LocalStrategy)
+2. Si le mot de passe est valide et que `totp_enabled = true` :
+    - Une session intermédiaire `pending2FA` est créée (pas de session complète)
+    - Redirection vers la page de vérification TOTP
+3. L'utilisateur saisit le code à 6 chiffres de son application
+4. Si le code est valide → session complète → accès au dashboard
+5. Alternative : utilisation d'un code de récupération à usage unique
+
+**Protection contre le brute-force :**
+
+- Rate limiting : 5 tentatives par fenêtre de 15 minutes (par IP + userId)
+- Tolérance TOTP : ±1 période (30 secondes) pour compenser les décalages d'horloge
+
 ### Sessions Express (routes web)
 
 Les routes authentifiées (`/dashboard`, `/admin`, etc.) utilisent des **sessions** stockées en MySQL.

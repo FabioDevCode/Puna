@@ -151,7 +151,7 @@ main (protégée — PR only)
 | --- | -------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 16  | **Migrations Sequelize (umzug)** | ⬜     | Remplacer `sync()` par des migrations versionnées (voir [ANALYSIS-MIGRATIONS.md](ANALYSIS-MIGRATIONS.md)). À étudier quand un outil de génération auto sera disponible |
 | 17  | **IV aléatoire (node:crypto)**   | ⬜     | Implémenter le pattern IV préfixé au chiffré                                                                                                                           |
-| 18  | **2FA / MFA**                    | ⬜     | Authentification à deux facteurs                                                                                                                                       |
+| 18  | **2FA / MFA**                    | ✅     | Authentification à deux facteurs (TOTP + codes de récupération) |
 | 19  | **Migrer ESLint 9 → 10**         | ⬜     | Quand l'écosystème de plugins sera stable sur v10                                                                                                                      |
 
 ---

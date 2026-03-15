@@ -82,6 +82,7 @@ vi.mock('../../../src/middlewares/loginRateLimiter.js', () => ({
     forgotPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
     resetPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
     twoFaRateLimiter: vi.fn((_req, _res, next) => next()),
+    twoFaConfigRateLimiter: vi.fn((_req, _res, next) => next()),
 }));
 // always lets requests through in RBAC tests (status enforcement is tested
 // separately in tests/middlewares/checkUserStatus.test.js).
