@@ -1,0 +1,36 @@
+<div class="flex flex-col items-center gap-4 bg-base-100 p-8 rounded-2xl shadow-xl" style="width: 360px;">
+    <div class="flex items-center mb-4 gap-2">
+        <img src="/img/puna_short_logo.png" alt="Puna logo" class="h-16">
+        <h1 class="font-inter" style="font-size: 3rem !important;">
+            Puna
+        </h1>
+    </div>
+
+    <h2>
+        Vérification en deux étapes
+    </h2>
+
+    <p class="text-sm text-center">
+        Entrez le code à 6 chiffres affiché dans votre application d'authentification.
+    </p>
+
+    <form action="/dp-2fa-verify" method="post" class="flex flex-col gap-4 w-full">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+        <label class="input input-sm input-bordered flex items-center gap-2">
+            <i class="fas fa-shield-alt" style="color: #6C7179; font-size: 1rem;"></i>
+            <input name="totp_code" type="text" inputmode="numeric" autocomplete="one-time-code" class="grow" placeholder="Code à 6 chiffres" maxlength="6" pattern="[0-9]{6}" required />
+        </label>
+
+        <button class="btn btn-secondary btn-sm">
+            Vérifier
+        </button>
+    </form>
+
+    <a href="/dp-2fa-recovery" class="link link-secondary text-sm">
+        Utiliser un code de récupération
+    </a>
+
+    <a href="/dp-login" class="btn btn-sm btn-ghost w-full">
+        Retour à la connexion
+    </a>
+</div>
