@@ -30,7 +30,7 @@ export default [
             'linebreak-style': ['error', 'unix'],
             quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
             semi: ['error', 'always'],
-            'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+            'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
             'no-console': 'off',
             'no-empty': 'warn',
             'comma-dangle': ['error', 'only-multiline'],

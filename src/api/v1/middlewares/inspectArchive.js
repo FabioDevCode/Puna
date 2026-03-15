@@ -124,7 +124,7 @@ export default async function inspectArchive(req, res, next) {
                     }
 
                     await zip.close();
-                } catch (err) {
+                } catch (_err) {
                     try {
                         await zip.close();
                     } catch (e) {
@@ -140,7 +140,7 @@ export default async function inspectArchive(req, res, next) {
         }
 
         return next();
-    } catch (err) {
+    } catch (_err) {
         const files = req.files || [];
         for (const toDel of files) {
             try {

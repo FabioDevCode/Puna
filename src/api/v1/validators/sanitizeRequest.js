@@ -25,7 +25,7 @@ export function sanitizeRequestBody(req, res, next) {
             req.sanitizedBody = req.body;
         }
         return next();
-    } catch (err) {
+    } catch (_err) {
         return res.status(400).json({ error: 'Invalid request body' });
     }
 }

@@ -33,7 +33,7 @@ vi.mock('tar', () => ({
 vi.stubEnv('NODE_ENV', 'development');
 
 // Import direct des fonctions utilitaires (les mocks ci-dessus empêchent les effets de bord)
-const { getLastLogDate, archiveLogs, checkAndRotateOnStartup, formatBytes } = await import('../../../src/config/logger.js');
+const { getLastLogDate, archiveLogs: _archiveLogs, checkAndRotateOnStartup: _checkAndRotateOnStartup, formatBytes } = await import('../../../src/config/logger.js');
 
 describe('logger rotation', () => {
     let tmpDir;

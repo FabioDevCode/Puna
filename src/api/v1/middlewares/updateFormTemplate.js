@@ -37,7 +37,7 @@ export async function updateFormTemplate(req, res, next) {
                 if (!templateObj || typeof templateObj !== 'object') {
                     templateObj = {};
                 }
-            } catch (err) {
+            } catch (_err) {
                 templateObj = {};
             }
         }
@@ -50,7 +50,7 @@ export async function updateFormTemplate(req, res, next) {
                 if (!columnsObj || typeof columnsObj !== 'object') {
                     columnsObj = {};
                 }
-            } catch (err) {
+            } catch (_err) {
                 columnsObj = {};
             }
         }

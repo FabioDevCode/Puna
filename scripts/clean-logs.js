@@ -26,7 +26,7 @@ async function cleanOldLogs() {
         // Vérifier que le dossier existe
         try {
             await fs.access(archiveDir);
-        } catch (error) {
+        } catch (_error) {
             console.log('Dossier archives non trouvé, rien à nettoyer');
             return;
         }

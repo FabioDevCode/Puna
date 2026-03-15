@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (activeTab) {
                     activeTab.click();
                 }
-            } catch (err) {
+            } catch (_err) {
                 alert("Erreur lors de l'enregistrement des colonnes.");
             }
         });
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (raw) {
                         tpl = JSON.parse(raw);
                     }
-                } catch (e) {
+                } catch (_e) {
                     tpl = {};
                 }
 
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (rawc) {
                         colsObj = JSON.parse(rawc);
                     }
-                } catch (e) {
+                } catch (_e) {
                     colsObj = {};
                 }
                 activeColumns = colsObj;
@@ -565,7 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (currentFilters && Object.keys(currentFilters).length) {
                             url += `&filters=${encodeURIComponent(JSON.stringify(currentFilters))}`;
                         }
-                    } catch (e) {
+                    } catch (_e) {
                         /* ignore */
                     }
 
@@ -760,17 +760,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                             syncing = false;
                                         });
                                     });
-                                } catch (e) {
+                                } catch (_e) {
                                     /* ignore */
                                 }
                             }
 
                             try {
                                 modalFilter.showModal();
-                            } catch (e) {
+                            } catch (_e) {
                                 try {
                                     modalFilter.classList.remove('none');
-                                } catch (err) {
+                                } catch (_err) {
                                     /* ignore */
                                 }
                             }
@@ -788,7 +788,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (d) {
                                     d.value = '';
                                 }
-                            } catch (e) {
+                            } catch (_e) {
                                 /* ignore */
                             }
                             try {
@@ -796,7 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 vals.forEach((inp) => {
                                     inp.value = '';
                                 });
-                            } catch (e) {
+                            } catch (_e) {
                                 /* ignore */
                             }
                             currentFilters = {};
@@ -806,16 +806,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                             try {
                                 modalFilter.close();
-                            } catch (e) {
+                            } catch (_e) {
                                 try {
                                     modalFilter.classList.add('none');
-                                } catch (err) {
+                                } catch (_err) {
                                     /* ignore */
                                 }
                             }
                             try {
                                 fetchPage(1);
-                            } catch (e) {
+                            } catch (_e) {
                                 /* ignore */
                             }
                         };
@@ -832,7 +832,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (d) {
                                     d.value = '';
                                 }
-                            } catch (e) {
+                            } catch (_e) {
                                 /* ignore */
                             }
                             try {
@@ -840,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 vals.forEach((inp) => {
                                     inp.value = '';
                                 });
-                            } catch (e) {
+                            } catch (_e) {
                                 /* ignore */
                             }
                         };
@@ -858,7 +858,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (d && d.value) {
                                     filters.createdAt = d.value;
                                 }
-                            } catch (e) {
+                            } catch (_e) {
                                 /* ignore */
                             }
                             try {
@@ -873,7 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         filters[k] = v;
                                     }
                                 });
-                            } catch (e) {
+                            } catch (_e) {
                                 /* ignore */
                             }
                             currentFilters = filters;
@@ -887,19 +887,19 @@ document.addEventListener('DOMContentLoaded', () => {
                                         btnFilter.classList.remove('btn-warning');
                                     }
                                 }
-                            } catch (e) {
+                            } catch (_e) {
                                 /* ignore */
                             }
                             try {
                                 modalFilter.close();
-                            } catch (e) {
+                            } catch (_e) {
                                 modalFilter.classList.add('none');
                             }
                             fetchPage(1);
                         };
                         modalFilterForm.addEventListener('submit', modalFilterForm._listener);
                     }
-                } catch (e) {
+                } catch (_e) {
                     /* ignore missing DOM */
                 }
             } else {

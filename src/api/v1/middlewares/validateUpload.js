@@ -17,7 +17,7 @@ async function hasPdfHeader(filePath) {
         }
         // check for '%PDF' at start
         return buf.slice(0, 4).toString() === '%PDF';
-    } catch (e) {
+    } catch (_e) {
         return false;
     }
 }
@@ -30,7 +30,7 @@ async function hasPngHeader(filePath) {
         }
         // PNG signature: 89 50 4E 47 0D 0A 1A 0A
         return buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47 && buf[4] === 0x0d && buf[5] === 0x0a && buf[6] === 0x1a && buf[7] === 0x0a;
-    } catch (e) {
+    } catch (_e) {
         return false;
     }
 }
@@ -43,7 +43,7 @@ async function hasJpegHeader(filePath) {
         }
         // JPEG signature: FF D8 FF
         return buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
-    } catch (e) {
+    } catch (_e) {
         return false;
     }
 }
@@ -57,7 +57,7 @@ async function hasGifHeader(filePath) {
         // GIF signature: GIF87a or GIF89a
         const header = buf.slice(0, 6).toString();
         return header === 'GIF87a' || header === 'GIF89a';
-    } catch (e) {
+    } catch (_e) {
         return false;
     }
 }
@@ -72,7 +72,7 @@ async function hasWebpHeader(filePath) {
         const riff = buf.slice(0, 4).toString();
         const webp = buf.slice(8, 12).toString();
         return riff === 'RIFF' && webp === 'WEBP';
-    } catch (e) {
+    } catch (_e) {
         return false;
     }
 }
@@ -157,7 +157,7 @@ export default async function validateUpload(req, res, next) {
         }
 
         return next();
-    } catch (err) {
+    } catch (_err) {
         // try cleanup
         const files = req.files || [];
         for (const toDel of files) {

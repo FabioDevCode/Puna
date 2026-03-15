@@ -42,7 +42,7 @@ export const createSite = async (req, res) => {
         );
         res.flash('success', 'Site créé avec succès.');
         return res.redirect(`/site/${site.id}/view`);
-    } catch (err) {
+    } catch (_err) {
         res.flash('error', 'Erreur lors de la création du site.');
         return res.redirect('/site/all');
     }
@@ -71,7 +71,7 @@ export const showSite = async (req, res) => {
             forms: data.forms,
             activeForm: data.activeForm,
         });
-    } catch (err) {
+    } catch (_err) {
         res.redirect('/dashboard');
     }
 };
@@ -95,7 +95,7 @@ export const deleteSite = async (req, res) => {
             res.flash('warning', result.error || 'Le nom de domaine ne correspond pas.');
             return res.redirect(`/site/${siteId}/view`);
         }
-    } catch (err) {
+    } catch (_err) {
         res.flash('error', 'Erreur lors de la suppression du site.');
         return res.redirect('/dashboard');
     }
@@ -140,7 +140,7 @@ export const revokeSiteTokens = async (req, res) => {
             const statusCode = result.error.includes('introuvable') ? 404 : result.error.includes('refusé') ? 403 : 500;
             return res.status(statusCode).json({ error: result.error });
         }
-    } catch (err) {
+    } catch (_err) {
         return res.status(500).json({ error: 'Server error' });
     }
 };

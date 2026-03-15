@@ -314,7 +314,7 @@ export async function getSubmissionsByFormWithFilters(formId, filters = {}, limi
         let parsed = null;
         try {
             parsed = typeof r.content === 'string' ? JSON.parse(r.content) : r.content;
-        } catch (e) {
+        } catch (_e) {
             parsed = null;
         }
         return {
@@ -375,7 +375,7 @@ export async function getInboxForDisplay(inboxId, userId, userRole) {
     let contentObj = {};
     try {
         contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
-    } catch (e) {
+    } catch (_e) {
         contentObj = {};
     }
 
@@ -385,7 +385,7 @@ export async function getInboxForDisplay(inboxId, userId, userRole) {
         if (form.template) {
             templateObj = typeof form.template === 'string' ? JSON.parse(form.template) : form.template;
         }
-    } catch (e) {
+    } catch (_e) {
         templateObj = {};
     }
 
@@ -398,7 +398,7 @@ export async function getInboxForDisplay(inboxId, userId, userRole) {
                 fileKeys = parsed;
             }
         }
-    } catch (e) {
+    } catch (_e) {
         fileKeys = [];
     }
 
@@ -461,7 +461,7 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
         let contentObj = {};
         try {
             contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
-        } catch (e) {
+        } catch (_e) {
             contentObj = {};
         }
 
@@ -474,7 +474,7 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
                     fileKeys = parsed;
                 }
             }
-        } catch (e) {
+        } catch (_e) {
             fileKeys = [];
         }
 
@@ -567,7 +567,7 @@ export async function verifyFileAccessAndGetPath(inboxId, filename, userId, user
         let contentObj = {};
         try {
             contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
-        } catch (e) {
+        } catch (_e) {
             contentObj = {};
         }
 
@@ -580,7 +580,7 @@ export async function verifyFileAccessAndGetPath(inboxId, filename, userId, user
                     fileKeys = parsed;
                 }
             }
-        } catch (e) {
+        } catch (_e) {
             fileKeys = [];
         }
 

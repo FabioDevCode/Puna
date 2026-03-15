@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1400);
                 }
                 Toast({ text: 'Tokens révoqués avec succès.', type: 'success' });
-            } catch (err) {
+            } catch (_err) {
                 // Minimal error feedback
                 Toast({ text: 'Erreur lors de la révocation des tokens.', type: 'error' });
             } finally {

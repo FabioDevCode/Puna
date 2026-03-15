@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.innerHTML = old;
                 }, 1200);
             }
-        } catch (err) {
+        } catch (_err) {
             btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur';
             Toast({ text: 'Erreur lors de la récupération du token.', type: 'error' });
             setTimeout(() => {

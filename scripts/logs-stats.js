@@ -45,7 +45,7 @@ console.log('Nombre de lignes (logs actifs):');
         try {
             const lines = execSync(`wc -l < "${filePath}"`, { encoding: 'utf-8' }).trim();
             console.log(`   ${file.padEnd(15)} ${lines.padStart(10)} lignes`);
-        } catch (error) {
+        } catch (_error) {
             console.log(`   ${file.padEnd(15)} ${'0'.padStart(10)} lignes`);
         }
     } else {
@@ -146,7 +146,7 @@ if (fs.existsSync(errorLogPath)) {
                     const time = new Date(log.time).toLocaleString('fr-FR');
                     const message = log.msg || log.err?.message || 'N/A';
                     console.log(`   [${time}] ${message.substring(0, 60)}${message.length > 60 ? '...' : ''}`);
-                } catch (e) {
+                } catch (_e) {
                     console.log(`   ${line.substring(0, 80)}...`);
                 }
             });

@@ -49,7 +49,7 @@
                         <p class="w-max">${this.pad2(d.getHours())}:${this.pad2(d.getMinutes())}:${this.pad2(d.getSeconds())}</p>
                     </div>
                 `;
-            } catch (e) {
+            } catch (_e) {
                 return String(value);
             }
         },
@@ -69,7 +69,7 @@
                     return String(value);
                 }
                 return `${d.getFullYear()}-${this.pad2(d.getMonth() + 1)}-${this.pad2(d.getDate())}`;
-            } catch (e) {
+            } catch (_e) {
                 return String(value);
             }
         },

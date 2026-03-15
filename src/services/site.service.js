@@ -328,7 +328,7 @@ export async function getSiteWithForms(siteId, userId, userRole, activeFormId = 
             if (f.template) {
                 templateObj = typeof f.template === 'string' ? JSON.parse(f.template) : f.template;
             }
-        } catch (e) {
+        } catch (_e) {
             templateObj = {};
         }
 

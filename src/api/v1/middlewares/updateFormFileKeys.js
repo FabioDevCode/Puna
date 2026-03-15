@@ -41,7 +41,7 @@ export async function updateFormFileKeys(req, res, next) {
                 if (Array.isArray(parsed)) {
                     fileKeys = parsed;
                 }
-            } catch (err) {
+            } catch (_err) {
                 // invalid JSON, start fresh
                 fileKeys = [];
             }

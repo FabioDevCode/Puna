@@ -24,7 +24,7 @@ export const createForm = async (req, res) => {
 
         res.flash('success', 'Formulaire créé avec succès.');
         return res.redirect(`/site/${fk_id_site}/view?f=${name}`);
-    } catch (err) {
+    } catch (_err) {
         res.flash('error', 'Erreur lors de la création du formulaire.');
         return res.redirect('/dashboard');
     }
@@ -53,7 +53,7 @@ export const deleteForm = async (req, res) => {
 
         res.flash('success', 'Formulaire supprimé.');
         return res.redirect(`/site/${siteId}/view`);
-    } catch (err) {
+    } catch (_err) {
         res.flash('error', 'Erreur lors de la suppression du formulaire.');
         return res.redirect('/dashboard');
     }
@@ -82,7 +82,7 @@ export const updateFormTemplateSave = async (req, res) => {
         await updateForm(formId, { template: templateObj });
 
         return res.redirect(`/site/${result.form.fk_id_site}/view?f=${result.form.name}`);
-    } catch (err) {
+    } catch (_err) {
         return res.redirect('/error');
     }
 };
@@ -118,7 +118,7 @@ export const getFormInbox = async (req, res) => {
                     filters = parsed;
                 }
             }
-        } catch (e) {
+        } catch (_e) {
             // Ignorer les filtres malformés
             filters = {};
         }
@@ -152,7 +152,7 @@ export const updateFormColumns = async (req, res) => {
         if (typeof cols === 'string') {
             try {
                 cols = JSON.parse(cols);
-            } catch (e) {
+            } catch (_e) {
                 cols = null;
             }
         }

@@ -84,7 +84,7 @@ export const exportFormToExcel = async (req, res) => {
             if (form.template) {
                 templateObj = typeof form.template === 'string' ? JSON.parse(form.template) : form.template;
             }
-        } catch (e) {
+        } catch (_e) {
             templateObj = {};
         }
 
@@ -94,7 +94,7 @@ export const exportFormToExcel = async (req, res) => {
             let contentObj = {};
             try {
                 contentObj = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
-            } catch (e) {
+            } catch (_e) {
                 contentObj = {};
             }
             Object.keys(contentObj).forEach((key) => allKeys.add(key));
@@ -152,7 +152,7 @@ export const exportFormToCSV = async (req, res) => {
             if (form.template) {
                 templateObj = typeof form.template === 'string' ? JSON.parse(form.template) : form.template;
             }
-        } catch (e) {
+        } catch (_e) {
             templateObj = {};
         }
 
@@ -162,7 +162,7 @@ export const exportFormToCSV = async (req, res) => {
             let contentObj = {};
             try {
                 contentObj = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
-            } catch (e) {
+            } catch (_e) {
                 contentObj = {};
             }
             Object.keys(contentObj).forEach((key) => allKeys.add(key));

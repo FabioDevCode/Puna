@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let url;
             try {
                 url = new URL(href, window.location.origin);
-            } catch (err) {
+            } catch (_err) {
                 return;
             }
             const linkPath = (url.pathname || '/').replace(/\/+$|\/$/, '') || '/';
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bestMatch) {
             bestMatch.classList.add('bg-secondary-content');
         }
-    } catch (err) {
+    } catch (_err) {
         // silent fail
         // console.error('admin_sidebar active script error', err);
     }

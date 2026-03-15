@@ -32,7 +32,7 @@ export async function authApiKeyAccess(req, res, next) {
         let payload;
         try {
             payload = decryptObject(jwt.verify(token, secret).data);
-        } catch (err) {
+        } catch (_err) {
             return res.status(401).json({ error: 'Invalid token' });
         }
 

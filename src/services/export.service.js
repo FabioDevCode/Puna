@@ -53,7 +53,7 @@ export async function getInboxWithFiles(inboxId, userId, userRole) {
     let contentObj = {};
     try {
         contentObj = typeof inbox.content === 'string' ? JSON.parse(inbox.content) : inbox.content;
-    } catch (e) {
+    } catch (_e) {
         contentObj = {};
     }
 
@@ -66,7 +66,7 @@ export async function getInboxWithFiles(inboxId, userId, userRole) {
                 fileKeys = parsed;
             }
         }
-    } catch (e) {
+    } catch (_e) {
         fileKeys = [];
     }
 
@@ -190,7 +190,7 @@ export async function generateExcelWorkbook(form, submissions, customColumns = [
         let contentObj = {};
         try {
             contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
-        } catch (e) {
+        } catch (_e) {
             contentObj = {};
         }
         Object.keys(contentObj).forEach((k) => allKeys.add(k));
@@ -232,7 +232,7 @@ export async function generateExcelWorkbook(form, submissions, customColumns = [
         let contentObj = {};
         try {
             contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
-        } catch (e) {
+        } catch (_e) {
             contentObj = {};
         }
 
@@ -308,7 +308,7 @@ export async function generateMultiFormExcelWorkbook(submissions) {
         let contentObj = {};
         try {
             contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
-        } catch (e) {
+        } catch (_e) {
             contentObj = {};
         }
         Object.keys(contentObj).forEach((k) => allKeys.add(k));
@@ -341,7 +341,7 @@ export async function generateMultiFormExcelWorkbook(submissions) {
         let contentObj = {};
         try {
             contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
-        } catch (e) {
+        } catch (_e) {
             contentObj = {};
         }
 
@@ -386,7 +386,7 @@ export async function generateFormCSV(form, submissions, customColumns = []) {
             let contentObj = {};
             try {
                 contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
-            } catch (e) {
+            } catch (_e) {
                 contentObj = {};
             }
             Object.keys(contentObj).forEach((k) => allKeys.add(k));
@@ -405,7 +405,7 @@ export async function generateFormCSV(form, submissions, customColumns = []) {
             let contentObj = {};
             try {
                 contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
-            } catch (e) {
+            } catch (_e) {
                 contentObj = {};
             }
 
@@ -512,7 +512,7 @@ export async function generateMultiFormCSV(submissions) {
             let contentObj = {};
             try {
                 contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
-            } catch (e) {
+            } catch (_e) {
                 contentObj = {};
             }
             Object.keys(contentObj).forEach((k) => allKeys.add(k));
@@ -523,7 +523,7 @@ export async function generateMultiFormCSV(submissions) {
             let contentObj = {};
             try {
                 contentObj = typeof sub.content === 'string' ? JSON.parse(sub.content) : sub.content;
-            } catch (e) {
+            } catch (_e) {
                 contentObj = {};
             }
 
