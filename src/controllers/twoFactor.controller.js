@@ -188,7 +188,7 @@ export const dp2faSetupGet = async (req, res) => {
             ip: req.ip,
         });
 
-        return res.render('auth/two-factor-setup', { layout: 'auth', qrCodeDataUrl, secret });
+        return res.render('auth/two-factor-setup', { layout: 'auth', qrCodeDataUrl, manualKey: secret });
     } catch (err) {
         errorLogger.error({ err, userId: user.id }, '2FA setup GET error');
         res.flash('error', 'Erreur de configuration 2FA.');
@@ -214,7 +214,24 @@ export const dp2faSetupPost = async (req, res) => {
         return res.redirect('/dp-2fa-setup');
     }
 
-    if (!verifyTotpToken(tempSecret, totp_code)) {
+    // Vérification directe avec le secret brut (pas encore chiffré en base)
+    // On ne peut pas utiliser verifyTotpToken() car il attend un secret chiffré (AES)
+    try {
+        const { TOTP, Secret } = await import('otpauth');
+        const totp = new TOTP({
+            issuer: process.env.TOTP_ISSUER || 'Puna',
+            algorithm: 'SHA1',
+            digits: 6,
+            period: 30,
+            secret: Secret.fromBase32(tempSecret),
+        });
+
+        if (totp.validate({ token: totp_code, window: 1 }) === null) {
+            res.flash('error', 'Code invalide. Scannez le QR code et réessayez.');
+            return res.redirect('/dp-2fa-setup');
+        }
+    } catch (err) {
+        errorLogger.error({ err, userId: user.id }, '2FA TOTP validation error');
         res.flash('error', 'Code invalide. Scannez le QR code et réessayez.');
         return res.redirect('/dp-2fa-setup');
     }
@@ -253,7 +270,7 @@ export const dp2faBackupCodesGet = (req, res) => {
     }
 
     delete req.session.totp_backup_codes_plain;
-    return res.render('auth/two-factor-backup-codes', { layout: 'auth', codes });
+    return res.render('auth/two-factor-backup-codes', { layout: 'auth', backupCodes: codes });
 };
 
 /**
@@ -335,12 +352,4 @@ export const dp2faRegeneratePost = async (req, res) => {
         res.flash('error', 'Erreur lors de la régénération des codes.');
         return res.redirect('/dashboard');
     }
-};
-
-/**
- * POST /dp-dismiss-2fa-banner — Masque la bannière de suggestion 2FA
- */
-export const dismiss2FABanner = (req, res) => {
-    req.session.dismiss2FABanner = true;
-    return res.redirect('/dashboard');
 };

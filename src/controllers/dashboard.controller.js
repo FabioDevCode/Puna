@@ -27,7 +27,7 @@ export const dashboard = async (req, res) => {
         const userRole = req.userRole || req.session.user?.role || 'viewer';
         const sitesWithCounts = await getSitesWithCounts(userId, userRole);
 
-        const show2FABannerBase = process.env.TOTP_ENABLED === 'true' && req.session.user && !req.session.dismissed2FABanner;
+        const show2FABannerBase = process.env.TOTP_ENABLED === 'true' && req.session.user;
 
         let userHas2FA = false;
         if (show2FABannerBase) {

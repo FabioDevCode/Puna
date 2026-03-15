@@ -10,7 +10,7 @@
         Codes de récupération
     </h2>
 
-    <div class="alert alert-warning text-sm">
+    <div class="alert alert-warning text-sm rounded-xl">
         <i class="fas fa-exclamation-triangle"></i>
         <span>Conservez ces codes en lieu sûr. Chaque code ne peut être utilisé qu'une seule fois. Ils ne seront plus affichés après cette page.</span>
     </div>
@@ -21,11 +21,11 @@
         {{/each}}
     </div>
 
-    <button class="btn btn-sm btn-outline w-full" onclick="copyBackupCodes()">
+    <button id="btn-copy-codes" class="btn btn-sm btn-outline w-full">
         <i class="fas fa-copy"></i> Copier tous les codes
     </button>
 
-    <button class="btn btn-sm btn-outline w-full" onclick="downloadBackupCodes()">
+    <button id="btn-download-codes" class="btn btn-sm btn-outline w-full">
         <i class="fas fa-download"></i> Télécharger (.txt)
     </button>
 
@@ -34,29 +34,4 @@
     </a>
 </div>
 
-<script>
-    function _getBackupCodes() {
-        return Array.from(document.querySelectorAll('.backup-code-item')).map(function(el) {
-            return el.textContent.trim();
-        });
-    }
-
-    function copyBackupCodes() {
-        navigator.clipboard.writeText(_getBackupCodes().join('\n')).then(function() {
-            alert('Codes copiés dans le presse-papier.');
-        }).catch(function() {
-            alert('Impossible de copier les codes. Veuillez les copier manuellement.');
-        });
-    }
-
-    function downloadBackupCodes() {
-        var text = _getBackupCodes().join('\n');
-        var blob = new Blob([text], { type: 'text/plain' });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'puna-backup-codes.txt';
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-</script>
+<script src="/js/auth/backup-codes.js"></script>

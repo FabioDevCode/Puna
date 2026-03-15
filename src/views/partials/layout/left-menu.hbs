@@ -36,6 +36,22 @@
         </ul>
     </nav>
 
+    {{#if show2FABanner}}
+        <div class="col-span-2 md:col-span-6 lg:col-span-12">
+            <div class="bg-secondary text-white shadow-lg rounded-2xl mb-4 p-2">
+                <div class="flex flex-col items-left gap-2">
+                    <span class="p-2">
+                        <i class="fas fa-shield-alt"></i>
+                        Protégez votre compte en activant l'authentification à deux facteurs.
+                    </span>
+                    <a href="/dp-2fa-setup" class="btn btn-sm shadow-sm">
+                        Configurer la 2FA
+                    </a>
+                </div>
+            </div>
+        </div>
+    {{/if}}
+
     <div class="mt-auto text-sm text-neutral">
         <div class="p-2 mx-2 flex flex-col gap-2 rounded-xl">
             <div class="flex items-center gap-2 select-none">

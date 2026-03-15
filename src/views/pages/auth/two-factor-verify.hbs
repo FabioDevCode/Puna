@@ -16,21 +16,21 @@
 
     <form action="/dp-2fa-verify" method="post" class="flex flex-col gap-4 w-full">
         <input type="hidden" name="_csrf" value="{{csrfToken}}" />
-        <label class="input input-sm input-bordered flex items-center gap-2">
-            <i class="fas fa-shield-alt" style="color: #6C7179; font-size: 1rem;"></i>
-            <input name="totp_code" type="text" inputmode="numeric" autocomplete="one-time-code" class="grow" placeholder="Code à 6 chiffres" maxlength="6" pattern="[0-9]{6}" required />
-        </label>
+    <label class="input input-sm input-bordered flex items-center gap-2">
+        <i class="fas fa-shield-alt" style="color: #6C7179; font-size: 1rem;"></i>
+        <input name="totp_code" type="text" inputmode="numeric" autocomplete="one-time-code" class="grow" placeholder="Code à 6 chiffres" maxlength="6" pattern="[0-9]{6}" required />
+</label>
 
-        <button class="btn btn-secondary btn-sm">
-            Vérifier
-        </button>
-    </form>
+<button class="btn btn-secondary btn-sm">
+    Vérifier
+</button>
+</form>
 
-    <a href="/dp-2fa-recovery" class="link link-secondary text-sm">
-        Utiliser un code de récupération
-    </a>
+<a href="/dp-2fa-recovery" class="btn btn-sm w-full">
+    Utiliser un code de récupération
+</a>
 
-    <a href="/dp-login" class="btn btn-sm btn-ghost w-full">
-        Retour à la connexion
-    </a>
+<a href="/dp-login" class="link link-secondary text-sm">
+    Retour à la connexion
+</a>
 </div>

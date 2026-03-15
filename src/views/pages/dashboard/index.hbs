@@ -4,29 +4,15 @@
     </h3>
 {{/slot}}
 
-{{#if show2FABanner}}
-    <div class="col-span-2 md:col-span-6 lg:col-span-12">
-        <div class="alert alert-info shadow-lg mb-4">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-shield-alt"></i>
-                <span>Protégez votre compte en activant l'authentification à deux facteurs.</span>
-                <a href="/dp-2fa-setup" class="btn btn-sm btn-primary">Configurer la 2FA</a>
-                <form action="/dp-dismiss-2fa-banner" method="post" class="inline">
-                    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
-                <button type="submit" class="btn btn-sm btn-ghost">Plus tard</button>
-            </form>
-        </div>
-    </div>
-</div>
-{{/if}}
-
 {{> widgets/inbox-percentages }}
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
     <div class="stats-grid gap-4">
         {{> widgets/inbox-counts }}
 
-        {{!-- {{> widgets/last-receive }} --}}
+        {{!--
+        {{> widgets/last-receive }}
+        --}}
 
         {{> widgets/site-distribution }}
     </div>

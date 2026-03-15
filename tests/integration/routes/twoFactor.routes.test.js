@@ -8,7 +8,6 @@
  *   GET  /dp-2fa-backup-codes   — display backup codes once (requires auth)
  *   POST /dp-2fa-disable        — disable 2FA (requires auth + password)
  *   POST /dp-2fa-regenerate     — regenerate backup codes (requires auth + password)
- *   POST /dp-dismiss-2fa-banner — dismiss the 2FA suggestion banner (requires auth)
  */
 
 import cookieParser from 'cookie-parser';
@@ -425,23 +424,6 @@ describe('2FA configuration routes', () => {
 
             expect(res.status).toBe(302);
             expect(res.headers.location).toContain('/dp-2fa-backup-codes');
-        });
-    });
-
-    // -----------------------------------------------------------------------
-    describe('POST /dp-dismiss-2fa-banner', () => {
-        it('redirects to /dp-login when unauthenticated', async () => {
-            const res = await request(app).post('/dp-dismiss-2fa-banner');
-
-            expect(res.status).toBe(302);
-            expect(res.headers.location).toContain('/dp-login');
-        });
-
-        it('redirects to /dashboard when authenticated', async () => {
-            const res = await request(app).post('/dp-dismiss-2fa-banner').set('X-Test-User', makeSessionUser());
-
-            expect(res.status).toBe(302);
-            expect(res.headers.location).toContain('/dashboard');
         });
     });
 });

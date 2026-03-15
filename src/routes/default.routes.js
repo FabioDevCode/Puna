@@ -51,7 +51,6 @@ router.post('/dp-2fa-setup', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.d
 router.get('/dp-2fa-backup-codes', requireAuth, twoFactorCtl.dp2faBackupCodesGet);
 router.post('/dp-2fa-disable', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.dp2faDisablePost);
 router.post('/dp-2fa-regenerate', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.dp2faRegeneratePost);
-router.post('/dp-dismiss-2fa-banner', requireAuth, twoFactorCtl.dismiss2FABanner);
 
 router.get('/dashboard', requireAuth, dashboardCtl.dashboard);
 

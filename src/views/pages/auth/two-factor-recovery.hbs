@@ -16,21 +16,21 @@
 
     <form action="/dp-2fa-recovery" method="post" class="flex flex-col gap-4 w-full">
         <input type="hidden" name="_csrf" value="{{csrfToken}}" />
-        <label class="input input-sm input-bordered flex items-center gap-2">
-            <i class="fas fa-life-ring" style="color: #6C7179; font-size: 1rem;"></i>
-            <input name="recovery_code" type="text" class="grow" placeholder="xxxx-xxxx" maxlength="9" required />
-        </label>
+    <label class="input input-sm input-bordered flex items-center gap-2">
+        <i class="fas fa-life-ring" style="color: #6C7179; font-size: 1rem;"></i>
+        <input name="recovery_code" type="text" class="grow" placeholder="xxxx-xxxx" maxlength="9" required />
+</label>
 
-        <button class="btn btn-secondary btn-sm">
-            Vérifier
-        </button>
-    </form>
+<button class="btn btn-secondary btn-sm">
+    Vérifier
+</button>
+</form>
 
-    <a href="/dp-2fa-verify" class="link link-secondary text-sm">
-        Utiliser le code de l'application
-    </a>
+<a href="/dp-2fa-verify" class="btn btn-sm w-full">
+    Utiliser le code de l'application
+</a>
 
-    <a href="/dp-login" class="btn btn-sm btn-ghost w-full">
-        Retour à la connexion
-    </a>
+<a href="/dp-login" class="link link-secondary text-sm">
+    Retour à la connexion
+</a>
 </div>
