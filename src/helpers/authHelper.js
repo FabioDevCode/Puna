@@ -61,10 +61,24 @@ export function isConnected(req, res, next) {
 }
 
 export function requireAuth(req, res, next) {
+    // Note: req.session.pending2FA (état intermédiaire 2FA) ne passe PAS ce guard,
+    // seule une session complète (req.session.user) est acceptée.
     if (!req.session?.user) {
         return res.redirect('/dp-login');
     }
     return checkUserStatus(req, res, next);
+}
+
+/**
+ * Guard pour les routes de vérification 2FA.
+ * Vérifie que la session contient un état "pending2FA" (mot de passe validé, TOTP en attente).
+ * Redirige vers /dp-login si absent.
+ */
+export function requirePending2FA(req, res, next) {
+    if (req.session?.pending2FA) {
+        return next();
+    }
+    return res.redirect('/dp-login');
 }
 
 export function isConnectDash(req, res, next) {

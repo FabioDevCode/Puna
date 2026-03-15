@@ -108,6 +108,37 @@ export const forgotPasswordRateLimiter = rateLimit({
 });
 
 /**
+ * Rate limiter pour la vérification 2FA (TOTP et codes de récupération)
+ * Maximum 5 tentatives par fenêtre de 15 minutes
+ */
+export const twoFaRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+
+    keyGenerator: (req) => {
+        const userId = req.session?.pending2FA?.userId || 'unknown';
+        return `2fa:${req.ip}:${userId}`;
+    },
+
+    handler: (req, res) => {
+        auditLogger.warn({
+            action: '2FA_RATE_LIMIT_EXCEEDED',
+            ip: req.ip,
+            userId: req.session?.pending2FA?.userId || 'unknown',
+            userAgent: req.get('User-Agent'),
+        });
+
+        res.flash('error', 'Trop de tentatives de vérification. Réessayez dans 15 minutes.');
+        return res.redirect('/dp-2fa-verify');
+    },
+
+    validate: { keyGeneratorIpFallback: false },
+});
+
+/**
  * Rate limiter pour la réinitialisation effective du mot de passe
  * Limite à 5 tentatives par fenêtre de 15 minutes
  */
