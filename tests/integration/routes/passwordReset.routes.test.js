@@ -80,7 +80,7 @@ vi.mock('../../../src/middlewares/loginRateLimiter.js', () => ({
     firstLoginRateLimiter: vi.fn((_req, _res, next) => next()),
     forgotPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
     resetPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
-    twoFaConfigRateLimiter: vi.fn((_req, _res, next) => next()),
+    twoFaRateLimiter: vi.fn((_req, _res, next) => next()),
 }));
 
 vi.mock('../../../src/config/mailer.js', () => ({
