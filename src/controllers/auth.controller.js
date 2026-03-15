@@ -129,7 +129,31 @@ export const dpConnect = (req, res) => {
             errorLogger.error({ err: e, userId: user?.id }, 'Failed to update last_connection');
         }
 
-        // Log de la connexion réussie
+        // Vérifier si la 2FA est requise pour cet utilisateur
+        const isTotpActive = process.env.TOTP_ENABLED === 'true' && user.totp_enabled === true;
+
+        if (isTotpActive) {
+            // Session intermédiaire — l'utilisateur doit encore valider son code TOTP
+            req.session.pending2FA = {
+                userId: user.id,
+                login: user.login,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+            };
+
+            auditLogger.info({
+                action: 'LOGIN_2FA_PENDING',
+                userId: user.id,
+                login: user.login,
+                ip,
+                userAgent: req.get('User-Agent'),
+            });
+
+            return res.redirect('/dp-2fa-verify');
+        }
+
+        // Pas de 2FA — connexion directe (flux existant inchangé)
         auditLogger.info({
             action: 'LOGIN_SUCCESS',
             userId: user.id,

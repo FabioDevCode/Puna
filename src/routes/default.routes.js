@@ -7,9 +7,10 @@ import * as formCtl from '../controllers/form.controller.js';
 import * as inboxCtl from '../controllers/inbox.controller.js';
 import * as passwordResetCtl from '../controllers/passwordReset.controller.js';
 import * as siteCtl from '../controllers/site.controller.js';
-import { requireAuth, isConnectDash } from '../helpers/authHelper.js';
+import * as twoFactorCtl from '../controllers/twoFactor.controller.js';
+import { requireAuth, isConnectDash, requirePending2FA } from '../helpers/authHelper.js';
 import { actionAccess, roleAccess } from '../middlewares/checkAccess.js';
-import { loginRateLimiter, firstLoginRateLimiter, forgotPasswordRateLimiter, resetPasswordRateLimiter } from '../middlewares/loginRateLimiter.js';
+import { loginRateLimiter, firstLoginRateLimiter, forgotPasswordRateLimiter, resetPasswordRateLimiter, twoFaRateLimiter } from '../middlewares/loginRateLimiter.js';
 
 const router = express.Router();
 
@@ -28,6 +29,12 @@ router.get('/dp-forgot-password', isConnectDash, passwordResetCtl.forgotPassword
 router.post('/dp-forgot-password', forgotPasswordRateLimiter, passwordResetCtl.forgotPasswordPost);
 router.get('/dp-reset-password/:token', isConnectDash, passwordResetCtl.resetPasswordGet);
 router.post('/dp-reset-password/:token', resetPasswordRateLimiter, passwordResetCtl.resetPasswordPost);
+
+// 2FA Verification (session intermédiaire — mot de passe validé, TOTP en attente)
+router.get('/dp-2fa-verify', requirePending2FA, twoFactorCtl.dp2faVerifyGet);
+router.post('/dp-2fa-verify', twoFaRateLimiter, requirePending2FA, twoFactorCtl.dp2faVerifyPost);
+router.get('/dp-2fa-recovery', requirePending2FA, twoFactorCtl.dp2faRecoveryGet);
+router.post('/dp-2fa-recovery', twoFaRateLimiter, requirePending2FA, twoFactorCtl.dp2faRecoveryPost);
 
 // CONNECTED ========================================================================
 router.get('/dashboard', requireAuth, dashboardCtl.dashboard);
