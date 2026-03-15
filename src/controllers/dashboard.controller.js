@@ -1,4 +1,5 @@
 import { errorLogger } from '../config/logger.js';
+import models from '../models/index.js';
 import {
     getSitesWithCounts,
     getGlobalStatsFromSites,
@@ -26,8 +27,19 @@ export const dashboard = async (req, res) => {
         const userRole = req.userRole || req.session.user?.role || 'viewer';
         const sitesWithCounts = await getSitesWithCounts(userId, userRole);
 
+        const show2FABannerBase = process.env.TOTP_ENABLED === 'true' && req.session.user && !req.session.dismissed2FABanner;
+
+        let userHas2FA = false;
+        if (show2FABannerBase) {
+            const dbUser = await models.User.findByPk(req.session.user.id, {
+                attributes: ['totp_enabled'],
+            });
+            userHas2FA = dbUser?.totp_enabled || false;
+        }
+
         res.render('dashboard', {
             stats: getGlobalStatsFromSites(sitesWithCounts),
+            show2FABanner: show2FABannerBase && !userHas2FA,
         });
     } catch (err) {
         console.error(err);

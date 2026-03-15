@@ -7,6 +7,7 @@ import * as formCtl from '../controllers/form.controller.js';
 import * as inboxCtl from '../controllers/inbox.controller.js';
 import * as passwordResetCtl from '../controllers/passwordReset.controller.js';
 import * as siteCtl from '../controllers/site.controller.js';
+import * as twoFactorCtl from '../controllers/twoFactor.controller.js';
 import { requireAuth, isConnectDash } from '../helpers/authHelper.js';
 import { actionAccess, roleAccess } from '../middlewares/checkAccess.js';
 import { loginRateLimiter, firstLoginRateLimiter, forgotPasswordRateLimiter, resetPasswordRateLimiter } from '../middlewares/loginRateLimiter.js';
@@ -30,6 +31,15 @@ router.get('/dp-reset-password/:token', isConnectDash, passwordResetCtl.resetPas
 router.post('/dp-reset-password/:token', resetPasswordRateLimiter, passwordResetCtl.resetPasswordPost);
 
 // CONNECTED ========================================================================
+
+// 2FA Configuration (utilisateur connecté)
+router.get('/dp-2fa-setup', requireAuth, twoFactorCtl.dp2faSetupGet);
+router.post('/dp-2fa-setup', requireAuth, twoFactorCtl.dp2faSetupPost);
+router.get('/dp-2fa-backup-codes', requireAuth, twoFactorCtl.dp2faBackupCodesGet);
+router.post('/dp-2fa-disable', requireAuth, twoFactorCtl.dp2faDisablePost);
+router.post('/dp-2fa-regenerate', requireAuth, twoFactorCtl.dp2faRegeneratePost);
+router.post('/dp-dismiss-2fa-banner', requireAuth, twoFactorCtl.dismiss2FABanner);
+
 router.get('/dashboard', requireAuth, dashboardCtl.dashboard);
 
 router.get('/stats/inbox-counts', requireAuth, dashboardCtl.getInboxCounts);
