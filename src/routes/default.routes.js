@@ -37,6 +37,15 @@ router.get('/dp-2fa-recovery', requirePending2FA, twoFactorCtl.dp2faRecoveryGet)
 router.post('/dp-2fa-recovery', twoFaRateLimiter, requirePending2FA, twoFactorCtl.dp2faRecoveryPost);
 
 // CONNECTED ========================================================================
+
+// 2FA Configuration (utilisateur connecté)
+router.get('/dp-2fa-setup', requireAuth, twoFactorCtl.dp2faSetupGet);
+router.post('/dp-2fa-setup', requireAuth, twoFactorCtl.dp2faSetupPost);
+router.get('/dp-2fa-backup-codes', requireAuth, twoFactorCtl.dp2faBackupCodesGet);
+router.post('/dp-2fa-disable', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.dp2faDisablePost);
+router.post('/dp-2fa-regenerate', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.dp2faRegeneratePost);
+router.post('/dp-dismiss-2fa-banner', requireAuth, twoFactorCtl.dismiss2FABanner);
+
 router.get('/dashboard', requireAuth, dashboardCtl.dashboard);
 
 router.get('/stats/inbox-counts', requireAuth, dashboardCtl.getInboxCounts);

@@ -1,0 +1,40 @@
+<div class="flex flex-col items-center gap-4 bg-base-100 p-8 rounded-2xl shadow-xl" style="width: 400px;">
+    <div class="flex items-center mb-4 gap-2">
+        <img src="/img/puna_short_logo.png" alt="Puna logo" class="h-16">
+        <h1 class="font-inter" style="font-size: 3rem !important;">
+            Puna
+        </h1>
+    </div>
+
+    <h2>
+        Configurer la 2FA
+    </h2>
+
+    <p class="text-sm text-center">
+        Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy…).
+    </p>
+
+    <img src="{{qrCodeDataUrl}}" alt="QR code 2FA" class="rounded-lg" style="width: 200px; height: 200px;" />
+
+<div class="w-full">
+    <p class="text-xs text-center mb-1">Ou saisissez la clé manuellement :</p>
+    <div class="bg-base-200 rounded p-2 text-center font-mono text-sm break-all select-all">
+        {{manualKey}}
+    </div>
+</div>
+
+<form action="/dp-2fa-setup" method="post" class="flex flex-col gap-4 w-full">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+<label class="input input-sm input-bordered flex items-center gap-2">
+    <i class="fas fa-shield-alt" style="color: #6C7179; font-size: 1rem;"></i>
+    <input name="totp_code" type="text" inputmode="numeric" pattern="[0-9]{6}" class="grow" placeholder="Code à 6 chiffres" maxlength="6" required />
+</label>
+<button class="btn btn-secondary btn-sm">
+    Vérifier et activer
+</button>
+</form>
+
+<a href="/dashboard" class="btn btn-sm btn-wide self-center w-full">
+    Annuler
+</a>
+</div>

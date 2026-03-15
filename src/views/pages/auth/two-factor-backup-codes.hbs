@@ -1,0 +1,29 @@
+<div class="flex flex-col items-center gap-4 bg-base-100 p-8 rounded-2xl shadow-xl" style="width: 420px;">
+    <div class="flex items-center mb-4 gap-2">
+        <img src="/img/puna_short_logo.png" alt="Puna logo" class="h-16">
+        <h1 class="font-inter" style="font-size: 3rem !important;">
+            Puna
+        </h1>
+    </div>
+
+    <h2>
+        Codes de récupération
+    </h2>
+
+    <div class="alert alert-warning text-sm">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Conservez ces codes en lieu sûr. Ils ne seront plus affichés après cette page.</span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 w-full">
+        {{#each backupCodes}}
+            <div class="bg-base-200 rounded p-2 text-center font-mono text-sm select-all">
+                {{this}}
+            </div>
+        {{/each}}
+    </div>
+
+    <a href="/dashboard" class="btn btn-secondary btn-sm w-full">
+        J'ai sauvegardé mes codes
+    </a>
+</div>
