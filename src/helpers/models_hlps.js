@@ -49,11 +49,7 @@ export const buildAttributes = (attributes) => {
 export const buildIndexes = (attributes) => {
     const indexes = [];
     for (const key in attributes) {
-        if (
-            Object.prototype.hasOwnProperty.call(attributes, key) &&
-            Object.prototype.hasOwnProperty.call(attributes[key], 'primaryKey') &&
-            attributes[key].primaryKey
-        ) {
+        if (Object.prototype.hasOwnProperty.call(attributes, key) && Object.prototype.hasOwnProperty.call(attributes[key], 'primaryKey') && attributes[key].primaryKey) {
             indexes.push({
                 name: 'PRIMARY',
                 unique: true,

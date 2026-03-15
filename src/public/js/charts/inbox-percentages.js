@@ -12,8 +12,7 @@
             icon: document.getElementById(`icon-${i.key}`),
         };
         if (els[i.key].value) {
-            els[i.key].value.style.transition =
-                'opacity 360ms cubic-bezier(.2,.9,.2,1), transform 360ms cubic-bezier(.2,.9,.2,1)';
+            els[i.key].value.style.transition = 'opacity 360ms cubic-bezier(.2,.9,.2,1), transform 360ms cubic-bezier(.2,.9,.2,1)';
             els[i.key].value.style.opacity = '0';
             els[i.key].value.style.transform = 'translateY(6px)';
             els[i.key].value.setAttribute('aria-hidden', 'true');

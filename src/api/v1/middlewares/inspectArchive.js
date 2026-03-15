@@ -106,9 +106,7 @@ export default async function inspectArchive(req, res, next) {
                                 await fs.unlink(f.path).catch((e) => {
                                     errorLogger.error({ err: e, path: f.path }, 'Failed to cleanup archive file');
                                 });
-                                return res
-                                    .status(400)
-                                    .json({ error: 'Archive contains executable files and is rejected' });
+                                return res.status(400).json({ error: 'Archive contains executable files and is rejected' });
                             }
                         }
                     }

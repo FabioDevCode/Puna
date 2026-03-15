@@ -1,10 +1,4 @@
-import {
-    AppError,
-    ForbiddenError,
-    NotFoundError,
-    UnauthorizedError,
-    ValidationError,
-} from '../../../src/utils/errors.js';
+import { AppError, ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../../src/utils/errors.js';
 
 describe('errors utils', () => {
     describe('AppError', () => {

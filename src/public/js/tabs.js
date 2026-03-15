@@ -33,8 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modalColumnsList) {
             modalColumnsList.innerHTML = '';
             if (!activeKeys.length) {
-                modalColumnsList.innerHTML =
-                    '<p class="text-sm text-muted">Aucune colonne disponible pour ce formulaire.</p>';
+                modalColumnsList.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour ce formulaire.</p>';
             } else {
                 activeKeys.forEach((k) => {
                     const label = document.createElement('label');
@@ -107,9 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const inputs = modalColumnsList
-                ? Array.from(modalColumnsList.querySelectorAll('input[type="checkbox"][data-key]'))
-                : [];
+            const inputs = modalColumnsList ? Array.from(modalColumnsList.querySelectorAll('input[type="checkbox"][data-key]')) : [];
             const payload = {};
             inputs.forEach((inp) => {
                 const k = inp.dataset.key;
@@ -268,13 +265,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 activeColumns = colsObj;
 
-                const visibleKeys = keys.filter((k) =>
-                    colsObj && typeof colsObj[k] !== 'undefined' ? !!colsObj[k] : true
-                );
+                const visibleKeys = keys.filter((k) => (colsObj && typeof colsObj[k] !== 'undefined' ? !!colsObj[k] : true));
                 if (!keys.length) {
                     if (keysContainer) {
-                        keysContainer.innerHTML =
-                            '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>';
+                        keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>';
                     }
                     if (valuesContainer) {
                         valuesContainer.innerHTML = '';
@@ -666,8 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             if (!currentVisibleKeys || !currentVisibleKeys.length) {
                                 if (modalFilterKeys) {
-                                    modalFilterKeys.innerHTML =
-                                        '<p class="text-sm text-muted">Aucune colonne disponible pour filtrer.</p>';
+                                    modalFilterKeys.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour filtrer.</p>';
                                 }
                             } else {
                                 // Date label left (disabled input) and date input right
@@ -799,9 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 /* ignore */
                             }
                             try {
-                                const vals = modalFilterValues
-                                    ? Array.from(modalFilterValues.querySelectorAll('input[data-key]'))
-                                    : [];
+                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
                                 vals.forEach((inp) => {
                                     inp.value = '';
                                 });
@@ -845,9 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 /* ignore */
                             }
                             try {
-                                const vals = modalFilterValues
-                                    ? Array.from(modalFilterValues.querySelectorAll('input[data-key]'))
-                                    : [];
+                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
                                 vals.forEach((inp) => {
                                     inp.value = '';
                                 });
@@ -873,9 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 /* ignore */
                             }
                             try {
-                                const vals = modalFilterValues
-                                    ? Array.from(modalFilterValues.querySelectorAll('input[data-key]'))
-                                    : [];
+                                const vals = modalFilterValues ? Array.from(modalFilterValues.querySelectorAll('input[data-key]')) : [];
                                 vals.forEach((inp) => {
                                     const k = inp.dataset.key;
                                     if (!k) {

@@ -3,9 +3,7 @@ import path from 'path';
 import { fileTypeFromFile } from 'file-type';
 import { errorLogger } from '../../../config/logger.js';
 
-const ALLOWED = (process.env.ALLOWED_EXTENSIONS || '.png,.jpg,.jpeg,.webp,.pdf,.doc,.docx,.odt,.txt,.xls,.xlsx,.csv')
-    .split(',')
-    .map((s) => s.trim().toLowerCase());
+const ALLOWED = (process.env.ALLOWED_EXTENSIONS || '.png,.jpg,.jpeg,.webp,.pdf,.doc,.docx,.odt,.txt,.xls,.xlsx,.csv').split(',').map((s) => s.trim().toLowerCase());
 
 function extFromName(name) {
     return path.extname(name || '').toLowerCase();
@@ -31,16 +29,7 @@ async function hasPngHeader(filePath) {
             return false;
         }
         // PNG signature: 89 50 4E 47 0D 0A 1A 0A
-        return (
-            buf[0] === 0x89 &&
-            buf[1] === 0x50 &&
-            buf[2] === 0x4e &&
-            buf[3] === 0x47 &&
-            buf[4] === 0x0d &&
-            buf[5] === 0x0a &&
-            buf[6] === 0x1a &&
-            buf[7] === 0x0a
-        );
+        return buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47 && buf[4] === 0x0d && buf[5] === 0x0a && buf[6] === 0x1a && buf[7] === 0x0a;
     } catch (e) {
         return false;
     }

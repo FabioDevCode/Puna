@@ -36,10 +36,7 @@ export const formRateLimiter = rateLimit({
     skipFailedRequests: false,
     handler: (req, res, next, options) => {
         // Log pour monitoring
-        apiLogger.warn(
-            { formCode: req.params.code, max: RATE_LIMIT_FORM_MAX, windowMs: RATE_LIMIT_FORM_WINDOW_MS },
-            'Rate limit atteint'
-        );
+        apiLogger.warn({ formCode: req.params.code, max: RATE_LIMIT_FORM_MAX, windowMs: RATE_LIMIT_FORM_WINDOW_MS }, 'Rate limit atteint');
 
         res.status(429).json(options.message);
     },

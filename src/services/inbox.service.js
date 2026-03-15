@@ -284,13 +284,9 @@ export async function getSubmissionsByFormWithFilters(formId, filters = {}, limi
                 conditions.push(Sequelize.where(Sequelize.fn('DATE', Sequelize.col('createdAt')), String(value)));
             } else {
                 // Filtrage par contenu JSON : JSON_UNQUOTE(JSON_EXTRACT(content, '$.key')) LIKE '%value%'
-                const expr = Sequelize.where(
-                    Sequelize.fn(
-                        'JSON_UNQUOTE',
-                        Sequelize.fn('JSON_EXTRACT', Sequelize.col('content'), Sequelize.literal(`'$.${key}'`))
-                    ),
-                    { [Op.like]: `%${String(value)}%` }
-                );
+                const expr = Sequelize.where(Sequelize.fn('JSON_UNQUOTE', Sequelize.fn('JSON_EXTRACT', Sequelize.col('content'), Sequelize.literal(`'$.${key}'`))), {
+                    [Op.like]: `%${String(value)}%`,
+                });
                 conditions.push(expr);
             }
         }

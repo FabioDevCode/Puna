@@ -134,10 +134,7 @@ describe('POST /api/v1/send/:code', () => {
     // -----------------------------------------------------------------------
     describe('Authentication — x-key-puna header', () => {
         it('returns 401 when x-key-puna header is absent', async () => {
-            const res = await request(app)
-                .post('/api/v1/send/TEST001')
-                .set('Authorization', validBearerToken)
-                .send({ name: 'Test' });
+            const res = await request(app).post('/api/v1/send/TEST001').set('Authorization', validBearerToken).send({ name: 'Test' });
 
             expect(res.status).toBe(401);
             expect(res.body).toHaveProperty('error');
@@ -146,11 +143,7 @@ describe('POST /api/v1/send/:code', () => {
         it('returns 401 when x-key-puna header is invalid', async () => {
             const wrongKey = 'X'.repeat(TEST_API_KEY.length);
 
-            const res = await request(app)
-                .post('/api/v1/send/TEST001')
-                .set('x-key-puna', wrongKey)
-                .set('Authorization', validBearerToken)
-                .send({ name: 'Test' });
+            const res = await request(app).post('/api/v1/send/TEST001').set('x-key-puna', wrongKey).set('Authorization', validBearerToken).send({ name: 'Test' });
 
             expect(res.status).toBe(401);
             expect(res.body).toHaveProperty('error');
@@ -160,21 +153,14 @@ describe('POST /api/v1/send/:code', () => {
     // -----------------------------------------------------------------------
     describe('Authentication — Bearer token', () => {
         it('returns 401 when Authorization header is absent', async () => {
-            const res = await request(app)
-                .post('/api/v1/send/TEST001')
-                .set('x-key-puna', TEST_API_KEY)
-                .send({ name: 'Test' });
+            const res = await request(app).post('/api/v1/send/TEST001').set('x-key-puna', TEST_API_KEY).send({ name: 'Test' });
 
             expect(res.status).toBe(401);
             expect(res.body).toHaveProperty('error');
         });
 
         it('returns 401 when Bearer token is invalid', async () => {
-            const res = await request(app)
-                .post('/api/v1/send/TEST001')
-                .set('x-key-puna', TEST_API_KEY)
-                .set('Authorization', 'Bearer invalid.jwt.token')
-                .send({ name: 'Test' });
+            const res = await request(app).post('/api/v1/send/TEST001').set('x-key-puna', TEST_API_KEY).set('Authorization', 'Bearer invalid.jwt.token').send({ name: 'Test' });
 
             expect(res.status).toBe(401);
             expect(res.body).toHaveProperty('error');
@@ -186,11 +172,7 @@ describe('POST /api/v1/send/:code', () => {
         it('returns 404 when form code does not exist', async () => {
             vi.mocked(models.Form.findOne).mockResolvedValue(null);
 
-            const res = await request(app)
-                .post('/api/v1/send/UNKNOWN')
-                .set('x-key-puna', TEST_API_KEY)
-                .set('Authorization', validBearerToken)
-                .send({ name: 'Test' });
+            const res = await request(app).post('/api/v1/send/UNKNOWN').set('x-key-puna', TEST_API_KEY).set('Authorization', validBearerToken).send({ name: 'Test' });
 
             expect(res.status).toBe(404);
             expect(res.body).toHaveProperty('error');
@@ -202,11 +184,7 @@ describe('POST /api/v1/send/:code', () => {
         it('returns 200 and persists data to inbox when request is valid', async () => {
             const payload = { name: 'Alice', email: 'alice@example.com', message: 'Hello!' };
 
-            const res = await request(app)
-                .post('/api/v1/send/TEST001')
-                .set('x-key-puna', TEST_API_KEY)
-                .set('Authorization', validBearerToken)
-                .send(payload);
+            const res = await request(app).post('/api/v1/send/TEST001').set('x-key-puna', TEST_API_KEY).set('Authorization', validBearerToken).send(payload);
 
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('success', true);
@@ -215,11 +193,7 @@ describe('POST /api/v1/send/:code', () => {
         });
 
         it('returns 200 with empty body (accepted)', async () => {
-            const res = await request(app)
-                .post('/api/v1/send/TEST001')
-                .set('x-key-puna', TEST_API_KEY)
-                .set('Authorization', validBearerToken)
-                .send({});
+            const res = await request(app).post('/api/v1/send/TEST001').set('x-key-puna', TEST_API_KEY).set('Authorization', validBearerToken).send({});
 
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('success', true);

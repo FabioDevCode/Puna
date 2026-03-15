@@ -25,10 +25,7 @@
          * @returns {string} Chaîne échappée
          */
         escapeHtml(str) {
-            return String(str).replace(
-                /[&<>"'`]/g,
-                (s) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#x60;' })[s]
-            );
+            return String(str).replace(/[&<>"'`]/g, (s) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#x60;' })[s]);
         },
 
         /**

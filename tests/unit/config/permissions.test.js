@@ -1,15 +1,4 @@
-import {
-    ACTIONS,
-    ENTITIES,
-    ROLES,
-    can,
-    getPermissions,
-    getRateLimit,
-    hasRole,
-    isRateLimitReached,
-    permissions,
-    rateLimits,
-} from '../../../src/config/permissions.js';
+import { ACTIONS, ENTITIES, ROLES, can, getPermissions, getRateLimit, hasRole, isRateLimitReached, permissions, rateLimits } from '../../../src/config/permissions.js';
 
 describe('permissions config', () => {
     describe('can', () => {

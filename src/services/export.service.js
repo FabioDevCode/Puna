@@ -394,8 +394,7 @@ export async function generateFormCSV(form, submissions, customColumns = []) {
 
         // Définir les headers
         const headers = ['ID', 'Date'];
-        const keysToUse =
-            customColumns.length > 0 ? customColumns : Array.from(allKeys).map((key) => ({ key, header: key }));
+        const keysToUse = customColumns.length > 0 ? customColumns : Array.from(allKeys).map((key) => ({ key, header: key }));
 
         keysToUse.forEach((col) => {
             headers.push(col.header || col.key);
@@ -472,9 +471,7 @@ export async function generateUsersCSV(users) {
                 Rôle: user.role || 'N/A',
                 'Créé par': user.creator ? user.creator.login : 'N/A',
                 Activé: user.enabled ? 'Oui' : 'Non',
-                'Dernière connexion': user.last_connection
-                    ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm')
-                    : 'N/A',
+                'Dernière connexion': user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
                 'Créé le': dayjs(user.createdAt).format('YYYY-MM-DD HH:mm'),
             });
         });

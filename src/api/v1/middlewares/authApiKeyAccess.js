@@ -10,11 +10,7 @@ export async function authApiKeyAccess(req, res, next) {
         const apiKey = req.headers['x-key-puna'];
         const expectedKey = process.env.API_KEY;
 
-        const isValidKey =
-            expectedKey &&
-            apiKey &&
-            apiKey.length === expectedKey.length &&
-            crypto.timingSafeEqual(Buffer.from(apiKey), Buffer.from(expectedKey));
+        const isValidKey = expectedKey && apiKey && apiKey.length === expectedKey.length && crypto.timingSafeEqual(Buffer.from(apiKey), Buffer.from(expectedKey));
 
         if (!isValidKey) {
             return res.status(401).json({ error: 'Invalid API key' });

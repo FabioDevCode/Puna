@@ -24,22 +24,7 @@ const BLOCK_CLOSE = /^(\s*){{\/([a-zA-Z]+)}}/;
 const ELSE_BLOCK = /^(\s*){{else}}/;
 
 // Balises HTML void (auto-fermantes)
-const HTML_VOID_ELEMENTS = new Set([
-    'area',
-    'base',
-    'br',
-    'col',
-    'embed',
-    'hr',
-    'img',
-    'input',
-    'link',
-    'meta',
-    'param',
-    'source',
-    'track',
-    'wbr',
-]);
+const HTML_VOID_ELEMENTS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
 
 function formatHandlebars(content) {
     // Vérifier si le fichier original se termine par un saut de ligne
@@ -97,12 +82,7 @@ function formatHandlebars(content) {
                 pendingTagOpen &&
                 !trimmed.includes('<') &&
                 !trimmed.startsWith('>') &&
-                (trimmed.includes('=') ||
-                    trimmed.includes('class') ||
-                    trimmed.includes('id') ||
-                    trimmed.includes('data-') ||
-                    trimmed.includes('href') ||
-                    trimmed.includes('src'));
+                (trimmed.includes('=') || trimmed.includes('class') || trimmed.includes('id') || trimmed.includes('data-') || trimmed.includes('href') || trimmed.includes('src'));
 
             if (isAttributeLine) {
                 // Ligne d'attributs - même niveau que la balise ouvrante

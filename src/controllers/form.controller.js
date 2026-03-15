@@ -1,10 +1,5 @@
 import { errorLogger } from '../config/logger.js';
-import {
-    createForm as createFormService,
-    deleteForm as deleteFormService,
-    verifyFormAccess,
-    updateForm,
-} from '../services/form.service.js';
+import { createForm as createFormService, deleteForm as deleteFormService, verifyFormAccess, updateForm } from '../services/form.service.js';
 import { getSubmissionsByFormWithFilters } from '../services/inbox.service.js';
 import { verifySiteAccess } from '../services/site.service.js';
 

@@ -159,10 +159,7 @@ describe('auth.service', () => {
             const result = await activateUserAccount('user-uuid-1', 'NewPassword123!');
 
             expect(result).toBe(true);
-            expect(models.User.update).toHaveBeenCalledWith(
-                expect.objectContaining({ status: 'active' }),
-                expect.objectContaining({ where: { id: 'user-uuid-1' } })
-            );
+            expect(models.User.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'active' }), expect.objectContaining({ where: { id: 'user-uuid-1' } }));
         });
 
         it('returns false when no user row is updated', async () => {

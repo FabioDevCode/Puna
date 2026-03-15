@@ -144,8 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         removeBadges();
         const badge = document.createElement('div');
         // Use plain Tailwind/Daisy classes: transparent bg, 1px neutral border, neutral text
-        badge.className =
-            'inline-flex items-center gap-1 cursor-pointer px-2 py-1/2 rounded-full border border-neutral text-neutral bg-transparent text-sm';
+        badge.className = 'inline-flex items-center gap-1 cursor-pointer px-2 py-1/2 rounded-full border border-neutral text-neutral bg-transparent text-sm';
         badge.innerHTML = `${escapeHtml(text)} <span class="text-sm text-neutral">×</span>`;
         badge.title = 'Cliquer pour réinitialiser la recherche';
         badge.addEventListener('click', () => {
