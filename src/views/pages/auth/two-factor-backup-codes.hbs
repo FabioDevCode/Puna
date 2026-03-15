@@ -1,4 +1,4 @@
-<div class="flex flex-col items-center gap-4 bg-base-100 p-8 rounded-2xl shadow-xl" style="width: 420px;">
+<div class="flex flex-col items-center gap-4 bg-base-100 p-8 rounded-2xl shadow-xl" style="width: 400px;">
     <div class="flex items-center mb-4 gap-2">
         <img src="/img/puna_short_logo.png" alt="Puna logo" class="h-16">
         <h1 class="font-inter" style="font-size: 3rem !important;">
@@ -12,18 +12,51 @@
 
     <div class="alert alert-warning text-sm">
         <i class="fas fa-exclamation-triangle"></i>
-        <span>Conservez ces codes en lieu sûr. Ils ne seront plus affichés après cette page.</span>
+        <span>Conservez ces codes en lieu sûr. Chaque code ne peut être utilisé qu'une seule fois. Ils ne seront plus affichés après cette page.</span>
     </div>
 
     <div class="grid grid-cols-2 gap-2 w-full">
         {{#each backupCodes}}
-            <div class="bg-base-200 rounded p-2 text-center font-mono text-sm select-all">
-                {{this}}
-            </div>
+            <div class="font-mono text-center bg-base-200 rounded p-2 text-sm backup-code-item">{{this}}</div>
         {{/each}}
     </div>
+
+    <button class="btn btn-sm btn-outline w-full" onclick="copyBackupCodes()">
+        <i class="fas fa-copy"></i> Copier tous les codes
+    </button>
+
+    <button class="btn btn-sm btn-outline w-full" onclick="downloadBackupCodes()">
+        <i class="fas fa-download"></i> Télécharger (.txt)
+    </button>
 
     <a href="/dashboard" class="btn btn-secondary btn-sm w-full">
         J'ai sauvegardé mes codes
     </a>
 </div>
+
+<script>
+    function _getBackupCodes() {
+        return Array.from(document.querySelectorAll('.backup-code-item')).map(function(el) {
+            return el.textContent.trim();
+        });
+    }
+
+    function copyBackupCodes() {
+        navigator.clipboard.writeText(_getBackupCodes().join('\n')).then(function() {
+            alert('Codes copiés dans le presse-papier.');
+        }).catch(function() {
+            alert('Impossible de copier les codes. Veuillez les copier manuellement.');
+        });
+    }
+
+    function downloadBackupCodes() {
+        var text = _getBackupCodes().join('\n');
+        var blob = new Blob([text], { type: 'text/plain' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'puna-backup-codes.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
