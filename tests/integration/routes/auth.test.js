@@ -85,6 +85,7 @@ vi.mock('../../../src/middlewares/loginRateLimiter.js', () => ({
     forgotPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
     resetPasswordRateLimiter: vi.fn((_req, _res, next) => next()),
     twoFaRateLimiter: vi.fn((_req, _res, next) => next()),
+    twoFaConfigRateLimiter: vi.fn((_req, _res, next) => next()),
 }));
 
 vi.mock('bcrypt', () => ({
