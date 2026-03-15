@@ -51,5 +51,20 @@
         "defaultValue": "pending",
         "type": "ENUM",
         "values": ["pending", "active", "inactive", "suspended", "banned", "anonymized"]
+    },
+    "totp_backup_codes": {
+        "allowNull": true,
+        "defaultValue": null,
+        "type": "TEXT"
+    },
+    "totp_enabled": {
+        "allowNull": false,
+        "defaultValue": false,
+        "type": "BOOLEAN"
+    },
+    "totp_secret": {
+        "allowNull": true,
+        "defaultValue": null,
+        "type": "STRING"
     }
 }
