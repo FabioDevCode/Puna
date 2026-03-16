@@ -4,9 +4,7 @@ import {
     getSitesWithCounts,
     getGlobalStatsFromSites,
     getTopForms,
-    getTopSiteWithForms,
     getInboxCountsByDay,
-    getInboxPercentagesDetailed,
     getInboxCountsBySite as getInboxCountsBySiteService,
     getInboxHeatmap as getInboxHeatmapService,
 } from '../services/stats.service.js';
@@ -65,22 +63,6 @@ export const getTopFroms = async (req, res) => {
 };
 
 /**
- * Top site avec répartition des formulaires (90 jours)
- */
-export const getTopSiteForms = async (req, res) => {
-    const userId = req.session.user?.id;
-    const days = 90;
-
-    try {
-        const result = await getTopSiteWithForms(userId, days);
-        return res.json(result);
-    } catch (err) {
-        errorLogger.error({ err, userId: req.session?.user?.id }, 'getTopSiteForms error');
-        return res.status(500).json({ error: 'Server error' });
-    }
-};
-
-/**
  * Comptage des inbox par jour
  */
 export const getInboxCounts = async (req, res) => {
@@ -93,22 +75,6 @@ export const getInboxCounts = async (req, res) => {
         return res.json({ ...result, days });
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxCounts error');
-        return res.status(500).json({ error: 'Server error' });
-    }
-};
-
-/**
- * Pourcentages des inbox (today vs yesterday, 7 jours, 30 jours)
- */
-export const getInboxPercentages = async (req, res) => {
-    const userId = req.session.user?.id;
-    const userRole = req.userRole || req.session.user?.role || 'viewer';
-
-    try {
-        const result = await getInboxPercentagesDetailed(userId, userRole);
-        return res.json(result);
-    } catch (err) {
-        errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxPercentages error');
         return res.status(500).json({ error: 'Server error' });
     }
 };

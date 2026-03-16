@@ -4,22 +4,8 @@
     </h3>
 {{/slot}}
 
-{{> widgets/inbox-percentages }}
-
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
-    <div class="stats-grid gap-4">
-        {{> widgets/inbox-counts }}
-
-        {{!--
-        {{> widgets/last-receive }}
-        --}}
-
-        {{> widgets/site-distribution }}
-    </div>
-</div>
-
-<div class="col-span-2 md:col-span-6 lg:col-span-12">
-    {{> widgets/inbox-heatmap }}
+    {{> widgets/inbox-counts }}
 </div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-8">
@@ -27,5 +13,9 @@
 </div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-4">
-    {{> widgets/top-sites-radial }}
+    {{> widgets/site-distribution }}
+</div>
+
+<div class="col-span-2 md:col-span-6 lg:col-span-12">
+    {{> widgets/inbox-heatmap }}
 </div>

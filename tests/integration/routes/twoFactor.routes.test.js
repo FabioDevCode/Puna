@@ -120,9 +120,7 @@ vi.mock('../../../src/services/stats.service.js', () => ({
     getSitesWithCounts: vi.fn().mockResolvedValue([]),
     getGlobalStatsFromSites: vi.fn().mockReturnValue({}),
     getTopForms: vi.fn().mockResolvedValue([]),
-    getTopSiteWithForms: vi.fn().mockResolvedValue({}),
     getInboxCountsByDay: vi.fn().mockResolvedValue({ labels: [], data: [] }),
-    getInboxPercentagesDetailed: vi.fn().mockResolvedValue({}),
     getInboxCountsBySite: vi.fn().mockResolvedValue([]),
     getInboxHeatmap: vi.fn().mockResolvedValue([]),
 }));

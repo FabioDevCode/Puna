@@ -55,10 +55,8 @@ router.post('/dp-2fa-regenerate', requireAuth, twoFaConfigRateLimiter, twoFactor
 router.get('/dashboard', requireAuth, dashboardCtl.dashboard);
 
 router.get('/stats/inbox-counts', requireAuth, dashboardCtl.getInboxCounts);
-router.get('/stats/inbox-percentages', requireAuth, dashboardCtl.getInboxPercentages);
 router.get('/stats/inbox-heatmap', requireAuth, dashboardCtl.getInboxHeatmap);
 router.get('/stats/top-froms', requireAuth, dashboardCtl.getTopFroms);
-router.get('/stats/top-site-forms', requireAuth, dashboardCtl.getTopSiteForms);
 router.get('/stats/inbox-by-site', requireAuth, dashboardCtl.getInboxCountsBySite);
 
 // Administration
