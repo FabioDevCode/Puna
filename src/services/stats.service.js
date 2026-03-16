@@ -4,7 +4,6 @@
  */
 
 import dayjs from 'dayjs';
-import { Op } from 'sequelize';
 import models from '../models/index.js';
 
 /**
@@ -246,15 +245,16 @@ export async function getInboxCountsBySite(userId) {
 
     const labels = (rows || []).map((r) => r.site_domain);
     const data = (rows || []).map((r) => Number(r.cnt) || 0);
+    const ids = (rows || []).map((r) => r.site_id);
 
-    return { labels, data };
+    return { labels, data, ids };
 }
 
 /**
  * Générer la heatmap des inbox (jour de semaine x heure)
  * @param {string} userId - ID de l'utilisateur
  * @param {string} userRole - Rôle de l'utilisateur
- * @param {number} days - Nombre de jours (7, 30, 90, 180)
+ * @param {number} days - Nombre de jours (7 ou 30)
  * @returns {Promise<Object>} - { hours: [], series: [{ name, data }] }
  */
 export async function getInboxHeatmap(userId, userRole, days = 7) {
@@ -264,34 +264,24 @@ export async function getInboxHeatmap(userId, userRole, days = 7) {
     start.setHours(0, 0, 0, 0);
     start.setDate(start.getDate() - (days - 1));
 
-    const siteWhere = userRole === 'super_admin' ? null : { fk_id_user: userId };
+    const siteFilter = userRole === 'super_admin' ? '' : 'AND s.fk_id_user = :userId';
 
-    const includeOptions = {
-        model: models.Form,
-        as: 'form',
-        attributes: [],
-        include: [
-            {
-                model: models.Site,
-                as: 'site',
-                attributes: [],
-            },
-        ],
-    };
+    const sql = `
+        SELECT
+            DAYOFWEEK(i.createdAt) AS dow,
+            HOUR(i.createdAt)      AS h,
+            COUNT(i.id)            AS cnt
+        FROM inbox i
+        JOIN form f ON f.id = i.fk_id_form
+        JOIN site s ON s.id = f.fk_id_site
+        WHERE i.createdAt BETWEEN :start AND :end
+          ${siteFilter}
+        GROUP BY DAYOFWEEK(i.createdAt), HOUR(i.createdAt)
+    `;
 
-    // Ajouter le filtre WHERE seulement si nécessaire (pas super_admin)
-    if (siteWhere) {
-        includeOptions.include[0].where = siteWhere;
-    }
-
-    const inboxRows = await models.Inbox.findAll({
-        where: {
-            createdAt: {
-                [Op.gte]: start,
-                [Op.lte]: end,
-            },
-        },
-        include: [includeOptions],
+    const rows = await models.sequelize.query(sql, {
+        replacements: { userId, start, end },
+        type: models.Sequelize.QueryTypes.SELECT,
     });
 
     // Préparer matrice 7x24 (Lundi..Dimanche, heures 00..23)
@@ -299,14 +289,13 @@ export async function getInboxHeatmap(userId, userRole, days = 7) {
     const hours = Array.from({ length: 24 }, (_, i) => (i === 0 ? '00' : String(i)));
     const matrix = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0));
 
-    (inboxRows || []).forEach((r) => {
-        const created = dayjs(r.createdAt);
-        // day() -> 0 (Sunday) .. 6 (Saturday); on veut Monday=0 .. Sunday=6
-        const dow = created.day();
-        const mondayIndex = (dow + 6) % 7;
-        const h = created.hour(); // 0..23
-        if (matrix[mondayIndex] && typeof matrix[mondayIndex][h] !== 'undefined') {
-            matrix[mondayIndex][h]++;
+    // DAYOFWEEK() retourne 1=Dimanche..7=Samedi -> on veut Lundi=0..Dimanche=6
+    (rows || []).forEach((r) => {
+        const mysqlDow = Number(r.dow); // 1=Dim, 2=Lun, ..., 7=Sam
+        const mondayIndex = (mysqlDow + 5) % 7; // Lun=0, Mar=1, ..., Dim=6
+        const hour = Number(r.h);
+        if (matrix[mondayIndex] && typeof matrix[mondayIndex][hour] !== 'undefined') {
+            matrix[mondayIndex][hour] = Number(r.cnt) || 0;
         }
     });
 

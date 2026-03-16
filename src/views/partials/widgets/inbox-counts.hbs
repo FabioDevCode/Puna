@@ -1,8 +1,11 @@
 <div id="statA" class="bg-base-100 stats-item p-4 stats-item--a shadow-xl">
     <div class="flex flex-col gap-2 w-full">
         <div class="flex items-center justify-between">
-            <div class="text-sm font-semibold select-none">
-                Nombre d'entrées reçues
+            <div class="flex items-center gap-3">
+                <div class="text-sm font-semibold select-none">
+                    Nombre d'entrées reçues
+                </div>
+                <span id="statA_total" class="text-xs font-medium badge badge-ghost"></span>
             </div>
             <select id="statA_range" class="select select-sm select-bordered select-secondary">
                 <option value="7" selected>7 derniers jours</option>

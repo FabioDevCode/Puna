@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const range = document.getElementById('statA_range');
     const chartEl = document.getElementById('statA_chart');
+    const totalEl = document.getElementById('statA_total');
     let chart = null;
 
     async function fetchData(days) {
@@ -66,7 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function load(days) {
         const resp = await fetchData(days);
-        renderChart(resp.labels || [], resp.data || []);
+        const data = resp.data || [];
+        const total = data.reduce((sum, v) => sum + v, 0);
+        if (totalEl) {
+            totalEl.textContent = `${total} sur ${days}j`;
+        }
+        renderChart(resp.labels || [], data);
     }
 
     load(7);

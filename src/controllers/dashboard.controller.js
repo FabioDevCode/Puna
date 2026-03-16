@@ -101,7 +101,7 @@ export const getInboxHeatmap = async (req, res) => {
     const userId = req.session.user?.id;
     const userRole = req.userRole || req.session.user?.role || 'viewer';
     const daysRaw = parseInt(req.query.days, 10) || 7;
-    const days = [7, 30, 90, 180].includes(daysRaw) ? daysRaw : 7;
+    const days = [7, 30].includes(daysRaw) ? daysRaw : 7;
 
     try {
         const result = await getInboxHeatmapService(userId, userRole, days);
