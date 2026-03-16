@@ -131,7 +131,7 @@ main (protégée — PR only)
 
 | #   | Tâche                             | Statut | Détail                                              |
 | --- | --------------------------------- | ------ | --------------------------------------------------- |
-| 8   | **Reset mot de passe**            | ⬜     | Avec `nodemailer` (déjà dans les deps)              |
+| 8   | **Reset mot de passe**            | ✅     | Avec `nodemailer` (déjà dans les deps)              |
 | 9   | **Splitter admin.controller.js**  | ✅     | 3 sous-controllers : admin, adminUsers, adminLogs   |
 | 10  | **ESLint 9 flat config**          | ✅     | Migrer `.eslintrc` → `eslint.config.js`             |
 | 11  | **Migrer CryptoJS → node:crypto** | ✅     | Remplacer la dépendance externe par le module natif |
@@ -151,7 +151,7 @@ main (protégée — PR only)
 | --- | -------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 16  | **Migrations Sequelize (umzug)** | ⬜     | Remplacer `sync()` par des migrations versionnées (voir [ANALYSIS-MIGRATIONS.md](ANALYSIS-MIGRATIONS.md)). À étudier quand un outil de génération auto sera disponible |
 | 17  | **IV aléatoire (node:crypto)**   | ⬜     | Implémenter le pattern IV préfixé au chiffré                                                                                                                           |
-| 18  | **2FA / MFA**                    | ✅     | Authentification à deux facteurs (TOTP + codes de récupération) |
+| 18  | **2FA / MFA**                    | ✅     | Authentification à deux facteurs (TOTP + codes de récupération)                                                                                                        |
 | 19  | **Migrer ESLint 9 → 10**         | ⬜     | Quand l'écosystème de plugins sera stable sur v10                                                                                                                      |
 
 ---

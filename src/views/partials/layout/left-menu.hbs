@@ -5,20 +5,22 @@
         </div>
     </a>
 
+    <ul class="menu p-2 gap-[1px] rounded-lg">
+        {{#roleIs roles='super_admin,owner'}}
+            <li>
+                <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
+                    <i class="fa-solid fa-sliders"></i>
+                    Administration
+                </a>
+            </li>
+        {{/roleIs}}
+    </ul>
+
     <nav class="flex-1">
         <div class="px-4 py-2 text-xs font-bold text-neutral-content uppercase tracking-wider select-none">
             App
         </div>
         <ul class="menu p-2 gap-[1px] rounded-lg">
-            {{#roleIs roles='super_admin,owner'}}
-                <li>
-                    <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
-                        <i class="fa-solid fa-sliders"></i>
-                        Administration
-                    </a>
-                </li>
-            {{/roleIs}}
-
             <li>
                 <a href="/dashboard"
                 class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
