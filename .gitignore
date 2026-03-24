@@ -1,5 +1,4 @@
 .project_docs
-.vscode
 .env
 .DS_Store
 node_modules

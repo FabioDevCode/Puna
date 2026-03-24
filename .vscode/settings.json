@@ -1,0 +1,35 @@
+{
+    "[handlebars]": {
+        "editor.autoIndent": "full",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": false,
+        "editor.tabSize": 4
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 4
+    },
+    "[jsonc]": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 4
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "emmet.includeLanguages": {
+        "handlebars": "html"
+    },
+    "eslint.validate": ["javascript", "javascriptreact", "json", "jsonc", "typescript", "typescriptreact"],
+    "files.associations": {
+        "*.hbs": "handlebars"
+    },
+    "files.trimTrailingWhitespace": true
+}
