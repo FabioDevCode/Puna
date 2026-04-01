@@ -57,6 +57,14 @@
         "reset_title": "Réinitialiser le mot de passe",
         "reset_token_invalid": "Le lien de réinitialisation est invalide ou a expiré."
     },
+    "password": {
+        "min_length": "Le mot de passe doit contenir au moins 16 caractères.",
+        "needs_uppercase": "Le mot de passe doit contenir au moins une lettre majuscule.",
+        "needs_lowercase": "Le mot de passe doit contenir au moins une lettre minuscule.",
+        "needs_digit": "Le mot de passe doit contenir au moins un chiffre.",
+        "needs_special": "Le mot de passe doit contenir au moins un caractère spécial.",
+        "too_weak": "Le mot de passe ne respecte pas les critères de sécurité."
+    },
     "site": {
         "create_help": "253 caractères maximum.",
         "create_title": "Créer un nouveau site",
