@@ -18,14 +18,14 @@
 (function () {
     'use strict';
 
-    var passwordInput = document.querySelector('input[name="password"]');
-    var confirmInput = document.querySelector('input[name="confirm_password"]');
-    var rulesContainer = document.querySelector('[data-pwd-rules]');
-    var submitBtn = document.querySelector('[data-pwd-submit]');
+    const passwordInput = document.querySelector('input[name="password"]');
+    const confirmInput = document.querySelector('input[name="confirm_password"]');
+    const rulesContainer = document.querySelector('[data-pwd-rules]');
+    const submitBtn = document.querySelector('[data-pwd-submit]');
 
     if (!passwordInput || !confirmInput || !rulesContainer || !submitBtn) return;
 
-    var rules = {
+    const rules = {
         min_length: function (pwd) {
             return pwd.length >= 16;
         },
@@ -43,18 +43,18 @@
         },
     };
 
-    var CLASS_DEFAULT = 'text-base-content/60';
-    var CLASS_VALID = 'text-success';
+    const CLASS_DEFAULT = 'text-base-content/60';
+    const CLASS_VALID = 'text-success';
 
     function checkRules() {
-        var pwd = passwordInput.value;
-        var allValid = true;
+        const pwd = passwordInput.value;
+        let allValid = true;
 
         Object.keys(rules).forEach(function (key) {
-            var li = rulesContainer.querySelector('[data-rule="' + key + '"]');
+            const li = rulesContainer.querySelector('[data-rule="' + key + '"]');
             if (!li) return;
 
-            var passed = pwd.length > 0 && rules[key](pwd);
+            const passed = pwd.length > 0 && rules[key](pwd);
             if (passed) {
                 li.classList.remove(CLASS_DEFAULT);
                 li.classList.add(CLASS_VALID);
@@ -69,14 +69,14 @@
     }
 
     function checkMatch() {
-        var pwd = passwordInput.value;
-        var confirm = confirmInput.value;
+        const pwd = passwordInput.value;
+        const confirm = confirmInput.value;
         return pwd.length > 0 && confirm.length > 0 && pwd === confirm;
     }
 
     function update() {
-        var rulesOk = checkRules();
-        var matchOk = checkMatch();
+        const rulesOk = checkRules();
+        const matchOk = checkMatch();
         submitBtn.disabled = !(rulesOk && matchOk);
     }
 

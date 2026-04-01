@@ -23,10 +23,10 @@
     });
 
     document.getElementById('btn-download-codes').addEventListener('click', function () {
-        var text = getBackupCodes().join('\n');
-        var blob = new Blob([text], { type: 'text/plain' });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
+        const text = getBackupCodes().join('\n');
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
         a.href = url;
         a.download = 'puna-backup-codes.txt';
         a.click();
