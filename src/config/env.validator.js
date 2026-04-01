@@ -35,6 +35,8 @@ const OPTIONAL_VARS = {
     APP_URL: 'http://localhost:3000',
     TOTP_ENABLED: 'false', // Active/désactive la fonctionnalité 2FA globalement
     TOTP_ISSUER: 'Puna', // Nom affiché dans l'application d'authentification
+    ADMIN_LOGIN: '', // Login du premier administrateur (requis au premier démarrage)
+    ADMIN_EMAIL: '', // Email du premier administrateur (optionnel)
 };
 
 /**

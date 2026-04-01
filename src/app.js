@@ -21,7 +21,7 @@ import { logger, apiLogger, errorLogger } from './config/logger.js';
 import { mailEnabled } from './config/mailer.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
-import { initAdminUSer } from './helpers/init_admin_user.js';
+import { initAdminUser } from './helpers/init_admin_user.js';
 import { csrfProtection, csrfTokenInjector } from './middlewares/csrf.js';
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
 import flashMessages from './middlewares/flashMessages.js';
@@ -181,7 +181,7 @@ app.set('view engine', 'hbs');
 app.set('views', [`${__dirname}/views/pages`]);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-await initAdminUSer();
+await initAdminUser();
 await routes(app);
 await api(app);
 
