@@ -9,5 +9,12 @@ export default defineConfig({
             reporter: ['text', 'json-summary', 'json'],
             reportsDirectory: './coverage',
         },
+        server: {
+            deps: {
+                // Load node-cron via native Node.js instead of Vite's transform
+                // pipeline, avoiding the "missing source files" sourcemap warning.
+                external: ['node-cron'],
+            },
+        },
     },
 });
