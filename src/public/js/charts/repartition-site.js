@@ -54,7 +54,7 @@
                 row.className = 'flex flex-col gap-1 px-1 py-1 rounded hover:bg-base-200 transition-colors cursor-pointer no-underline';
 
                 row.innerHTML = `
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between gap-1">
                         <span class="text-sm truncate">${label}</span>
                         <span class="text-xs text-muted">${count} (${pct}%)</span>
                     </div>
