@@ -205,6 +205,12 @@ function buildTestApp() {
         next();
     });
 
+    // Stub i18n: add req.__ to every request (i18n.init is not wired in the test app)
+    app.use((req, _res, next) => {
+        req.__ = (key) => key;
+        next();
+    });
+
     app.use('/', defaultRouter);
 
     return app;
@@ -402,6 +408,20 @@ describe('auth routes', () => {
 
             expect(res.status).toBe(200);
             expect(res.text).toContain('Login inconnu.');
+        });
+
+        it('rejects a weak password and renders first-login view with error', async () => {
+            vi.mocked(findUserByLogin).mockResolvedValueOnce({ ...mockUser, status: 'pending' });
+
+            const res = await request(app).post('/dp-first-co').send({
+                login: 'testuser',
+                password: 'weak',
+                confirm_password: 'weak',
+            });
+
+            expect(res.status).toBe(200);
+            expect(res.text).toContain('auth/first-login');
+            expect(res.text).toContain('password.too_weak');
         });
     });
 });
