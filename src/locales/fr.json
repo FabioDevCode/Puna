@@ -30,6 +30,15 @@
     "misc": {
         "beta_version": "beta-0.0.1"
     },
+    "password": {
+        "instruct": "Le mot de passe doit contenir au moins :",
+        "min_length": "16 caractères.",
+        "needs_digit": "Un chiffre.",
+        "needs_lowercase": "Une lettre minuscule.",
+        "needs_special": "Un caractère spécial.",
+        "needs_uppercase": "Une lettre majuscule.",
+        "too_weak": "Le mot de passe ne respecte pas les critères de sécurité."
+    },
     "passwordReset": {
         "email_body": "Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le lien ci-dessous pour en choisir un nouveau :",
         "email_button": "Réinitialiser mon mot de passe",
@@ -56,14 +65,6 @@
         "reset_success": "Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.",
         "reset_title": "Réinitialiser le mot de passe",
         "reset_token_invalid": "Le lien de réinitialisation est invalide ou a expiré."
-    },
-    "password": {
-        "min_length": "Le mot de passe doit contenir au moins 16 caractères.",
-        "needs_uppercase": "Le mot de passe doit contenir au moins une lettre majuscule.",
-        "needs_lowercase": "Le mot de passe doit contenir au moins une lettre minuscule.",
-        "needs_digit": "Le mot de passe doit contenir au moins un chiffre.",
-        "needs_special": "Le mot de passe doit contenir au moins un caractère spécial.",
-        "too_weak": "Le mot de passe ne respecte pas les critères de sécurité."
     },
     "site": {
         "create_help": "253 caractères maximum.",
