@@ -205,6 +205,12 @@ function buildTestApp() {
         next();
     });
 
+    // Stub i18n: add req.__ to every request (i18n.init is not wired in the test app)
+    app.use((req, _res, next) => {
+        req.__ = (key) => key;
+        next();
+    });
+
     app.use('/', defaultRouter);
 
     return app;
@@ -306,8 +312,8 @@ describe('passwordReset routes', () => {
 
             const agent = request.agent(app);
             const postRes = await agent.post('/dp-reset-password/validtoken').send({
-                password: 'NewPassword123!',
-                confirm_password: 'NewPassword123!',
+                password: 'NewPassword1234!',
+                confirm_password: 'NewPassword1234!',
             });
             expect(postRes.status).toBe(302);
             expect(postRes.headers.location).toContain('/dp-login');
@@ -337,14 +343,25 @@ describe('passwordReset routes', () => {
 
             const agent = request.agent(app);
             const postRes = await agent.post('/dp-reset-password/badtoken').send({
-                password: 'NewPassword123!',
-                confirm_password: 'NewPassword123!',
+                password: 'NewPassword1234!',
+                confirm_password: 'NewPassword1234!',
             });
             expect(postRes.status).toBe(302);
             expect(postRes.headers.location).toContain('/dp-forgot-password');
 
             const forgotPage = await agent.get('/dp-forgot-password');
             expect(forgotPage.text).toContain('invalide ou a expiré');
+        });
+
+        it('with weak password: renders reset-password view with error', async () => {
+            const res = await request(app).post('/dp-reset-password/validtoken').send({
+                password: 'weak',
+                confirm_password: 'weak',
+            });
+
+            expect(res.status).toBe(200);
+            expect(res.text).toContain('auth/reset-password');
+            expect(res.text).toContain('password.too_weak');
         });
     });
 });

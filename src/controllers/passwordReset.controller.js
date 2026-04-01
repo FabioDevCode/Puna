@@ -1,6 +1,7 @@
 import { auditLogger, errorLogger } from '../config/logger.js';
 import { mailEnabled } from '../config/mailer.js';
 import { createPasswordResetRequest, validateResetToken, resetPassword } from '../services/passwordReset.service.js';
+import { validatePasswordStrength } from '../utils/password.js';
 
 export const forgotPasswordGet = (req, res) => {
     res.render('auth/forgot-password', {
@@ -74,6 +75,17 @@ export const resetPasswordPost = async (req, res) => {
     if (password !== confirm_password) {
         res.flash('error', 'Les mots de passe ne correspondent pas.');
         return res.redirect(`/dp-reset-password/${token}`);
+    }
+
+    // Valider la force du mot de passe
+    const { valid, errors } = validatePasswordStrength(password);
+    if (!valid) {
+        return res.render('auth/reset-password', {
+            layout: 'auth',
+            token,
+            error: req.__('password.too_weak'),
+            passwordErrors: errors.map((key) => req.__(key)),
+        });
     }
 
     try {

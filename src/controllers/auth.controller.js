@@ -2,6 +2,7 @@ import passport from 'passport';
 import { auditLogger, errorLogger } from '../config/logger.js';
 import { activateUserAccount, findUserByLogin } from '../services/auth.service.js';
 import { incrementFailedAttempts, resetFailedAttempts, updateLastConnection } from '../services/user.service.js';
+import { validatePasswordStrength } from '../utils/password.js';
 
 export const dpFirstCoPost = async (req, res) => {
     const { login, password, confirm_password } = req.body;
@@ -47,6 +48,22 @@ export const dpFirstCoPost = async (req, res) => {
             return res.render('auth/first-login', {
                 layout: 'auth',
                 error: 'Les mots de passe ne correspondent pas.',
+            });
+        }
+
+        // Valider la force du mot de passe
+        const { valid, errors } = validatePasswordStrength(password);
+        if (!valid) {
+            auditLogger.warn({
+                action: 'FIRST_LOGIN_FAILED',
+                ip,
+                login,
+                reason: 'weak_password',
+            });
+            return res.render('auth/first-login', {
+                layout: 'auth',
+                error: req.__('password.too_weak'),
+                passwordErrors: errors.map((key) => req.__(key)),
             });
         }
 
