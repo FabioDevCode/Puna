@@ -26,7 +26,7 @@
 <form action="/dp-2fa-setup" method="post" class="flex flex-col gap-4 w-full">
     <input type="hidden" name="_csrf" value="{{csrfToken}}" />
 <label class="input input-sm input-bordered flex items-center gap-2">
-    <i class="fas fa-shield-alt" style="color: #6C7179; font-size: 1rem;"></i>
+    <i class="fas fa-shield-alt" style="color: #6C7179; font-size: .8rem;"></i>
     <input name="totp_code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" class="grow" placeholder="Code à 6 chiffres" maxlength="6" required />
 </label>
 <button class="btn btn-secondary btn-sm">
