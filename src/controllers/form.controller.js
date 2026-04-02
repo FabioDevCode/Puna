@@ -2,6 +2,7 @@ import { errorLogger } from '../config/logger.js';
 import { createForm as createFormService, deleteForm as deleteFormService, verifyFormAccess, updateForm } from '../services/form.service.js';
 import { getSubmissionsByFormWithFilters } from '../services/inbox.service.js';
 import { verifySiteAccess } from '../services/site.service.js';
+import { isValidFormName } from '../utils/validators.js';
 
 /**
  * Créer un formulaire
@@ -10,6 +11,15 @@ export const createForm = async (req, res) => {
     const { name, fk_id_site } = req.body;
     const userId = req.session.user?.id;
     const userRole = req.userRole || req.session.user?.role || 'viewer';
+
+    // Validation du nom
+    const nameCheck = isValidFormName(name);
+    if (!nameCheck.valid) {
+        res.flash('error', res.__(nameCheck.error));
+        return res.redirect(`/site/${fk_id_site}/view`);
+    }
+
+    const trimmedName = name.trim();
 
     try {
         // Vérifier l'accès au site
@@ -20,10 +30,10 @@ export const createForm = async (req, res) => {
         }
 
         // Créer le formulaire (le code est généré automatiquement)
-        await createFormService({ name, fk_id_site });
+        await createFormService({ name: trimmedName, fk_id_site });
 
         res.flash('success', 'Formulaire créé avec succès.');
-        return res.redirect(`/site/${fk_id_site}/view?f=${name}`);
+        return res.redirect(`/site/${fk_id_site}/view?f=${trimmedName}`);
     } catch (_err) {
         res.flash('error', 'Erreur lors de la création du formulaire.');
         return res.redirect('/dashboard');
