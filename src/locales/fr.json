@@ -120,5 +120,13 @@
         "verify_submit": "Vérifier",
         "verify_subtitle": "Entrez le code à 6 chiffres affiché dans votre application d'authentification.",
         "verify_title": "Vérification en deux étapes"
+    },
+    "validation": {
+        "domain_invalid_format": "Le format du domaine est invalide (ex : example.com).",
+        "domain_required": "Le nom de domaine est requis.",
+        "domain_too_long": "Le nom de domaine ne doit pas dépasser 253 caractères.",
+        "form_name_invalid_chars": "Le nom du formulaire contient des caractères non autorisés.",
+        "form_name_required": "Le nom du formulaire est requis.",
+        "form_name_too_long": "Le nom du formulaire ne doit pas dépasser 50 caractères."
     }
 }
