@@ -63,6 +63,7 @@ export const dp2faVerifyPost = async (req, res) => {
             email: pending.email,
             role: pending.role,
             status: pending.status,
+            locale: user.locale || 'fr',
         };
         delete req.session.pending2FA;
 
@@ -137,6 +138,7 @@ export const dp2faRecoveryPost = async (req, res) => {
             email: pending.email,
             role: pending.role,
             status: pending.status,
+            locale: user.locale || 'fr',
         };
         delete req.session.pending2FA;
 

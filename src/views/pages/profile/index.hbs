@@ -1,0 +1,54 @@
+<div class="flex flex-col gap-6 p-6 max-w-2xl">
+    <h3 class="font-inter">{{__ "profile.title"}}</h3>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-base">{{__ "profile.info_title"}}</h2>
+
+            <div class="grid grid-cols-2 gap-4 mt-2">
+                <div>
+                    <span class="text-sm text-gray-500">{{__ "profile.login_label"}}</span>
+                    <p class="font-medium">{{user.login}}</p>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-500">{{__ "profile.email_label"}}</span>
+                    <p class="font-medium">{{#if user.email}}{{user.email}}{{else}}-{{/if}}</p>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-500">{{__ "profile.role_label"}}</span>
+                    <p><span class="badge_role badge_{{user.role}}">{{user.role}}</span></p>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-500">{{__ "profile.2fa_label"}}</span>
+                    <p class="font-medium">
+                        {{#if user.totp_enabled}}
+                            <span class="badge badge-success badge-sm">{{__ "profile.2fa_enabled"}}</span>
+                        {{else}}
+                            <span class="badge badge-warning badge-sm">{{__ "profile.2fa_disabled"}}</span>
+                        {{/if}}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-base">{{__ "profile.language_title"}}</h2>
+            <p class="text-sm text-gray-500 mb-2">{{__ "profile.language_desc"}}</p>
+
+            <form action="/profile/locale" method="post">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+            <div class="flex items-center gap-3">
+                <select name="locale" class="select select-sm select-bordered">
+                    <option value="fr" {{#ifEquals user.locale "fr"}}selected{{/ifEquals}}>Français</option>
+                    <option value="en" {{#ifEquals user.locale "en"}}selected{{/ifEquals}}>English</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-secondary">
+                    {{__ "btn.apply"}}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>

@@ -59,10 +59,14 @@ export async function searchUsers(query, limit = 20) {
  * @returns {Promise<Object|null>} - Utilisateur ou null
  */
 export async function getUserById(userId, includePassword = false) {
-    const attributes = includePassword ? ['id', 'email', 'name', 'role', 'password', 'createdAt', 'updatedAt'] : ['id', 'email', 'name', 'role', 'createdAt', 'updatedAt'];
+    const user = await models.User.findByPk(userId);
+    if (!user) return null;
 
-    const user = await models.User.findByPk(userId, { attributes });
-    return user ? user.toJSON() : null;
+    const data = user.toJSON();
+    if (!includePassword) {
+        delete data.password;
+    }
+    return data;
 }
 
 /**
@@ -436,6 +440,19 @@ export async function updateLastConnection(userId) {
     const [updated] = await models.User.update({ last_connection: new Date() }, { where: { id: userId } });
 
     return updated > 0;
+}
+
+/**
+ * Mettre à jour la locale d'un utilisateur
+ * @param {string} userId - ID de l'utilisateur
+ * @param {string} locale - Nouvelle locale ('fr' ou 'en')
+ * @returns {Promise<Object>} - Utilisateur mis à jour
+ */
+export async function updateUserLocale(userId, locale) {
+    const user = await models.User.findByPk(userId);
+    if (!user) throw new Error('Utilisateur introuvable');
+    await user.update({ locale });
+    return user.toJSON();
 }
 
 /**

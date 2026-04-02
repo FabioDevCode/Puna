@@ -23,6 +23,11 @@
         "allowNull": true,
         "type": "DATE"
     },
+    "locale": {
+        "allowNull": false,
+        "defaultValue": "fr",
+        "type": "ENUM('fr','en')"
+    },
     "login": {
         "allowNull": false,
         "type": "STRING(100)",

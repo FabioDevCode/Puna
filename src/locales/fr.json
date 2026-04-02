@@ -25,6 +25,7 @@
         "administration": "Administration",
         "dashboard": "Dashboard",
         "logout": "Se déconnecter",
+        "profile": "Profil",
         "website": "Site web"
     },
     "misc": {
@@ -38,6 +39,21 @@
         "needs_special": "Un caractère spécial.",
         "needs_uppercase": "Une lettre majuscule.",
         "too_weak": "Le mot de passe ne respecte pas les critères de sécurité."
+    },
+    "profile": {
+        "title": "Mon profil",
+        "info_title": "Informations du compte",
+        "login_label": "Identifiant",
+        "email_label": "Email",
+        "role_label": "Rôle",
+        "2fa_label": "Double authentification",
+        "2fa_enabled": "Activée",
+        "2fa_disabled": "Non activée",
+        "language_title": "Langue de l'interface",
+        "language_desc": "Choisissez la langue d'affichage de l'application.",
+        "invalid_locale": "Langue non supportée.",
+        "locale_updated": "Langue mise à jour.",
+        "update_error": "Erreur lors de la mise à jour."
     },
     "passwordReset": {
         "email_body": "Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le lien ci-dessous pour en choisir un nouveau :",

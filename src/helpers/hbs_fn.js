@@ -56,6 +56,10 @@ export default {
         return a === b;
     },
 
+    ifEquals: function (a, b, options) {
+        return a === b ? options.fn(this) : options.inverse(this);
+    },
+
     /**
      * Helper pour vérifier si l'utilisateur peut faire une action
      * Usage: {{#actionCan entity="site" action="create"}}...{{/actionCan}}
