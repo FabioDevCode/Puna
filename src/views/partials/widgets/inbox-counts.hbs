@@ -7,10 +7,10 @@
                 </div>
                 <span id="statA_total" class="text-xs font-medium badge badge-ghost"></span>
             </div>
-            <select id="statA_range" class="select select-sm select-bordered select-secondary">
-                <option value="7" selected>7 derniers jours</option>
-                <option value="30">30 derniers jours</option>
-            </select>
+            <div id="statA_range" role="tablist" class="tabs tabs-boxed tabs-sm">
+                <a role="tab" class="tab tab-active" data-value="7">7 jours</a>
+                <a role="tab" class="tab" data-value="30">30 jours</a>
+            </div>
         </div>
         <div id="statA_chart" class="overflow-hidden h-[344px]"></div>
     </div>

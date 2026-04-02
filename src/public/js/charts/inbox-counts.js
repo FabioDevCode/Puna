@@ -77,8 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     load(7);
 
-    range.addEventListener('change', (e) => {
-        const val = parseInt(e.target.value, 10) || 7;
-        load(val);
+    range.querySelectorAll('.tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+            range.querySelector('.tab-active')?.classList.remove('tab-active');
+            tab.classList.add('tab-active');
+            const val = parseInt(tab.dataset.value, 10) || 7;
+            load(val);
+        });
     });
 });

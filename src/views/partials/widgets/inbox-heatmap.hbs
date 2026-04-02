@@ -4,10 +4,10 @@
             <div class="text-sm font-semibold select-none">
                 Intensité de réception (jour/heure)
             </div>
-            <select id="statH_range" class="select select-sm select-bordered select-secondary">
-                <option value="7" selected>7 derniers jours</option>
-                <option value="30">30 derniers jours</option>
-            </select>
+            <div id="statH_range" role="tablist" class="tabs tabs-boxed tabs-sm">
+                <a role="tab" class="tab tab-active" data-value="7">7 jours</a>
+                <a role="tab" class="tab" data-value="30">30 jours</a>
+            </div>
         </div>
         <div id="statH_chart" style="height: 280px; overflow: hidden;"></div>
     </div>

@@ -1,7 +1,7 @@
 (function () {
-    const select = document.getElementById('statTop_range');
+    const tablist = document.getElementById('statTop_range');
     const tbody = document.getElementById('statTop_body');
-    if (!select || !tbody) {
+    if (!tablist || !tbody) {
         return;
     }
 
@@ -44,7 +44,8 @@
     }
 
     async function load() {
-        const days = select.value || '7';
+        const activeTab = tablist.querySelector('.tab-active');
+        const days = activeTab ? activeTab.dataset.value : '7';
         try {
             const resp = await fetch(`/stats/top-froms?days=${encodeURIComponent(days)}`, {
                 credentials: 'same-origin',
@@ -62,6 +63,12 @@
         }
     }
 
-    select.addEventListener('change', load);
+    tablist.querySelectorAll('.tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+            tablist.querySelector('.tab-active')?.classList.remove('tab-active');
+            tab.classList.add('tab-active');
+            load();
+        });
+    });
     setTimeout(load, 80);
 })();

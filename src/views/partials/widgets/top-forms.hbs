@@ -2,10 +2,10 @@
 class="bg-base-100 h-[350px] w-full flex flex-col gap-4 p-4 justify-between stats-item flex-1 shadow-xl">
     <div class="flex items-center justify-between w-full">
         <div class="text-sm font-semibold select-none">Top 5 formulaires</div>
-        <select id="statTop_range" class="select select-sm select-bordered select-secondary">
-            <option value="7" selected>7 derniers jours</option>
-            <option value="30">30 derniers jours</option>
-        </select>
+        <div id="statTop_range" role="tablist" class="tabs tabs-boxed tabs-sm">
+            <a role="tab" class="tab tab-active" data-value="7">7 jours</a>
+            <a role="tab" class="tab" data-value="30">30 jours</a>
+        </div>
     </div>
 
     <div id="tableTopContainer" class="overflow-x-auto w-full border border-base-200">
