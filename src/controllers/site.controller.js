@@ -4,9 +4,11 @@ import {
     deleteSiteWithForms,
     generateSiteToken,
     revokeSiteTokens as revokeSiteTokensService,
+    domainExists,
 } from '../services/site.service.js';
 import { getSitesWithCounts } from '../services/stats.service.js';
 import stringUtils from '../utils/string.js';
+import { isValidDomain } from '../utils/validators.js';
 
 /**
  * Liste de tous les sites (page)
@@ -32,10 +34,25 @@ export const allSite = async (req, res) => {
 export const createSite = async (req, res) => {
     const { domain } = req.body;
     const userId = req.session.user?.id;
+
+    // 1. Validation du format
+    const domainCheck = isValidDomain(domain);
+    if (!domainCheck.valid) {
+        res.flash('error', res.__(domainCheck.error));
+        return res.redirect('/site/all');
+    }
+
+    // 2. Vérification d'unicité
     try {
+        const exists = await domainExists(domain.trim());
+        if (exists) {
+            res.flash('error', res.__('site.exists_error'));
+            return res.redirect('/site/all');
+        }
+
         const site = await createSiteService(
             {
-                domain,
+                domain: domain.trim(),
                 control_code: stringUtils.generateCode(16),
             },
             userId
