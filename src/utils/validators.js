@@ -4,7 +4,7 @@
 
 /**
  * Valide un nom de domaine.
- * - Longueur : 1 à 253 caractères
+ * - Longueur : 1 à 128 caractères
  * - Format : domaine FQDN valide (lettres, chiffres, tirets, au moins un point, TLD ≥ 2 lettres)
  * - Pas d'espaces
  *
@@ -22,7 +22,7 @@ export function isValidDomain(domain) {
         return { valid: false, error: 'validation.domain_required' };
     }
 
-    if (trimmed.length > 253) {
+    if (trimmed.length > 128) {
         return { valid: false, error: 'validation.domain_too_long' };
     }
 

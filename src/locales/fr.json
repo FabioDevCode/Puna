@@ -67,7 +67,7 @@
         "reset_token_invalid": "Le lien de réinitialisation est invalide ou a expiré."
     },
     "site": {
-        "create_help": "253 caractères maximum.",
+        "create_help": "128 caractères maximum.",
         "create_title": "Créer un nouveau site",
         "domain_placeholder": "Nom de domaine",
         "exists_error": "Un site avec ce domaine existe déjà."
@@ -124,7 +124,7 @@
     "validation": {
         "domain_invalid_format": "Le format du domaine est invalide (ex : example.com).",
         "domain_required": "Le nom de domaine est requis.",
-        "domain_too_long": "Le nom de domaine ne doit pas dépasser 253 caractères.",
+        "domain_too_long": "Le nom de domaine ne doit pas dépasser 128 caractères.",
         "form_name_invalid_chars": "Le nom du formulaire contient des caractères non autorisés.",
         "form_name_required": "Le nom du formulaire est requis.",
         "form_name_too_long": "Le nom du formulaire ne doit pas dépasser 50 caractères."

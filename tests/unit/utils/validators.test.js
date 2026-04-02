@@ -43,8 +43,8 @@ describe('isValidDomain', () => {
         expect(isValidDomain('   ').error).toBe('validation.domain_required');
     });
 
-    it('rejette un domaine trop long (> 253 chars)', () => {
-        const long = 'a'.repeat(250) + '.com';
+    it('rejette un domaine trop long (> 128 chars)', () => {
+        const long = 'a'.repeat(125) + '.com';
         expect(isValidDomain(long).valid).toBe(false);
         expect(isValidDomain(long).error).toBe('validation.domain_too_long');
     });
