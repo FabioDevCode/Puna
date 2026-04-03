@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>403 - Accès interdit</title>
+<title>{{__ "error.403_title"}}</title>
 <style>
     * {
     margin: 0;
@@ -153,27 +153,27 @@
     <div class="error-container">
         <div class="error-icon">🔒</div>
         <div class="error-code">403</div>
-        <h1 class="error-title">Accès interdit</h1>
+        <h1 class="error-title">{{__ "error.403_heading"}}</h1>
         <p class="error-message">
             {{#if message}}
                 {{message}}
             {{else}}
-                Vous n'avez pas les permissions nécessaires pour accéder à cette ressource.
+                {{__ "error.403_message"}}
             {{/if}}
         </p>
 
         {{#if entity}}
             <div class="error-details">
-                <p><strong>Entité :</strong> {{entity}}</p>
+                <p><strong>{{__ "error.403_entity"}}</strong> {{entity}}</p>
                 {{#if action}}
-                    <p><strong>Action :</strong> {{action}}</p>
+                    <p><strong>{{__ "error.403_action"}}</strong> {{action}}</p>
                 {{/if}}
                 {{#if userRole}}
-                    <p><strong>Votre rôle :</strong> {{roleLabel userRole}}</p>
+                    <p><strong>{{__ "error.403_your_role"}}</strong> {{roleLabel userRole}}</p>
                 {{/if}}
                 {{#if allowedRoles}}
                     <p>
-                        <strong>Rôles autorisés :</strong>
+                        <strong>{{__ "error.403_allowed_roles"}}</strong>
                         {{#each allowedRoles}}
                             {{roleLabel this}}{{#unless @last}}, {{/unless}}
                         {{/each}}
@@ -183,8 +183,8 @@
         {{/if}}
 
         <div style="margin-top: 40px">
-            <a href="/dashboard" class="btn-home">Retour au tableau de bord</a>
-            <a href="javascript:history.back()" class="btn-back">← Retour</a>
+            <a href="/dashboard" class="btn-home">{{__ "error.return_dashboard"}}</a>
+            <a href="javascript:history.back()" class="btn-back">{{__ "error.go_back"}}</a>
         </div>
     </div>
 </body>

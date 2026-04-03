@@ -7,12 +7,12 @@
     </div>
 
     <h2>
-        Codes de récupération
+        {{__ "twoFactor.backup_title"}}
     </h2>
 
     <div class="alert alert-warning text-sm rounded-xl">
         <i class="fas fa-exclamation-triangle"></i>
-        <span>Conservez ces codes en lieu sûr. Chaque code ne peut être utilisé qu'une seule fois. Ils ne seront plus affichés après cette page.</span>
+        <span>{{__ "twoFactor.backup_warning"}}</span>
     </div>
 
     <div class="grid grid-cols-2 gap-2 w-full">
@@ -22,15 +22,15 @@
     </div>
 
     <button id="btn-copy-codes" class="btn btn-sm btn-outline w-full">
-        <i class="fas fa-copy" style="font-size: .8rem;"></i> Copier tous les codes
+        <i class="fas fa-copy" style="font-size: .8rem;"></i> {{__ "twoFactor.backup_copy"}}
     </button>
 
     <button id="btn-download-codes" class="btn btn-sm btn-outline w-full">
-        <i class="fas fa-download" style="font-size: .8rem;"></i> Télécharger (.txt)
+        <i class="fas fa-download" style="font-size: .8rem;"></i> {{__ "twoFactor.backup_download"}}
     </button>
 
     <a href="/dashboard" class="btn btn-secondary btn-sm w-full">
-        J'ai sauvegardé mes codes
+        {{__ "twoFactor.backup_saved"}}
     </a>
 </div>
 

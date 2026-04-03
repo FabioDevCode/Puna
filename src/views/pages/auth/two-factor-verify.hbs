@@ -7,30 +7,30 @@
     </div>
 
     <h2>
-        Vérification en deux étapes
+        {{__ "twoFactor.verify_title"}}
     </h2>
 
     <p class="text-sm text-center">
-        Entrez le code à 6 chiffres affiché dans votre application d'authentification.
+        {{__ "twoFactor.verify_subtitle"}}
     </p>
 
     <form action="/dp-2fa-verify" method="post" class="flex flex-col gap-4 w-full">
         <input type="hidden" name="_csrf" value="{{csrfToken}}" />
     <label class="input input-sm input-bordered flex items-center gap-2">
         <i class="fas fa-shield-alt" style="color: #6C7179; font-size: .8rem;"></i>
-        <input name="totp_code" type="text" inputmode="numeric" autocomplete="one-time-code" class="grow" placeholder="Code à 6 chiffres" maxlength="6" pattern="[0-9]{6}" required />
+        <input name="totp_code" type="text" inputmode="numeric" autocomplete="one-time-code" class="grow" placeholder="{{__ "twoFactor.verify_placeholder"}}" maxlength="6" pattern="[0-9]{6}" required />
 </label>
 
 <button class="btn btn-secondary btn-sm">
-    Vérifier
+    {{__ "twoFactor.verify_submit"}}
 </button>
 </form>
 
 <a href="/dp-2fa-recovery" class="btn btn-sm w-full">
-    Utiliser un code de récupération
+    {{__ "twoFactor.recovery_link"}}
 </a>
 
 <a href="/dp-login" class="link link-secondary text-sm">
-    Retour à la connexion
+    {{__ "twoFactor.back_login"}}
 </a>
 </div>

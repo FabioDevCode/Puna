@@ -7,30 +7,30 @@
     </div>
 
     <h2>
-        Code de récupération
+        {{__ "twoFactor.recovery_title"}}
     </h2>
 
     <p class="text-sm text-center">
-        Entrez l'un de vos codes de récupération à 8 caractères.
+        {{__ "twoFactor.recovery_subtitle"}}
     </p>
 
     <form action="/dp-2fa-recovery" method="post" class="flex flex-col gap-4 w-full">
         <input type="hidden" name="_csrf" value="{{csrfToken}}" />
     <label class="input input-sm input-bordered flex items-center gap-2">
         <i class="fas fa-life-ring" style="color: #6C7179; font-size: .8rem;"></i>
-        <input name="recovery_code" type="text" class="grow" placeholder="xxxx-xxxx" maxlength="9" required />
+        <input name="recovery_code" type="text" class="grow" placeholder="{{__ "twoFactor.recovery_placeholder"}}" maxlength="9" required />
 </label>
 
 <button class="btn btn-secondary btn-sm">
-    Vérifier
+    {{__ "twoFactor.recovery_submit"}}
 </button>
 </form>
 
 <a href="/dp-2fa-verify" class="btn btn-sm w-full">
-    Utiliser le code de l'application
+    {{__ "twoFactor.recovery_back_totp"}}
 </a>
 
 <a href="/dp-login" class="link link-secondary text-sm">
-    Retour à la connexion
+    {{__ "twoFactor.back_login"}}
 </a>
 </div>

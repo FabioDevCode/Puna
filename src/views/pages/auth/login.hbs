@@ -7,7 +7,7 @@
     </div>
 
     <h2>
-        Se connecter
+        {{__ "auth.login_title"}}
     </h2>
 
     <form action="/dp-connect" method="post" class="flex flex-col gap-4 w-full">
@@ -23,16 +23,16 @@
 </label>
 
 <button class="btn btn-secondary btn-sm">
-    Se connecter
+    {{__ "auth.login_submit"}}
 </button>
 
 <a href="/dp-first-connexion" class="btn btn-sm btn-wide self-center w-full">
-    Première connexion
+    {{__ "auth.first_login_link"}}
 </a>
 
 {{#if mailEnabled}}
     <a href='/dp-forgot-password' class='mt-2 link link-secondary text-sm self-center'>
-        Mot de passe oublié ?
+        {{__ "passwordReset.login_forgot_link"}}
     </a>
 {{/if}}
 </form>
