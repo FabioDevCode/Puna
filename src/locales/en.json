@@ -1,12 +1,4 @@
 {
-    "auth": {
-        "first_login_link": "First login",
-        "first_login_submit": "Confirm",
-        "first_login_title": "First login",
-        "login_link": "Log in",
-        "login_submit": "Log in",
-        "login_title": "Log in"
-    },
     "admin": {
         "anonymize": "Anonymize",
         "assigned_sites": "Assigned sites",
@@ -123,6 +115,14 @@
         "users_title": "Users",
         "your_password_placeholder": "Your password"
     },
+    "auth": {
+        "first_login_link": "First login",
+        "first_login_submit": "Confirm",
+        "first_login_title": "First login",
+        "login_link": "Log in",
+        "login_submit": "Log in",
+        "login_title": "Log in"
+    },
     "btn": {
         "apply": "Apply",
         "cancel": "Cancel",
@@ -135,24 +135,6 @@
         "save": "Save",
         "search": "Search"
     },
-    "error": {
-        "404_hint": "Check the URL or go back to the dashboard.",
-        "404_message": "This page does not exist or has been moved.",
-        "404_title": "Page not found",
-        "403_action": "Action:",
-        "403_allowed_roles": "Allowed roles:",
-        "403_entity": "Entity:",
-        "403_heading": "Forbidden",
-        "403_message": "You do not have the necessary permissions to access this resource.",
-        "403_title": "403 - Forbidden",
-        "403_your_role": "Your role:",
-        "500_hint": "The team has been notified. Try again in a few moments.",
-        "500_message": "An unexpected error occurred on the server.",
-        "500_title": "Server error",
-        "go_back": "← Back",
-        "return_dashboard": "Back to dashboard",
-        "return_to_home": "Back to home"
-    },
     "common": {
         "action_irreversible": "This action is irreversible.",
         "loading": "Loading…"
@@ -160,20 +142,42 @@
     "email": {
         "auto_footer": "Puna — This email was sent automatically, please do not reply."
     },
+    "error": {
+        "403_action": "Action:",
+        "403_allowed_roles": "Allowed roles:",
+        "403_entity": "Entity:",
+        "403_heading": "Forbidden",
+        "403_message": "You do not have the necessary permissions to access this resource.",
+        "403_title": "403 - Forbidden",
+        "403_your_role": "Your role:",
+        "404_hint": "Check the URL or go back to the dashboard.",
+        "404_message": "This page does not exist or has been moved.",
+        "404_title": "Page not found",
+        "500_hint": "The team has been notified. Try again in a few moments.",
+        "500_message": "An unexpected error occurred on the server.",
+        "500_title": "Server error",
+        "go_back": "← Back",
+        "return_dashboard": "Back to dashboard",
+        "return_to_home": "Back to home"
+    },
     "export": {
         "csv": "Export CSV",
         "excel": "Export Excel",
-        "header_email": "Email",
-        "header_login": "Login",
-        "header_role": "Role",
+        "header_created_at": "Created at",
         "header_created_by": "Created by",
+        "header_email": "Email",
         "header_enabled": "Enabled",
         "header_last_connection": "Last connection",
-        "header_created_at": "Created at",
-        "users_sheet": "Users",
+        "header_login": "Login",
+        "header_role": "Role",
+        "no": "No",
         "users_filename_prefix": "users_",
-        "yes": "Yes",
-        "no": "No"
+        "users_sheet": "Users",
+        "yes": "Yes"
+    },
+    "filter": {
+        "description": "Enter values to filter displayed columns (cumulative AND conditions).",
+        "title": "Filter entries"
     },
     "flash": {
         "2fa_already_enabled": "2FA is already enabled on your account.",
@@ -246,22 +250,12 @@
         "site_delete_error": "Error deleting site.",
         "site_deleted": "Site deleted successfully.",
         "site_domain_mismatch": "The domain name does not match.",
+        "status_anonymized": "Account not found.",
         "status_banned": "Your account has been banned.",
         "status_inactive": "Your account has been disabled. Contact an administrator.",
         "status_suspended": "Your account is suspended. Contact an administrator.",
-        "status_anonymized": "Account not found.",
         "unexpected_error": "Unexpected error",
         "wrong_password": "Incorrect password."
-    },
-    "permission": {
-        "create": "create",
-        "delete": "delete",
-        "read": "view",
-        "update": "edit"
-    },
-    "filter": {
-        "description": "Enter values to filter displayed columns (cumulative AND conditions).",
-        "title": "Filter entries"
     },
     "form": {
         "code_label": "CODE:",
@@ -297,8 +291,38 @@
         "site_label": "Site",
         "value": "Value"
     },
-    "modal": {
-        "confirm_delete": "Confirm deletion"
+    "js": {
+        "actions": "Actions",
+        "code_copied": "Code copied to clipboard.",
+        "code_copied_short": "Code copied",
+        "code_copy_error": "Error copying code.",
+        "codes_copied": "Codes copied to clipboard.",
+        "codes_copy_error": "Unable to copy codes. Please copy them manually.",
+        "columns_save_error": "Error saving columns.",
+        "count_format": "{{shown}} of {{total}}",
+        "data": "Data",
+        "date": "Date",
+        "entries_count": "{{count}} entry/entries",
+        "error": "Error",
+        "inbox_count_summary": "{{total}} over {{days}}d",
+        "loading_error": "Error loading",
+        "locale_code": "en-GB",
+        "locale_short": "en",
+        "network_error": "Network error",
+        "no_columns": "No columns available for this form.",
+        "no_data": "No data",
+        "no_filter_columns": "No columns available for filtering.",
+        "no_keys": "No keys defined for this form.",
+        "no_results": "No results",
+        "no_submissions": "No submissions yet",
+        "revoked": "Revoked",
+        "sites_deselected_role_change": "Sites have been deselected due to the role change",
+        "token_copied": "Token copied to clipboard.",
+        "token_copied_short": "Token copied",
+        "token_fetch_error": "Error retrieving token.",
+        "tokens_revoke_error": "Error revoking tokens.",
+        "tokens_revoked": "Tokens revoked successfully.",
+        "users_loading_error": "Error loading users."
     },
     "menu": {
         "administration": "Administration",
@@ -310,6 +334,9 @@
     },
     "misc": {
         "beta_version": "beta-0.0.1"
+    },
+    "modal": {
+        "confirm_delete": "Confirm deletion"
     },
     "password": {
         "instruct": "Password must contain at least:",
@@ -347,19 +374,25 @@
         "reset_title": "Reset password",
         "reset_token_invalid": "The reset link is invalid or has expired."
     },
+    "permission": {
+        "create": "create",
+        "delete": "delete",
+        "read": "view",
+        "update": "edit"
+    },
     "profile": {
-        "title": "My profile",
-        "info_title": "Account information",
-        "login_label": "Username",
-        "email_label": "Email",
-        "role_label": "Role",
-        "2fa_label": "Two-factor authentication",
-        "2fa_enabled": "Enabled",
         "2fa_disabled": "Not enabled",
-        "language_title": "Interface language",
-        "language_desc": "Choose the application display language.",
+        "2fa_enabled": "Enabled",
+        "2fa_label": "Two-factor authentication",
+        "email_label": "Email",
+        "info_title": "Account information",
         "invalid_locale": "Unsupported language.",
+        "language_desc": "Choose the application display language.",
+        "language_title": "Interface language",
         "locale_updated": "Language updated.",
+        "login_label": "Username",
+        "role_label": "Role",
+        "title": "My profile",
         "update_error": "Error updating profile."
     },
     "site": {
@@ -436,39 +469,6 @@
         "verify_submit": "Verify",
         "verify_subtitle": "Enter the 6-digit code displayed in your authenticator app.",
         "verify_title": "Two-step verification"
-    },
-    "js": {
-        "actions": "Actions",
-        "code_copied": "Code copied to clipboard.",
-        "code_copied_short": "Code copied",
-        "code_copy_error": "Error copying code.",
-        "codes_copied": "Codes copied to clipboard.",
-        "codes_copy_error": "Unable to copy codes. Please copy them manually.",
-        "columns_save_error": "Error saving columns.",
-        "count_format": "{{shown}} of {{total}}",
-        "data": "Data",
-        "date": "Date",
-        "entries_count": "{{count}} entry/entries",
-        "error": "Error",
-        "inbox_count_summary": "{{total}} over {{days}}d",
-        "loading_error": "Error loading",
-        "locale_code": "en-GB",
-        "locale_short": "en",
-        "network_error": "Network error",
-        "no_columns": "No columns available for this form.",
-        "no_data": "No data",
-        "no_filter_columns": "No columns available for filtering.",
-        "no_keys": "No keys defined for this form.",
-        "no_results": "No results",
-        "no_submissions": "No submissions yet",
-        "revoked": "Revoked",
-        "sites_deselected_role_change": "Sites have been deselected due to the role change",
-        "token_copied": "Token copied to clipboard.",
-        "token_copied_short": "Token copied",
-        "token_fetch_error": "Error retrieving token.",
-        "tokens_revoke_error": "Error revoking tokens.",
-        "tokens_revoked": "Tokens revoked successfully.",
-        "users_loading_error": "Error loading users."
     },
     "validation": {
         "domain_invalid_format": "Invalid domain format (e.g. example.com).",

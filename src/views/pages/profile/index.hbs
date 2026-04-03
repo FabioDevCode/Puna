@@ -1,40 +1,48 @@
-<div class="flex flex-col gap-6 p-6 max-w-2xl">
-    <h3 class="font-inter">{{__ "profile.title"}}</h3>
+{{#slot "title"}}
+    <h3 class="font-inter truncate ellipsis-truncate title-max-w mt-[6px]">
+        {{__ "profile.title"}}
+    </h3>
+{{/slot}}
 
+<div class="col-span-2 md:col-span-6 lg:col-span-6">
     <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-base">{{__ "profile.info_title"}}</h2>
+        <div class="card-body p-6">
+            <h2 class="card-title text-base font-semibold">{{__ "profile.info_title"}}</h2>
 
-            <div class="grid grid-cols-2 gap-4 mt-2">
+            <div class="grid grid-cols-3 gap-4 mt-2 py-1">
                 <div>
                     <span class="text-sm text-gray-500">{{__ "profile.login_label"}}</span>
-                    <p class="font-medium">{{user.login}}</p>
-                </div>
-                <div>
-                    <span class="text-sm text-gray-500">{{__ "profile.email_label"}}</span>
-                    <p class="font-medium">{{#if user.email}}{{user.email}}{{else}}-{{/if}}</p>
+                    <p class="font-medium mb-1">
+                        {{user.login}}
+                    </p>
                 </div>
                 <div>
                     <span class="text-sm text-gray-500">{{__ "profile.role_label"}}</span>
-                    <p><span class="badge_role badge_{{user.role}}">{{user.role}}</span></p>
+                    <p class="mb-1">
+                        <span class="badge badge-outline badge_role badge-lg badge_{{user.role}}">
+                            {{user.role}}
+                        </span>
+                    </p>
                 </div>
                 <div>
                     <span class="text-sm text-gray-500">{{__ "profile.2fa_label"}}</span>
-                    <p class="font-medium">
+                    <p class="font-medium mb-1">
                         {{#if user.totp_enabled}}
                             <span class="badge badge-success badge-sm">{{__ "profile.2fa_enabled"}}</span>
                         {{else}}
-                            <span class="badge badge-warning badge-sm">{{__ "profile.2fa_disabled"}}</span>
+                            <span class="badge badge-error badge-sm">{{__ "profile.2fa_disabled"}}</span>
                         {{/if}}
                     </p>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
+<div class="col-span-2 md:col-span-6 lg:col-span-6">
     <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-base">{{__ "profile.language_title"}}</h2>
+        <div class="card-body p-6">
+            <h2 class="card-title text-base font-semibold">{{__ "profile.language_title"}}</h2>
             <p class="text-sm text-gray-500 mb-2">{{__ "profile.language_desc"}}</p>
 
             <form action="/profile/locale" method="post">
