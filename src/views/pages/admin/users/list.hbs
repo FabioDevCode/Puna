@@ -1,6 +1,6 @@
 {{#slot "title"}}
     <div class="flex items-center gap-4">
-        <h3 class="font-inter">Utilisateurs</h3>
+        <h3 class="font-inter">{{__ "admin.users_title"}}</h3>
     </div>
 {{/slot}}
 
@@ -10,7 +10,7 @@
         {{#actionCan entity='user' action='create'}}
             <button id="btn-create-user" class="btn btn-sm btn-secondary gap-2">
                 <i class="fa-solid fa-plus"></i>
-                Nouvel utilisateur
+                {{__ "admin.users_new"}}
             </button>
         {{/actionCan}}
     {{/roleIs}}
@@ -49,12 +49,12 @@
                             <button id="exportExcelBtn"
                             class="btn btn-sm bg-green-700 text-white border-green-700 hover:bg-green-800 hover:text-white hover:border-green-700 transition-colors">
                                 <i class="fa-solid fa-file-excel"></i>
-                                <span class="hidden md:flex">Exporter un Excel</span>
+                                <span class="hidden md:flex">{{__ "admin.users_export_excel"}}</span>
                             </button>
                             <button id="exportCSVBtn"
                             class="btn btn-sm bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:text-white hover:border-blue-600 transition-colors">
                                 <i class="fa-solid fa-file-csv"></i>
-                                <span class="hidden md:flex">Exporter un CSV</span>
+                                <span class="hidden md:flex">{{__ "admin.users_export_csv"}}</span>
                             </button>
                         </div>
 
@@ -65,13 +65,13 @@
                                 <option value="auto" selected>Auto</option>
                                 <option value="login">Login</option>
                                 <option value="email">Email</option>
-                                <option value="role">Rôle</option>
-                                <option value="created_by">Créé par</option>
+                                <option value="role">{{__ "admin.users_col_role"}}</option>
+                                <option value="created_by">{{__ "admin.users_created_by"}}</option>
                             </select>
 
                             <!-- Input de recherche -->
                             <div class="relative">
-                                <input type="text" id="searchInput" placeholder="Rechercher..."
+                                <input type="text" id="searchInput" placeholder="{{__ "admin.users_search_placeholder"}}"
                                 class="input input-sm input-bordered w-full md:w-64 pr-8">
                                 <button id="clearSearch"
                                 class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-content hover:text-neutral hidden">
@@ -89,14 +89,14 @@
                 <table class="table w-full table-pin-cols">
                     <thead id="users_table_head" class="text-[14px] bg-base-200">
                         <tr>
-                            <th>Login</th>
-                            <th>Statut</th>
-                            <th>Email</th>
-                            <th>Dernière connexion</th>
-                            <th>Rôle</th>
-                            <th>Créé par</th>
-                            <th>Créé le</th>
-                            <th class="text-right">Actions</th>
+                            <th>{{__ "admin.users_col_login"}}</th>
+                            <th>{{__ "admin.users_col_status"}}</th>
+                            <th>{{__ "admin.users_col_email"}}</th>
+                            <th>{{__ "admin.users_col_last_connection"}}</th>
+                            <th>{{__ "admin.users_col_role"}}</th>
+                            <th>{{__ "admin.users_col_created_by"}}</th>
+                            <th>{{__ "admin.users_col_created_at"}}</th>
+                            <th class="text-right">{{__ "admin.users_col_actions"}}</th>
                         </tr>
                     </thead>
                     <tbody id="users_table_body">
@@ -110,7 +110,7 @@
             class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4">
                 <i class="fa-solid fa-spinner fa-spin text-5xl text-neutral-content"></i>
                 <p class="text-sm text-neutral text-center select-none">
-                    Chargement des utilisateurs...
+                    {{__ "admin.users_loading"}}
                 </p>
             </div>
 
@@ -119,7 +119,7 @@
             class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4 none">
                 <i class="fa-solid fa-users text-5xl text-neutral-content"></i>
                 <p class="text-sm text-neutral text-center select-none">
-                    Aucun utilisateur trouvé
+                    {{__ "admin.users_empty"}}
                 </p>
             </div>
         </div>

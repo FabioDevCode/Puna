@@ -3,7 +3,7 @@
         <a href="/admin/users" class="btn btn-outline btn-sm">
             <i class="fa-solid fa-arrow-left"></i>
         </a>
-        <h3 class="font-inter">Détails utilisateur</h3>
+        <h3 class="font-inter">{{__ "admin.user_view_title"}}</h3>
     </div>
 {{/slot}}
 
@@ -14,7 +14,7 @@
                 <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-warning">
                     <i class="fa-solid fa-pen-to-square"></i>
                     <span class="hidden md:flex">
-                        Modifier l'utilisateur
+                        {{__ "admin.user_btn_edit"}}
                     </span>
                 </a>
             {{/unless}}
@@ -27,7 +27,7 @@
                     <a href="/admin/users/{{user.id}}/edit" class="btn btn-sm btn-warning">
                         <i class="fa-solid fa-pen-to-square"></i>
                         <span class="hidden md:flex">
-                            Modifier l'utilisateur
+                            {{__ "admin.user_btn_edit"}}
                         </span>
                     </a>
                 {{/unless}}
@@ -41,7 +41,7 @@
             data-user-id="{{user.id}}" data-user-login="{{user.login}}">
                 <i class="far fa-trash-alt"></i>
                 <span class="hidden md:flex">
-                    Supprimer cet utilisateur
+                    {{__ "admin.user_btn_delete"}}
                 </span>
             </button>
         {{/actionCan}}
@@ -99,21 +99,21 @@
 
                     <div class="w-full flex justify-between items-center text-sm mt-3">
                         <span class="text-base-content/50 font-medium">
-                            Dernière connexion
+                            {{__ "admin.user_last_connection"}}
                         </span>
                         <span class="font-semibold text-base-content/80">
                             {{#if user.last_connection}}
                                 {{user.last_connection}}
                             {{else}}
                                 <span class="italic text-base-content/40">
-                                    Jamais
+                                    {{__ "admin.user_never"}}
                                 </span>
                             {{/if}}
                         </span>
                     </div>
                     <div class="w-full flex justify-between items-center text-sm mt-3">
                         <span class="text-base-content/50 font-medium">
-                            Création
+                            {{__ "admin.user_creation"}}
                         </span>
                         <span class="font-semibold text-base-content/80">
                             {{user.createdAt}}
@@ -129,13 +129,13 @@
             <div class="card bg-base-100 shadow-xl border border-base-200">
                 <div class="card-body p-6">
                     <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
-                        Informations du compte
+                        {{__ "admin.user_account_info"}}
                     </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
                         <div class="group">
                             <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
-                                Identifiant (Login)
+                                {{__ "admin.user_label_login"}}
                             </span>
                             <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
                                 {{user.login}}
@@ -143,7 +143,7 @@
                         </div>
                         <div class="group">
                             <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
-                                Adresse Email
+                                {{__ "admin.user_label_email"}}
                             </span>
                             <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200">
                                 {{#if user.email}}
@@ -155,7 +155,7 @@
                         </div>
                         <div class="group">
                             <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
-                                Rôle Système
+                                {{__ "admin.user_label_role"}}
                             </span>
                             <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
                                 {{user.role}}
@@ -163,13 +163,13 @@
                         </div>
                         <div class="group">
                             <span class="block text-[11px] font-bold text-base-content/50 uppercase tracking-widest mb-2">
-                                Créé par
+                                {{__ "admin.user_label_created_by"}}
                             </span>
                             <div class="bg-base-200/50 group-hover:bg-base-200/80 transition-colors rounded-lg px-4 py-3.5 font-semibold text-base-content text-sm border border-base-200 flex items-center gap-2">
                                 {{#if user.creator}}
                                     {{user.creator.login}}
                                 {{else}}
-                                    <span class="italic text-base-content/40">Système</span>
+                                    <span class="italic text-base-content/40">{{__ "admin.user_system"}}</span>
                                 {{/if}}
                             </div>
                         </div>
@@ -182,13 +182,13 @@
         <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
             <div class="card-body p-6">
                 <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
-                    Sites assignés
+                    {{__ "admin.user_assigned_sites"}}
                 </h3>
 
                 {{#if (eq user.role "super_admin")}}
                     <div class="flex flex-col items-center justify-center p-6 bg-neutral/10 rounded-lg border border-neutral">
                         <p class="text-neutral text-md font-medium text-center">
-                            Un <b>super_admin</b> accède à tous les sites web.
+                            {{{__ "admin.user_superadmin_all_sites"}}}
                         </p>
                     </div>
                 {{else}}
@@ -213,10 +213,10 @@
                                 <i class="fa-solid fa-link-slash"></i>
                             </div>
                             <h4 class="text-base-content/80 font-bold mb-1">
-                                Aucun site assigné
+                                {{__ "admin.user_no_assigned_sites"}}
                             </h4>
                             <p class="text-base-content/50 text-sm font-medium text-center">
-                                Cet utilisateur n'a pas encore accès à des sites web.
+                                {{__ "admin.user_no_sites_desc"}}
                             </p>
                         </div>
                     {{/if}}
