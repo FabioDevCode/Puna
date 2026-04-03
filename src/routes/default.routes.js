@@ -6,6 +6,7 @@ import * as exportCtl from '../controllers/export.controller.js';
 import * as formCtl from '../controllers/form.controller.js';
 import * as inboxCtl from '../controllers/inbox.controller.js';
 import * as passwordResetCtl from '../controllers/passwordReset.controller.js';
+import * as profileCtl from '../controllers/profile.controller.js';
 import * as siteCtl from '../controllers/site.controller.js';
 import * as twoFactorCtl from '../controllers/twoFactor.controller.js';
 import { requireAuth, isConnectDash, requirePending2FA } from '../helpers/authHelper.js';
@@ -53,6 +54,9 @@ router.post('/dp-2fa-disable', requireAuth, twoFaConfigRateLimiter, twoFactorCtl
 router.post('/dp-2fa-regenerate', requireAuth, twoFaConfigRateLimiter, twoFactorCtl.dp2faRegeneratePost);
 
 router.get('/dashboard', requireAuth, dashboardCtl.dashboard);
+
+router.get('/profile', requireAuth, profileCtl.profilePage);
+router.post('/profile/locale', requireAuth, profileCtl.updateLocale);
 
 router.get('/stats/inbox-counts', requireAuth, dashboardCtl.getInboxCounts);
 router.get('/stats/inbox-heatmap', requireAuth, dashboardCtl.getInboxHeatmap);

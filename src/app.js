@@ -50,7 +50,7 @@ app.use('/api', cors(corsApiPublic));
 app.set('trust proxy', 1);
 
 i18n.configure({
-    locales: ['fr'],
+    locales: ['fr', 'en'],
     defaultLocale: 'fr',
     directory: `${__dirname}/locales`,
     cookie: 'lang',
@@ -151,6 +151,15 @@ app.use(flashMessages);
 // injectUserRole APRÈS session et passport
 app.use(injectUserRole);
 
+// Locale utilisateur
+app.use((req, res, next) => {
+    if (req.session?.user?.locale) {
+        req.setLocale(req.session.user.locale);
+        res.setLocale(req.session.user.locale);
+    }
+    next();
+});
+
 // Protection CSRF - doit être après session, cookieParser et passport
 app.use(csrfProtection);
 app.use(csrfTokenInjector);
@@ -165,6 +174,12 @@ app.use((req, res, next) => {
 // Inject mailEnabled into all templates
 app.use((req, res, next) => {
     res.locals.mailEnabled = mailEnabled;
+    next();
+});
+
+// Injecter les traductions JS client dans les locals
+app.use((req, res, next) => {
+    res.locals.clientI18n = JSON.stringify(res.__('js') || {});
     next();
 });
 
