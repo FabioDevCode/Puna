@@ -218,6 +218,12 @@ function buildTestApp() {
     app.use(flashMessages);
     app.use(injectUserRole);
 
+    // Stub i18n: add req.__ to every request (i18n.init is not wired in the test app)
+    app.use((req, _res, next) => {
+        req.__ = (key) => key;
+        next();
+    });
+
     // Stub res.render
     app.use((_req, res, next) => {
         res.render = (view) => {

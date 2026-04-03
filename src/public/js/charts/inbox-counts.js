@@ -70,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = resp.data || [];
         const total = data.reduce((sum, v) => sum + v, 0);
         if (totalEl) {
-            totalEl.textContent = `${total} sur ${days}j`;
+            const fmt = (window.__i18n && window.__i18n.inbox_count_summary) || '{{total}} sur {{days}}j';
+            totalEl.textContent = fmt.replace('{{total}}', total).replace('{{days}}', days);
         }
         renderChart(resp.labels || [], data);
     }

@@ -35,12 +35,12 @@ export const dp2faVerifyPost = async (req, res) => {
         const user = await models.User.findByPk(pending.userId);
 
         if (!user || !user.totp_enabled || !user.totp_secret) {
-            res.flash('error', 'Erreur de configuration 2FA.');
+            res.flash('error', req.__('flash.2fa_config_error'));
             return res.redirect('/dp-login');
         }
 
         if (!totp_code || typeof totp_code !== 'string' || !/^\d{6}$/.test(totp_code)) {
-            res.flash('error', 'Code invalide. Veuillez réessayer.');
+            res.flash('error', req.__('flash.2fa_invalid_code'));
             return res.redirect('/dp-2fa-verify');
         }
 
@@ -52,7 +52,7 @@ export const dp2faVerifyPost = async (req, res) => {
                 ip: req.ip,
                 reason: 'invalid_totp_code',
             });
-            res.flash('error', 'Code invalide. Veuillez réessayer.');
+            res.flash('error', req.__('flash.2fa_invalid_code'));
             return res.redirect('/dp-2fa-verify');
         }
 
@@ -79,7 +79,7 @@ export const dp2faVerifyPost = async (req, res) => {
         return res.redirect('/dashboard');
     } catch (err) {
         errorLogger.error({ err, userId: pending.userId }, '2FA verify error');
-        res.flash('error', 'Erreur lors de la vérification.');
+        res.flash('error', req.__('flash.2fa_verification_error'));
         return res.redirect('/dp-2fa-verify');
     }
 };
@@ -106,12 +106,12 @@ export const dp2faRecoveryPost = async (req, res) => {
         const user = await models.User.findByPk(pending.userId);
 
         if (!user || !user.totp_enabled || !user.totp_backup_codes) {
-            res.flash('error', 'Erreur de configuration 2FA.');
+            res.flash('error', req.__('flash.2fa_config_error'));
             return res.redirect('/dp-login');
         }
 
         if (!recovery_code || typeof recovery_code !== 'string' || recovery_code.trim() === '') {
-            res.flash('error', 'Code de récupération invalide.');
+            res.flash('error', req.__('flash.2fa_invalid_recovery'));
             return res.redirect('/dp-2fa-recovery');
         }
 
@@ -124,7 +124,7 @@ export const dp2faRecoveryPost = async (req, res) => {
                 login: pending.login,
                 ip: req.ip,
             });
-            res.flash('error', 'Code de récupération invalide.');
+            res.flash('error', req.__('flash.2fa_invalid_recovery'));
             return res.redirect('/dp-2fa-recovery');
         }
 
@@ -152,15 +152,15 @@ export const dp2faRecoveryPost = async (req, res) => {
 
         // Avertir l'utilisateur du nombre de codes restants
         if (result.remainingCount === 0) {
-            res.flash('warning', 'Dernier code de récupération utilisé ! Régénérez vos codes dans les paramètres.');
+            res.flash('warning', req.__('flash.2fa_last_recovery_used'));
         } else {
-            res.flash('success', `Connexion réussie. Il vous reste ${result.remainingCount} code(s) de récupération.`);
+            res.flash('success', req.__('flash.2fa_login_remaining', { count: result.remainingCount }));
         }
 
         return res.redirect('/dashboard');
     } catch (err) {
         errorLogger.error({ err, userId: pending.userId }, '2FA recovery error');
-        res.flash('error', 'Erreur lors de la vérification.');
+        res.flash('error', req.__('flash.2fa_verification_error'));
         return res.redirect('/dp-2fa-recovery');
     }
 };
@@ -176,7 +176,7 @@ export const dp2faSetupGet = async (req, res) => {
         const status = await getTotpStatus(user.id);
 
         if (status.enabled) {
-            res.flash('info', 'La 2FA est déjà activée sur votre compte.');
+            res.flash('info', req.__('flash.2fa_already_enabled'));
             return res.redirect('/dashboard');
         }
 
@@ -193,7 +193,7 @@ export const dp2faSetupGet = async (req, res) => {
         return res.render('auth/two-factor-setup', { layout: 'auth', qrCodeDataUrl, manualKey: secret });
     } catch (err) {
         errorLogger.error({ err, userId: user.id }, '2FA setup GET error');
-        res.flash('error', 'Erreur de configuration 2FA.');
+        res.flash('error', req.__('flash.2fa_config_error'));
         return res.redirect('/dashboard');
     }
 };
@@ -207,12 +207,12 @@ export const dp2faSetupPost = async (req, res) => {
     const tempSecret = req.session.totp_temp_secret;
 
     if (!tempSecret) {
-        res.flash('error', 'Session expirée. Veuillez recommencer la configuration.');
+        res.flash('error', req.__('flash.2fa_session_expired'));
         return res.redirect('/dp-2fa-setup');
     }
 
     if (!totp_code || typeof totp_code !== 'string' || !/^\d{6}$/.test(totp_code)) {
-        res.flash('error', 'Code invalide. Scannez le QR code et réessayez.');
+        res.flash('error', req.__('flash.2fa_invalid_qr_code'));
         return res.redirect('/dp-2fa-setup');
     }
 
@@ -229,12 +229,12 @@ export const dp2faSetupPost = async (req, res) => {
         });
 
         if (totp.validate({ token: totp_code, window: 1 }) === null) {
-            res.flash('error', 'Code invalide. Scannez le QR code et réessayez.');
+            res.flash('error', req.__('flash.2fa_invalid_qr_code'));
             return res.redirect('/dp-2fa-setup');
         }
     } catch (err) {
         errorLogger.error({ err, userId: user.id }, '2FA TOTP validation error');
-        res.flash('error', 'Code invalide. Scannez le QR code et réessayez.');
+        res.flash('error', req.__('flash.2fa_invalid_qr_code'));
         return res.redirect('/dp-2fa-setup');
     }
 
@@ -252,11 +252,11 @@ export const dp2faSetupPost = async (req, res) => {
             ip: req.ip,
         });
 
-        res.flash('success', 'Authentification à deux facteurs activée !');
+        res.flash('success', req.__('flash.2fa_enabled'));
         return res.redirect('/dp-2fa-backup-codes');
     } catch (err) {
         errorLogger.error({ err, userId: user.id }, '2FA setup POST error');
-        res.flash('error', "Erreur lors de l'activation de la 2FA.");
+        res.flash('error', req.__('flash.2fa_enable_error'));
         return res.redirect('/dp-2fa-setup');
     }
 };
@@ -286,14 +286,14 @@ export const dp2faDisablePost = async (req, res) => {
         const dbUser = await models.User.findByPk(user.id);
 
         if (!dbUser) {
-            res.flash('error', 'Erreur de configuration 2FA.');
+            res.flash('error', req.__('flash.2fa_config_error'));
             return res.redirect('/dashboard');
         }
 
         const isValid = await verifyPassword(password, dbUser.password);
 
         if (!isValid) {
-            res.flash('error', 'Mot de passe incorrect.');
+            res.flash('error', req.__('flash.wrong_password'));
             return res.redirect('/dashboard');
         }
 
@@ -306,11 +306,11 @@ export const dp2faDisablePost = async (req, res) => {
             ip: req.ip,
         });
 
-        res.flash('success', 'Authentification à deux facteurs désactivée.');
+        res.flash('success', req.__('flash.2fa_disabled'));
         return res.redirect('/dashboard');
     } catch (err) {
         errorLogger.error({ err, userId: user.id }, '2FA disable error');
-        res.flash('error', 'Erreur lors de la désactivation de la 2FA.');
+        res.flash('error', req.__('flash.2fa_disable_error'));
         return res.redirect('/dashboard');
     }
 };
@@ -326,14 +326,14 @@ export const dp2faRegeneratePost = async (req, res) => {
         const dbUser = await models.User.findByPk(user.id);
 
         if (!dbUser) {
-            res.flash('error', 'Erreur de configuration 2FA.');
+            res.flash('error', req.__('flash.2fa_config_error'));
             return res.redirect('/dashboard');
         }
 
         const isValid = await verifyPassword(password, dbUser.password);
 
         if (!isValid) {
-            res.flash('error', 'Mot de passe incorrect.');
+            res.flash('error', req.__('flash.wrong_password'));
             return res.redirect('/dashboard');
         }
 
@@ -347,11 +347,11 @@ export const dp2faRegeneratePost = async (req, res) => {
             ip: req.ip,
         });
 
-        res.flash('success', 'Codes de récupération régénérés.');
+        res.flash('success', req.__('flash.2fa_codes_regenerated'));
         return res.redirect('/dp-2fa-backup-codes');
     } catch (err) {
         errorLogger.error({ err, userId: user.id }, '2FA regenerate error');
-        res.flash('error', 'Erreur lors de la régénération des codes.');
+        res.flash('error', req.__('flash.2fa_codes_regen_error'));
         return res.redirect('/dashboard');
     }
 };

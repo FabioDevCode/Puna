@@ -57,10 +57,10 @@ export const createSite = async (req, res) => {
             },
             userId
         );
-        res.flash('success', 'Site créé avec succès.');
+        res.flash('success', req.__('flash.site_created'));
         return res.redirect(`/site/${site.id}/view`);
     } catch (_err) {
-        res.flash('error', 'Erreur lors de la création du site.');
+        res.flash('error', req.__('flash.site_create_error'));
         return res.redirect('/site/all');
     }
 };
@@ -106,14 +106,14 @@ export const deleteSite = async (req, res) => {
         const result = await deleteSiteWithForms(siteId, userId, userRole, confirm_domain);
 
         if (result.success) {
-            res.flash('success', 'Site supprimé avec succès.');
+            res.flash('success', req.__('flash.site_deleted'));
             return res.redirect('/site/all');
         } else {
-            res.flash('warning', result.error || 'Le nom de domaine ne correspond pas.');
+            res.flash('warning', result.error || req.__('flash.site_domain_mismatch'));
             return res.redirect(`/site/${siteId}/view`);
         }
     } catch (_err) {
-        res.flash('error', 'Erreur lors de la suppression du site.');
+        res.flash('error', req.__('flash.site_delete_error'));
         return res.redirect('/dashboard');
     }
 };

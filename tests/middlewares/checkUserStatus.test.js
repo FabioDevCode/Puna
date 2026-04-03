@@ -37,6 +37,7 @@ function makeRes() {
     return {
         flash: vi.fn(),
         redirect: vi.fn(),
+        __: (key) => key,
     };
 }
 
@@ -73,7 +74,7 @@ describe('checkUserStatus middleware', () => {
         expect(next).not.toHaveBeenCalled();
         expect(req.session.destroy).toHaveBeenCalledOnce();
         expect(res.redirect).toHaveBeenCalledWith('/dp-login');
-        expect(res.flash).toHaveBeenCalledWith('error', 'Votre compte a été désactivé. Contactez un administrateur.');
+        expect(res.flash).toHaveBeenCalledWith('error', 'flash.status_inactive');
     });
 
     it('destroys session and redirects when status is suspended', async () => {
@@ -87,7 +88,7 @@ describe('checkUserStatus middleware', () => {
         expect(next).not.toHaveBeenCalled();
         expect(req.session.destroy).toHaveBeenCalledOnce();
         expect(res.redirect).toHaveBeenCalledWith('/dp-login');
-        expect(res.flash).toHaveBeenCalledWith('error', 'Votre compte est suspendu. Contactez un administrateur.');
+        expect(res.flash).toHaveBeenCalledWith('error', 'flash.status_suspended');
     });
 
     it('destroys session and redirects when status is banned', async () => {
@@ -101,7 +102,7 @@ describe('checkUserStatus middleware', () => {
         expect(next).not.toHaveBeenCalled();
         expect(req.session.destroy).toHaveBeenCalledOnce();
         expect(res.redirect).toHaveBeenCalledWith('/dp-login');
-        expect(res.flash).toHaveBeenCalledWith('error', 'Votre compte a été banni.');
+        expect(res.flash).toHaveBeenCalledWith('error', 'flash.status_banned');
     });
 
     it('destroys session and redirects when status is anonymized', async () => {
@@ -115,7 +116,7 @@ describe('checkUserStatus middleware', () => {
         expect(next).not.toHaveBeenCalled();
         expect(req.session.destroy).toHaveBeenCalledOnce();
         expect(res.redirect).toHaveBeenCalledWith('/dp-login');
-        expect(res.flash).toHaveBeenCalledWith('error', 'Compte introuvable.');
+        expect(res.flash).toHaveBeenCalledWith('error', 'flash.status_anonymized');
     });
 
     it('destroys session and redirects when user does not exist in DB (null status)', async () => {
@@ -129,7 +130,7 @@ describe('checkUserStatus middleware', () => {
         expect(next).not.toHaveBeenCalled();
         expect(req.session.destroy).toHaveBeenCalledOnce();
         expect(res.redirect).toHaveBeenCalledWith('/dp-login');
-        expect(res.flash).toHaveBeenCalledWith('error', 'Compte introuvable.');
+        expect(res.flash).toHaveBeenCalledWith('error', 'flash.status_anonymized');
     });
 
     it('skips DB check and calls next() when statusCheckedAt is recent (cache TTL)', async () => {

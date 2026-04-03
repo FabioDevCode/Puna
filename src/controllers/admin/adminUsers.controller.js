@@ -73,7 +73,7 @@ export const adminUsersList = async (req, res) => {
         });
     } catch (err) {
         errorLogger.error({ err }, 'adminUsersList error');
-        res.status(500).json({ error: 'Erreur serveur' });
+        res.status(500).json({ error: req.__('flash.server_error') });
     }
 };
 
@@ -90,17 +90,17 @@ export const adminUsersExportExcel = async (req, res) => {
         // Créer le workbook Excel
         const ExcelJS = (await import('exceljs')).default;
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Utilisateurs');
+        const worksheet = workbook.addWorksheet(req.__('export.users_sheet'));
 
         // Définir les colonnes
         worksheet.columns = [
-            { header: 'Email', key: 'email', width: 30 },
-            { header: 'Login', key: 'login', width: 20 },
-            { header: 'Rôle', key: 'role', width: 15 },
-            { header: 'Créé par', key: 'created_by', width: 20 },
-            { header: 'Activé', key: 'enabled', width: 10 },
-            { header: 'Dernière connexion', key: 'last_connection', width: 20 },
-            { header: 'Créé le', key: 'createdAt', width: 20 },
+            { header: req.__('export.header_email'), key: 'email', width: 30 },
+            { header: req.__('export.header_login'), key: 'login', width: 20 },
+            { header: req.__('export.header_role'), key: 'role', width: 15 },
+            { header: req.__('export.header_created_by'), key: 'created_by', width: 20 },
+            { header: req.__('export.header_enabled'), key: 'enabled', width: 10 },
+            { header: req.__('export.header_last_connection'), key: 'last_connection', width: 20 },
+            { header: req.__('export.header_created_at'), key: 'createdAt', width: 20 },
         ];
 
         // Style des en-têtes
@@ -114,14 +114,14 @@ export const adminUsersExportExcel = async (req, res) => {
                 login: user.login,
                 role: user.role || 'N/A',
                 created_by: user.creator ? user.creator.login : 'N/A',
-                enabled: user.enabled ? 'Oui' : 'Non',
+                enabled: user.enabled ? req.__('export.yes') : req.__('export.no'),
                 last_connection: user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
                 createdAt: dayjs(user.createdAt).format('YYYY-MM-DD HH:mm'),
             });
         });
 
         // Générer le fichier
-        const fileName = `utilisateurs_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.xlsx`;
+        const fileName = `${req.__('export.users_filename_prefix')}${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.xlsx`;
 
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
@@ -130,7 +130,7 @@ export const adminUsersExportExcel = async (req, res) => {
         res.end();
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUsersExportExcel error');
-        res.status(500).json({ error: "Erreur lors de l'export" });
+        res.status(500).json({ error: req.__('flash.export_error') });
     }
 };
 
@@ -146,10 +146,21 @@ export const adminUsersExportCSV = async (req, res) => {
 
         // Générer le CSV via le service d'export
         const { generateUsersCSV } = await import('../../services/export.service.js');
-        const csvData = await generateUsersCSV(users);
+        const labels = {
+            email: req.__('export.header_email'),
+            login: req.__('export.header_login'),
+            role: req.__('export.header_role'),
+            created_by: req.__('export.header_created_by'),
+            enabled: req.__('export.header_enabled'),
+            last_connection: req.__('export.header_last_connection'),
+            created_at: req.__('export.header_created_at'),
+            yes: req.__('export.yes'),
+            no: req.__('export.no'),
+        };
+        const csvData = await generateUsersCSV(users, labels);
 
         // Générer le fichier
-        const fileName = `utilisateurs_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.csv`;
+        const fileName = `${req.__('export.users_filename_prefix')}${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.csv`;
 
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
@@ -162,7 +173,7 @@ export const adminUsersExportCSV = async (req, res) => {
         res.end();
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUsersExportCSV error');
-        res.status(500).json({ error: "Erreur lors de l'export" });
+        res.status(500).json({ error: req.__('flash.export_error') });
     }
 };
 
@@ -176,14 +187,14 @@ export const adminCreateUser = async (req, res) => {
 
         // Validation basique
         if (!login || !email || !role) {
-            res.flash('warning', 'Veuillez remplir tous les champs obligatoires.');
+            res.flash('warning', req.__('flash.admin_fields_required'));
             return res.redirect('/admin/users');
         }
 
         // Vérifier si l'utilisateur existe déjà via le service
         const exists = await userExists(email, login);
         if (exists) {
-            res.flash('error', 'Un utilisateur avec cet email ou login existe déjà.');
+            res.flash('error', req.__('flash.admin_user_exists'));
             return res.redirect('/admin/users');
         }
 
@@ -202,11 +213,11 @@ export const adminCreateUser = async (req, res) => {
             await assignUserToSites(newUser.id, siteIds);
         }
 
-        res.flash('success', 'Utilisateur créé avec succès.');
+        res.flash('success', req.__('flash.admin_user_created'));
         res.redirect('/admin/users');
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminCreateUser error');
-        res.flash('error', "Erreur lors de la création de l'utilisateur.");
+        res.flash('error', req.__('flash.admin_user_create_error'));
         res.redirect('/admin/users');
     }
 };
@@ -221,31 +232,31 @@ export const adminDeleteUser = async (req, res) => {
 
         // Validation basique
         if (!user_id || !password) {
-            res.flash('warning', 'Données manquantes pour la suppression.');
+            res.flash('warning', req.__('flash.admin_delete_data_missing'));
             return res.redirect('/admin/users');
         }
 
         // Vérifier le mot de passe de l'utilisateur connecté
         const currentUser = await models.User.findByPk(currentUserId);
         if (!currentUser) {
-            res.flash('error', 'Session invalide.');
+            res.flash('error', req.__('flash.session_invalid'));
             return res.redirect('/admin/users');
         }
 
         const isPasswordValid = await verifyPassword(password, currentUser.password);
         if (!isPasswordValid) {
-            res.flash('error', 'Mot de passe incorrect.');
+            res.flash('error', req.__('flash.wrong_password'));
             return res.redirect('/admin/users');
         }
 
         // Supprimer l'utilisateur et ses relations via le service
         await deleteUserWithRelations(user_id);
 
-        res.flash('success', 'Utilisateur supprimé.');
+        res.flash('success', req.__('flash.admin_user_deleted'));
         res.redirect('/admin/users');
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminDeleteUser error');
-        res.flash('error', "Erreur lors de la suppression de l'utilisateur.");
+        res.flash('error', req.__('flash.admin_user_delete_error'));
         res.redirect('/admin/users');
     }
 };
@@ -296,7 +307,7 @@ export const adminEditUser = async (req, res) => {
 
         // Un owner ne peut pas modifier un super_admin
         if (currentUserRole === 'owner' && user.role === 'super_admin') {
-            res.flash('error', 'Vous ne pouvez pas modifier un super administrateur.');
+            res.flash('error', req.__('flash.admin_cannot_edit_superadmin'));
             return res.redirect(`/admin/users/${userId}/view`);
         }
 
@@ -337,7 +348,7 @@ export const adminUpdateUser = async (req, res) => {
         // Un owner ne peut pas modifier un super_admin
         const targetUser = await getUserWithRelations(userId);
         if (targetUser && currentUserRole === 'owner' && targetUser.role === 'super_admin') {
-            res.flash('error', 'Vous ne pouvez pas modifier un super administrateur.');
+            res.flash('error', req.__('flash.admin_cannot_edit_superadmin'));
             return res.redirect(`/admin/users/${userId}/view`);
         }
 
@@ -345,11 +356,11 @@ export const adminUpdateUser = async (req, res) => {
         const siteIds = sites ? (Array.isArray(sites) ? sites : [sites]) : [];
         await updateUserSiteAssignments(userId, siteIds);
 
-        res.flash('success', 'Utilisateur mis à jour.');
+        res.flash('success', req.__('flash.admin_user_updated'));
         res.redirect(`/admin/users/${userId}/view`);
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminUpdateUser error');
-        res.flash('error', "Erreur lors de la mise à jour de l'utilisateur.");
+        res.flash('error', req.__('flash.admin_user_update_error'));
         res.redirect(`/admin/users/${req.params.id}/edit`);
     }
 };
@@ -364,18 +375,18 @@ export const adminChangeUserStatus = async (req, res) => {
         const admin = req.session.user;
 
         if (!status) {
-            res.flash('warning', 'Statut manquant.');
+            res.flash('warning', req.__('flash.admin_status_missing'));
             return res.redirect(`/admin/users/${targetUserId}/view`);
         }
 
         if (status === 'banned' && (!reason || !reason.trim())) {
-            res.flash('warning', 'Un motif est obligatoire pour bannir un utilisateur.');
+            res.flash('warning', req.__('flash.admin_ban_reason_required'));
             return res.redirect(`/admin/users/${targetUserId}/view`);
         }
 
         await changeUserStatus(targetUserId, status, { userId: admin.id, login: admin.login, role: admin.role }, reason || null, 'manual', req.ip || null);
 
-        res.flash('success', `Statut mis à jour : ${status}.`);
+        res.flash('success', req.__('flash.admin_status_updated', { status }));
         return res.redirect(`/admin/users/${targetUserId}/view`);
     } catch (err) {
         if (
@@ -392,7 +403,7 @@ export const adminChangeUserStatus = async (req, res) => {
         }
 
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminChangeUserStatus error');
-        res.flash('error', 'Erreur lors du changement de statut.');
+        res.flash('error', req.__('flash.admin_status_error'));
         return res.redirect(`/admin/users/${targetUserId}/view`);
     }
 };

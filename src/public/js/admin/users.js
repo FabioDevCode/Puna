@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const response = await fetch(`/admin/users/list?${params}`);
             if (!response.ok) {
-                throw new Error('Erreur réseau');
+                throw new Error(window.__i18n?.network_error || 'Erreur réseau');
             }
 
             const data = await response.json();
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updatePagination();
         } catch (error) {
             console.error('Erreur chargement users:', error);
-            Toast({ text: 'Erreur lors du chargement des utilisateurs.', type: 'error' });
+            Toast({ text: window.__i18n?.users_loading_error || 'Erreur lors du chargement des utilisateurs.', type: 'error' });
         } finally {
             state.isLoading = false;
             elements.loading.classList.add('none');
@@ -296,7 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update compteur
         const _start = state.total === 0 ? 0 : state.offset + 1;
         const end = Math.min(state.offset + state.limit, state.total);
-        elements.countLabel.textContent = `${end} sur ${state.total}`;
+        const fmt = (window.__i18n && window.__i18n.count_format) || '{{shown}} sur {{total}}';
+        elements.countLabel.textContent = fmt.replace('{{shown}}', end).replace('{{total}}', state.total);
 
         // Update boutons
         elements.currentBtn.textContent = currentPage;

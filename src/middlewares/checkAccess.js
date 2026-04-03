@@ -62,7 +62,9 @@ export function actionAccess(entity, action) {
             // Retourner 403 Forbidden
             return res.status(403).render('pages/errors/403', {
                 layout: 'error',
-                message: `Vous n'avez pas la permission de ${action === 'read' ? 'consulter' : action === 'create' ? 'créer' : action === 'update' ? 'modifier' : 'supprimer'} cette ressource.`,
+                message: req.__('flash.no_permission', {
+                    action: req.__(`permission.${action}`),
+                }),
                 entity,
                 action,
                 userRole,
@@ -118,7 +120,7 @@ export function roleAccess(allowedRoles) {
             // Retourner 403 Forbidden
             return res.status(403).render('pages/errors/403', {
                 layout: 'error',
-                message: "Votre rôle ne permet pas d'accéder à cette ressource.",
+                message: req.__('flash.role_no_access'),
                 allowedRoles,
                 userRole,
             });

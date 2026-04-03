@@ -37,7 +37,7 @@ export function errorHandler(err, req, res, _next) {
     // ── Réponse pour les routes API ─────────────────────────────────────────
     if (isApiRoute) {
         // Ne jamais exposer les détails d'une erreur 5xx vers l'extérieur
-        const message = statusCode >= 500 ? 'Erreur serveur' : err.message || 'Erreur';
+        const message = statusCode >= 500 ? req.__('flash.server_error') : err.message || req.__('flash.unexpected_error');
         return res.status(statusCode).json({ error: message });
     }
 
@@ -53,7 +53,7 @@ export function errorHandler(err, req, res, _next) {
     }
 
     // Autres 4xx (400/401/403) : flash message + redirect
-    const flashMessage = err.message || 'Une erreur est survenue.';
+    const flashMessage = err.message || req.__('flash.generic_error');
     if (typeof res.flash === 'function') {
         res.flash('error', flashMessage);
     }

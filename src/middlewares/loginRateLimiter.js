@@ -34,7 +34,7 @@ export const loginRateLimiter = rateLimit({
             userAgent: req.get('User-Agent'),
         });
 
-        res.flash('error', 'Trop de tentatives de connexion. Réessayez dans 15 minutes.');
+        res.flash('error', req.__('flash.rate_limit_login'));
         return res.redirect('/dp-login');
     },
 
@@ -65,7 +65,7 @@ export const firstLoginRateLimiter = rateLimit({
             userAgent: req.get('User-Agent'),
         });
 
-        res.flash('error', 'Trop de tentatives. Réessayez dans 15 minutes.');
+        res.flash('error', req.__('flash.rate_limit_generic'));
         return res.redirect('/dp-first-connexion');
     },
 
@@ -99,7 +99,7 @@ export const forgotPasswordRateLimiter = rateLimit({
             userAgent: req.get('User-Agent'),
         });
 
-        res.flash('error', 'Trop de demandes. Réessayez dans 15 minutes.');
+        res.flash('error', req.__('flash.rate_limit_requests'));
         return res.redirect('/dp-forgot-password');
     },
 
@@ -131,7 +131,7 @@ export const twoFaRateLimiter = rateLimit({
             userAgent: req.get('User-Agent'),
         });
 
-        res.flash('error', 'Trop de tentatives de vérification. Réessayez dans 15 minutes.');
+        res.flash('error', req.__('flash.rate_limit_verification'));
         return res.redirect('/dp-2fa-verify');
     },
 
@@ -160,7 +160,7 @@ export const resetPasswordRateLimiter = rateLimit({
             userAgent: req.get('User-Agent'),
         });
 
-        res.flash('error', 'Trop de tentatives. Réessayez dans 15 minutes.');
+        res.flash('error', req.__('flash.rate_limit_generic'));
         return res.redirect('/dp-forgot-password');
     },
 
@@ -193,7 +193,7 @@ export const twoFaConfigRateLimiter = rateLimit({
             userAgent: req.get('User-Agent'),
         });
 
-        res.flash('error', 'Trop de tentatives. Réessayez dans 15 minutes.');
+        res.flash('error', req.__('flash.rate_limit_generic'));
         return res.redirect('/dashboard');
     },
 

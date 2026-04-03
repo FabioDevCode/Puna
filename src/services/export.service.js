@@ -457,22 +457,35 @@ export async function generateFormCSV(form, submissions, customColumns = []) {
 /**
  * Générer un fichier CSV à partir de la liste des utilisateurs
  * @param {Array} users - Liste des utilisateurs
+ * @param {Object} [labels] - Labels traduits pour les en-têtes et valeurs (optionnel)
  * @returns {Promise<string>} - Contenu CSV
  */
-export async function generateUsersCSV(users) {
+export async function generateUsersCSV(users, labels = {}) {
+    const l = {
+        email: labels.email || 'Email',
+        login: labels.login || 'Login',
+        role: labels.role || 'Rôle',
+        created_by: labels.created_by || 'Créé par',
+        enabled: labels.enabled || 'Activé',
+        last_connection: labels.last_connection || 'Dernière connexion',
+        created_at: labels.created_at || 'Créé le',
+        yes: labels.yes || 'Oui',
+        no: labels.no || 'Non',
+    };
+
     return new Promise((resolve, reject) => {
         const rows = [];
 
         // Préparer les données
         users.forEach((user) => {
             rows.push({
-                Email: user.email || '',
-                Login: user.login || '',
-                Rôle: user.role || 'N/A',
-                'Créé par': user.creator ? user.creator.login : 'N/A',
-                Activé: user.enabled ? 'Oui' : 'Non',
-                'Dernière connexion': user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
-                'Créé le': dayjs(user.createdAt).format('YYYY-MM-DD HH:mm'),
+                [l.email]: user.email || '',
+                [l.login]: user.login || '',
+                [l.role]: user.role || 'N/A',
+                [l.created_by]: user.creator ? user.creator.login : 'N/A',
+                [l.enabled]: user.enabled ? l.yes : l.no,
+                [l.last_connection]: user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : 'N/A',
+                [l.created_at]: dayjs(user.createdAt).format('YYYY-MM-DD HH:mm'),
             });
         });
 

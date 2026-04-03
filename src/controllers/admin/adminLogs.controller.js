@@ -61,9 +61,9 @@ export const countFilesRecursive = async (dirPath) => {
  * @param {boolean} isManual - Indique si c'est une archive manuelle
  * @returns {string} Date formatée
  */
-const formatDateLabel = (dateStr, isManual = false) => {
+const formatDateLabel = (dateStr, isManual = false, t = null) => {
     if (dateStr === 'today') {
-        return "Aujourd'hui";
+        return t ? t('admin.logs_today') : "Aujourd'hui";
     }
     // Pour les archives manuelles, afficher la date avec l'heure et un indicateur
     if (isManual) {
@@ -81,7 +81,7 @@ const formatDateLabel = (dateStr, isManual = false) => {
  * Liste les archives disponibles dans le dossier archives
  * @returns {Promise<Array>} Liste des archives avec date et label
  */
-const listArchives = async () => {
+const listArchives = async (t = null) => {
     try {
         await fs.access(archiveDir);
     } catch {
@@ -98,7 +98,7 @@ const listArchives = async () => {
             archives.push({
                 filename: f,
                 date: dateStr,
-                label: formatDateLabel(dateStr, false),
+                label: formatDateLabel(dateStr, false, t),
                 isManual: false,
             });
         } else if (f.endsWith('-manual.tar.gz')) {
@@ -107,7 +107,7 @@ const listArchives = async () => {
             archives.push({
                 filename: f,
                 date: dateTimeStr,
-                label: formatDateLabel(dateTimeStr, true),
+                label: formatDateLabel(dateTimeStr, true, t),
                 isManual: true,
             });
         }
@@ -165,7 +165,7 @@ const extractLogFromArchive = async (archiveFilename, logType) => {
  */
 export const logsViewer = async (req, res) => {
     try {
-        const archives = await listArchives();
+        const archives = await listArchives(req.__);
 
         res.render('admin/logs/viewer', {
             layout: 'admin',
@@ -186,7 +186,7 @@ export const readLogs = async (req, res) => {
         const { date = 'today', type = 'app', search = '', timeFrom = '', timeTo = '', level = '' } = req.query;
 
         if (!LOG_TYPES.includes(type)) {
-            return res.status(400).json({ error: 'Type de log invalide' });
+            return res.status(400).json({ error: req.__('flash.admin_log_type_invalid') });
         }
 
         let content = '';
@@ -280,7 +280,7 @@ export const readLogs = async (req, res) => {
         });
     } catch (err) {
         logger.error({ err }, 'readLogs error');
-        res.status(500).json({ error: 'Erreur lors de la lecture des logs' });
+        res.status(500).json({ error: req.__('flash.admin_log_read_error') });
     }
 };
 
@@ -289,10 +289,10 @@ export const readLogs = async (req, res) => {
  */
 export const getArchives = async (req, res) => {
     try {
-        const archives = await listArchives();
+        const archives = await listArchives(req.__);
         res.json({ archives });
     } catch (err) {
         logger.error({ err }, 'getArchives error');
-        res.status(500).json({ error: 'Erreur lors de la récupération des archives' });
+        res.status(500).json({ error: req.__('flash.admin_log_archives_error') });
     }
 };

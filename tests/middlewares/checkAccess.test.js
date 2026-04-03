@@ -13,12 +13,13 @@ vi.mock('../../src/config/logger.js', () => ({
 describe('checkAccess middleware', () => {
     function makeReq(role) {
         if (!role) {
-            return { path: '/test', method: 'GET', session: {} };
+            return { path: '/test', method: 'GET', session: {}, __: (key) => key };
         }
         return {
             path: '/test',
             method: 'GET',
             session: { user: { id: 'user-1', login: role, role } },
+            __: (key) => key,
         };
     }
 

@@ -84,7 +84,8 @@
                 return '-';
             }
             const date = new Date(timestamp);
-            return date.toLocaleTimeString('fr-FR', {
+            const localeCode = (window.__i18n && window.__i18n.locale_code) || 'fr-FR';
+            return date.toLocaleTimeString(localeCode, {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',

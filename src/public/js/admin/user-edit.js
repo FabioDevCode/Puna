@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const container = sitesListContainer.parentElement;
                 const notice = document.createElement('div');
                 notice.className = 'alert alert-info alert-sm mt-2';
-                notice.innerHTML = '<i class="fa-solid fa-info-circle mr-2"></i>Les sites ont été désélectionnés suite au changement de rôle';
+                notice.innerHTML = `<i class="fa-solid fa-info-circle mr-2"></i>${(window.__i18n && window.__i18n.sites_deselected_role_change) || 'Les sites ont été désélectionnés suite au changement de rôle'}`;
                 container.appendChild(notice);
 
                 setTimeout(() => notice.remove(), 3000);
