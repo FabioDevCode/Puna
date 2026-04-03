@@ -15,7 +15,7 @@
             <button id="btn_copy_token" class="btn btn-sm btn-outline btn-info" data-site-id="{{site.id}}">
                 <i class="fa-solid fa-clone"></i>
                 <span class="hidden md:flex">
-                    Copier un token
+                    {{__ "form.copy_token"}}
                 </span>
             </button>
         {{/actionCan}}
@@ -66,7 +66,7 @@
                     <div class="text-center">
                         <i class="fa-solid fa-file-alt text-5xl text-base-300 mb-2"></i>
                         <p class="text-sm text-muted">
-                            Aucun formulaire créé pour ce site
+                            {{__ "site.no_forms"}}
                         </p>
                     </div>
                     {{#actionCan entity='form' action='create'}}
@@ -84,14 +84,14 @@
                 <div class="flex flex-row items-center flex-wrap justify-between gap-2">
                     <div class="flex flex-col w-auto min-w-[160px]">
                         <div id="info_form_code_wrap" class="flex items-center gap-2 opacity-25">
-                            <span class="text-sm text-muted select-none">CODE&nbsp;:</span>
+                            <span class="text-sm text-muted select-none">{{__ "form.code_label"}}&nbsp;</span>
                             <code id="info_form_code" class="text-sm font-mono bg-base-200 px-2 py-1 rounded"></code>
 
                             {{#actionCan entity='form' action='update'}}
                                 <button id="btn_copy_code" class="btn btn-sm btn-outline btn-info none">
                                     <i class="fa-solid fa-clone"></i>
                                     <span class="hidden md:flex">
-                                        Copier le code
+                                        {{__ "form.copy_code"}}
                                     </span>
                                 </button>
                             {{/actionCan}}
@@ -154,14 +154,14 @@
                                             <button id="exportExcelBtn"
                                             class="flex items-center gap-2 text-green-800 bg-green-100 hover:bg-green-700 hover:text-base-100">
                                                 <i class="fa-solid fa-file-excel"></i>
-                                                Exporter un Excel
+                                                {{__ "export.excel"}}
                                             </button>
                                         </li>
                                         <li>
                                             <button id="exportCSVBtn"
                                             class="flex items-center gap-2 text-green-800 bg-green-100 hover:bg-green-700 hover:text-base-100">
                                                 <i class="fa-solid fa-file-csv"></i>
-                                                Exporter un CSV
+                                                {{__ "export.csv"}}
                                             </button>
                                         </li>
                                     </ul>
@@ -170,7 +170,7 @@
                                 {{#actionCan entity='form' action='read'}}
                                     <button id="filtreTableBtn" class="btn btn-sm">
                                         <i class="fa-solid fa-filter"></i>
-                                        <span class="hidden md:flex">Filtre</span>
+                                        <span class="hidden md:flex">{{__ "filter.title"}}</span>
                                     </button>
                                 {{/actionCan}}
 
@@ -197,7 +197,7 @@
                 class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4">
                     <i class="fa-solid fa-table text-5xl text-neutral-content"></i>
                     <p class="text-sm text-neutral text-center select-none">
-                        Aucune entrée reçu pour ce formualire
+                        {{__ "inbox.no_entries"}}
                     </p>
                 </div>
             </div>

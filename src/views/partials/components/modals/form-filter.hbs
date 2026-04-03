@@ -1,7 +1,7 @@
 <dialog id="modal_filter" class="modal">
     <form method="dialog" id="modal_filter_form" class="modal-box w-11/12 max-w-3xl">
-        <h3 class="font-bold text-lg">Filtrer les entrées</h3>
-        <p class="py-2 text-sm text-muted">Saisissez des valeurs pour filtrer les colonnes affichées (conditions cumulatives AND).</p>
+        <h3 class="font-bold text-lg">{{__ "filter.title"}}</h3>
+        <p class="py-2 text-sm text-muted">{{__ "filter.description"}}</p>
 
         <div id="modal_filter_body" class="grid grid-cols-2 gap-4 mt-4">
             <div class="col-span-2">
@@ -18,13 +18,13 @@
 
         <div class="modal-action mt-4">
             <button id="modal_filter_cancel" class="btn btn-sm">
-                Annuler
+                {{__ "btn.cancel"}}
             </button>
             <button id="modal_filter_clear" type="button" class="btn btn-sm btn-outline btn-primary">
-                Vider les champs
+                {{__ "btn.clear"}}
             </button>
             <button id="modal_filter_apply" type="submit" class="btn btn-sm btn-secondary">
-                Appliquer
+                {{__ "btn.apply"}}
             </button>
         </div>
     </form>

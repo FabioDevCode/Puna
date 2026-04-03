@@ -11,26 +11,26 @@ id=site.id
 <a class="tab btn btn-sm btn-secondary" data-open-modal="modal_create_form_{{id}}">
     <i class="fas fa-plus"></i>
     <span class="hidden md:flex">
-        Nouveau formulaire
+        {{__ "form.new_form"}}
     </span>
 </a>
 
 <dialog id="modal_create_form_{{id}}" class="modal">
     <div class="modal-box w-11/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
-        <h2 class="text-lg font-bold mb-2">Créer un nouveau formulaire</h2>
-        <p class="py-1 text-sm text-muted">50 caractères maximum.</p>
+        <h2 class="text-lg font-bold mb-2">{{__ "form.create_title"}}</h2>
+        <p class="py-1 text-sm text-muted">{{__ "form.create_help"}}</p>
 
         <form id="formCreateForm_{{id}}" action="/create-form" method="post" class="flex flex-col mt-2 gap-4">
             <input type="hidden" name="_csrf" value="{{csrfToken}}" />
         <input type="hidden" name="fk_id_site" value="{{id}}" />
     <input type="text" name="name" class="input input-sm input-bordered w-full" placeholder="Contact" maxlength="50" required="" />
-<p id="create_form_msg_{{id}}" class="text-sm text-error hidden">Un formulaire avec ce nom existe déjà.</p>
+<p id="create_form_msg_{{id}}" class="text-sm text-error hidden">{{__ "form.exists_error"}}</p>
 </form>
 <div class="modal-action mt-4">
     <form method="dialog">
-        <button class="btn btn-sm">Annuler</button>
+        <button class="btn btn-sm">{{__ "btn.cancel"}}</button>
     </form>
-    <button id="btnCreateForm_{{id}}" type="submit" form="formCreateForm_{{id}}" class="btn btn-sm btn-secondary">Créer</button>
+    <button id="btnCreateForm_{{id}}" type="submit" form="formCreateForm_{{id}}" class="btn btn-sm btn-secondary">{{__ "btn.create"}}</button>
 </div>
 </div>
 </dialog>

@@ -10,7 +10,7 @@
             <li>
                 <a href="/dashboard" class="rounded-lg flex items-center gap-2 px-3 py-2 hover:bg-neutral hover:text-base-100">
                     <i class="fa-solid fa-display"></i>
-                    App
+                    {{__ "menu.app"}}
                 </a>
             </li>
         {{/roleIs}}
@@ -19,32 +19,32 @@
     <!-- Menu Administration -->
     <nav class="flex-1">
         <div class="px-4 py-2 text-xs font-bold text-neutral-content uppercase tracking-wider">
-            Administration
+            {{__ "menu.administration"}}
         </div>
         <ul class="menu p-2 gap-[1px] rounded-lg">
             <li>
                 <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-chart-bar"></i>
-                    Vue d'ensemble
+                    {{__ "admin.overview"}}
                 </a>
             </li>
             <li>
                 <a href="/admin/users" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-users-line"></i>
-                    Utilisateurs
+                    {{__ "admin.users"}}
                 </a>
             </li>
             {{#roleIs roles='super_admin'}}
                 {{!-- <li>
                 <a href="/admin/settings" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-gears"></i>
-                    Paramètres
+                    {{__ "admin.settings"}}
                 </a>
             </li> --}}
             <li>
                 <a href="/admin/logs" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-list"></i>
-                    Logs
+                    {{__ "admin.logs"}}
                 </a>
             </li>
         {{/roleIs}}
@@ -68,7 +68,7 @@
         <li>
             <a href="/dp-logout" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100 gap-2 px-3 py-2">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                Se déconnecter
+                {{__ "menu.logout"}}
             </a>
         </li>
     </ul>

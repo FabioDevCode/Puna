@@ -1,27 +1,27 @@
 <button id="btn-new-site" class="btn btn-sm btn-secondary">
     <i class="fas fa-plus"></i>
     <span class="hidden md:flex">
-        Nouveau
+        {{__ "btn.new"}}
     </span>
 </button>
 
 <dialog id="my_modal_new_site" class="modal">
     <div class="modal-box w-12/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
         <h2 class="text-lg font-bol mb-2">
-            Créer un nouveau site
+            {{__ "site.create_title"}}
         </h2>
-        <p class="py-1 text-sm text-muted">Nom de domaine : 128 caractères maximum.</p>
+        <p class="py-1 text-sm text-muted">{{__ "site.create_help"}}</p>
 
         <form id="fromCreateSite" action="/create-site" method="post" class="flex flex-col mt-2 gap-4">
             <input type="hidden" name="_csrf" value="{{csrfToken}}" />
         <input type="text" name="domain" class="input input-sm input-bordered w-full" placeholder="puna.fr" maxlength="128" required="" />
-    <p id="create_site_msg" class="text-sm text-error hidden">Un site avec ce domaine existe déjà.</p>
+    <p id="create_site_msg" class="text-sm text-error hidden">{{__ "site.exists_error"}}</p>
 </form>
 <div class="modal-action mt-4">
     <form method="dialog">
-        <button class="btn btn-sm">Annuler</button>
+        <button class="btn btn-sm">{{__ "btn.cancel"}}</button>
     </form>
-    <button id="btnCreateSite" type="submit" class="btn btn-sm btn-secondary" form="fromCreateSite">Créer</button>
+    <button id="btnCreateSite" type="submit" class="btn btn-sm btn-secondary" form="fromCreateSite">{{__ "btn.create"}}</button>
 </div>
 </div>
 </dialog>

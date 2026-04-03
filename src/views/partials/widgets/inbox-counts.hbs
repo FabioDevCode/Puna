@@ -3,13 +3,13 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="text-sm font-semibold select-none">
-                    Nombre d'entrées reçues
+                    {{__ "stats.inbox_count_title"}}
                 </div>
                 <span id="statA_total" class="text-xs font-medium badge badge-ghost"></span>
             </div>
             <div id="statA_range" role="tablist" class="tabs tabs-boxed tabs-sm">
-                <a role="tab" class="tab tab-active" data-value="7">7 jours</a>
-                <a role="tab" class="tab" data-value="30">30 jours</a>
+                <a role="tab" class="tab tab-active" data-value="7">{{__ "stats.7_days"}}</a>
+                <a role="tab" class="tab" data-value="30">{{__ "stats.30_days"}}</a>
             </div>
         </div>
         <div id="statA_chart" class="overflow-hidden h-[344px]"></div>

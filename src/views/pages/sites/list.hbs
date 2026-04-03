@@ -1,6 +1,6 @@
 {{#slot "title"}}
     <h3 class="font-inter truncate ellipsis-truncate title-max-w mt-[6px]">
-        Site web
+        {{__ "menu.website"}}
     </h3>
 {{/slot}}
 
@@ -25,9 +25,9 @@
             <div class="card-body">
                 <div class="flex flex-col items-center justify-center py-12 gap-4">
                     <i class="fa-solid fa-network-wired text-5xl text-neutral-content"></i>
-                    <h3 class="text-xl font-bold text-neutral">Aucun site web</h3>
+                    <h3 class="text-xl font-bold text-neutral">{{__ "site.no_sites_title"}}</h3>
                     <p class="text-sm text-neutral-content text-center max-w-md">
-                        Vous n'avez pas encore créé de site. Cliquez sur le bouton "Nouveau" pour commencer.
+                        {{__ "site.no_sites_message"}}
                     </p>
                 </div>
             </div>
