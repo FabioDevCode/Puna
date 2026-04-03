@@ -26,7 +26,8 @@
     "locale": {
         "allowNull": false,
         "defaultValue": "fr",
-        "type": "ENUM('fr','en')"
+        "type": "ENUM",
+        "values": ["fr", "en"]
     },
     "login": {
         "allowNull": false,
