@@ -257,7 +257,7 @@ describe('passwordReset routes', () => {
             expect(postRes.headers.location).toContain('/dp-forgot-password');
 
             const getRes = await agent.get('/dp-forgot-password');
-            expect(getRes.text).toContain('Si un compte avec cet email existe');
+            expect(getRes.text).toContain('flash.reset_link_sent');
         });
 
         it('with non-existent email: redirects with the SAME success flash (anti-enumeration)', async () => {
@@ -269,7 +269,7 @@ describe('passwordReset routes', () => {
             expect(postRes.headers.location).toContain('/dp-forgot-password');
 
             const getRes = await agent.get('/dp-forgot-password');
-            expect(getRes.text).toContain('Si un compte avec cet email existe');
+            expect(getRes.text).toContain('flash.reset_link_sent');
         });
 
         it('with empty email: redirects with error flash', async () => {
@@ -279,7 +279,7 @@ describe('passwordReset routes', () => {
             expect(postRes.headers.location).toContain('/dp-forgot-password');
 
             const getRes = await agent.get('/dp-forgot-password');
-            expect(getRes.text).toContain('Veuillez saisir une adresse email');
+            expect(getRes.text).toContain('flash.enter_email');
         });
     });
 
@@ -301,7 +301,7 @@ describe('passwordReset routes', () => {
             expect(getRes.headers.location).toContain('/dp-forgot-password');
 
             const forgotPage = await agent.get('/dp-forgot-password');
-            expect(forgotPage.text).toContain('invalide ou a expiré');
+            expect(forgotPage.text).toContain('flash.reset_link_invalid');
         });
     });
 
@@ -319,7 +319,7 @@ describe('passwordReset routes', () => {
             expect(postRes.headers.location).toContain('/dp-login');
 
             const loginPage = await agent.get('/dp-login');
-            expect(loginPage.text).toContain('Mot de passe réinitialisé avec succès');
+            expect(loginPage.text).toContain('flash.password_reset_success');
         });
 
         it('with valid token + mismatching passwords: redirects back with error flash', async () => {
@@ -335,7 +335,7 @@ describe('passwordReset routes', () => {
             expect(postRes.headers.location).toContain('/dp-reset-password/validtoken');
 
             const resetPage = await agent.get('/dp-reset-password/validtoken');
-            expect(resetPage.text).toContain('Les mots de passe ne correspondent pas');
+            expect(resetPage.text).toContain('flash.passwords_mismatch');
         });
 
         it('with invalid/expired token: redirects to forgot-password with error flash', async () => {
@@ -350,7 +350,7 @@ describe('passwordReset routes', () => {
             expect(postRes.headers.location).toContain('/dp-forgot-password');
 
             const forgotPage = await agent.get('/dp-forgot-password');
-            expect(forgotPage.text).toContain('invalide ou a expiré');
+            expect(forgotPage.text).toContain('flash.reset_link_invalid');
         });
 
         it('with weak password: renders reset-password view with error', async () => {
@@ -383,6 +383,11 @@ describe('rate limiting: POST /dp-forgot-password', () => {
         rateLimitApp.use(express.urlencoded({ extended: true }));
         rateLimitApp.use(session({ secret: 'test-rl-secret', resave: false, saveUninitialized: true, cookie: { secure: false } }));
         rateLimitApp.use(flashMessages);
+        // Stub i18n: req.__ is needed by rate limiter handlers
+        rateLimitApp.use((req, _res, next) => {
+            req.__ = (key) => key;
+            next();
+        });
         // Simple route that always succeeds — rate limiter counts every request
         rateLimitApp.post('/dp-forgot-password', forgotPasswordRateLimiter, (_req, res) => res.status(200).end());
     });

@@ -52,6 +52,7 @@ describe('createSite — validation', () => {
             body: {},
             session: { user: { id: 1 } },
             userRole: 'owner',
+            __: vi.fn((key) => key),
         };
         res = {
             flash: vi.fn(),

@@ -25,17 +25,17 @@ export const createForm = async (req, res) => {
         // Vérifier l'accès au site
         const site = await verifySiteAccess(fk_id_site, userId, userRole);
         if (!site) {
-            res.flash('error', 'Accès refusé.');
+            res.flash('error', req.__('flash.access_denied'));
             return res.redirect('/dashboard');
         }
 
         // Créer le formulaire (le code est généré automatiquement)
         await createFormService({ name: trimmedName, fk_id_site });
 
-        res.flash('success', 'Formulaire créé avec succès.');
+        res.flash('success', req.__('flash.form_created'));
         return res.redirect(`/site/${fk_id_site}/view?f=${trimmedName}`);
     } catch (_err) {
-        res.flash('error', 'Erreur lors de la création du formulaire.');
+        res.flash('error', req.__('flash.form_create_error'));
         return res.redirect('/dashboard');
     }
 };
@@ -52,7 +52,7 @@ export const deleteForm = async (req, res) => {
         // Vérifier l'accès au formulaire
         const result = await verifyFormAccess(form_id, userId, userRole);
         if (!result) {
-            res.flash('error', 'Accès refusé.');
+            res.flash('error', req.__('flash.access_denied'));
             return res.redirect('/dashboard');
         }
 
@@ -61,10 +61,10 @@ export const deleteForm = async (req, res) => {
         // Supprimer le formulaire
         await deleteFormService(form_id);
 
-        res.flash('success', 'Formulaire supprimé.');
+        res.flash('success', req.__('flash.form_deleted'));
         return res.redirect(`/site/${siteId}/view`);
     } catch (_err) {
-        res.flash('error', 'Erreur lors de la suppression du formulaire.');
+        res.flash('error', req.__('flash.form_delete_error'));
         return res.redirect('/dashboard');
     }
 };

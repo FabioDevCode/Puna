@@ -83,7 +83,7 @@ export const deleteInbox = async (req, res) => {
         // Récupérer les infos avant suppression pour redirection
         const data = await getInboxForDisplay(inboxId, userId, userRole);
         if (!data) {
-            res.flash('error', 'Entrée introuvable ou accès refusé.');
+            res.flash('error', req.__('flash.inbox_not_found'));
             return res.redirect('/dashboard');
         }
 
@@ -94,15 +94,15 @@ export const deleteInbox = async (req, res) => {
 
         if (!result.success) {
             errorLogger.warn({ error: result.error, inboxId, userId }, 'deleteInbox service returned error');
-            res.flash('error', 'Erreur lors de la suppression.');
+            res.flash('error', req.__('flash.inbox_delete_error'));
             return res.redirect('/dashboard');
         }
 
-        res.flash('success', 'Entrée supprimée.');
+        res.flash('success', req.__('flash.inbox_deleted'));
         res.redirect(`/site/${siteId}/view?f=${data.form.name}`);
     } catch (err) {
         errorLogger.error({ err, inboxId, userId }, 'deleteInbox error');
-        res.flash('error', 'Erreur lors de la suppression.');
+        res.flash('error', req.__('flash.inbox_delete_error'));
         res.redirect('/dashboard');
     }
 };

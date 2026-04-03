@@ -283,7 +283,7 @@ describe('auth routes', () => {
 
             // Follow redirect — flash message should appear on the login page
             const loginPage = await agent.get('/dp-login');
-            expect(loginPage.text).toContain('Votre compte est désactivé. Contactez un administrateur.');
+            expect(loginPage.text).toContain('flash.account_deactivated');
         });
 
         it('redirects to /dp-login with suspended-account message when user is suspended', async () => {
@@ -299,7 +299,7 @@ describe('auth routes', () => {
             expect(postRes.headers.location).toContain('/dp-login');
 
             const loginPage = await agent.get('/dp-login');
-            expect(loginPage.text).toContain('Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.');
+            expect(loginPage.text).toContain('flash.account_suspended');
         });
 
         it('increments failed_login_attempts counter on login failure for active user', async () => {
@@ -332,7 +332,7 @@ describe('auth routes', () => {
             expect(incrementFailedAttempts).not.toHaveBeenCalled();
 
             const loginPage = await agent.get('/dp-login');
-            expect(loginPage.text).toContain('Votre compte a été banni.');
+            expect(loginPage.text).toContain('flash.account_banned');
         });
 
         it('resets failed_login_attempts counter on successful login', async () => {
@@ -398,7 +398,7 @@ describe('auth routes', () => {
             const res = await request(app).post('/dp-first-co').send({ login: 'testuser', password: 'newpassword', confirm_password: 'newpassword' });
 
             expect(res.status).toBe(200);
-            expect(res.text).toContain('Votre compte a été banni.');
+            expect(res.text).toContain('flash.account_banned');
         });
 
         it('shows login-unknown message when user does not exist', async () => {
@@ -407,7 +407,7 @@ describe('auth routes', () => {
             const res = await request(app).post('/dp-first-co').send({ login: 'unknown', password: 'newpassword', confirm_password: 'newpassword' });
 
             expect(res.status).toBe(200);
-            expect(res.text).toContain('Login inconnu.');
+            expect(res.text).toContain('flash.login_unknown');
         });
 
         it('rejects a weak password and renders first-login view with error', async () => {

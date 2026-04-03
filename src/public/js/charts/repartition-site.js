@@ -19,12 +19,12 @@
             el.innerHTML = '';
 
             if (labels.length === 0) {
-                el.innerHTML = '<p class="text-sm text-muted text-center">Aucune donnée</p>';
+                el.innerHTML = `<p class="text-sm text-muted text-center">${(window.__i18n && window.__i18n.no_data) || 'Aucune donnée'}</p>`;
                 return;
             }
 
             if (total === 0) {
-                el.innerHTML = '<p class="text-sm text-muted text-center">Aucune soumission pour le moment</p>';
+                el.innerHTML = `<p class="text-sm text-muted text-center">${(window.__i18n && window.__i18n.no_submissions) || 'Aucune soumission pour le moment'}</p>`;
                 return;
             }
 
@@ -35,7 +35,7 @@
                 .slice(0, 12);
 
             if (items.length === 0) {
-                el.innerHTML = '<p class="text-sm text-muted text-center">Aucune soumission pour le moment</p>';
+                el.innerHTML = `<p class="text-sm text-muted text-center">${(window.__i18n && window.__i18n.no_submissions) || 'Aucune soumission pour le moment'}</p>`;
                 return;
             }
 

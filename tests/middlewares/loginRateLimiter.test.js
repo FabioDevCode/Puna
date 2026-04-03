@@ -34,6 +34,11 @@ function buildApp(limiter, routePath = '/dp-connect', successStatus = 401) {
         })
     );
     app.use(flashMessages);
+    // Stub i18n: req.__ is needed by rate limiter handlers
+    app.use((req, _res, next) => {
+        req.__ = (key) => key;
+        next();
+    });
     app.post(routePath, limiter, (_req, res) => res.status(successStatus).json({ ok: true }));
     return app;
 }

@@ -15,22 +15,22 @@ export const forgotPasswordPost = async (req, res) => {
     const ip = req.ip;
 
     if (!mailEnabled) {
-        res.flash('error', 'Le service de messagerie est désactivé. Contactez un administrateur.');
+        res.flash('error', req.__('flash.mail_disabled'));
         return res.redirect('/dp-forgot-password');
     }
 
     if (!email || email.trim() === '') {
-        res.flash('error', 'Veuillez saisir une adresse email.');
+        res.flash('error', req.__('flash.enter_email'));
         return res.redirect('/dp-forgot-password');
     }
 
     try {
         await createPasswordResetRequest(email);
-        res.flash('success', 'Si un compte avec cet email existe, un lien de réinitialisation a été envoyé.');
+        res.flash('success', req.__('flash.reset_link_sent'));
         return res.redirect('/dp-forgot-password');
     } catch (err) {
         errorLogger.error({ err, ip, email }, 'Error during forgot password request');
-        res.flash('error', 'Une erreur est survenue. Veuillez réessayer.');
+        res.flash('error', req.__('flash.generic_error'));
         return res.redirect('/dp-forgot-password');
     } finally {
         auditLogger.info({
@@ -48,7 +48,7 @@ export const resetPasswordGet = async (req, res) => {
         const user = await validateResetToken(token);
 
         if (!user) {
-            res.flash('error', 'Le lien de réinitialisation est invalide ou a expiré.');
+            res.flash('error', req.__('flash.reset_link_invalid'));
             return res.redirect('/dp-forgot-password');
         }
 
@@ -58,7 +58,7 @@ export const resetPasswordGet = async (req, res) => {
         });
     } catch (err) {
         errorLogger.error({ err }, 'Error during reset token validation');
-        res.flash('error', 'Une erreur est survenue. Veuillez réessayer.');
+        res.flash('error', req.__('flash.generic_error'));
         return res.redirect('/dp-forgot-password');
     }
 };
@@ -68,12 +68,12 @@ export const resetPasswordPost = async (req, res) => {
     const { password, confirm_password } = req.body;
 
     if (!password || password.trim() === '') {
-        res.flash('error', 'Veuillez saisir un mot de passe.');
+        res.flash('error', req.__('flash.enter_password'));
         return res.redirect(`/dp-reset-password/${token}`);
     }
 
     if (password !== confirm_password) {
-        res.flash('error', 'Les mots de passe ne correspondent pas.');
+        res.flash('error', req.__('flash.passwords_mismatch'));
         return res.redirect(`/dp-reset-password/${token}`);
     }
 
@@ -92,15 +92,15 @@ export const resetPasswordPost = async (req, res) => {
         const result = await resetPassword(token, password);
 
         if (!result) {
-            res.flash('error', 'Le lien de réinitialisation est invalide ou a expiré.');
+            res.flash('error', req.__('flash.reset_link_invalid'));
             return res.redirect('/dp-forgot-password');
         }
 
-        res.flash('success', 'Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.');
+        res.flash('success', req.__('flash.password_reset_success'));
         return res.redirect('/dp-login');
     } catch (err) {
         errorLogger.error({ err }, 'Error during password reset');
-        res.flash('error', 'Une erreur est survenue. Veuillez réessayer.');
+        res.flash('error', req.__('flash.generic_error'));
         return res.redirect('/dp-forgot-password');
     }
 };

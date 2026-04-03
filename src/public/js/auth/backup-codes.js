@@ -10,13 +10,13 @@
             .writeText(getBackupCodes().join('\n'))
             .then(function () {
                 Toast({
-                    text: 'Codes copiés dans le presse-papier.',
+                    text: (window.__i18n && window.__i18n.codes_copied) || 'Codes copiés dans le presse-papier.',
                     type: 'success',
                 });
             })
             .catch(function () {
                 Toast({
-                    text: 'Impossible de copier les codes. Veuillez les copier manuellement.',
+                    text: (window.__i18n && window.__i18n.codes_copy_error) || 'Impossible de copier les codes. Veuillez les copier manuellement.',
                     type: 'error',
                 });
             });

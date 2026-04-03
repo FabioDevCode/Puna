@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modalColumnsList) {
             modalColumnsList.innerHTML = '';
             if (!activeKeys.length) {
-                modalColumnsList.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour ce formulaire.</p>';
+                modalColumnsList.innerHTML = `<p class="text-sm text-muted">${window.__i18n?.no_columns || 'Aucune colonne disponible pour ce formulaire.'}</p>`;
             } else {
                 activeKeys.forEach((k) => {
                     const label = document.createElement('label');
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeTab.click();
                 }
             } catch (_err) {
-                alert("Erreur lors de l'enregistrement des colonnes.");
+                alert(window.__i18n?.columns_save_error || "Erreur lors de l'enregistrement des colonnes.");
             }
         });
     }
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const visibleKeys = keys.filter((k) => (colsObj && typeof colsObj[k] !== 'undefined' ? !!colsObj[k] : true));
                 if (!keys.length) {
                     if (keysContainer) {
-                        keysContainer.innerHTML = '<p class="text-sm text-muted">Aucune clé définie pour ce formulaire.</p>';
+                        keysContainer.innerHTML = `<p class="text-sm text-muted">${window.__i18n?.no_keys || 'Aucune clé définie pour ce formulaire.'}</p>`;
                     }
                     if (valuesContainer) {
                         valuesContainer.innerHTML = '';
@@ -338,12 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     // tr.appendChild(thCheck);
 
                     const thDate = document.createElement('th');
-                    thDate.textContent = 'Date';
+                    thDate.textContent = window.__i18n?.date || 'Date';
                     tr.appendChild(thDate);
 
                     if (!keysArr.length) {
                         const th = document.createElement('th');
-                        th.textContent = 'Données';
+                        th.textContent = window.__i18n?.data || 'Données';
                         tr.appendChild(th);
                     } else {
                         keysArr.forEach((k) => {
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const thAction = document.createElement('th');
                     thAction.classList.add('text-right');
-                    thAction.innerHTML = 'Actions';
+                    thAction.innerHTML = window.__i18n?.actions || 'Actions';
                     tr.appendChild(thAction);
 
                     inboxHead.appendChild(tr);
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const tdEmpty = document.createElement('td');
                         tdEmpty.colSpan = columnsCount;
                         tdEmpty.className = 'text-sm text-center text-muted py-4';
-                        tdEmpty.textContent = 'Aucun résultat';
+                        tdEmpty.textContent = window.__i18n?.no_results || 'Aucun résultat';
                         trEmpty.appendChild(tdEmpty);
                         if (inboxBody) {
                             inboxBody.appendChild(trEmpty);
@@ -533,7 +533,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const countEl = document.getElementById('count_inbox');
                     const shown = items.length;
                     if (countEl) {
-                        countEl.textContent = `${shown} sur ${total || 0}`;
+                        const fmt = window.__i18n?.count_format || '{{shown}} sur {{total}}';
+                        countEl.textContent = fmt.replace('{{shown}}', shown).replace('{{total}}', total || 0);
                     }
 
                     // update pagination UI if present
@@ -660,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             if (!currentVisibleKeys || !currentVisibleKeys.length) {
                                 if (modalFilterKeys) {
-                                    modalFilterKeys.innerHTML = '<p class="text-sm text-muted">Aucune colonne disponible pour filtrer.</p>';
+                                    modalFilterKeys.innerHTML = `<p class="text-sm text-muted">${window.__i18n?.no_filter_columns || 'Aucune colonne disponible pour filtrer.'}</p>`;
                                 }
                             } else {
                                 // Date label left (disabled input) and date input right
@@ -670,7 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     const leftDateInput = document.createElement('input');
                                     leftDateInput.type = 'text';
                                     leftDateInput.disabled = true;
-                                    leftDateInput.value = 'Date';
+                                    leftDateInput.value = window.__i18n?.date || 'Date';
                                     leftDateInput.className = 'input input-bordered w-full input-sm bg-base-100';
                                     leftDateWrap.appendChild(leftDateInput);
                                     modalFilterKeys.appendChild(leftDateWrap);
@@ -695,7 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     flatpickr(dateInput, {
                                         appendTo: document.querySelector('#modal_filter'),
                                         dateFormat: 'Y-m-d',
-                                        locale: 'fr',
+                                        locale: window.__i18n?.locale_short || 'fr',
                                         disableMobile: false,
                                     });
 
@@ -1000,14 +1001,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 await navigator.clipboard.writeText(text);
                 // temporary feedback: change button text/icon like token.js but without green color
                 const old = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check"></i> Code copié';
-                Toast({ text: 'Code copié dans le presse-papier.', type: 'success' });
+                copyBtn.innerHTML = `<i class="fas fa-check"></i> ${window.__i18n?.code_copied_short || 'Code copié'}`;
+                Toast({ text: window.__i18n?.code_copied || 'Code copié dans le presse-papier.', type: 'success' });
                 setTimeout(() => {
                     copyBtn.innerHTML = old;
                 }, 1200);
             } catch (err) {
                 console.error(err);
-                Toast({ text: 'Erreur lors de la copie du code.', type: 'error' });
+                Toast({ text: window.__i18n?.code_copy_error || 'Erreur lors de la copie du code.', type: 'error' });
             }
         });
     }

@@ -23,12 +23,13 @@ export const STATUS_CHECK_TTL_MS = parseInt(process.env.STATUS_CHECK_TTL_MS || '
 
 /**
  * Messages flash selon le statut de l'utilisateur
+ * Les clés correspondent aux sections i18n dans fr.json / en.json
  */
-const STATUS_MESSAGES = {
-    inactive: 'Votre compte a été désactivé. Contactez un administrateur.',
-    suspended: 'Votre compte est suspendu. Contactez un administrateur.',
-    banned: 'Votre compte a été banni.',
-    anonymized: 'Compte introuvable.',
+const STATUS_MESSAGE_KEYS = {
+    inactive: 'flash.status_inactive',
+    suspended: 'flash.status_suspended',
+    banned: 'flash.status_banned',
+    anonymized: 'flash.status_anonymized',
 };
 
 /**
@@ -107,7 +108,8 @@ function invalidateSession(req, res, status, sessionUser) {
         timestamp: new Date().toISOString(),
     });
 
-    const flashMessage = STATUS_MESSAGES[status] || 'Votre session a été invalidée.';
+    const messageKey = STATUS_MESSAGE_KEYS[status] || 'flash.session_invalidated';
+    const flashMessage = res.__?.(messageKey) || req.__?.(messageKey) || messageKey;
 
     // Définir le message flash avant la destruction de la session
     if (typeof res.flash === 'function') {

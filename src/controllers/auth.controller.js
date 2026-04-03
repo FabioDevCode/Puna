@@ -24,7 +24,7 @@ export const dpFirstCoPost = async (req, res) => {
                 });
                 return res.render('auth/first-login', {
                     layout: 'auth',
-                    error: 'Votre compte a été banni.',
+                    error: req.__('flash.account_banned'),
                 });
             }
             auditLogger.warn({
@@ -35,7 +35,7 @@ export const dpFirstCoPost = async (req, res) => {
             });
             return res.render('auth/first-login', {
                 layout: 'auth',
-                error: 'Login inconnu.',
+                error: req.__('flash.login_unknown'),
             });
         }
         if (password !== confirm_password) {
@@ -47,7 +47,7 @@ export const dpFirstCoPost = async (req, res) => {
             });
             return res.render('auth/first-login', {
                 layout: 'auth',
-                error: 'Les mots de passe ne correspondent pas.',
+                error: req.__('flash.passwords_mismatch'),
             });
         }
 
@@ -77,7 +77,7 @@ export const dpFirstCoPost = async (req, res) => {
             ip,
         });
 
-        res.flash('success', 'Compte activé ! Vous pouvez maintenant vous connecter.');
+        res.flash('success', req.__('flash.account_activated'));
         return res.redirect('/dp-login');
     } catch (err) {
         auditLogger.error({
@@ -88,7 +88,7 @@ export const dpFirstCoPost = async (req, res) => {
         });
         return res.render('auth/first-login', {
             layout: 'auth',
-            error: 'Erreur lors de la mise à jour du mot de passe.',
+            error: req.__('flash.password_update_error'),
         });
     }
 };
@@ -109,16 +109,16 @@ export const dpConnect = (req, res) => {
             });
 
             // Identify the reason for failure to provide a more specific message
-            let flashMsg = 'Identifiants incorrects.';
+            let flashMsg = req.__('flash.invalid_credentials');
             try {
                 const existingUser = await findUserByLogin(login);
                 if (existingUser && existingUser.status !== 'anonymized') {
                     if (existingUser.status === 'banned') {
-                        flashMsg = 'Votre compte a été banni.';
+                        flashMsg = req.__('flash.account_banned');
                     } else if (existingUser.status === 'suspended') {
-                        flashMsg = 'Votre compte est suspendu suite à de trop nombreuses tentatives de connexion. Contactez un administrateur.';
+                        flashMsg = req.__('flash.account_suspended');
                     } else if (existingUser.status === 'inactive') {
-                        flashMsg = 'Votre compte est désactivé. Contactez un administrateur.';
+                        flashMsg = req.__('flash.account_deactivated');
                     } else {
                         // Increment the failed attempts counter (may trigger auto-suspension)
                         await incrementFailedAttempts(existingUser.id, existingUser.login, ip);

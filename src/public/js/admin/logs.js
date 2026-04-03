@@ -221,7 +221,8 @@
      * @param {number} count - Nombre d'entrées
      */
     function updateCount(count) {
-        elements.logCount.textContent = `${count} entrée${count !== 1 ? 's' : ''}`;
+        const fmt = (window.__i18n && window.__i18n.entries_count) || '{{count}} entrée(s)';
+        elements.logCount.textContent = fmt.replace('{{count}}', count);
     }
 
     /**
@@ -313,7 +314,7 @@
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.error || 'Erreur lors du chargement');
+                throw new Error(data.error || (window.__i18n && window.__i18n.loading_error) || 'Erreur lors du chargement');
             }
 
             const data = await response.json();

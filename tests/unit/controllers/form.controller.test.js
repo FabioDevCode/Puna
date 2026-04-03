@@ -60,6 +60,7 @@ describe('createForm — validation', () => {
             body: { fk_id_site: 5 },
             session: { user: { id: 1 } },
             userRole: 'owner',
+            __: vi.fn((key) => key),
         };
         res = {
             flash: vi.fn(),
@@ -107,7 +108,7 @@ describe('createForm — validation', () => {
         req.body.name = 'MonFormulaire';
         verifySiteAccess.mockResolvedValue(null);
         await createForm(req, res);
-        expect(res.flash).toHaveBeenCalledWith('error', 'Accès refusé.');
+        expect(res.flash).toHaveBeenCalledWith('error', 'flash.access_denied');
         expect(res.redirect).toHaveBeenCalledWith('/dashboard');
     });
 });

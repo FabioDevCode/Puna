@@ -35,15 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const opener = document.getElementById(`btn_revoke_tokens_opener_${siteId}`);
                 if (opener) {
                     const old = opener.innerHTML;
-                    opener.innerHTML = '<i class="fas fa-check"></i> Révoqué';
+                    opener.innerHTML = `<i class="fas fa-check"></i> ${window.__i18n?.revoked || 'Révoqué'}`;
                     setTimeout(() => {
                         opener.innerHTML = old;
                     }, 1400);
                 }
-                Toast({ text: 'Tokens révoqués avec succès.', type: 'success' });
+                Toast({ text: window.__i18n?.tokens_revoked || 'Tokens révoqués avec succès.', type: 'success' });
             } catch (_err) {
                 // Minimal error feedback
-                Toast({ text: 'Erreur lors de la révocation des tokens.', type: 'error' });
+                Toast({ text: window.__i18n?.tokens_revoke_error || 'Erreur lors de la révocation des tokens.', type: 'error' });
             } finally {
                 btn.disabled = false;
             }
