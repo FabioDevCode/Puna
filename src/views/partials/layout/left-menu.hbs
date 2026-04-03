@@ -10,7 +10,7 @@
             <li>
                 <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-sliders"></i>
-                    Administration
+                    {{__ "menu.administration"}}
                 </a>
             </li>
         {{/roleIs}}
@@ -18,21 +18,21 @@
 
     <nav class="flex-1">
         <div class="px-4 py-2 text-xs font-bold text-neutral-content uppercase tracking-wider select-none">
-            App
+            {{__ "menu.app"}}
         </div>
         <ul class="menu p-2 gap-[1px] rounded-lg">
             <li>
                 <a href="/dashboard"
                 class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-chart-line"></i>
-                    Dashboard
+                    {{__ "menu.dashboard"}}
                 </a>
             </li>
             <li>
                 <a href="/site/all"
                 class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-network-wired"></i>
-                    Site web
+                    {{__ "menu.website"}}
                 </a>
             </li>
         </ul>
@@ -44,10 +44,10 @@
                 <div class="flex flex-col items-left gap-2">
                     <span class="p-2">
                         <i class="fas fa-shield-alt"></i>
-                        Protégez votre compte en activant l'authentification à deux facteurs.
+                        {{__ "twoFactor.banner_message"}}
                     </span>
                     <a href="/dp-2fa-setup" class="btn btn-sm shadow-sm">
-                        Configurer la 2FA
+                        {{__ "twoFactor.banner_setup"}}
                     </a>
                 </div>
             </div>
@@ -70,7 +70,7 @@
             <li>
                 <a href="/dp-logout" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100 gap-2 px-3 py-2">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    Se déconnecter
+                    {{__ "menu.logout"}}
                 </a>
             </li>
         </ul>

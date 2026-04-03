@@ -1,10 +1,10 @@
 <div id="statTopFroms"
 class="bg-base-100 h-[350px] w-full flex flex-col gap-4 p-4 justify-between stats-item flex-1 shadow-xl">
     <div class="flex items-center justify-between w-full">
-        <div class="text-sm font-semibold select-none">Top 5 formulaires</div>
+        <div class="text-sm font-semibold select-none">{{__ "stats.top_forms_title"}}</div>
         <div id="statTop_range" role="tablist" class="tabs tabs-boxed tabs-sm">
-            <a role="tab" class="tab tab-active" data-value="7">7 jours</a>
-            <a role="tab" class="tab" data-value="30">30 jours</a>
+            <a role="tab" class="tab tab-active" data-value="7">{{__ "stats.7_days"}}</a>
+            <a role="tab" class="tab" data-value="30">{{__ "stats.30_days"}}</a>
         </div>
     </div>
 
@@ -13,14 +13,14 @@ class="bg-base-100 h-[350px] w-full flex flex-col gap-4 p-4 justify-between stat
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Formulaire</th>
-                    <th>Site</th>
-                    <th class="text-right">Entrées</th>
+                    <th>{{__ "form.label"}}</th>
+                    <th>{{__ "stats.site_header"}}</th>
+                    <th class="text-right">{{__ "stats.entries_header"}}</th>
                 </tr>
             </thead>
             <tbody id="statTop_body">
                 <tr>
-                    <td colspan="3" class="text-center text-sm text-muted">Chargement…</td>
+                    <td colspan="3" class="text-center text-sm text-muted">{{__ "common.loading"}}</td>
                 </tr>
             </tbody>
         </table>

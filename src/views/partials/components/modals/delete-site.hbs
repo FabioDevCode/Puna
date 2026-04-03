@@ -13,16 +13,16 @@ domain="puna.fr"
 <button class="btn btn-sm btn-error btn-outline" data-open-modal="delete_site_modal_{{id}}">
     <i class="far fa-trash-alt"></i>
     <span class="hidden md:flex">
-        Supprimer ce site
+        {{__ "site.delete_title"}}
     </span>
 </button>
 
 <dialog id="delete_site_modal_{{id}}" class="modal">
     <div class="modal-box w-12/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
         <h2 class="text-lg font-bold mb-2 text-error">
-            Confirmer la suppression du site
+            {{__ "site.confirm_delete_title"}}
         </h2>
-        <p class="mb-2">Pour supprimer ce site, veuillez saisir <b>{{domain}}</b>&nbsp;:</p>
+        <p class="mb-2">{{__ "site.confirm_delete_hint"}} <b>{{domain}}</b>&nbsp;:</p>
         <form id="formDeleteSite_{{id}}" action="/delete-site/{{id}}" method="post" class="flex flex-col gap-4">
             <input type="hidden" name="_csrf" value="{{csrfToken}}" />
         <input id="confirm_domain_{{id}}" type="text" name="confirm_domain"
@@ -30,10 +30,10 @@ domain="puna.fr"
     </form>
     <div class="modal-action mt-4">
         <form method="dialog">
-            <button class="btn btn-sm">Annuler</button>
+            <button class="btn btn-sm">{{__ "btn.cancel"}}</button>
         </form>
         <button id="btnConfirmDelete_{{id}}" class="btn btn-sm btn-error" type="submit" form="formDeleteSite_{{id}}"
-        disabled="">Confirmer la suppression</button>
+        disabled="">{{__ "modal.confirm_delete"}}</button>
 </div>
 </div>
 </dialog>

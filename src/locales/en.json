@@ -7,12 +7,51 @@
         "login_submit": "Log in",
         "login_title": "Log in"
     },
+    "admin": {
+        "anonymize": "Anonymize",
+        "assigned_sites": "Assigned sites",
+        "ban": "Ban",
+        "ban_reason_label": "Ban reason",
+        "ban_reason_placeholder": "Enter the reason for the ban...",
+        "ban_user_title": "Ban this user",
+        "confirm_ban_user": "Are you sure you want to ban the user {{login}}?",
+        "confirm_delete_user": "Are you sure you want to delete the user {{login}}?",
+        "confirm_with_password": "Confirm with your password",
+        "create_user_submit": "Create user",
+        "deactivate": "Deactivate",
+        "delete_user_title": "Delete a user",
+        "email_label": "Email",
+        "filter_sites_placeholder": "Filter sites...",
+        "login_label": "Login",
+        "logs": "Logs",
+        "new_user_title": "New user",
+        "no_sites_available": "No site available",
+        "no_sites_match": "No site matches your search",
+        "overview": "Overview",
+        "reactivate": "Reactivate",
+        "role_beta": "Beta Tester",
+        "role_editor": "Editor (Can edit)",
+        "role_label": "Role",
+        "role_owner": "Owner",
+        "role_viewer": "Viewer (Read only)",
+        "select_role": "Select a role",
+        "settings": "Settings",
+        "sites_selection_hint": "Select the sites the user will have access to.",
+        "status_change_title": "Status change",
+        "users": "Users",
+        "your_password_placeholder": "Your password"
+    },
     "btn": {
         "apply": "Apply",
         "cancel": "Cancel",
         "clear": "Clear",
         "create": "Create",
-        "new": "New"
+        "delete": "Delete",
+        "download": "Download",
+        "new": "New",
+        "revoke": "Revoke",
+        "save": "Save",
+        "search": "Search"
     },
     "error": {
         "404_hint": "Check the URL or go back to the dashboard.",
@@ -32,8 +71,16 @@
         "return_dashboard": "Back to dashboard",
         "return_to_home": "Back to home"
     },
+    "common": {
+        "action_irreversible": "This action is irreversible.",
+        "loading": "Loading…"
+    },
     "email": {
         "auto_footer": "Puna — This email was sent automatically, please do not reply."
+    },
+    "export": {
+        "csv": "Export CSV",
+        "excel": "Export Excel"
     },
     "filter": {
         "description": "Enter values to filter displayed columns (cumulative AND conditions).",
@@ -41,12 +88,44 @@
     },
     "form": {
         "code_label": "CODE:",
+        "columns_desc": "Check the columns to display in the list.",
+        "columns_title": "Column selection",
+        "confirm_delete": "Are you sure you want to delete this form? This action is irreversible.",
         "copy_code": "Copy code",
         "copy_token": "Copy a token",
-        "label": "Form"
+        "create_help": "50 characters maximum.",
+        "create_title": "Create a new form",
+        "delete_title": "Delete this form",
+        "exists_error": "A form with this name already exists.",
+        "label": "Form",
+        "new_form": "New form",
+        "template_btn": "Template",
+        "template_desc": "Rename the fields as they should appear.",
+        "template_key": "Key (identifier)",
+        "template_label": "Label (editable)",
+        "template_title": "Edit the form template"
+    },
+    "inbox": {
+        "confirm_delete_entry": "Are you sure you want to delete this entry?",
+        "download_all": "Download all documents",
+        "download_preparing": "Preparing download",
+        "download_wait": "Please wait while the ZIP archive is being created...",
+        "field": "Field",
+        "form_data": "Form data",
+        "general_info": "General information",
+        "no_data": "No data available",
+        "no_entries": "No entries received for this form",
+        "received_date": "Received date",
+        "received_files": "Received documents",
+        "site_label": "Site",
+        "value": "Value"
+    },
+    "modal": {
+        "confirm_delete": "Confirm deletion"
     },
     "menu": {
         "administration": "Administration",
+        "app": "App",
         "dashboard": "Dashboard",
         "logout": "Log out",
         "profile": "Profile",
@@ -107,10 +186,30 @@
         "update_error": "Error updating profile."
     },
     "site": {
+        "confirm_delete_hint": "To delete this site, please enter",
+        "confirm_delete_title": "Confirm site deletion",
         "create_help": "128 characters maximum.",
         "create_title": "Create a new site",
+        "delete_title": "Delete this site",
         "domain_placeholder": "Domain name",
-        "exists_error": "A site with this domain already exists."
+        "exists_error": "A site with this domain already exists.",
+        "no_forms": "No forms created for this site",
+        "no_sites_message": "You haven't created a site yet. Click the \"New\" button to get started.",
+        "no_sites_title": "No website",
+        "revoke_message": "By revoking tokens, all previously used and copied tokens for this site will be invalidated.",
+        "revoke_title": "Revoke tokens",
+        "search_placeholder": "Enter the domain name...",
+        "search_title": "Search for a site"
+    },
+    "stats": {
+        "7_days": "7 days",
+        "30_days": "30 days",
+        "distribution_title": "Total distribution by site",
+        "entries_header": "Entries",
+        "heatmap_title": "Reception intensity (day/hour)",
+        "inbox_count_title": "Number of entries received",
+        "site_header": "Site",
+        "top_forms_title": "Top 5 forms"
     },
     "twoFactor": {
         "back_login": "Back to login",

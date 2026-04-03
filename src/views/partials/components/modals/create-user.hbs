@@ -2,7 +2,7 @@
 <dialog id="createUserModal" class="modal">
     <div class="modal-box w-11/12 max-w-2xl">
         <h3 class="font-bold text-lg mb-2">
-            Nouvel utilisateur
+            {{__ "admin.new_user_title"}}
         </h3>
 
         <form id="formCreateUser" action="/admin/users/create" method="POST" class="flex flex-col gap-4">
@@ -11,7 +11,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="form-control w-full">
                 <label class="label">
-                    <span class="label-text font-semibold">Login <span class="text-error">*</span></span>
+                    <span class="label-text font-semibold">{{__ "admin.login_label"}} <span class="text-error">*</span></span>
                 </label>
                 <input type="text" name="login" placeholder="ex: jdupont"
                 class="input input-sm input-bordered w-full" required />
@@ -19,7 +19,7 @@
 
             <div class="form-control w-full">
                 <label class="label">
-                    <span class="label-text font-semibold">Email <span class="text-error">*</span></span>
+                    <span class="label-text font-semibold">{{__ "admin.email_label"}} <span class="text-error">*</span></span>
                 </label>
                 <input type="email" name="email" placeholder="ex: jean.dupont@example.com"
                 class="input input-sm input-bordered w-full" required />
@@ -29,26 +29,26 @@
         <!-- Role -->
         <div class="form-control w-full">
             <label class="label">
-                <span class="label-text font-semibold">Rôle <span class="text-error">*</span></span>
+                <span class="label-text font-semibold">{{__ "admin.role_label"}} <span class="text-error">*</span></span>
             </label>
             <select name="role" class="select select-sm select-bordered w-full" required>
-                <option value="" disabled selected>Sélectionner un rôle</option>
-                <option value="viewer">Viewer (Lecture seule)</option>
-                <option value="editor">Editor (Peut modifier)</option>
-                <option value="owner">Owner (Propriétaire)</option>
-                <option value="beta">Beta Tester</option>
+                <option value="" disabled selected>{{__ "admin.select_role"}}</option>
+                <option value="viewer">{{__ "admin.role_viewer"}}</option>
+                <option value="editor">{{__ "admin.role_editor"}}</option>
+                <option value="owner">{{__ "admin.role_owner"}}</option>
+                <option value="beta">{{__ "admin.role_beta"}}</option>
             </select>
         </div>
 
         <!-- Sites assignés -->
         <div class="form-control w-full">
             <label class="label">
-                <span class="label-text font-semibold">Sites assignés</span>
+                <span class="label-text font-semibold">{{__ "admin.assigned_sites"}}</span>
             </label>
 
             <!-- Recherche de sites -->
             <div class="relative mb-2">
-                <input type="text" id="siteSearchInput" placeholder="Filtrer les sites..."
+                <input type="text" id="siteSearchInput" placeholder="{{__ "admin.filter_sites_placeholder"}}"
                 class="input input-sm input-bordered w-full pl-8">
                 <i
                 class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-content text-xs"></i>
@@ -67,19 +67,18 @@
             {{else}}
                 <div class="text-center text-neutral text-sm p-8 flex flex-col items-center gap-2">
                     <i class="fa-solid fa-globe text-2xl opacity-20"></i>
-                    <span>Aucun site disponible</span>
+                    <span>{{__ "admin.no_sites_available"}}</span>
                 </div>
             {{/each}}
 
             <!-- Message aucun résultat recherche -->
             <div id="noSiteFound" class="hidden text-center text-neutral text-sm p-4">
-                Aucun site ne correspond à votre recherche
+                {{__ "admin.no_sites_match"}}
             </div>
         </div>
 
         <label class="label">
-            <span class="label-text-alt text-neutral">Sélectionnez les sites auxquels l'utilisateur aura
-                accès.</span>
+            <span class="label-text-alt text-neutral">{{__ "admin.sites_selection_hint"}}</span>
         </label>
     </div>
 </form>
@@ -87,10 +86,10 @@
 <div class="modal-action mt-2">
     <form method="dialog">
         <!-- Le bouton annuler ferme la modale car il est dans un form method="dialog" -->
-        <button class="btn btn-sm">Annuler</button>
+        <button class="btn btn-sm">{{__ "btn.cancel"}}</button>
     </form>
     <button type="submit" form="formCreateUser" class="btn btn-sm btn-secondary gap-2">
-        Créer l'utilisateur
+        {{__ "admin.create_user_submit"}}
     </button>
 </div>
 </div>

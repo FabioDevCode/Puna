@@ -7,12 +7,51 @@
         "login_submit": "Se connecter",
         "login_title": "Se connecter"
     },
+    "admin": {
+        "anonymize": "Anonymiser",
+        "assigned_sites": "Sites assignés",
+        "ban": "Bannir",
+        "ban_reason_label": "Motif du bannissement",
+        "ban_reason_placeholder": "Indiquez le motif du bannissement...",
+        "ban_user_title": "Bannir cet utilisateur",
+        "confirm_ban_user": "Êtes-vous sûr de vouloir bannir l'utilisateur {{login}} ?",
+        "confirm_delete_user": "Êtes-vous sûr de vouloir supprimer l'utilisateur {{login}} ?",
+        "confirm_with_password": "Confirmez avec votre mot de passe",
+        "create_user_submit": "Créer l'utilisateur",
+        "deactivate": "Désactiver",
+        "delete_user_title": "Supprimer un utilisateur",
+        "email_label": "Email",
+        "filter_sites_placeholder": "Filtrer les sites...",
+        "login_label": "Login",
+        "logs": "Logs",
+        "new_user_title": "Nouvel utilisateur",
+        "no_sites_available": "Aucun site disponible",
+        "no_sites_match": "Aucun site ne correspond à votre recherche",
+        "overview": "Vue d'ensemble",
+        "reactivate": "Réactiver",
+        "role_beta": "Beta Tester",
+        "role_editor": "Editor (Peut modifier)",
+        "role_label": "Rôle",
+        "role_owner": "Owner (Propriétaire)",
+        "role_viewer": "Viewer (Lecture seule)",
+        "select_role": "Sélectionner un rôle",
+        "settings": "Paramètres",
+        "sites_selection_hint": "Sélectionnez les sites auxquels l'utilisateur aura accès.",
+        "status_change_title": "Changement de statut",
+        "users": "Utilisateurs",
+        "your_password_placeholder": "Votre mot de passe"
+    },
     "btn": {
         "apply": "Appliquer",
         "cancel": "Annuler",
         "clear": "Vider",
         "create": "Créer",
-        "new": "Nouveau"
+        "delete": "Supprimer",
+        "download": "Télécharger",
+        "new": "Nouveau",
+        "revoke": "Révoquer",
+        "save": "Enregistrer",
+        "search": "Rechercher"
     },
     "error": {
         "404_hint": "Vérifiez l'URL ou revenez au tableau de bord.",
@@ -32,8 +71,16 @@
         "return_dashboard": "Retour au tableau de bord",
         "return_to_home": "Retour à l'accueil"
     },
+    "common": {
+        "action_irreversible": "Cette action est irréversible.",
+        "loading": "Chargement…"
+    },
     "email": {
         "auto_footer": "Puna — Cet email a été envoyé automatiquement, merci de ne pas y répondre."
+    },
+    "export": {
+        "csv": "Exporter un CSV",
+        "excel": "Exporter un Excel"
     },
     "filter": {
         "description": "Saisissez des valeurs pour filtrer les colonnes affichées (conditions cumulatives AND).",
@@ -41,12 +88,44 @@
     },
     "form": {
         "code_label": "CODE :",
+        "columns_desc": "Cochez les colonnes à afficher dans la liste.",
+        "columns_title": "Choix des colonnes",
+        "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce formulaire ? Cette action est irréversible.",
         "copy_code": "Copier le code",
         "copy_token": "Copier un token",
-        "label": "Formulaire"
+        "create_help": "50 caractères maximum.",
+        "create_title": "Créer un nouveau formulaire",
+        "delete_title": "Supprimer ce formulaire",
+        "exists_error": "Un formulaire avec ce nom existe déjà.",
+        "label": "Formulaire",
+        "new_form": "Nouveau formulaire",
+        "template_btn": "Template",
+        "template_desc": "Renommez les champs tels qu'ils doivent apparaître.",
+        "template_key": "Clé (identifiant)",
+        "template_label": "Libellé (modifiable)",
+        "template_title": "Modifier le template du formulaire"
+    },
+    "inbox": {
+        "confirm_delete_entry": "Êtes-vous sûr de vouloir supprimer cette entrée ?",
+        "download_all": "Télécharger tous les documents",
+        "download_preparing": "Préparation du téléchargement",
+        "download_wait": "Veuillez patienter pendant la création de l'archive ZIP...",
+        "field": "Champ",
+        "form_data": "Données du formulaire",
+        "general_info": "Informations générales",
+        "no_data": "Aucune donnée disponible",
+        "no_entries": "Aucune entrée reçue pour ce formulaire",
+        "received_date": "Date de réception",
+        "received_files": "Documents reçus",
+        "site_label": "Site",
+        "value": "Valeur"
+    },
+    "modal": {
+        "confirm_delete": "Confirmer la suppression"
     },
     "menu": {
         "administration": "Administration",
+        "app": "App",
         "dashboard": "Dashboard",
         "logout": "Se déconnecter",
         "profile": "Profil",
@@ -56,7 +135,6 @@
         "beta_version": "beta-0.0.1"
     },
     "password": {
-        "instruct": "Le mot de passe doit contenir au moins :",
         "min_length": "16 caractères.",
         "needs_digit": "Un chiffre.",
         "needs_lowercase": "Une lettre minuscule.",
@@ -107,10 +185,30 @@
         "reset_token_invalid": "Le lien de réinitialisation est invalide ou a expiré."
     },
     "site": {
+        "confirm_delete_hint": "Pour supprimer ce site, veuillez saisir",
+        "confirm_delete_title": "Confirmer la suppression du site",
         "create_help": "128 caractères maximum.",
         "create_title": "Créer un nouveau site",
+        "delete_title": "Supprimer ce site",
         "domain_placeholder": "Nom de domaine",
-        "exists_error": "Un site avec ce domaine existe déjà."
+        "exists_error": "Un site avec ce domaine existe déjà.",
+        "no_forms": "Aucun formulaire créé pour ce site",
+        "no_sites_message": "Vous n'avez pas encore créé de site. Cliquez sur le bouton \"Nouveau\" pour commencer.",
+        "no_sites_title": "Aucun site web",
+        "revoke_message": "En révoquant les tokens, tous les tokens utilisés et copiés précédemment pour ce site seront invalidés.",
+        "revoke_title": "Révoquer les tokens",
+        "search_placeholder": "Tapez le nom de domaine...",
+        "search_title": "Rechercher un site"
+    },
+    "stats": {
+        "7_days": "7 jours",
+        "30_days": "30 jours",
+        "distribution_title": "Répartition totale par site",
+        "entries_header": "Entrées",
+        "heatmap_title": "Intensité de réception (jour/heure)",
+        "inbox_count_title": "Nombre d'entrées reçues",
+        "site_header": "Site",
+        "top_forms_title": "Top 5 formulaires"
     },
     "twoFactor": {
         "back_login": "Retour à la connexion",
