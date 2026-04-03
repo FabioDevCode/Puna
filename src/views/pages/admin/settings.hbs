@@ -1,5 +1,5 @@
 {{#slot "title"}}
-    <h3 class="font-inter">Paramètres</h3>
+    <h3 class="font-inter">{{__ "admin.settings_title"}}</h3>
 {{/slot}}
 
 <!-- Card: Paramètres -->
@@ -8,16 +8,15 @@
         <div class="card-body">
             <div class="alert alert-info">
                 <i class="fa-solid fa-info-circle"></i>
-                <span>Cette section est en cours de développement. Les paramètres de l'application seront disponibles
-                    prochainement.</span>
+                <span>{{__ "admin.settings_wip_message"}}</span>
             </div>
 
             <!-- Placeholder pour les futurs paramètres -->
             <div class="grid grid-cols-1 gap-6 mt-6">
-                <div class="divider">Paramètres généraux</div>
+                <div class="divider">{{__ "admin.settings_general"}}</div>
 
                 <p class="text-neutral-content text-center py-8">
-                    Contenu à définir...
+                    {{__ "admin.settings_placeholder"}}
                 </p>
             </div>
         </div>

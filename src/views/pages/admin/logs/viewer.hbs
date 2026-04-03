@@ -1,11 +1,11 @@
 {{#slot "title"}}
-    <h3 class="font-inter">Logs</h3>
+    <h3 class="font-inter">{{__ "admin.logs_title"}}</h3>
 {{/slot}}
 
 {{#slot "buttons"}}
     <button id="btn-refresh" class="btn btn-sm btn-outline">
         <i class="fa-solid fa-sync"></i>
-        Actualiser
+        {{__ "admin.logs_refresh"}}
     </button>
 {{/slot}}
 
@@ -17,10 +17,10 @@
                 <!-- Sélecteur de date -->
                 <div class="form-control w-full max-w-xs">
                     <label class="label">
-                        <span class="label-text font-medium">Date</span>
+                        <span class="label-text font-medium">{{__ "admin.logs_label_date"}}</span>
                     </label>
                     <select id="select-date" class="select select-bordered select-sm w-full">
-                        <option value="today" selected>Aujourd'hui</option>
+                        <option value="today" selected>{{__ "admin.logs_today"}}</option>
                         {{#each archives}}
                             <option value="{{this.date}}">{{this.label}}</option>
                         {{/each}}
@@ -30,23 +30,23 @@
                 <!-- Sélecteur de type -->
                 <div class="form-control w-full max-w-xs">
                     <label class="label">
-                        <span class="label-text font-medium">Type</span>
+                        <span class="label-text font-medium">{{__ "admin.logs_label_type"}}</span>
                     </label>
                     <select id="select-type" class="select select-bordered select-sm w-full">
-                        <option value="app">Application</option>
+                        <option value="app">{{__ "admin.logs_type_app"}}</option>
                         <option value="api">API</option>
-                        <option value="audit">Audit</option>
-                        <option value="error" selected>Erreurs</option>
+                        <option value="audit">{{__ "admin.logs_type_audit"}}</option>
+                        <option value="error" selected>{{__ "admin.logs_type_errors"}}</option>
                     </select>
                 </div>
 
                 <!-- Sélecteur de niveau -->
                 <div class="form-control w-full max-w-xs">
                     <label class="label">
-                        <span class="label-text font-medium">Niveau</span>
+                        <span class="label-text font-medium">{{__ "admin.logs_label_level"}}</span>
                     </label>
                     <select id="select-level" class="select select-bordered select-sm w-full">
-                        <option value="" selected>Tous</option>
+                        <option value="" selected>{{__ "admin.logs_level_all"}}</option>
                         <option value="10">Trace</option>
                         <option value="20">Debug</option>
                         <option value="30">Info</option>
@@ -59,29 +59,29 @@
                 <!-- Plage horaire -->
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-medium">Plage horaire</span>
+                        <span class="label-text font-medium">{{__ "admin.logs_label_time_range"}}</span>
                     </label>
                     <div class="join">
                         <input type="time" id="input-time-from"
                         class="input input-bordered input-sm join-item w-28"
-                        title="Heure de début" />
-                        <span class="join-item flex items-center px-2 bg-base-200 text-sm">à</span>
+                        title="{{__ "admin.logs_time_from"}}" />
+                        <span class="join-item flex items-center px-2 bg-base-200 text-sm">{{__ "admin.logs_time_separator"}}</span>
                         <input type="time" id="input-time-to"
                         class="input input-bordered input-sm join-item w-28"
-                        title="Heure de fin" />
+                        title="{{__ "admin.logs_time_to"}}" />
                     </div>
                 </div>
 
                 <!-- Boutons d'action -->
                 <div class="form-control">
                     <div class="flex gap-2">
-                        <button id="btn-apply-filters" class="btn btn-sm btn-secondary join-item" title="Appliquer les filtres">
+                        <button id="btn-apply-filters" class="btn btn-sm btn-secondary join-item" title="{{__ "btn.apply"}}">
                             <i class="fa-solid fa-filter"></i>
-                            Appliquer
+                            {{__ "btn.apply"}}
                         </button>
-                        <button id="btn-reset-filters" class="btn btn-sm join-item" title="Réinitialiser les filtres">
+                        <button id="btn-reset-filters" class="btn btn-sm join-item" title="{{__ "admin.logs_reset"}}">
                             <i class="fa-solid fa-times"></i>
-                            Réinitialiser
+                            {{__ "admin.logs_reset"}}
                         </button>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                 <!-- Recherche -->
                 <div class="form-control w-full max-w-xs">
                     <div class="join">
-                        <input type="text" id="input-search" placeholder="Rechercher par mot-clé..."
+                        <input type="text" id="input-search" placeholder="{{__ "admin.logs_search_placeholder"}}"
                         class="input input-bordered input-sm join-item w-full" />
                         <button id="btn-search" class="btn btn-sm btn-neutral join-item">
                             <i class="fa-solid fa-search"></i>
@@ -106,14 +106,14 @@
 
                 <!-- Bouton tri ordre -->
                 <div class="form-control">
-                    <button id="btn-toggle-order" class="btn btn-sm btn-outline" title="Inverser l'ordre">
+                    <button id="btn-toggle-order" class="btn btn-sm btn-outline" title="{{__ "admin.logs_toggle_order"}}">
                         <i class="fa-solid fa-arrow-right-arrow-left rotate-90"></i>
                     </button>
                 </div>
 
                 <!-- Compteur -->
                 <div class="flex items-center gap-2 ml-auto">
-                    <span class="badge badge-neutral" id="log-count">0 entrées</span>
+                    <span class="badge badge-neutral" id="log-count">{{__ "admin.logs_count_entries"}}</span>
                 </div>
             </div>
         </div>
@@ -125,19 +125,19 @@
             <!-- Loading -->
             <div id="logs-loading" class="hidden p-8 text-center">
                 <span class="loading loading-spinner loading-lg"></span>
-                <p class="mt-2 text-sm text-neutral-content">Chargement des logs...</p>
+                <p class="mt-2 text-sm text-neutral-content">{{__ "admin.logs_loading"}}</p>
             </div>
 
             <!-- Erreur -->
             <div id="logs-error" class="hidden p-8 text-center">
                 <i class="fa-solid fa-exclamation-triangle text-4xl text-warning mb-2"></i>
-                <p class="text-sm text-neutral-content" id="logs-error-message">Erreur lors du chargement</p>
+                <p class="text-sm text-neutral-content" id="logs-error-message">{{__ "admin.logs_error_loading"}}</p>
             </div>
 
             <!-- Logs vides -->
             <div id="logs-empty" class="hidden p-8 text-center">
                 <i class="fa-solid fa-inbox text-4xl text-neutral-content/50 mb-2"></i>
-                <p class="text-sm text-neutral-content">Aucun log trouvé</p>
+                <p class="text-sm text-neutral-content">{{__ "admin.logs_empty"}}</p>
             </div>
 
             <!-- Table des logs -->
@@ -145,11 +145,11 @@
                 <table class="table table-sm table-zebra">
                     <thead class="bg-base-100">
                         <tr>
-                            <th class="w-28">Heure</th>
-                            <th class="w-28">Niveau</th>
-                            <th class="w-20">Status</th>
-                            <th class="w-96">Url</th>
-                            <th>Message</th>
+                            <th class="w-28">{{__ "admin.logs_col_time"}}</th>
+                            <th class="w-28">{{__ "admin.logs_col_level"}}</th>
+                            <th class="w-20">{{__ "admin.logs_col_status"}}</th>
+                            <th class="w-96">{{__ "admin.logs_col_url"}}</th>
+                            <th>{{__ "admin.logs_col_message"}}</th>
                             <th class="w-10"></th>
                         </tr>
                     </thead>
@@ -167,12 +167,12 @@
     <div class="modal-box max-w-4xl">
         <h3 class="font-bold text-lg mb-4">
             <i class="fa-solid fa-file-alt mr-2"></i>
-            Détails du log
+            {{__ "admin.logs_detail_title"}}
         </h3>
         <pre id="log-detail-content" class="bg-base-200 p-4 rounded-lg overflow-x-auto text-sm max-h-96"></pre>
         <div class="modal-action">
             <form method="dialog">
-                <button class="btn btn-sm">Fermer</button>
+                <button class="btn btn-sm">{{__ "admin.logs_close"}}</button>
             </form>
         </div>
     </div>

@@ -1,6 +1,6 @@
 {{#slot "title"}}
     <h3 class="font-inter">
-        Vue d'ensemble
+        {{__ "admin.overview_title"}}
     </h3>
 {{/slot}}
 
@@ -11,9 +11,9 @@
             <div class="stat-figure text-neutral">
                 <i class="fa-solid fa-users text-3xl"></i>
             </div>
-            <div class="stat-title">Utilisateurs</div>
+            <div class="stat-title">{{__ "admin.stats_users"}}</div>
             <div class="stat-value text-neutral">{{stats.users}}</div>
-            <div class="stat-desc">Total</div>
+            <div class="stat-desc">{{__ "admin.stats_total"}}</div>
         </div>
     </div>
 </div>
@@ -24,9 +24,9 @@
             <div class="stat-figure text-neutral">
                 <i class="fa-solid fa-globe text-3xl"></i>
             </div>
-            <div class="stat-title">Sites</div>
+            <div class="stat-title">{{__ "admin.stats_sites"}}</div>
             <div class="stat-value text-neutral">{{stats.sites}}</div>
-            <div class="stat-desc">Total</div>
+            <div class="stat-desc">{{__ "admin.stats_total"}}</div>
         </div>
     </div>
 </div>
@@ -37,9 +37,9 @@
             <div class="stat-figure text-neutral">
                 <i class="fa-solid fa-file-lines text-3xl"></i>
             </div>
-            <div class="stat-title">Formulaires</div>
+            <div class="stat-title">{{__ "admin.stats_forms"}}</div>
             <div class="stat-value text-neutral">{{stats.forms}}</div>
-            <div class="stat-desc">Total</div>
+            <div class="stat-desc">{{__ "admin.stats_total"}}</div>
         </div>
     </div>
 </div>
@@ -50,9 +50,9 @@
             <div class="stat-figure text-neutral">
                 <i class="fa-solid fa-inbox text-3xl"></i>
             </div>
-            <div class="stat-title">Entrées</div>
+            <div class="stat-title">{{__ "admin.stats_entries"}}</div>
             <div class="stat-value text-neutral">{{stats.entries}}</div>
-            <div class="stat-desc">Total</div>
+            <div class="stat-desc">{{__ "admin.stats_total"}}</div>
         </div>
     </div>
 </div>
@@ -64,9 +64,9 @@
             <div class="stat-figure text-success">
                 <i class="fa-solid fa-circle text-sm animate-pulse"></i>
             </div>
-            <div class="stat-title">En ligne</div>
+            <div class="stat-title">{{__ "admin.stats_online"}}</div>
             <div class="stat-value text-success">{{activityStats.connectedUsers}}</div>
-            <div class="stat-desc">Utilisateurs connectés</div>
+            <div class="stat-desc">{{__ "admin.stats_connected_users"}}</div>
         </div>
     </div>
 </div>
@@ -77,9 +77,9 @@
             <div class="stat-figure text-error">
                 <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
             </div>
-            <div class="stat-title">Erreurs</div>
+            <div class="stat-title">{{__ "admin.stats_errors"}}</div>
             <div class="stat-value text-error">{{activityStats.errorsCount}}</div>
-            <div class="stat-desc">Logs</div>
+            <div class="stat-desc">{{__ "admin.stats_logs"}}</div>
         </div>
     </div>
 </div>
@@ -90,9 +90,9 @@
             <div class="stat-figure text-info">
                 <i class="fa-regular fa-calendar-plus text-3xl"></i>
             </div>
-            <div class="stat-title">Créés aujourd'hui</div>
+            <div class="stat-title">{{__ "admin.stats_created_today"}}</div>
             <div class="stat-value text-info">{{activityStats.todaySites}} / {{activityStats.todayForms}}</div>
-            <div class="stat-desc">Sites / Formulaires</div>
+            <div class="stat-desc">{{__ "admin.stats_sites_forms"}}</div>
         </div>
     </div>
 </div>
@@ -103,9 +103,9 @@
             <div class="stat-figure text-warning">
                 <i class="fa-regular fa-folder-open text-3xl"></i>
             </div>
-            <div class="stat-title">Fichiers</div>
+            <div class="stat-title">{{__ "admin.stats_files"}}</div>
             <div class="stat-value text-warning">{{activityStats.totalFiles}}</div>
-            <div class="stat-desc">Total uploadés</div>
+            <div class="stat-desc">{{__ "admin.stats_total_uploaded"}}</div>
         </div>
     </div>
 </div>
