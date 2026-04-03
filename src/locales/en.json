@@ -1,4 +1,12 @@
 {
+    "auth": {
+        "first_login_link": "First login",
+        "first_login_submit": "Confirm",
+        "first_login_title": "First login",
+        "login_link": "Log in",
+        "login_submit": "Log in",
+        "login_title": "Log in"
+    },
     "btn": {
         "apply": "Apply",
         "cancel": "Cancel",
@@ -7,9 +15,25 @@
         "new": "New"
     },
     "error": {
-        "404_message": "This page might have gone on vacation…",
-        "404_title": "Error 404 – Page missing!",
+        "404_hint": "Check the URL or go back to the dashboard.",
+        "404_message": "This page does not exist or has been moved.",
+        "404_title": "Page not found",
+        "403_action": "Action:",
+        "403_allowed_roles": "Allowed roles:",
+        "403_entity": "Entity:",
+        "403_heading": "Forbidden",
+        "403_message": "You do not have the necessary permissions to access this resource.",
+        "403_title": "403 - Forbidden",
+        "403_your_role": "Your role:",
+        "500_hint": "The team has been notified. Try again in a few moments.",
+        "500_message": "An unexpected error occurred on the server.",
+        "500_title": "Server error",
+        "go_back": "← Back",
+        "return_dashboard": "Back to dashboard",
         "return_to_home": "Back to home"
+    },
+    "email": {
+        "auto_footer": "Puna — This email was sent automatically, please do not reply."
     },
     "filter": {
         "description": "Enter values to filter displayed columns (cumulative AND conditions).",

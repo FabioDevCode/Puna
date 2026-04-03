@@ -7,17 +7,17 @@
     </div>
 
     <h2>
-        Configurer la 2FA
+        {{__ "twoFactor.setup_title"}}
     </h2>
 
     <p class="text-sm text-center">
-        Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy, etc.)
+        {{__ "twoFactor.setup_subtitle"}}
     </p>
 
     <img src="{{qrCodeDataUrl}}" alt="QR Code 2FA" class="w-48 h-48 rounded-lg border border-base-300" />
 
 <div class="w-full">
-    <p class="text-xs text-center mb-1">Ou saisissez cette clé manuellement :</p>
+    <p class="text-xs text-center mb-1">{{__ "twoFactor.setup_manual_key"}}</p>
     <div class="bg-base-200 rounded p-2 text-center font-mono text-sm break-all select-all">
         {{manualKey}}
     </div>
@@ -27,14 +27,14 @@
     <input type="hidden" name="_csrf" value="{{csrfToken}}" />
 <label class="input input-sm input-bordered flex items-center gap-2">
     <i class="fas fa-shield-alt" style="color: #6C7179; font-size: .8rem;"></i>
-    <input name="totp_code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" class="grow" placeholder="Code à 6 chiffres" maxlength="6" required />
+    <input name="totp_code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" class="grow" placeholder="{{__ "twoFactor.setup_verify_placeholder"}}" maxlength="6" required />
 </label>
 <button class="btn btn-secondary btn-sm">
-    Vérifier et activer
+    {{__ "twoFactor.setup_submit"}}
 </button>
 </form>
 
 <a href="/dashboard" class="btn btn-sm btn-ghost w-full">
-    Passer pour le moment
+    {{__ "twoFactor.setup_skip"}}
 </a>
 </div>

@@ -1,4 +1,12 @@
 {
+    "auth": {
+        "first_login_link": "Première connexion",
+        "first_login_submit": "Confirmer",
+        "first_login_title": "Première connexion",
+        "login_link": "Se connecter",
+        "login_submit": "Se connecter",
+        "login_title": "Se connecter"
+    },
     "btn": {
         "apply": "Appliquer",
         "cancel": "Annuler",
@@ -7,9 +15,25 @@
         "new": "Nouveau"
     },
     "error": {
-        "404_message": "Cette page a peut-être pris des vacances…",
-        "404_title": "Erreur 404 – Page disparue !",
+        "404_hint": "Vérifiez l'URL ou revenez au tableau de bord.",
+        "404_message": "Cette page n'existe pas ou a été déplacée.",
+        "404_title": "Page introuvable",
+        "403_action": "Action :",
+        "403_allowed_roles": "Rôles autorisés :",
+        "403_entity": "Entité :",
+        "403_heading": "Accès interdit",
+        "403_message": "Vous n'avez pas les permissions nécessaires pour accéder à cette ressource.",
+        "403_title": "403 - Accès interdit",
+        "403_your_role": "Votre rôle :",
+        "500_hint": "L'équipe a été notifiée. Réessayez dans quelques instants.",
+        "500_message": "Une erreur inattendue est survenue côté serveur.",
+        "500_title": "Erreur serveur",
+        "go_back": "← Retour",
+        "return_dashboard": "Retour au tableau de bord",
         "return_to_home": "Retour à l'accueil"
+    },
+    "email": {
+        "auto_footer": "Puna — Cet email a été envoyé automatiquement, merci de ne pas y répondre."
     },
     "filter": {
         "description": "Saisissez des valeurs pour filtrer les colonnes affichées (conditions cumulatives AND).",

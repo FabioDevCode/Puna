@@ -7,7 +7,7 @@
     </div>
 
     <h2>
-        Première connexion
+        {{__ "auth.first_login_title"}}
     </h2>
 
     {{#if error}}
@@ -55,11 +55,11 @@
 </div>
 
 <button class="btn btn-secondary btn-sm" data-pwd-submit>
-    Confirmer
+    {{__ "auth.first_login_submit"}}
 </button>
 
 <a href="/dp-login" class="btn btn-sm btn-wide self-center w-full">
-    Se connecter
+    {{__ "auth.login_link"}}
 </a>
 </form>
 </div>

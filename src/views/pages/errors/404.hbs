@@ -20,13 +20,13 @@
     <body id="error_body" class="flex justify-center items-center h-screen min-h-screen w-screen min-w-screen">
         <div class="flex flex-col text-base-100 items-center gap-8 bg-secondary p-12 rounded-2xl shadow-xl" style="width: 660px;">
             <p class="text-8xl font-black opacity-30">404</p>
-            <h1>Page introuvable</h1>
+            <h1>{{__ "error.404_title"}}</h1>
             <p class="text-center opacity-80">
-                Cette page n'existe pas ou a été déplacée.<br />
-            Vérifiez l'URL ou revenez au tableau de bord.
+                {{__ "error.404_message"}}<br />
+            {{__ "error.404_hint"}}
         </p>
         <div class="flex gap-4">
-            <a href="/dashboard" class="btn btn-wide">Tableau de bord</a>
+            <a href="/dashboard" class="btn btn-wide">{{__ "menu.dashboard"}}</a>
         </div>
     </div>
 </body>
