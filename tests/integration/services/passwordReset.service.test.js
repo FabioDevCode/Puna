@@ -97,7 +97,7 @@ describe('passwordReset.service', () => {
             expect(sendMail).toHaveBeenCalledWith(
                 expect.objectContaining({
                     to: 'test@example.com',
-                    subject: 'Réinitialisation de votre mot de passe — Puna',
+                    subject: 'Réinitialisation de votre mot de passe - Puna',
                     html: expect.stringContaining('Puna'),
                 })
             );

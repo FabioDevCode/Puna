@@ -102,6 +102,7 @@ describe('mailer config', () => {
                     to: 'user@example.com',
                     subject: 'Test',
                     html: '<p>Test</p>',
+                    attachments: [],
                 });
                 expect(appLogger.info).toHaveBeenCalledWith({ to: 'user@example.com', messageId: 'msg-123' }, 'Email sent successfully');
             });
