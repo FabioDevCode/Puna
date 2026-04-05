@@ -1,6 +1,6 @@
 {
 	"name": "puna",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "Application de gestion de feedbacks",
 	"main": "server.js",
 	"type": "module",
