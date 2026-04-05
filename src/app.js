@@ -196,6 +196,11 @@ app.set('view engine', 'hbs');
 app.set('views', [`${__dirname}/views/pages`]);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
+app.use((_, res, next) => {
+    res.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+    next();
+});
+
 await initAdminUser();
 await routes(app);
 await api(app);
