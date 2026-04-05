@@ -10,7 +10,9 @@
         {{#actionCan entity='user' action='create'}}
             <button id="btn-create-user" class="btn btn-sm btn-secondary gap-2">
                 <i class="fa-solid fa-plus"></i>
-                {{__ "admin.users_new"}}
+                <span class="hidden md:flex">
+                    {{__ "admin.users_new"}}
+                </span>
             </button>
         {{/actionCan}}
     {{/roleIs}}

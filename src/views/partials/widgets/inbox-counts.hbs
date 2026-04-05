@@ -1,15 +1,15 @@
 <div id="statA" class="bg-base-100 stats-item p-4 stats-item--a shadow-xl">
     <div class="flex flex-col gap-2 w-full">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="text-sm font-semibold select-none">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-3 w-max">
+                <div class="text-sm font-semibold select-none w-max">
                     {{__ "stats.inbox_count_title"}}
                 </div>
-                <span id="statA_total" class="text-xs font-medium badge badge-ghost"></span>
+                <span id="statA_total" class="text-xs font-medium badge badge-ghost w-max"></span>
             </div>
-            <div id="statA_range" role="tablist" class="tabs tabs-boxed tabs-sm">
-                <a role="tab" class="tab tab-active" data-value="7">{{__ "stats.7_days"}}</a>
-                <a role="tab" class="tab" data-value="30">{{__ "stats.30_days"}}</a>
+            <div id="statA_range" role="tablist" class="tabs tabs-boxed tabs-sm w-max">
+                <a role="tab" class="tab w-max tab-active" data-value="7">{{__ "stats.7_days"}}</a>
+                <a role="tab" class="tab w-max" data-value="30">{{__ "stats.30_days"}}</a>
             </div>
         </div>
         <div id="statA_chart" class="overflow-hidden h-[344px]"></div>

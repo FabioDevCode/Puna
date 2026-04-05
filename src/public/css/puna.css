@@ -345,7 +345,7 @@ h3.font-inter {
     }
 }
 
-#statA_range :is(.tab-active, [aria-selected='true']):not(.tab-disabled):not([disabled]),
+/* #statA_range :is(.tab-active, [aria-selected='true']):not(.tab-disabled):not([disabled]),
 #statA_range :is(input:checked),
 #statH_range :is(.tab-active, [aria-selected='true']):not(.tab-disabled):not([disabled]),
 #statH_range :is(input:checked),
@@ -355,7 +355,7 @@ h3.font-inter {
     background-color: #0675c3;
     --tw-text-opacity: 1;
     color: whitesmoke;
-}
+} */
 
 .no-activate {
     display: flex;

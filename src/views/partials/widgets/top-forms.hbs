@@ -1,10 +1,12 @@
 <div id="statTopFroms"
 class="bg-base-100 h-[350px] w-full flex flex-col gap-4 p-4 justify-between stats-item flex-1 shadow-xl">
-    <div class="flex items-center justify-between w-full">
-        <div class="text-sm font-semibold select-none">{{__ "stats.top_forms_title"}}</div>
-        <div id="statTop_range" role="tablist" class="tabs tabs-boxed tabs-sm">
-            <a role="tab" class="tab tab-active" data-value="7">{{__ "stats.7_days"}}</a>
-            <a role="tab" class="tab" data-value="30">{{__ "stats.30_days"}}</a>
+    <div class="flex items-center justify-between w-full flex-wrap gap-2">
+        <div class="text-sm font-semibold select-none w-max">
+            {{__ "stats.top_forms_title"}}
+        </div>
+        <div id="statTop_range" role="tablist" class="tabs tabs-boxed tabs-sm w-max">
+            <a role="tab" class="tab w-max tab-active" data-value="7">{{__ "stats.7_days"}}</a>
+            <a role="tab" class="tab w-max" data-value="30">{{__ "stats.30_days"}}</a>
         </div>
     </div>
 
