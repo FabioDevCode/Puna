@@ -344,7 +344,8 @@
         "needs_lowercase": "Une lettre minuscule.",
         "needs_special": "Un caractère spécial.",
         "needs_uppercase": "Une lettre majuscule.",
-        "too_weak": "Le mot de passe ne respecte pas les critères de sécurité."
+        "too_weak": "Le mot de passe ne respecte pas les critères de sécurité.",
+        "instruct": "password.instruct"
     },
     "passwordReset": {
         "email_body": "Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le lien ci-dessous pour en choisir un nouveau :",
