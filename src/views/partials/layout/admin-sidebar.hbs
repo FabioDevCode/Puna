@@ -5,16 +5,16 @@
         </div>
     </a>
 
-    <ul class="menu p-2 gap-[1px] rounded-lg">
-        {{#roleIs roles='super_admin,owner'}}
+    {{#roleIs roles='super_admin,owner'}}
+        <ul class="menu p-2 gap-[1px] rounded-lg">
             <li>
                 <a href="/dashboard" class="rounded-lg flex items-center gap-2 px-3 py-2 hover:bg-neutral hover:text-base-100">
                     <i class="fa-solid fa-display"></i>
                     {{__ "menu.app"}}
                 </a>
             </li>
-        {{/roleIs}}
-    </ul>
+        </ul>
+    {{/roleIs}}
 
     <!-- Menu Administration -->
     <nav class="flex-1">
