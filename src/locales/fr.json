@@ -140,7 +140,7 @@
         "loading": "Chargement…"
     },
     "email": {
-        "auto_footer": "Puna — Cet email a été envoyé automatiquement, merci de ne pas y répondre."
+        "auto_footer": "Puna - Cet email a été envoyé automatiquement, merci de ne pas y répondre."
     },
     "error": {
         "403_action": "Action :",
@@ -339,13 +339,13 @@
         "confirm_delete": "Confirmer la suppression"
     },
     "password": {
+        "instruct": "password.instruct",
         "min_length": "16 caractères.",
         "needs_digit": "Un chiffre.",
         "needs_lowercase": "Une lettre minuscule.",
         "needs_special": "Un caractère spécial.",
         "needs_uppercase": "Une lettre majuscule.",
-        "too_weak": "Le mot de passe ne respecte pas les critères de sécurité.",
-        "instruct": "password.instruct"
+        "too_weak": "Le mot de passe ne respecte pas les critères de sécurité."
     },
     "passwordReset": {
         "email_body": "Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le lien ci-dessous pour en choisir un nouveau :",

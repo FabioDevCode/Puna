@@ -140,7 +140,7 @@
         "loading": "Loading…"
     },
     "email": {
-        "auto_footer": "Puna — This email was sent automatically, please do not reply."
+        "auto_footer": "Puna - This email was sent automatically, please do not reply."
     },
     "error": {
         "403_action": "Action:",

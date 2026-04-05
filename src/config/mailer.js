@@ -28,10 +28,11 @@ if (mailEnabled) {
  * @param {string} options.to - Recipient email address.
  * @param {string} options.subject - Email subject.
  * @param {string} options.html - HTML body of the email.
+ * @param {Array} [options.attachments] - Optional nodemailer attachments (supports CID inline images).
  * @returns {Promise<void>}
  * @throws {Error} If the mail service is not configured.
  */
-export async function sendMail({ to, subject, html }) {
+export async function sendMail({ to, subject, html, attachments = [] }) {
     if (!mailEnabled) {
         throw new Error('Mail service is not configured');
     }
@@ -42,6 +43,7 @@ export async function sendMail({ to, subject, html }) {
             to,
             subject,
             html,
+            attachments,
         });
         appLogger.info({ to, messageId: info.messageId }, 'Email sent successfully');
     } catch (err) {

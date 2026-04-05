@@ -4,6 +4,8 @@
  */
 
 import crypto from 'node:crypto';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { logger as appLogger, auditLogger } from '../config/logger.js';
 import { sendMail, mailEnabled } from '../config/mailer.js';
 import { renderMailTemplate } from '../helpers/mail.helpers.js';
@@ -53,10 +55,20 @@ export async function createPasswordResetRequest(email) {
 
         const html = await renderMailTemplate('reset-password', { resetUrl });
 
+        const __dirname = path.dirname(fileURLToPath(import.meta.url));
+        const logoPath = path.join(__dirname, '../public/img/puna_logo.png');
+
         await sendMail({
             to: user.email,
-            subject: 'Réinitialisation de votre mot de passe — Puna',
+            subject: 'Réinitialisation de votre mot de passe - Puna',
             html,
+            attachments: [
+                {
+                    filename: 'puna_logo.png',
+                    path: logoPath,
+                    cid: 'puna_logo',
+                },
+            ],
         });
 
         auditLogger.info({ action: 'PASSWORD_RESET_REQUESTED', userId: user.id, email: user.email }, 'Password reset email sent');
