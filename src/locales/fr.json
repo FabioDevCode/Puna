@@ -420,6 +420,7 @@
     "stats": {
         "7_days": "7 jours",
         "30_days": "30 jours",
+        "days_of_week": ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
         "distribution_title": "Répartition totale par site",
         "entries_header": "Entrées",
         "heatmap_title": "Intensité de réception (jour/heure)",

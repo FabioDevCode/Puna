@@ -420,6 +420,7 @@
     "stats": {
         "7_days": "7 days",
         "30_days": "30 days",
+        "days_of_week": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         "distribution_title": "Total distribution by site",
         "entries_header": "Entries",
         "heatmap_title": "Reception intensity (day/hour)",

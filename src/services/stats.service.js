@@ -257,7 +257,7 @@ export async function getInboxCountsBySite(userId) {
  * @param {number} days - Nombre de jours (7 ou 30)
  * @returns {Promise<Object>} - { hours: [], series: [{ name, data }] }
  */
-export async function getInboxHeatmap(userId, userRole, days = 7) {
+export async function getInboxHeatmap(userId, userRole, days = 7, locale = 'fr') {
     const end = new Date();
     end.setHours(23, 59, 59, 999);
     const start = new Date();
@@ -285,7 +285,11 @@ export async function getInboxHeatmap(userId, userRole, days = 7) {
     });
 
     // Préparer matrice 7x24 (Lundi..Dimanche, heures 00..23)
-    const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const daysOfWeekByLocale = {
+        fr: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
+        en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    };
+    const daysOfWeek = daysOfWeekByLocale[locale] ?? daysOfWeekByLocale.fr;
     const hours = Array.from({ length: 24 }, (_, i) => (i === 0 ? '00' : String(i)));
     const matrix = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0));
 

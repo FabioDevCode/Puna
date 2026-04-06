@@ -104,7 +104,8 @@ export const getInboxHeatmap = async (req, res) => {
     const days = [7, 30].includes(daysRaw) ? daysRaw : 7;
 
     try {
-        const result = await getInboxHeatmapService(userId, userRole, days);
+        const locale = req.session.user?.locale || 'fr';
+        const result = await getInboxHeatmapService(userId, userRole, days, locale);
         return res.json(result);
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxHeatmap error');
