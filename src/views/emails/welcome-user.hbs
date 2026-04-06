@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{__ "welcomeEmail.email_subject"}}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4;padding:40px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;overflow:hidden;">
+                    <tr>
+                        <td style="background-color:#ffffff;padding:32px 40px 0px 32px;">
+                            <table cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="vertical-align:middle;padding-right:10px;">
+                                        <img src="cid:puna_logo" alt="Logo Puna" style="height:36px;width:auto;display:block;" />
+                                </td>
+                                <td style="vertical-align:middle;">
+                                    <h1 style="margin:0;color:#1a1a2e;font-size:22px;font-weight:700;">Puna</h1>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:40px;">
+                        <p style="margin:0 0 16px;color:#333333;font-size:16px;">{{__ "welcomeEmail.email_greeting"}}</p>
+                        <p style="margin:0 0 16px;color:#555555;font-size:15px;line-height:1.6;">
+                            {{__ "welcomeEmail.email_body"}}
+                        </p>
+                        <p style="margin:0 0 24px;color:#1a1a2e;font-size:18px;font-weight:700;text-align:center;">
+                            <strong>{{login}}</strong>
+                        </p>
+                        <p style="margin:0 0 24px;color:#555555;font-size:15px;line-height:1.6;">
+                            {{__ "welcomeEmail.email_instruction"}}
+                        </p>
+                        <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+                            <tr>
+                                <td style="border-radius:6px;background-color:#0075c3;">
+                                    <a href="{{firstLoginUrl}}"
+                                    style="display:inline-block;padding:14px 28px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;">
+                                        {{__ "welcomeEmail.email_button"}}
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="margin:0;color:#888888;font-size:13px;">
+                            {{__ "welcomeEmail.email_ignore"}}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color:#f9f9f9;padding:20px 40px;border-top:1px solid #eeeeee;">
+                        <p style="margin:0;color:#aaaaaa;font-size:12px;">
+                            &copy; {{__ "email.auto_footer"}}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

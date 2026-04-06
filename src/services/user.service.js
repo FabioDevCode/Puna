@@ -3,8 +3,12 @@
  * Gère les opérations CRUD sur les utilisateurs (admin)
  */
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Op } from 'sequelize';
-import { auditLogger } from '../config/logger.js';
+import { auditLogger, logger as appLogger } from '../config/logger.js';
+import { sendMail, mailEnabled } from '../config/mailer.js';
+import { renderMailTemplate } from '../helpers/mail.helpers.js';
 import models from '../models/index.js';
 import { hashPassword } from './auth.service.js';
 
@@ -313,6 +317,47 @@ export async function createUserAdmin(userData) {
 
     const user = await models.User.create(dataToCreate);
     return user.toJSON();
+}
+
+/**
+ * Envoyer un email de bienvenue à un nouvel utilisateur
+ * @param {Object} user - Objet utilisateur (doit contenir login et email)
+ * @param {string} user.login - Login de l'utilisateur
+ * @param {string} user.email - Email de l'utilisateur
+ * @returns {Promise<void>}
+ * @throws {Error} Si le service mail n'est pas configuré ou si l'email est absent
+ */
+export async function sendWelcomeEmail(user) {
+    if (!mailEnabled) {
+        throw new Error('Mail service is not configured');
+    }
+
+    if (!user.email) {
+        throw new Error('User has no email address');
+    }
+
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+    const firstLoginUrl = `${appUrl}/dp-first-connexion`;
+
+    const html = await renderMailTemplate('welcome-user', { login: user.login, firstLoginUrl });
+
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const logoPath = path.join(__dirname, '../public/img/puna_logo.png');
+
+    await sendMail({
+        to: user.email,
+        subject: 'Bienvenue sur Puna — Activez votre compte',
+        html,
+        attachments: [
+            {
+                filename: 'puna_logo.png',
+                path: logoPath,
+                cid: 'puna_logo',
+            },
+        ],
+    });
+
+    appLogger.info({ action: 'WELCOME_EMAIL_SENT', userLogin: user.login, email: user.email }, 'Welcome email sent to new user');
 }
 
 /**

@@ -56,6 +56,7 @@
         "role_owner": "Owner",
         "role_viewer": "Viewer (Read only)",
         "select_role": "Select a role",
+        "send_welcome_email": "Send a welcome email to this user",
         "settings": "Settings",
         "settings_general": "General settings",
         "settings_placeholder": "Content to be defined...",
@@ -217,6 +218,8 @@
         "admin_user_exists": "A user with this email or login already exists.",
         "admin_user_update_error": "Error updating user.",
         "admin_user_updated": "User updated.",
+        "admin_welcome_email_error": "User created, but the welcome email could not be sent.",
+        "admin_welcome_email_sent": "Welcome email sent to the user.",
         "enter_email": "Please enter an email address.",
         "enter_password": "Please enter a password.",
         "export_error": "Export error",
@@ -477,5 +480,13 @@
         "form_name_invalid_chars": "Form name contains invalid characters.",
         "form_name_required": "Form name is required.",
         "form_name_too_long": "Form name must not exceed 50 characters."
+    },
+    "welcomeEmail": {
+        "email_body": "An account has been created for you on Puna. Your login identifier is:",
+        "email_button": "Activate my account",
+        "email_greeting": "Hello,",
+        "email_ignore": "If you did not expect this invitation, simply ignore this email.",
+        "email_instruction": "Click the button below to set your password and access your space.",
+        "email_subject": "Welcome to Puna — Activate your account"
     }
 }

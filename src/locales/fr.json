@@ -56,6 +56,7 @@
         "role_owner": "Owner (Propriétaire)",
         "role_viewer": "Viewer (Lecture seule)",
         "select_role": "Sélectionner un rôle",
+        "send_welcome_email": "Envoyer un email de bienvenue à l'utilisateur",
         "settings": "Paramètres",
         "settings_general": "Paramètres généraux",
         "settings_placeholder": "Contenu à définir...",
@@ -217,6 +218,8 @@
         "admin_user_exists": "Un utilisateur avec cet email ou login existe déjà.",
         "admin_user_update_error": "Erreur lors de la mise à jour de l'utilisateur.",
         "admin_user_updated": "Utilisateur mis à jour.",
+        "admin_welcome_email_error": "Utilisateur créé, mais l'envoi de l'email de bienvenue a échoué.",
+        "admin_welcome_email_sent": "Email de bienvenue envoyé à l'utilisateur.",
         "enter_email": "Veuillez saisir une adresse email.",
         "enter_password": "Veuillez saisir un mot de passe.",
         "export_error": "Erreur lors de l'export",
@@ -477,5 +480,13 @@
         "form_name_invalid_chars": "Le nom du formulaire contient des caractères non autorisés.",
         "form_name_required": "Le nom du formulaire est requis.",
         "form_name_too_long": "Le nom du formulaire ne doit pas dépasser 50 caractères."
+    },
+    "welcomeEmail": {
+        "email_body": "Un compte a été créé pour vous sur Puna. Votre identifiant de connexion est :",
+        "email_button": "Activer mon compte",
+        "email_greeting": "Bonjour,",
+        "email_ignore": "Si vous n'êtes pas à l'origine de cette invitation, ignorez simplement cet email.",
+        "email_instruction": "Cliquez sur le bouton ci-dessous pour définir votre mot de passe et accéder à votre espace.",
+        "email_subject": "Bienvenue sur Puna — Activez votre compte"
     }
 }

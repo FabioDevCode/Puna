@@ -81,6 +81,17 @@
             <span class="label-text-alt text-neutral">{{__ "admin.sites_selection_hint"}}</span>
         </label>
     </div>
+
+    <!-- Email de bienvenue (visible uniquement si le mail est configuré) -->
+    {{#if mailEnabled}}
+        <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-3">
+                <input type="checkbox" name="sendWelcomeEmail" value="on"
+                class="checkbox checkbox-sm checkbox-neutral rounded-md" />
+                <span class="label-text">{{__ "admin.send_welcome_email"}}</span>
+            </label>
+        </div>
+    {{/if}}
 </form>
 
 <div class="modal-action mt-2">

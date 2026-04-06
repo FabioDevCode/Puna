@@ -12,6 +12,7 @@ import {
     getUserWithRelations,
     changeUserStatus,
     deleteUserWithRelations,
+    sendWelcomeEmail,
 } from '../../services/user.service.js';
 
 /**
@@ -182,7 +183,7 @@ export const adminUsersExportCSV = async (req, res) => {
  */
 export const adminCreateUser = async (req, res) => {
     try {
-        const { login, email, role, sites } = req.body;
+        const { login, email, role, sites, sendWelcomeEmail: sendEmail } = req.body;
         const creatorId = req.session.user?.id;
 
         // Validation basique
@@ -214,7 +215,19 @@ export const adminCreateUser = async (req, res) => {
         }
 
         res.flash('success', req.__('flash.admin_user_created'));
-        res.redirect('/admin/users');
+
+        // Envoi optionnel de l'email de bienvenue (n'empêche pas la création en cas d'échec)
+        if (sendEmail === 'on') {
+            try {
+                await sendWelcomeEmail(newUser);
+                res.flash('info', req.__('flash.admin_welcome_email_sent'));
+            } catch (mailErr) {
+                errorLogger.error({ err: mailErr, userId: newUser.id }, 'sendWelcomeEmail error');
+                res.flash('warning', req.__('flash.admin_welcome_email_error'));
+            }
+        }
+
+        return res.redirect('/admin/users');
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminCreateUser error');
         res.flash('error', req.__('flash.admin_user_create_error'));
