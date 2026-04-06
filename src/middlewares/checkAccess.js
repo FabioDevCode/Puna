@@ -60,8 +60,8 @@ export function actionAccess(entity, action) {
             );
 
             // Retourner 403 Forbidden
-            return res.status(403).render('pages/errors/403', {
-                layout: 'error',
+            return res.status(403).render('errors/403', {
+                layout: false,
                 message: req.__('flash.no_permission', {
                     action: req.__(`permission.${action}`),
                 }),
@@ -118,8 +118,8 @@ export function roleAccess(allowedRoles) {
             );
 
             // Retourner 403 Forbidden
-            return res.status(403).render('pages/errors/403', {
-                layout: 'error',
+            return res.status(403).render('errors/403', {
+                layout: false,
                 message: req.__('flash.role_no_access'),
                 allowedRoles,
                 userRole,

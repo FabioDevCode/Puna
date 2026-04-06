@@ -60,6 +60,18 @@ export default {
         return JSON.stringify(context);
     },
 
+    /**
+     * Converts a role key (e.g. "viewer") to its localised label.
+     * Falls back to the raw key when no translation is found.
+     */
+    roleLabel: function (role, options) {
+        if (!role) return '';
+        const locale = options?.data?.root?.locale || 'fr';
+        const label = i18n.__({ phrase: `user.role_${role}`, locale });
+        // i18n returns the key itself when no translation exists
+        return label === `user.role_${role}` ? role : label;
+    },
+
     eq: function (a, b) {
         return a === b;
     },
