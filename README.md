@@ -12,3 +12,9 @@ Vous êtes libre de l’utiliser, le modifier et le redistribuer,
 - daisyUI v4 : https://v4.daisyui.com/
 - tailwindCSS : https://tailwindcss.com/
 - ApexCharts : https://apexcharts.com/
+
+## Playwrgiht
+
+- npm install
+- npx playwright install chromium
+- cp .env.test.example .env.test

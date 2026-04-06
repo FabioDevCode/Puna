@@ -18,3 +18,10 @@ migrations/
 
 # Coverage
 coverage/
+
+# Playwright
+test-results/
+playwright-report/
+tests/e2e/.auth/
+storage/test.sqlite
+.env.test
