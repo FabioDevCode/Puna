@@ -1,405 +1,623 @@
 # Plan d'implémentation — Puna
 
-> Analyse du projet et recommandations d'implémentation — 24 mars 2026
+> Préparation à la mise en public du projet — 6 avril 2026
 
 ---
 
-## Ordre d'implémentation recommandé
+## Vue d'ensemble
 
-| #   | Tâche                                            | Effort | Impact    |
-| --- | ------------------------------------------------ | ------ | --------- |
-| 1   | Super admin via variables d'environnement        | Faible | Fondation |
-| 2   | Validation de mot de passe fort (16 car. min)    | Faible | Sécurité  |
-| 3   | Validation des inputs (création site/form)       | Moyen  | Sécurité  |
-| 4   | Internationalisation complète (FR + EN + switch) | Élevé  | UX        |
-| 5   | Script de setup interactif                       | Moyen  | DX        |
-| 6   | Tests end-to-end (Playwright)                    | Élevé  | Qualité   |
+| #   | Tâche                                      | Effort | Priorité |
+| --- | ------------------------------------------ | ------ | -------- |
+| 1   | Script d'installation (`scripts/setup.js`) | Moyen  | Haute    |
+| 2   | Documents de contribution open-source      | Moyen  | Haute    |
+| 3   | CI GitHub Actions (lint + tests)           | Faible | Haute    |
+| 4   | Enrichir le README.md                      | Moyen  | Haute    |
 
----
-
-## 1. Super admin via variables d'environnement
-
-### Pourquoi en premier
-
-C'est un changement fondationnel, rapide et sans risque de régression. Il supprime une convention fragile (`init_admin_user.js` avec des valeurs hardcodées) et aligne la configuration sur le pattern déjà établi dans `env.validator.js`.
-
-### État actuel
-
-- `src/helpers/init_admin_user.js` crée un utilisateur `admin` / `super_admin` / `pending` si la table `User` est vide.
-- Login hardcodé à `'admin'`, email à `''`, aucune personnalisation possible.
-- Appelé dans `app.js` après `models.sequelize.sync()`.
-
-### Recommandations d'implémentation
-
-1. **Ajouter les variables d'environnement** dans `env.validator.js` :
-    - `ADMIN_LOGIN` (obligatoire) — login du premier administrateur
-    - `ADMIN_EMAIL` (optionnel) — email du premier administrateur
-    - Ces variables ne sont vérifiées qu'au premier démarrage (quand `User.count() === 0`).
-
-2. **Modifier `init_admin_user.js`** pour lire depuis `process.env` :
-
-    ```js
-    export const initAdminUser = async () => {
-        const count = await models.User.count();
-        if (count === 0) {
-            const login = process.env.ADMIN_LOGIN;
-            if (!login) {
-                errorLogger.error('ADMIN_LOGIN env var is required for first startup');
-                process.exit(1);
-            }
-            await models.User.create({
-                email: process.env.ADMIN_EMAIL || '',
-                login,
-                role: 'super_admin',
-                status: 'pending',
-                enabled: false,
-                created_by: null,
-            });
-            logger.info(`Admin user "${login}" created (status: pending)`);
-        }
-    };
-    ```
-
-3. **Corriger le typo** dans le nom de la fonction : `initAdminUSer` → `initAdminUser` (et mettre à jour l'import dans `app.js`).
-
-4. **Documenter** dans `.env.example` et `README.md`.
-
-### Fichiers impactés
-
-- `src/helpers/init_admin_user.js`
-- `src/config/env.validator.js` (ajout dans `OPTIONAL_VARS` ou validation conditionnelle)
-- `src/app.js` (renommage import)
-- `.env.example`
+Les tâches 1 et 2 sont indépendantes. La tâche 3 doit être en place avant la première PR externe. La tâche 4 finalise la présentation publique du projet.
 
 ---
 
-## 2. Validation de mot de passe fort
-
-### Pourquoi en deuxième
-
-Faille de sécurité directe : actuellement **aucune validation** de force du mot de passe n'existe. Les 3 points d'entrée acceptent n'importe quelle chaîne (même vide dans certains cas). C'est un changement ciblé avec un scope réduit.
-
-### État actuel
-
-| Point d'entrée        | Fichier                                             | Validation actuelle                                            |
-| --------------------- | --------------------------------------------------- | -------------------------------------------------------------- |
-| Première connexion    | `auth.controller.js` (`dpFirstCoPost`)              | Seulement `password === confirm_password`                      |
-| Reset mot de passe    | `passwordReset.controller.js` (`resetPasswordPost`) | Seulement `password !== ''` et `password === confirm_password` |
-| Création user (admin) | `admin/adminUsers.controller.js`                    | Aucune                                                         |
-
-### Recommandations d'implémentation
-
-1. **Créer un validateur centralisé** dans `src/utils/password.js` :
-
-    ```js
-    /**
-     * Valide la force d'un mot de passe.
-     * Minimum 16 caractères, au moins : 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial.
-     * @param {string} password
-     * @returns {{ valid: boolean, errors: string[] }}
-     */
-    export function validatePasswordStrength(password) {
-        const errors = [];
-        if (!password || password.length < 16) {
-            errors.push('password_min_length'); // clé i18n
-        }
-        if (!/[A-Z]/.test(password)) {
-            errors.push('password_needs_uppercase');
-        }
-        if (!/[a-z]/.test(password)) {
-            errors.push('password_needs_lowercase');
-        }
-        if (!/[0-9]/.test(password)) {
-            errors.push('password_needs_digit');
-        }
-        if (!/[^A-Za-z0-9]/.test(password)) {
-            errors.push('password_needs_special');
-        }
-        return { valid: errors.length === 0, errors };
-    }
-    ```
-
-2. **Intégrer dans les 3 controllers** : appeler `validatePasswordStrength()` avant `hashPassword()`.
-
-3. **Ajouter un indicateur visuel** côté vue (HTML/JS) pour afficher les critères en temps réel sur les formulaires de mot de passe.
-
-4. **Ajouter les clés i18n** correspondantes dans `fr.json` (et `en.json` quand l'i18n sera complété).
-
-5. **Écrire les tests unitaires** pour `validatePasswordStrength()` (couverture exhaustive des cas limites).
-
-### Fichiers impactés
-
-- `src/utils/password.js` (nouveau)
-- `src/controllers/auth.controller.js`
-- `src/controllers/passwordReset.controller.js`
-- `src/controllers/admin/adminUsers.controller.js`
-- `src/locales/fr.json`
-- `tests/unit/utils/password.test.js` (nouveau)
-- Vues HBS des formulaires de mot de passe
-
----
-
-## 3. Validation des inputs (création site / form)
-
-### Pourquoi en troisième
-
-Puisque tu es déjà dans une dynamique de validation (point 2), enchaîner avec la validation des inputs métier est logique. Le risque actuel est modéré car `sanitizeAll` nettoie les XSS, mais il n'y a aucune validation de format ni d'unicité côté serveur.
-
-### État actuel
-
-| Entité | Champ    | Validation actuelle                                                                                                                           |
-| ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Site   | `domain` | Aucune. `domainExists()` existe dans le service mais **n'est jamais appelé** dans le controller. Seul un label HTML indique « 253 car. max ». |
-| Form   | `name`   | Aucune. Passé tel quel à `models.Form.create()`.                                                                                              |
-
-### Recommandations d'implémentation
-
-1. **Valider le domaine côté serveur** dans `site.controller.js` :
-    - Longueur max : 253 caractères
-    - Format : regex de domaine valide (`/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i`)
-    - **Appeler `domainExists()`** avant la création (la fonction existe déjà !)
-    - Retourner un flash d'erreur avec message i18n si invalide
-
-2. **Valider le nom de formulaire** dans `form.controller.js` :
-    - Longueur max raisonnable (ex : 100 caractères)
-    - Caractères autorisés (alphanumérique + espaces + tirets/underscores)
-    - Trim des espaces
-
-3. **Approche recommandée** : plutôt que Joi/Zod (écarté dans `TODO.md` pour l'API publique), créer des fonctions de validation simples dans un fichier `src/utils/validators.js` :
-
-    ```js
-    export function isValidDomain(domain) { ... }
-    export function isValidFormName(name) { ... }
-    ```
-
-4. **Note** : la décision d'écarter Joi/Zod dans `TODO.md` concerne l'API publique (`/api/v1/send`) pour garder le stockage JSON brut. Ici, il s'agit de **l'interface web interne** : la validation est non seulement souhaitable, elle est nécessaire.
-
-### Fichiers impactés
-
-- `src/utils/validators.js` (nouveau)
-- `src/controllers/site.controller.js`
-- `src/controllers/form.controller.js`
-- `src/locales/fr.json` (clés d'erreur)
-- `tests/unit/utils/validators.test.js` (nouveau)
-
----
-
-## 4. Internationalisation complète (FR + EN + switch)
-
-### Pourquoi en quatrième
-
-C'est le chantier le plus volumineux. L'infrastructure i18n existe déjà (`i18n` est configuré dans `app.js`, `fr.json` existe avec 116 lignes), mais **~70+ strings françaises sont hardcodées** dans les controllers, middlewares, services et vues HBS. Il faut d'abord stabiliser les fonctionnalités (points 1-3) avant de tout passer en i18n — sinon chaque modification ajoutera de nouvelles strings à traduire.
-
-### État actuel
-
-**Infrastructure existante :**
-
-- `i18n` (package npm) configuré dans `app.js` avec `locales: ['fr']` et `cookie: 'lang'`, `queryParameter: 'lang'`
-- `fr.json` couvre partiellement : 2FA, password reset, menus, boutons, erreurs 404
-- Les helpers HBS ont accès à `__()` via i18n
-
-**Strings hardcodées identifiées (~70+) :**
-
-| Zone                                                                       | Nb approximatif | Exemples                                                                     |
-| -------------------------------------------------------------------------- | --------------- | ---------------------------------------------------------------------------- |
-| Controllers (auth, site, form, inbox, passwordReset, twoFactor, admin)     | ~40             | `'Votre compte a été banni.'`, `'Site créé avec succès.'`, `'Accès refusé.'` |
-| Middlewares (checkAccess, checkUserStatus, loginRateLimiter, errorHandler) | ~12             | `'Trop de tentatives de connexion...'`, `"Vous n'avez pas la permission..."` |
-| Services (site, inbox)                                                     | ~10             | `'Site introuvable ou accès refusé'`, `'Fichier physique introuvable'`       |
-| Vues HBS                                                                   | ~50+            | Titres de pages, labels, placeholders, messages d'aide dans les templates    |
-
-### Recommandations d'implémentation
-
-1. **Phase A — Extraire toutes les strings FR restantes vers `fr.json`** :
-    - Auditer systématiquement chaque controller, middleware et service.
-    - Structurer les clés par domaine : `auth.banned`, `site.created`, `form.access_denied`, `middleware.rate_limit`, etc.
-    - Dans les controllers/middlewares, remplacer les strings par `req.__('clé')` ou `res.__('clé')`.
-    - Dans les services (qui n'ont pas accès à `req`), retourner des **clés d'erreur** plutôt que des messages traduits, et laisser le controller traduire.
-    - Dans les vues HBS, utiliser le helper `{{__ "clé"}}`.
-
-2. **Phase B — Créer `en.json`** :
-    - Copier la structure de `fr.json` et traduire toutes les clés.
-    - Ajouter `'en'` dans `locales` de la config i18n dans `app.js`.
-
-3. **Phase C — Implémenter le switch de langue** :
-    - La librairie `i18n` supporte déjà le cookie `lang` et le query parameter `lang` (configurés dans `app.js`).
-    - Ajouter un **sélecteur de langue dans le layout principal** (`views/layouts/main.hbs`) :
-        ```hbs
-        <a href="?lang=fr" class="{{#if (eq locale 'fr')}}active{{/if}}">FR</a>
-        <a href="?lang=en" class="{{#if (eq locale 'en')}}active{{/if}}">EN</a>
-        ```
-    - Persister le choix via le cookie `lang` (déjà supporté par `i18n`).
-    - Injecter `locale` dans `res.locals` pour la vue :
-        ```js
-        app.use((req, res, next) => {
-            res.locals.locale = req.getLocale();
-            next();
-        });
-        ```
-
-4. **Phase D — Sauvegarder la préférence utilisateur** (optionnel) :
-    - Ajouter un champ `locale` au modèle `User` (valeur par défaut : `'fr'`).
-    - Au login, restaurer la langue depuis le profil utilisateur.
-    - Quand l'utilisateur switch, mettre à jour en base.
-
-### Fichiers impactés
-
-- `src/locales/fr.json` (complétion massive)
-- `src/locales/en.json` (nouveau)
-- `src/app.js` (config i18n, middleware locale)
-- Tous les controllers (~8 fichiers)
-- Middlewares concernés (~5 fichiers)
-- Services concernés (~2 fichiers, changement de pattern)
-- Vues HBS (~15-20 fichiers)
-- Optionnel : `src/models/attributes/user.attributes.json`, `src/services/user.service.js`
-
----
-
-## 5. Script de setup interactif
-
-### Pourquoi en cinquième
-
-Le `SETUP_SCRIPT.md` existe déjà avec une spécification détaillée (2 scripts : `setup.js` et `setup-admin.js`). L'implémentation est indépendante du reste, mais il est préférable d'attendre que les points 1-4 soient stabilisés pour que le script reflète la configuration finale (ex : variables `ADMIN_LOGIN` du point 1, la locale par défaut du point 4).
-
-### État actuel
-
-- `SETUP_SCRIPT.md` décrit 2 scripts non implémentés :
-    - `setup.js` : génération interactive du `.env` (9 sections, modules natifs uniquement)
-    - `setup-admin.js` : création du premier admin via CLI
-- Aucun fichier de script n'existe encore.
-
-### Recommandations d'implémentation
-
-1. **`scripts/setup.js`** — Script interactif CLI :
-    - Utiliser `readline` natif (pas de dépendance externe, conformément au `SETUP_SCRIPT.md`).
-    - 9 sections avec valeurs par défaut et auto-génération des clés crypto via `crypto.randomBytes()`.
-    - Sauvegarder un backup de `.env` existant avant écrasement.
-    - Valider les inputs avec les mêmes règles que `env.validator.js` (longueur de `KEV`, `KIV`, etc.).
-
-2. **`scripts/setup-admin.js`** — Création du premier admin :
-    - Avec le point 1 implémenté, ce script pourrait simplement pré-remplir `ADMIN_LOGIN` et `ADMIN_EMAIL` dans le `.env`.
-    - Alternative : mode interactif OU mode non-interactif via env vars (CI/CD friendly).
-
-3. **Ajouter des commandes npm** :
-
-    ```json
-    "setup": "node scripts/setup.js",
-    "setup:admin": "node scripts/setup-admin.js"
-    ```
-
-4. **Gérer le mode Docker** : détecter si on est dans un container (la fonction `isRunningInDocker()` existe déjà dans `env.validator.js`) et adapter les valeurs par défaut (hostname DB → `db`, ClamAV → `clamav`, etc.).
-
-### Fichiers impactés
-
-- `scripts/setup.js` (nouveau)
-- `scripts/setup-admin.js` (nouveau)
-- `package.json` (scripts npm)
-- `.env.example` (mise à jour si nécessaire)
-- `README.md` (documentation)
-
----
-
-## 6. Tests end-to-end (Playwright)
-
-### Pourquoi en dernier
-
-Les tests E2E doivent couvrir des parcours utilisateurs stables. Implémenter d'abord les points 1-5 assure que les flux testés (première connexion avec mot de passe fort, switch de langue, etc.) ne changeront pas immédiatement après l'écriture des tests.
-
-### État actuel
-
-- 26 fichiers de tests existants (unit + middleware + integration) via **Vitest**.
-- Aucun test E2E, aucune dépendance Playwright.
-- L'app utilise des vues HBS rendues côté serveur → Playwright est adapté (pas besoin de tester un SPA).
-
-### Recommandations d'implémentation
-
-1. **Installation** :
-
-    ```bash
-    npm install -D @playwright/test
-    npx playwright install chromium  # un seul navigateur suffit au début
-    ```
-
-2. **Configuration** — créer `playwright.config.js` :
-
-    ```js
-    import { defineConfig } from '@playwright/test';
-    export default defineConfig({
-        testDir: './tests/e2e',
-        webServer: {
-            command: 'node --env-file=.env.test server.js',
-            port: 3001,
-            reuseExistingServer: !process.env.CI,
-        },
-        use: {
-            baseURL: 'http://localhost:3001',
-            locale: 'fr-FR',
-        },
-    });
-    ```
-
-3. **Environnement de test** :
-    - Créer un `.env.test` dédié avec une base de données de test (SQLite pour simplifier ou une DB MySQL/MariaDB de test).
-    - Script de seed pour injecter un admin et des données de test.
-
-4. **Parcours prioritaires à tester** :
-   | Priorité | Parcours | Couverture |
-   |----------|----------|------------|
-   | Haute | Première connexion (activation compte admin) | Auth + validation mot de passe |
-   | Haute | Login / Logout | Session + Passport |
-   | Haute | Création d'un site | Input validation + RBAC |
-   | Haute | Création d'un formulaire | Input validation |
-   | Moyenne | Suppression d'un site (confirmation domaine) | UX critique |
-   | Moyenne | Consultation de l'inbox | Navigation + données |
-   | Moyenne | Export des données | Téléchargement de fichier |
-   | Basse | Switch de langue | i18n (après point 4) |
-   | Basse | 2FA setup + vérification | TOTP (si `TOTP_ENABLED=true`) |
-   | Basse | Reset mot de passe | SMTP (nécessite un mock mail) |
-
-5. **Ajouter le script npm** :
-
-    ```json
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
-    ```
-
-6. **Pattern recommended pour les tests** :
-
-    ```js
-    // tests/e2e/auth.spec.js
-    import { test, expect } from '@playwright/test';
-
-    test.describe('Première connexion', () => {
-        test('refuse un mot de passe trop court', async ({ page }) => {
-            await page.goto('/dp-first-co');
-            await page.fill('[name="login"]', 'admin');
-            await page.fill('[name="password"]', 'short');
-            await page.fill('[name="confirm_password"]', 'short');
-            await page.click('button[type="submit"]');
-            await expect(page.locator('.flash-error')).toBeVisible();
-        });
-    });
-    ```
-
-### Fichiers impactés
-
-- `playwright.config.js` (nouveau)
-- `tests/e2e/` (nouveau dossier avec les specs)
-- `.env.test` (nouveau)
-- `package.json` (dépendance + scripts)
-- `.gitignore` (ajouter `test-results/`, `playwright-report/`)
-
----
-
-## Récapitulatif des dépendances entre tâches
+## 1. Script d'installation (`scripts/setup.js`)
+
+### Objectif
+
+Un seul script interactif CLI qui génère le fichier `.env` complet. Pas de `setup-admin.js` séparé : le login/email admin est demandé directement dans `setup.js`, et `init_admin_user.js` gère le fallback au démarrage.
+
+### Contraintes techniques
+
+- **Modules natifs uniquement** (`readline`, `crypto`, `fs`, `path`) — exécutable avant `npm install`
+- **Détection Docker** : si `/.dockerenv` existe, les valeurs par défaut s'adaptent automatiquement :
+    - `DB_IP` → `db` (nom du service Docker Compose)
+    - `CLAMAV_SOCKET` → vide
+    - `CLAMAV_HOST` → `clamav`
+- **Questions en anglais** (projet open-source)
+- **Pas de Makefile** — les scripts npm suffisent
+
+### Sections du script (dans l'ordre)
+
+| #   | Section         | Variables                                                                             | Comportement                                              |
+| --- | --------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| 1   | Application     | `NODE_ENV`, `PORT`                                                                    | Valeurs par défaut : `development`, `3022`                |
+| 2   | Base de données | `DB_IP`, `DB_PORT`, `DB_USER`, `DB_PWD`, `DB_NAME`, `DB_DIALECT`                      | Docker : `DB_IP=db`. Natif : `127.0.0.1`                  |
+| 3   | Sécurité (auto) | `KEY_TK`, `KEV`, `KIV`, `SESSION_SECRET`, `SESSION_MAX_AGE`, `CSRF_SECRET`, `API_KEY` | Générées via `crypto.randomBytes()`, **sans interaction** |
+| 4   | Helmet          | `HELMET_STRICT_TRANSPORT`                                                             | Défaut : `false`                                          |
+| 5   | Logs            | `LOG_RETENTION_APP/API/ERROR/AUDIT`, `LOG_TO_CONSOLE`                                 | Valeurs par défaut raisonnables                           |
+| 6   | Rate Limiting   | `RATE_LIMIT_FORM_MAX`, `RATE_LIMIT_FORM_WINDOW_MS`, `MAX_FAILED_LOGIN_ATTEMPTS`       | Défauts : `30`, `60000`, `10`                             |
+| 7   | Upload          | `API_MAX_FILE_SIZE`, `API_MAX_TOTAL_SIZE`, `API_MAX_FILES`, `API_MAX_FIELDS`, etc.    | Défauts du `.env.example`                                 |
+| 8   | ClamAV (opt.)   | `CLAMAV_ENABLED`, `CLAMAV_SOCKET`, `CLAMAV_HOST`, `CLAMAV_PORT`                       | Question oui/non. Si non → `CLAMAV_ENABLED=false`, skip   |
+| 9   | SMTP (opt.)     | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `APP_URL`            | Question oui/non. Si non → section omise du `.env`        |
+| 10  | TOTP (opt.)     | `TOTP_ENABLED`, `TOTP_ISSUER`                                                         | Question oui/non. Défaut : `false`                        |
+| 11  | Admin           | `ADMIN_LOGIN`, `ADMIN_EMAIL`                                                          | Login obligatoire, email optionnel                        |
+
+### Comportement UX
 
 ```
-1. Super admin env vars ──┐
-                          ├──→ 5. Script setup (utilise les mêmes env vars)
-2. Validation mot de passe ┤
-                           ├──→ 6. Tests E2E (teste les parcours stabilisés)
-3. Validation inputs ──────┤
-                           │
-4. i18n complète ──────────┘
+╔══════════════════════════════════════╗
+║     Puna — Environment Setup        ║
+╚══════════════════════════════════════╝
+
+🐳 Docker environment detected — defaults adjusted.
+
+── 1/11 Application ──────────────────
+? NODE_ENV [development] :
+? PORT [3022] :
+
+── 2/11 Database ─────────────────────
+? DB_IP [db] :
+? DB_PORT [3306] :
+? DB_USER [root] :
+? DB_PWD : ********
+? DB_NAME [puna] :
+? DB_DIALECT [mariadb] :
+
+── 3/11 Security Keys ───────────────
+✔ All security keys generated automatically.
+  KEY_TK .......... 64 chars
+  KEV ............. 64 hex chars (32 bytes AES-256)
+  KIV ............. 32 hex chars (16 bytes AES IV)
+  SESSION_SECRET .. 64 chars
+  CSRF_SECRET ..... 64 chars
+  API_KEY ......... 64 hex chars
+
+[...]
+
+── 8/11 ClamAV ──────────────────────
+? Enable ClamAV (antivirus scan)? (y/N) : N
+  → Skipped. Set CLAMAV_ENABLED=true in .env to enable later.
+
+[...]
+
+── 11/11 Admin ──────────────────────
+? Admin login [admin] : fabio
+? Admin email (optional) [] : fabio@example.com
+
+✔ .env file created successfully.
+  → Start the app: npm run dev (native) or docker compose up -d (Docker)
+  → First login: the admin account is in "pending" status.
+    Set your password at /dp-first-connexion
 ```
 
-Les tâches 1, 2, 3 sont indépendantes entre elles mais doivent précéder 5 et 6. La tâche 4 (i18n) est autonome mais volumineuse — elle produira des changements dans de très nombreux fichiers, ce qui rend les tests E2E plus pertinents une fois qu'elle est terminée.
+### Gestion du `.env` existant
+
+```
+⚠  An existing .env file was found.
+? Overwrite and create .env.backup? (y/N) :
+```
+
+- Si oui → copie `.env` → `.env.backup`, puis génère le nouveau
+- Si non → quitte proprement
+
+### Script npm
+
+```json
+"setup": "node scripts/setup.js"
+```
+
+### Fichiers impactés
+
+| Fichier            | Action                           |
+| ------------------ | -------------------------------- |
+| `scripts/setup.js` | Nouveau — script principal       |
+| `package.json`     | Ajout script `"setup"`           |
+| `SETUP_SCRIPT.md`  | Supprimer (remplacé par ce plan) |
+
+---
+
+## 2. Documents de contribution open-source
+
+### Liste des documents à créer
+
+| #   | Document                       | Emplacement                                  | Rôle                                                |
+| --- | ------------------------------ | -------------------------------------------- | --------------------------------------------------- |
+| 2a  | **CONTRIBUTING.md**            | Racine                                       | Guide complet pour les contributeurs                |
+| 2b  | **CODE_OF_CONDUCT.md**         | Racine                                       | Code de conduite (Contributor Covenant v2.1 FR)     |
+| 2c  | **Template — Bug report**      | `.github/ISSUE_TEMPLATE/bug_report.yml`      | Formulaire structuré de signalement de bug (YAML)   |
+| 2d  | **Template — Feature request** | `.github/ISSUE_TEMPLATE/feature_request.yml` | Formulaire de demande de fonctionnalité (YAML)      |
+| 2e  | **Config issues**              | `.github/ISSUE_TEMPLATE/config.yml`          | Liens vers discussions/doc + désactive issues vides |
+| 2f  | **Template — Pull Request**    | `.github/PULL_REQUEST_TEMPLATE.md`           | Checklist pour chaque PR                            |
+| 2g  | **CHANGELOG.md**               | Racine                                       | Historique des versions (Keep a Changelog FR)       |
+
+Tous les documents sont rédigés **en français**.
+
+---
+
+### 2a. CONTRIBUTING.md — Structure détaillée
+
+```markdown
+# Contribuer à Puna
+
+## Bienvenue
+
+[Ton d'accueil, lien vers le Code de Conduite]
+
+## Prérequis
+
+- Node.js 22+
+- MariaDB 11+ (ou Docker)
+- npm 10+
+- Git
+
+## Installation pour le développement
+
+1. Forker et cloner le dépôt
+2. `npm run setup` (génère le `.env` interactif)
+3. `npm install`
+4. `npm run dev`
+
+## Architecture du projet
+
+[Résumé : surfaces web/API, auto-loading conventions, controller → service]
+[Lien vers copilot-instructions.md pour les détails]
+
+## Conventions de code
+
+- ESM (`import`/`export`), pas de CommonJS
+- ESLint 9 flat config (`npm run lint:fix`)
+- Prettier (`npm run format`)
+- Pas de `dotenv` — utiliser `node --env-file=.env`
+- Services retournent du JSON (`model.toJSON()`), jamais des instances Sequelize
+
+## Workflow Git
+
+### Branches
+
+- `main` — branche stable, protégée (merge via PR uniquement)
+- `develop` — branche de travail quotidien
+- `feature/<nom>` — nouvelles fonctionnalités (depuis `develop`)
+- `fix/<nom>` — corrections de bugs (depuis `develop`)
+- `docs/<nom>` — documentation (depuis `develop`)
+
+### Processus
+
+1. Créer une branche depuis `develop`
+2. Développer + commiter (voir conventions de commits)
+3. Pousser et ouvrir une PR vers `develop`
+4. Review + CI verte → merge
+
+### Conventions de commits (Conventional Commits)
+
+Format : `<type>(<scope>): <description>`
+
+| Type     | Usage                                   |
+| -------- | --------------------------------------- |
+| feat     | Nouvelle fonctionnalité                 |
+| fix      | Correction de bug                       |
+| docs     | Documentation uniquement                |
+| test     | Ajout ou modification de tests          |
+| chore    | Maintenance (dépendances, CI, config)   |
+| refactor | Refactoring sans changement fonctionnel |
+| style    | Formatage, espaces, points-virgules     |
+
+Exemples :
+
+- `feat(auth): ajouter validation mot de passe fort`
+- `fix(site): corriger la vérification d'unicité du domaine`
+- `docs: mettre à jour le guide d'installation`
+- `test(service): ajouter tests unitaires twoFactor`
+
+## Signaler un bug
+
+Utiliser le template d'issue « Bug report » sur GitHub.
+Inclure : étapes de reproduction, comportement attendu vs observé, environnement.
+
+## Proposer une fonctionnalité
+
+Utiliser le template d'issue « Demande de fonctionnalité ».
+Décrire le besoin, la solution envisagée, et les alternatives considérées.
+
+## Soumettre une Pull Request
+
+Checklist :
+
+- [ ] La PR pointe vers `develop` (pas `main`)
+- [ ] Les tests passent (`npm test`)
+- [ ] Le linter est satisfait (`npm run lint`)
+- [ ] La PR est liée à une issue (si applicable)
+- [ ] La description explique le changement
+- [ ] Les nouveaux strings utilisent i18n (`req.__('clé')`)
+
+## Tests
+
+- Framework : Vitest (`npm test`, `npm run test:watch`)
+- Tests unitaires : `tests/unit/`
+- Tests d'intégration : `tests/integration/`
+- Tests middleware : `tests/middlewares/`
+- Tests E2E : `tests/e2e/` (Playwright)
+- Référence de mocking : `tests/unit/services/twoFactor.service.test.js`
+
+## Licence
+
+En contribuant, vous acceptez que vos contributions soient publiées
+sous la licence AGPLv3 du projet.
+```
+
+---
+
+### 2b. CODE_OF_CONDUCT.md
+
+Utiliser le **Contributor Covenant v2.1** traduit en français. C'est le standard de facto pour les projets open-source.
+
+Source officielle FR : https://www.contributor-covenant.org/fr/version/2/1/code_of_conduct/
+
+Contenu clé :
+
+- Engagement envers un environnement accueillant
+- Comportements acceptables et inacceptables
+- Responsabilités des mainteneurs
+- Portée (espaces du projet + représentation publique)
+- Application (email de contact pour signalement)
+- Attribution au Contributor Covenant
+
+---
+
+### 2c. Template — Bug report (`.github/ISSUE_TEMPLATE/bug_report.yml`)
+
+Format YAML (formulaire GitHub structuré, plus guidant qu'un template Markdown) :
+
+```yaml
+name: '🐛 Signaler un bug'
+description: 'Signaler un comportement inattendu ou une erreur'
+labels: ['bug']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Merci de prendre le temps de signaler ce bug.
+              Remplissez les champs ci-dessous pour nous aider à reproduire le problème.
+
+    - type: textarea
+      id: description
+      attributes:
+          label: 'Description du bug'
+          description: 'Décrivez clairement le problème rencontré.'
+      validations:
+          required: true
+
+    - type: textarea
+      id: steps
+      attributes:
+          label: 'Étapes de reproduction'
+          description: 'Listez les étapes pour reproduire le bug.'
+          placeholder: |
+              1. Aller sur '...'
+              2. Cliquer sur '...'
+              3. Observer l'erreur
+      validations:
+          required: true
+
+    - type: textarea
+      id: expected
+      attributes:
+          label: 'Comportement attendu'
+          description: 'Que devrait-il se passer normalement ?'
+      validations:
+          required: true
+
+    - type: textarea
+      id: actual
+      attributes:
+          label: 'Comportement observé'
+          description: 'Que se passe-t-il en réalité ?'
+      validations:
+          required: true
+
+    - type: dropdown
+      id: installation
+      attributes:
+          label: "Mode d'installation"
+          options:
+              - Docker (docker compose)
+              - Natif (Node.js)
+      validations:
+          required: true
+
+    - type: input
+      id: node-version
+      attributes:
+          label: 'Version de Node.js'
+          placeholder: 'ex: 22.12.0'
+
+    - type: input
+      id: os
+      attributes:
+          label: "Système d'exploitation"
+          placeholder: 'ex: Ubuntu 24.04, macOS 15, Windows 11'
+
+    - type: textarea
+      id: logs
+      attributes:
+          label: "Logs / Messages d'erreur"
+          description: 'Collez ici les logs pertinents (console, navigateur, etc.).'
+          render: shell
+
+    - type: textarea
+      id: screenshots
+      attributes:
+          label: "Captures d'écran"
+          description: "Si applicable, ajoutez des captures d'écran."
+
+    - type: checkboxes
+      id: checklist
+      attributes:
+          label: 'Vérifications'
+          options:
+              - label: "J'ai vérifié qu'aucune issue similaire n'existe déjà."
+                required: true
+```
+
+---
+
+### 2d. Template — Feature request (`.github/ISSUE_TEMPLATE/feature_request.yml`)
+
+```yaml
+name: '✨ Demande de fonctionnalité'
+description: 'Proposer une nouvelle fonctionnalité ou une amélioration'
+labels: ['feature']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Merci de proposer une amélioration pour Puna !
+
+    - type: textarea
+      id: problem
+      attributes:
+          label: 'Problème ou besoin'
+          description: 'Décrivez le problème ou le manque que cette fonctionnalité résoudrait.'
+          placeholder: 'Je suis souvent frustré quand...'
+      validations:
+          required: true
+
+    - type: textarea
+      id: solution
+      attributes:
+          label: 'Solution proposée'
+          description: 'Décrivez la solution que vous aimeriez voir.'
+      validations:
+          required: true
+
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: 'Alternatives envisagées'
+          description: "Avez-vous envisagé d'autres solutions ? Lesquelles et pourquoi les écarter ?"
+
+    - type: textarea
+      id: context
+      attributes:
+          label: 'Contexte supplémentaire'
+          description: "Informations complémentaires, captures d'écran, liens, etc."
+
+    - type: checkboxes
+      id: checklist
+      attributes:
+          label: 'Vérifications'
+          options:
+              - label: "J'ai vérifié qu'aucune issue similaire n'existe déjà."
+                required: true
+```
+
+---
+
+### 2e. Config issues (`.github/ISSUE_TEMPLATE/config.yml`)
+
+```yaml
+blank_issues_enabled: false
+contact_links:
+    - name: '📖 Documentation'
+      url: https://github.com/FabioDevCode/Puna#readme
+      about: "Consultez la documentation avant d'ouvrir une issue."
+    - name: '🔒 Signaler une faille de sécurité'
+      url: https://github.com/FabioDevCode/Puna/blob/main/SECURITY.md
+      about: 'Les failles de sécurité ne doivent PAS être signalées via une issue publique.'
+```
+
+---
+
+### 2f. Template — Pull Request (`.github/PULL_REQUEST_TEMPLATE.md`)
+
+```markdown
+## Description
+
+<!-- Décrivez les changements apportés par cette PR. -->
+
+## Issue liée
+
+<!-- Lien vers l'issue : Closes #123 -->
+
+## Type de changement
+
+- [ ] 🐛 Correction de bug (`fix`)
+- [ ] ✨ Nouvelle fonctionnalité (`feat`)
+- [ ] 📖 Documentation (`docs`)
+- [ ] ♻️ Refactoring (`refactor`)
+- [ ] 🧪 Tests (`test`)
+- [ ] 🔧 Maintenance (`chore`)
+
+## Checklist
+
+- [ ] Ma PR pointe vers `develop` (pas `main`)
+- [ ] J'ai testé mes changements localement
+- [ ] Les tests passent (`npm test`)
+- [ ] Le linter est satisfait (`npm run lint`)
+- [ ] J'ai ajouté des tests pour les nouvelles fonctionnalités (si applicable)
+- [ ] Les nouveaux messages utilisent i18n (si applicable)
+
+## Captures d'écran (si applicable)
+
+<!-- Ajoutez des captures si le changement est visuel -->
+```
+
+---
+
+### 2g. CHANGELOG.md
+
+Format **Keep a Changelog** (https://keepachangelog.com/fr/1.1.0/) :
+
+```markdown
+# Changelog
+
+Tous les changements notables de ce projet sont documentés dans ce fichier.
+
+Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
+et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
+
+## [Non publié]
+
+### Ajouté
+
+- Script d'installation interactif (`npm run setup`)
+- Guide de contribution (CONTRIBUTING.md)
+- Code de conduite (CODE_OF_CONDUCT.md)
+- Templates d'issues et de PR GitHub
+
+## [1.0.0] — YYYY-MM-DD
+
+### Ajouté
+
+- Gestion de sites et formulaires de feedback
+- Collecte de soumissions (inbox) via API REST publique
+- Export des données (JSON, CSV)
+- Authentification par session (Passport.js)
+- Authentification API (X-KEY-PUNA + JWT)
+- RBAC (super_admin, owner, beta, editor, viewer)
+- Authentification à deux facteurs (TOTP)
+- Réinitialisation de mot de passe par email
+- Validation de mot de passe fort (16 car. min)
+- Scan antivirus des uploads (ClamAV, optionnel)
+- Protection CSRF, Helmet, rate limiting
+- Logs structurés (Pino) avec rotation automatique
+- Panneau d'administration
+- Support Docker (Compose avec MariaDB + ClamAV)
+```
+
+---
+
+## 3. CI GitHub Actions
+
+### Workflow `.github/workflows/ci.yml`
+
+Déclenché sur push/PR vers `main` et `develop`. Deux jobs :
+
+1. **lint** — `npm ci` + `npm run lint`
+2. **test** — Service MariaDB, `npm ci` + `npm run test:coverage` + badge de couverture
+
+> Le détail complet du workflow est déjà documenté dans `TODO.md` (tâche #6). L'implémenter tel quel.
+
+### Protection de branches (à configurer sur GitHub)
+
+| Branche   | Règle                                                       |
+| --------- | ----------------------------------------------------------- |
+| `main`    | PR obligatoire, CI verte requise, aucun push direct         |
+| `develop` | PR obligatoire depuis `feature/*`/`fix/*`, CI verte requise |
+
+---
+
+## 4. Enrichir le README.md
+
+Le README actuel est minimal (~15 lignes). Pour la mise en public, il doit inclure :
+
+1. **En-tête** — logo/nom, description courte, badges (licence, CI, couverture)
+2. **Fonctionnalités** — liste des features clés
+3. **Prérequis** — Node 22+, MariaDB 11+ (ou Docker)
+4. **Installation rapide** (Docker) — 3 commandes : clone, `npm run setup`, `docker compose up -d`
+5. **Installation native** — clone, `npm run setup`, `npm install`, configurer MariaDB, `npm run dev`
+6. **Configuration** — renvoi vers `.env.example`, explication des sections optionnelles (ClamAV, SMTP, TOTP)
+7. **Utilisation** — premier login, créer un site, générer un token API, envoyer un formulaire
+8. **API publique** — résumé de `POST /api/v1/send/:code` + authentification
+9. **Développement** — commandes (`dev`, `test`, `lint`, `format`), structure du projet
+10. **Contribuer** — renvoi vers `CONTRIBUTING.md`
+11. **Sécurité** — renvoi vers `SECURITY.md`
+12. **Licence** — AGPLv3
+
+---
+
+## Labels GitHub recommandés
+
+À créer manuellement sur le dépôt (Settings → Labels) :
+
+| Label              | Couleur   | Usage                                 |
+| ------------------ | --------- | ------------------------------------- |
+| `bug`              | `#d73a4a` | Signalement de bug                    |
+| `feature`          | `#a2eeef` | Demande de fonctionnalité             |
+| `documentation`    | `#0075ca` | Amélioration de la documentation      |
+| `good first issue` | `#7057ff` | Accessible aux nouveaux contributeurs |
+| `help wanted`      | `#008672` | Contribution bienvenue                |
+| `duplicate`        | `#cfd3d7` | Issue doublon                         |
+| `wontfix`          | `#ffffff` | Ne sera pas traité                    |
+| `question`         | `#d876e3` | Question / discussion                 |
+| `security`         | `#e11d48` | Lié à la sécurité                     |
+| `performance`      | `#f59e0b` | Lié aux performances                  |
+
+---
+
+## Stratégie de branches
+
+```
+main (protégée — merge via PR uniquement, CI obligatoire)
+  │
+  ├── develop (travail quotidien, base de toutes les features)
+  │     ├── feature/setup-script
+  │     ├── feature/contributing-docs
+  │     ├── fix/domain-validation
+  │     ├── docs/readme
+  │     └── ...
+  │
+  └── release/v1.0.0 (préparation release → merge dans main + tag)
+```
+
+### Conventions
+
+- `main` : **jamais** de push direct. Merge depuis `develop` ou `release/*` via PR.
+- `develop` : branche de travail. Les features et fixes sont mergées ici.
+- `feature/*`, `fix/*`, `docs/*` : branches éphémères, supprimées après merge.
+- `release/*` : créée depuis `develop` quand prêt. Merge dans `main` + tag semver.
+- Les commits suivent **Conventional Commits** : `feat:`, `fix:`, `docs:`, `test:`, `chore:`, `refactor:`, `style:`
+
+---
+
+## Ordre d'exécution recommandé
+
+```
+1. scripts/setup.js ──────────────────────┐
+                                           ├──→ 4. README.md (documente le setup + contribution)
+2. Documents de contribution ─────────────┤
+   ├── CONTRIBUTING.md                     │
+   ├── CODE_OF_CONDUCT.md                 │
+   ├── .github/ISSUE_TEMPLATE/*.yml       │
+   ├── .github/PULL_REQUEST_TEMPLATE.md   │
+   └── CHANGELOG.md                       │
+                                           │
+3. CI GitHub Actions ─────────────────────┘
+```
+
+Les tâches 1 et 2 sont **indépendantes** et peuvent être faites en parallèle. La tâche 3 (CI) peut être faite à tout moment mais doit être en place avant d'accepter des PRs externes. La tâche 4 (README) arrive en dernier car elle référence tout le reste.
+
+---
+
+## Fichiers à supprimer après implémentation
+
+| Fichier                  | Raison                                      |
+| ------------------------ | ------------------------------------------- |
+| `SETUP_SCRIPT.md`        | Remplacé par ce plan + le script lui-même   |
+| `IMPLEMENTATION_PLAN.md` | Ce fichier — à supprimer une fois tout fait |
