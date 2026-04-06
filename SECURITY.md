@@ -4,7 +4,7 @@ Ce document décrit les mesures de sécurité mises en place dans Puna, ainsi qu
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 - [Vue d'ensemble](#-vue-densemble)
 - [Authentification](#-authentification--sessions)
@@ -22,17 +22,17 @@ Ce document décrit les mesures de sécurité mises en place dans Puna, ainsi qu
 
 ---
 
-## 🎯 Vue d'ensemble
+## Vue d'ensemble
 
 Puna implémente une approche de sécurité **multi-couches** pour protéger les données des utilisateurs et prévenir les vulnérabilités courantes (OWASP Top 10).
 
 ### Principes de sécurité appliqués
 
-- ✅ **Défense en profondeur** - Plusieurs couches de protection
-- ✅ **Moindre privilège** - Permissions minimales par défaut
-- ✅ **Validation stricte** - Toutes les entrées sont validées
-- ✅ **Chiffrement** - Données sensibles chiffrées
-- ✅ **Isolation** - Séparation API publique / routes authentifiées
+- **Défense en profondeur** - Plusieurs couches de protection
+- **Moindre privilège** - Permissions minimales par défaut
+- **Validation stricte** - Toutes les entrées sont validées
+- **Chiffrement** - Données sensibles chiffrées
+- **Isolation** - Séparation API publique / routes authentifiées
 
 ### Technologies de sécurité
 
@@ -44,13 +44,13 @@ Puna implémente une approche de sécurité **multi-couches** pour protéger les
 | **xss**                | Sanitization XSS                       | ^1.0.15 |
 | **sanitize-filename**  | Validation noms de fichiers            | ^1.6.3  |
 | **sequelize**          | ORM (prévention SQL injection)         | ^6.37.7 |
-| **crypto-js**          | Chiffrement AES                        | ^4.2.0  |
+| **node:crypto**        | Chiffrement AES (module natif Node.js) | natif   |
 | **csrf-csrf**          | Protection CSRF (Double Submit Cookie) | ^4.0.3  |
 | **express-rate-limit** | Rate limiting login & API              | ^7.x    |
 
 ---
 
-## 🔐 Authentification & Sessions
+## Authentification & Sessions
 
 ### Hachage des mots de passe (bcrypt)
 
@@ -67,9 +67,9 @@ const isValid = await bcrypt.compare(password, user.password);
 
 **Protection contre :**
 
-- ✅ Rainbow tables
-- ✅ Brute force (salt unique par utilisateur)
-- ✅ Stockage en clair
+- Rainbow tables
+- Brute force (salt unique par utilisateur)
+- Stockage en clair
 
 ### Tokens JWT (API publique)
 
@@ -78,15 +78,22 @@ Les API publiques (`/send/:code`) utilisent des **tokens JWT** pour l'authentifi
 **Caractéristiques :**
 
 - Signature HMAC SHA-256
-- Expiration configurable
-- Payload minimal (ID site, ID formulaire)
+- Sans expiration — le token reste valide tant que le `control_code` du site n'est pas régénéré (révocation = `POST /site/:id/revoke`)
+- Payload chiffré : `{ id, control_code }` est chiffré via `encryptObject()` (AES-256-CBC), puis stocké dans le champ `data` du JWT
+- Le formulaire est vérifié séparément via le paramètre `:code` dans l'URL
 - Clé secrète dans `.env` (`KEY_TK`)
 
 **Génération :**
 
 ```javascript
 import jwt from 'jsonwebtoken';
-const token = jwt.sign({ siteId, formId }, process.env.KEY_TK, { expiresIn: '365d' });
+import { encryptObject } from '../utils/crypto.js';
+
+// Le payload { id, control_code } est d'abord chiffré AES-256-CBC
+const payload = {
+    data: encryptObject({ id: site.id, control_code: site.control_code }),
+};
+const token = jwt.sign(payload, process.env.KEY_TK);
 ```
 
 **Validation :**
@@ -168,9 +175,9 @@ app.use(
 
 **Protection contre :**
 
-- ✅ Session fixation (cookie régénéré à chaque login)
-- ✅ Session hijacking (httpOnly cookie)
-- ✅ CSRF (Double Submit Cookie — voir section dédiée)
+- Session fixation (cookie régénéré à chaque login)
+- Session hijacking (httpOnly cookie)
+- CSRF (Double Submit Cookie — voir section dédiée)
 
 ### Première connexion obligatoire
 
@@ -183,11 +190,14 @@ Lors de la création d'un compte, l'utilisateur **doit** se connecter avec son m
 3. Première connexion → redirection forcée vers changement de mot de passe
 4. Nouveau mot de passe défini → accès complet au système
 
-**Fichier :** `src/helpers/init_admin_user.js`
+**Fichiers :**
+
+- `src/controllers/auth.controller.js` — flux de première connexion (`dpFirstCoPost`)
+- `src/helpers/init_admin_user.js` — création du compte admin initial
 
 ---
 
-## 🛡️ Autorisation & Permissions
+## Autorisation & Permissions
 
 ### Système ACL (Access Control List)
 
@@ -273,7 +283,7 @@ const sites = await getAvailableSites(userId, userRole);
 
 ---
 
-## 🌐 Sécurité HTTP (Helmet.js)
+## Sécurité HTTP (Helmet.js)
 
 Helmet.js configure automatiquement les **headers HTTP de sécurité** pour protéger contre les vulnérabilités web courantes.
 
@@ -317,7 +327,9 @@ contentSecurityPolicy: {
 }
 ```
 
-**Note :** `'unsafe-inline'` est nécessaire pour Tailwind CSS et certains composants. À terme, migration vers nonces CSP recommandée.
+> ⚠️ **`'unsafe-inline'` dans `scriptSrc` et `styleSrc`** : cette directive affaiblit la protection XSS offerte par la CSP.
+> Elle est actuellement nécessaire pour Tailwind CSS et certains composants front-end.
+> **Amélioration prévue :** migrer vers des nonces CSP (`'nonce-<valeur>'`) pour supprimer `'unsafe-inline'` tout en conservant le fonctionnement des scripts inline légitimes.
 
 ### HSTS (Strict Transport Security)
 
@@ -334,7 +346,7 @@ HELMET_STRICT_TRANSPORT=true  # Force HTTPS
 
 ---
 
-## 📤 Upload de fichiers
+## Upload de fichiers
 
 L'upload de fichiers est **hautement sécurisé** avec validation multi-niveaux.
 
@@ -395,9 +407,9 @@ const safeName = sanitize(originalName);
 
 **Protection contre :**
 
-- ✅ Path traversal
-- ✅ XSS dans les noms de fichiers
-- ✅ Caractères spéciaux problématiques
+- Path traversal
+- XSS dans les noms de fichiers
+- Caractères spéciaux problématiques
 
 #### 3. Stockage sécurisé
 
@@ -428,20 +440,52 @@ storage/
 ### Pipeline de traitement
 
 ```
-Upload → Validation → Déplacement → BDD
-  ↓          ↓            ↓           ↓
-Multer → validateUpload → moveFiles → saveInbox
+Upload → Validation → Inspection → Scan antivirus → Déplacement → BDD
+  ↓          ↓            ↓              ↓               ↓           ↓
+Multer → validateUpload → inspectArchive → scanUpload → moveFiles → saveInbox
 ```
 
-**Fichiers :**
+### Scan antivirus — ClamAV (optionnel)
+
+Le middleware `scanUpload` analyse chaque fichier uploadé via le daemon **ClamAV** (`clamd`) avant qu'il ne soit déplacé vers le stockage permanent.
+
+**Activation :** `CLAMAV_ENABLED=true` dans `.env` (désactivé par défaut — pass-through).
+
+| Mode de connexion | Variables d'environnement                 | Usage typique                          |
+| ----------------- | ----------------------------------------- | -------------------------------------- |
+| Socket Unix       | `CLAMAV_SOCKET=/tmp/clamd.socket`         | macOS Homebrew / Linux natif           |
+| TCP               | `CLAMAV_HOST=clamav` + `CLAMAV_PORT=3310` | Docker (service `clamav` dans Compose) |
+
+> La détection du mode est automatique : si `CLAMAV_SOCKET` est défini, le socket Unix est utilisé ; sinon, TCP.
+
+**Comportement :**
+
+| Situation                     | Réponse                 | Fichiers tmp   |
+| ----------------------------- | ----------------------- | -------------- |
+| ClamAV désactivé              | `next()` (pass-through) | Conservés      |
+| Fichier sain                  | `next()`                | Conservés      |
+| Fichier infecté               | **422** + détail virus  | Tous supprimés |
+| Erreur de connexion à `clamd` | **503** (fail-closed)   | Tous supprimés |
+
+> ⚠️ **Fail-closed** : si le daemon ClamAV est inaccessible alors qu'il est activé, **tous les uploads sont refusés** (503). Aucun fichier ne passe sans scan.
+
+**Vérification au démarrage :** `env.validator.js` effectue un `PING → PONG` vers le daemon au boot du serveur. Si ClamAV est inaccessible, le processus **refuse de démarrer**.
+
+**Docker :** le fichier `docker-compose.yml` inclut un service `clamav` (image `clamav/clamav:1.4`) prêt à l'emploi.
+
+**Fichier :** `src/api/v1/middlewares/scanUpload.js`
+
+**Tous les middlewares du pipeline :**
 
 - `src/api/v1/middlewares/multipartUpload.js`
 - `src/api/v1/middlewares/validateUpload.js`
+- `src/api/v1/middlewares/inspectArchive.js`
+- `src/api/v1/middlewares/scanUpload.js`
 - `src/api/v1/middlewares/moveFilesToUploads.js`
 
 ---
 
-## 💉 Protection contre les injections
+## Protection contre les injections
 
 ### SQL Injection
 
@@ -459,10 +503,10 @@ const user = await sequelize.query(`SELECT * FROM users WHERE email = '${userInp
 
 **Bonnes pratiques :**
 
-- ✅ Toujours utiliser les méthodes Sequelize (`findOne`, `create`, etc.)
-- ✅ Si requête brute nécessaire, utiliser les paramètres `replacements`
-- ✅ Valider les entrées utilisateur avant requête
-- ✅ `multipleStatements: false` dans la configuration Sequelize (désactivé explicitement)
+- Toujours utiliser les méthodes Sequelize (`findOne`, `create`, etc.)
+- Si requête brute nécessaire, utiliser les paramètres `replacements`
+- Valider les entrées utilisateur avant requête
+- `multipleStatements: false` dans la configuration Sequelize (désactivé explicitement)
 
 #### Protection des filtres dynamiques
 
@@ -641,15 +685,15 @@ app.use((err, req, res, next) => {
 
 **Protection contre :**
 
-- ✅ Cross-Site Request Forgery
-- ✅ Requêtes POST non autorisées depuis des sites tiers
-- ✅ L'attaquant ne peut pas lire le cookie `httpOnly`
+- Cross-Site Request Forgery
+- Requêtes POST non autorisées depuis des sites tiers
+- L'attaquant ne peut pas lire le cookie `httpOnly`
 
 **Variable d'environnement requise :** `CSRF_SECRET` (min. 32 caractères)
 
 ---
 
-## �🔑 Gestion des secrets
+## Gestion des secrets
 
 ### Variables d'environnement
 
@@ -670,22 +714,25 @@ DB_USER="root"
 DB_PWD="your_password"
 ```
 
-### Chiffrement AES (crypto-js)
+### Chiffrement AES (node:crypto)
 
-Les données sensibles peuvent être chiffrées avec AES-256 :
+Les données sensibles sont chiffrées avec AES-256-CBC via le module **natif** `node:crypto` (aucune dépendance externe) :
 
 ```javascript
-import CryptoJS from 'crypto-js';
+import { createCipheriv, createDecipheriv } from 'node:crypto';
+
+const key = Buffer.from(process.env.KEV, 'hex'); // 32 bytes (AES-256)
+const iv = Buffer.from(process.env.KIV, 'hex'); // 16 bytes
 
 // Chiffrement
-const encrypted = CryptoJS.AES.encrypt(data, CryptoJS.enc.Utf8.parse(process.env.KEV), {
-    iv: CryptoJS.enc.Utf8.parse(process.env.KIV),
-});
+const cipher = createCipheriv('aes-256-cbc', key, iv);
+let encrypted = cipher.update(data, 'utf8', 'hex');
+encrypted += cipher.final('hex');
 
 // Déchiffrement
-const decrypted = CryptoJS.AES.decrypt(encrypted, CryptoJS.enc.Utf8.parse(process.env.KEV), {
-    iv: CryptoJS.enc.Utf8.parse(process.env.KIV),
-});
+const decipher = createDecipheriv('aes-256-cbc', key, iv);
+let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+decrypted += decipher.final('utf8');
 ```
 
 **Fichier :** `src/utils/crypto.js`
@@ -755,7 +802,8 @@ const formRateLimiter = rateLimit({
 ### Stockage
 
 - **Actuellement :** MemoryStore (mono-instance)
-- **Production multi-instances :** Migrer vers Redis (`rate-limit-redis`)
+- **Limitation :** Si le processus Node redémarre (déploiement, crash, OOM), tous les compteurs sont remis à zéro — une fenêtre d'exploitation s'ouvre brièvement.
+- **Production multi-instances :** Migrer vers Redis (`rate-limit-redis`) pour un stockage partagé et persistant entre les instances.
 
 ---
 
@@ -990,16 +1038,20 @@ Si vous découvrez une vulnérabilité de sécurité dans Puna, merci de nous la
 
 **NE PAS** créer d'issue publique sur GitHub pour les vulnérabilités de sécurité.
 
-**Procédure :**
+**Procédure recommandée — GitHub Private Vulnerability Reporting :**
 
-1. **Email :** Envoyez un email à **security@puna.io** (à créer)
-2. **Objet :** "Security Vulnerability Report - [TITRE COURT]"
-3. **Contenu :**
+1. Aller sur l'onglet **Security** du dépôt GitHub
+2. Cliquer sur **"Report a vulnerability"** (signalement privé)
+3. Remplir le formulaire avec :
     - Description détaillée de la vulnérabilité
     - Étapes pour reproduire
     - Impact potentiel
     - Version affectée
     - Preuve de concept (si applicable)
+
+Ce mécanisme est entièrement privé — seuls les mainteneurs du projet peuvent voir le rapport jusqu'à la publication du correctif.
+
+**Alternative :** contact direct via les informations de profil GitHub du mainteneur.
 
 ### Délai de réponse
 
@@ -1044,8 +1096,8 @@ Les chercheurs en sécurité qui signalent des vulnérabilités de manière resp
 - [ ] Monitoring des erreurs (Sentry, etc.)
 - [ ] Tester sur securityheaders.com
 - [ ] Audit de sécurité (npm audit, Snyk)
-- [ ] Intégrer ClamAV pour scan antivirus des uploads
-- [ ] Externaliser la clé API (variable d'environnement)
+- [x] Intégrer ClamAV pour scan antivirus des uploads
+- [x] Externaliser la clé API (variable d'environnement `API_KEY`)
 
 ### Maintenance continue
 
@@ -1094,12 +1146,13 @@ curl -I https://yourdomain.com | grep -E "X-|Content-Security"
 | 2025-12-13 | 1.0     | Création initiale de SECURITY.md                                                                                                  |
 | 2025-12-13 | 1.1     | Ajout Helmet.js configuration                                                                                                     |
 | 2026-02-09 | 2.0     | Ajout CSRF (csrf-csrf), rate limiting, path traversal renforcé, SQL injection protection, graceful shutdown, masquage err.message |
+| 2026-04-06 | 2.1     | Migration crypto-js → node:crypto, correction payload JWT, mise à jour checklist, GitHub Private Vulnerability Reporting          |
 
 ---
 
-**Dernière mise à jour :** 9 février 2026
+**Dernière mise à jour :** 6 avril 2026
 
-**Contact sécurité :** ...
+**Contact sécurité :** Onglet Security du dépôt GitHub → "Report a vulnerability"
 
 ---
 
@@ -1107,4 +1160,3 @@ Pour toute question sur la sécurité de Puna, consultez également :
 
 - [README.md](README.md) - Documentation générale
 - [TODO.md](TODO.md) - Roadmap des améliorations de sécurité
-- [HELMET_INTEGRATION_TODO.md](HELMET_INTEGRATION_TODO.md) - Détails Helmet.js
