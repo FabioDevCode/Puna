@@ -205,6 +205,7 @@
         "admin_cannot_edit_superadmin": "You cannot edit a super administrator.",
         "admin_delete_data_missing": "Missing data for deletion.",
         "admin_fields_required": "Please fill in all required fields.",
+        "admin_log_archive_not_found": "No archive found for this date",
         "admin_log_archives_error": "Error retrieving archives",
         "admin_log_read_error": "Error reading logs",
         "admin_log_type_invalid": "Invalid log type",

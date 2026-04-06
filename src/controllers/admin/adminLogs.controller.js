@@ -55,31 +55,50 @@ export const countFilesRecursive = async (dirPath) => {
     return count;
 };
 
+// Patterns de noms d'archives générés par le serveur
+// Auto (cron minuit, démarrage serveur, variantes numérotées en cas de collision) :
+//   YYYY-MM-DD-archive-log.tar.gz
+//   YYYY-MM-DD-archive-N-log.tar.gz
+//   YYYY-MM-DD-startup-log.tar.gz
+//   YYYY-MM-DD-startup-N-log.tar.gz
+// Manuel (npm run logs:rotate) :
+//   YYYY-MM-DD-HHmmss-manual.tar.gz
+const REGEX_ARCHIVE_AUTO = /^(\d{4}-\d{2}-\d{2})-(archive|startup)(?:-\d+)?-log\.tar\.gz$/;
+const REGEX_ARCHIVE_MANUAL = /^(\d{4}-\d{2}-\d{2}-\d{6})-manual\.tar\.gz$/;
+
 /**
- * Formate une date pour l'affichage dans le sélecteur
- * @param {string} dateStr - Date au format YYYY-MM-DD ou YYYY-MM-DD-HHmmss
- * @param {boolean} isManual - Indique si c'est une archive manuelle
- * @returns {string} Date formatée
+ * Parse le nom d'un fichier d'archive et retourne ses métadonnées
+ * @param {string} filename - Nom du fichier
+ * @returns {{ calendarDate: string, type: 'auto'|'manual', filename: string }|null}
  */
-const formatDateLabel = (dateStr, isManual = false, t = null) => {
-    if (dateStr === 'today') {
-        return t ? t('admin.logs_today') : "Aujourd'hui";
-    }
-    // Pour les archives manuelles, afficher la date avec l'heure et un indicateur
-    if (isManual) {
-        // Format: YYYY-MM-DD-HHmmss -> YYYY-MM-DD HH:mm ⚙
-        const match = dateStr.match(/^(\d{4}-\d{2}-\d{2})-(\d{2})(\d{2})(\d{2})$/);
-        if (match) {
-            return `${match[1]} ${match[2]}:${match[3]} ⚙`;
-        }
-        return `${dateStr} ⚙`;
-    }
-    return dateStr; // Format YYYY-MM-DD déjà présent
+const parseArchiveFilename = (filename) => {
+    let m = filename.match(REGEX_ARCHIVE_AUTO);
+    if (m) return { calendarDate: m[1], type: 'auto', filename };
+    m = filename.match(REGEX_ARCHIVE_MANUAL);
+    if (m) return { calendarDate: m[1], type: 'manual', filename };
+    return null;
 };
 
 /**
- * Liste les archives disponibles dans le dossier archives
- * @returns {Promise<Array>} Liste des archives avec date et label
+ * Formate le label d'une archive manuelle pour l'affichage dans le sélecteur
+ * @param {string} dateTimeStr - Date au format YYYY-MM-DD-HHmmss
+ * @returns {string} Label formaté (ex: "2025-12-27 18:24 ⚙")
+ */
+const formatManualLabel = (dateTimeStr) => {
+    const match = dateTimeStr.match(/^(\d{4}-\d{2}-\d{2})-(\d{2})(\d{2})(\d{2})$/);
+    if (match) {
+        return `${match[1]} ${match[2]}:${match[3]} ⚙`;
+    }
+    return `${dateTimeStr} ⚙`;
+};
+
+/**
+ * Liste les archives disponibles dans le dossier archives.
+ * Les archives automatiques (startup, archive) sont groupées par date calendaire :
+ * plusieurs fichiers pour une même date (ex: startup + archive) sont fusionnés
+ * en une seule entrée dans le sélecteur.
+ * Les archives manuelles restent individuelles.
+ * @returns {Promise<Array<{ date: string, label: string, filenames: string[], isManual: boolean }>>}
  */
 const listArchives = async (t = null) => {
     try {
@@ -89,28 +108,42 @@ const listArchives = async (t = null) => {
     }
 
     const files = await fs.readdir(archiveDir);
-    const archives = [];
+
+    // Grouper les archives automatiques par date calendaire (YYYY-MM-DD)
+    const autoByDate = new Map();
+    const manuals = [];
 
     for (const f of files) {
-        // Archive quotidienne automatique: YYYY-MM-DD-archive-log.tar.gz
-        if (f.endsWith('-archive-log.tar.gz')) {
-            const dateStr = f.replace('-archive-log.tar.gz', '');
-            archives.push({
-                filename: f,
-                date: dateStr,
-                label: formatDateLabel(dateStr, false, t),
-                isManual: false,
-            });
-        } else if (f.endsWith('-manual.tar.gz')) {
-            // Archive manuelle: YYYY-MM-DD-HHmmss-manual.tar.gz
-            const dateTimeStr = f.replace('-manual.tar.gz', '');
-            archives.push({
-                filename: f,
-                date: dateTimeStr,
-                label: formatDateLabel(dateTimeStr, true, t),
-                isManual: true,
-            });
+        const parsed = parseArchiveFilename(f);
+        if (!parsed) continue;
+
+        if (parsed.type === 'auto') {
+            if (!autoByDate.has(parsed.calendarDate)) {
+                autoByDate.set(parsed.calendarDate, []);
+            }
+            autoByDate.get(parsed.calendarDate).push(f);
+        } else {
+            manuals.push(parsed);
         }
+    }
+
+    const archives = [];
+
+    // Entrées groupées pour les archives automatiques
+    for (const [date, filenames] of autoByDate) {
+        const count = filenames.length;
+        const label = count > 1 ? `${date} (×${count})` : date;
+        archives.push({ date, label, filenames, isManual: false });
+    }
+
+    // Entrées individuelles pour les archives manuelles
+    for (const { calendarDate, filename } of manuals) {
+        archives.push({
+            date: calendarDate,
+            label: formatManualLabel(calendarDate),
+            filenames: [filename],
+            isManual: true,
+        });
     }
 
     // Trier par date décroissante (plus récent en premier)
@@ -200,21 +233,25 @@ export const readLogs = async (req, res) => {
                 content = '';
             }
         } else {
-            // Extraction depuis une archive - déterminer le nom du fichier
-            let archiveFilename;
-
-            // Vérifier si c'est une archive manuelle (format: YYYY-MM-DD-HHmmss)
+            // Extraction depuis une ou plusieurs archives
             if (/^\d{4}-\d{2}-\d{2}-\d{6}$/.test(date)) {
-                archiveFilename = `${date}-manual.tar.gz`;
+                // Archive manuelle (format: YYYY-MM-DD-HHmmss)
+                const archiveFilename = `${date}-manual.tar.gz`;
+                try {
+                    content = await extractLogFromArchive(archiveFilename, type);
+                } catch (err) {
+                    return res.status(404).json({ error: err.message });
+                }
             } else {
-                // Archive quotidienne (format: YYYY-MM-DD)
-                archiveFilename = `${date}-archive-log.tar.gz`;
-            }
-
-            try {
-                content = await extractLogFromArchive(archiveFilename, type);
-            } catch (err) {
-                return res.status(404).json({ error: err.message });
+                // Archives groupées par date calendaire (YYYY-MM-DD)
+                // Peut contenir plusieurs fichiers (ex: startup + archive du même jour)
+                const allArchives = await listArchives();
+                const entry = allArchives.find((a) => a.date === date);
+                if (!entry) {
+                    return res.status(404).json({ error: req.__('flash.admin_log_archive_not_found') });
+                }
+                const contents = await Promise.all(entry.filenames.map((fn) => extractLogFromArchive(fn, type).catch(() => '')));
+                content = contents.join('\n');
             }
         }
 
