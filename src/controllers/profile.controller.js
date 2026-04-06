@@ -22,6 +22,14 @@ export const updateLocale = async (req, res) => {
     try {
         await updateUserLocale(userId, locale);
         req.session.user.locale = locale;
+        // Persister la langue dans le cookie "lang" lu par i18n.init
+        // Ainsi les pages hors session (login, mot de passe oublié...) seront déjà traduites
+        res.cookie('lang', locale, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 365 * 24 * 60 * 60 * 1000, // 1 an
+        });
         res.flash('success', res.__('profile.locale_updated'));
         return res.redirect('/profile');
     } catch (_err) {
