@@ -7,7 +7,7 @@ import db_config from '../config/database.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const sequelize = new Sequelize(db_config.database, db_config.user, db_config.password, {
+const sequelizeOptions = {
     host: db_config.host,
     dialect: db_config.dialect,
     port: db_config.port,
@@ -15,10 +15,18 @@ const sequelize = new Sequelize(db_config.database, db_config.user, db_config.pa
     define: {
         timestamps: true,
     },
-    charset: 'utf8mb4',
-    collate: 'utf8mb4_general_ci',
     timezone: '+00:00',
-});
+};
+
+// SQLite: use file storage, skip charset/collate (not supported)
+if (db_config.dialect === 'sqlite') {
+    sequelizeOptions.storage = path.resolve(db_config.storage || 'storage/test.sqlite');
+} else {
+    sequelizeOptions.charset = 'utf8mb4';
+    sequelizeOptions.collate = 'utf8mb4_general_ci';
+}
+
+const sequelize = new Sequelize(db_config.database, db_config.user, db_config.password, sequelizeOptions);
 
 const models = {
     Sequelize,

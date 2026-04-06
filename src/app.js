@@ -119,27 +119,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(sanitizeAll);
 
-const MySQLStore = MySQLStoreConstructor(session);
+// Session store — MySQL/MariaDB in production, MemoryStore for SQLite (E2E tests)
+let sessionStore;
+if (database.dialect === 'sqlite') {
+    // MemoryStore is acceptable for testing — sessions are not persisted across restarts
+    sessionStore = undefined; // express-session uses MemoryStore by default
+} else {
+    const MySQLStore = MySQLStoreConstructor(session);
+    sessionStore = new MySQLStore(database);
+}
 
-const sessionStore = new MySQLStore(database);
+const sessionConfig = {
+    name: 'puna',
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // true if https (HTTPS requis)
+        httpOnly: true,
+        maxAge: parseInt(process.env.SESSION_MAX_AGE || '43200000', 10), // 12 heures par défaut
+        sameSite: 'lax',
+    },
+    rolling: false,
+    unset: 'destroy',
+};
 
-app.use(
-    session({
-        name: 'puna',
-        secret: process.env.SESSION_SECRET,
-        store: sessionStore,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: process.env.NODE_ENV === 'production', // true if https (HTTPS requis)
-            httpOnly: true,
-            maxAge: parseInt(process.env.SESSION_MAX_AGE || '43200000', 10), // 12 heures par défaut
-            sameSite: 'lax',
-        },
-        rolling: false,
-        unset: 'destroy',
-    })
-);
+if (sessionStore) {
+    sessionConfig.store = sessionStore;
+}
+
+app.use(session(sessionConfig));
 
 initializePassport();
 app.use(passport.initialize());

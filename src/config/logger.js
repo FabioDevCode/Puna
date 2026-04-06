@@ -26,6 +26,13 @@ const config = {
         errorRetention: parseInt(process.env.LOG_RETENTION_ERROR, 10) || 30,
         auditRetention: parseInt(process.env.LOG_RETENTION_AUDIT, 10) || 90,
     },
+    test: {
+        level: 'warn',
+        appRetention: 1,
+        apiRetention: 1,
+        errorRetention: 1,
+        auditRetention: 1,
+    },
 };
 
 const env = process.env.NODE_ENV || 'development';

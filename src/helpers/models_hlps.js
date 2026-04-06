@@ -47,6 +47,10 @@ export const buildAttributes = (attributes) => {
 };
 
 export const buildIndexes = (attributes) => {
+    // SQLite manages PRIMARY KEY indexes automatically — skip explicit creation
+    const isSQLite = (process.env.DB_DIALECT || '').toLowerCase() === 'sqlite';
+    if (isSQLite) return [];
+
     const indexes = [];
     for (const key in attributes) {
         if (Object.prototype.hasOwnProperty.call(attributes, key) && Object.prototype.hasOwnProperty.call(attributes[key], 'primaryKey') && attributes[key].primaryKey) {

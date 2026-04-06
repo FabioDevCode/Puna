@@ -476,6 +476,9 @@
         "verify_subtitle": "Entrez le code à 6 chiffres affiché dans votre application d'authentification.",
         "verify_title": "Vérification en deux étapes"
     },
+    "user": {
+        "role_viewer": "user.role_viewer"
+    },
     "validation": {
         "domain_invalid_format": "Le format du domaine est invalide (ex : example.com).",
         "domain_required": "Le nom de domaine est requis.",
