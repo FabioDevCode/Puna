@@ -157,6 +157,9 @@ app.use((req, res, next) => {
         req.setLocale(req.session.user.locale);
         res.setLocale(req.session.user.locale);
     }
+    // Injecter la locale dans res.locals pour qu'elle soit accessible
+    // dans options.data.root des helpers Handlebars, y compris dans les blocs {{#each}}
+    res.locals.locale = req.getLocale();
     next();
 });
 

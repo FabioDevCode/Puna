@@ -84,8 +84,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {{#each fileEntries}}
-                        <div
-                        class="download-card relative flex items-center gap-3 p-4 rounded-lg border border-neutral-content bg-neutral-content/30 hover:shadow-md transition-all duration-200 group">
+                        <div class="download-card relative flex items-center gap-3 p-4 rounded-lg border border-neutral-content bg-neutral-content/30 hover:shadow-md transition-all duration-200 group">
                             <div class="flex-shrink-0">
                                 <div class="w-12 h-12 rounded-lg bg-[{{this.bg_color}}] flex items-center justify-center">
                                     <i class="{{this.icon}} text-3xl text-{{this.color}}"></i>
@@ -106,10 +105,11 @@
                             </div>
 
                             <!-- Download button (visible on hover) -->
-                            <a href="/inbox/{{../inbox.id}}/download/{{this.filename}}" data-download-link
-                            class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn btn-xs btn-neutral gap-1 pointer-events-auto z-10 shadow-md">
+                            <a href="/inbox/{{../inbox.id}}/download/{{this.filename}}" data-download-link="" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn btn-xs btn-neutral gap-1 pointer-events-auto z-10 shadow-md">
                                 <i class="fa-solid fa-download text-xs"></i>
-                                <span>{{__ "btn.download"}}</span>
+                                <span>
+                                    {{__ "inbox.download"}}
+                                </span>
                             </a>
                         </div>
                     {{/each}}

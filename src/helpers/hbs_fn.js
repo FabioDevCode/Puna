@@ -2,11 +2,19 @@ import i18n from 'i18n';
 import { can, hasRole } from '../config/permissions.js';
 
 export default {
-    __: function () {
-        return i18n.__.apply(this, arguments);
+    // Ces helpers lisent la locale depuis options.data.root.locale (contexte racine Handlebars)
+    // pour fonctionner correctement dans les blocs imbriqués {{#each}}, {{#if}}, {{#with}}, etc.
+    // où `this` pointe sur l'élément courant et non sur res.locals.
+    __: function (...args) {
+        const options = args.pop();
+        const key = args[0];
+        const locale = options?.data?.root?.locale || 'fr';
+        return i18n.__({ phrase: key, locale });
     },
-    __n: function () {
-        return i18n.__n.apply(this, arguments);
+    __n: function (...args) {
+        const options = args.pop();
+        const locale = options?.data?.root?.locale || 'fr';
+        return i18n.__n({ singular: args[0], plural: args[1], count: args[2], locale });
     },
     _capitalize: (str) => {
         if (typeof str !== 'string') {

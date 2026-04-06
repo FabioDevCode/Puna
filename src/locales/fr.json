@@ -273,7 +273,7 @@
         "exists_error": "Un formulaire avec ce nom existe déjà.",
         "label": "Formulaire",
         "new_form": "Nouveau formulaire",
-        "template_btn": "Template",
+        "template_btn": "Modèle",
         "template_desc": "Renommez les champs tels qu'ils doivent apparaître.",
         "template_key": "Clé (identifiant)",
         "template_label": "Libellé (modifiable)",
@@ -281,6 +281,7 @@
     },
     "inbox": {
         "confirm_delete_entry": "Êtes-vous sûr de vouloir supprimer cette entrée ?",
+        "download": "Télécharger",
         "download_all": "Télécharger tous les documents",
         "download_preparing": "Préparation du téléchargement",
         "download_wait": "Veuillez patienter pendant la création de l'archive ZIP...",
@@ -332,6 +333,7 @@
         "app": "App",
         "dashboard": "Tableau de bord",
         "logout": "Se déconnecter",
+        "my_account": "Mon compte",
         "profile": "Profil",
         "website": "Site web"
     },
@@ -487,6 +489,6 @@
         "email_greeting": "Bonjour,",
         "email_ignore": "Si vous n'êtes pas à l'origine de cette invitation, ignorez simplement cet email.",
         "email_instruction": "Cliquez sur le bouton ci-dessous pour définir votre mot de passe et accéder à votre espace.",
-        "email_subject": "Bienvenue sur Puna — Activez votre compte"
+        "email_subject": "Bienvenue sur Puna - Activez votre compte"
     }
 }

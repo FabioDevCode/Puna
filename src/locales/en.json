@@ -281,6 +281,7 @@
     },
     "inbox": {
         "confirm_delete_entry": "Are you sure you want to delete this entry?",
+        "download": "Download",
         "download_all": "Download all documents",
         "download_preparing": "Preparing download",
         "download_wait": "Please wait while the ZIP archive is being created...",
@@ -332,6 +333,7 @@
         "app": "App",
         "dashboard": "Dashboard",
         "logout": "Log out",
+        "my_account": "My account",
         "profile": "Profile",
         "website": "Website"
     },
@@ -487,6 +489,6 @@
         "email_greeting": "Hello,",
         "email_ignore": "If you did not expect this invitation, simply ignore this email.",
         "email_instruction": "Click the button below to set your password and access your space.",
-        "email_subject": "Welcome to Puna — Activate your account"
+        "email_subject": "Welcome to Puna - Activate your account"
     }
 }
