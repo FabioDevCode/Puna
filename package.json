@@ -24,7 +24,8 @@
 		"test:e2e:seed": "node --env-file=.env.test scripts/seed-e2e.js",
 		"logs:clean": "node scripts/clean-logs.js",
 		"logs:stats": "node scripts/logs-stats.js",
-		"logs:rotate": "node scripts/rotate-logs.js"
+		"logs:rotate": "node scripts/rotate-logs.js",
+		"seed:demo": "node --env-file=.env scripts/seed-screenshots.js"
 	},
 	"lint-staged": {
 		"*.js": [
