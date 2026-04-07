@@ -7,7 +7,7 @@ export default defineConfig({
         exclude: ['tests/e2e/**', 'node_modules/**'],
         coverage: {
             provider: 'v8',
-            reporter: ['text', 'json-summary', 'json'],
+            reporter: ['text', 'json-summary', 'json', 'html'],
             reportsDirectory: './coverage',
         },
         server: {
