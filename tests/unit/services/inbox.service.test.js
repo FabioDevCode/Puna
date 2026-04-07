@@ -121,7 +121,9 @@ function makeMockSite(overrides = {}) {
 
 describe('inbox.service', () => {
     beforeEach(() => {
-        // resetAllMocks clears both history and mock implementations to avoid state leaks
+        // Use resetAllMocks (not clearAllMocks) to also reset mock implementations
+        // between tests. This prevents state leaks where e.g. fs.existsSync is set
+        // to return true in one test and bleeds into subsequent tests.
         vi.resetAllMocks();
     });
 
