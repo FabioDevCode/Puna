@@ -27,7 +27,7 @@ vi.mock('../../src/config/logger.js', () => ({
 let loginSeq = 0;
 const uniqueLogin = (prefix = 'user') => `${prefix}-${++loginSeq}`;
 
-function buildApp(limiter, routePath = '/dp-connect', successStatus = 401) {
+function buildApp(limiter, routePath = '/dp-connect', successStatus = 401, extraMiddleware = null) {
     const app = express();
     app.use(cookieParser());
     app.use(express.json());
@@ -46,6 +46,9 @@ function buildApp(limiter, routePath = '/dp-connect', successStatus = 401) {
         req.__ = (key) => key;
         next();
     });
+    if (extraMiddleware) {
+        app.use(extraMiddleware);
+    }
     app.post(routePath, limiter, (_req, res) => res.status(successStatus).json({ ok: true }));
     return app;
 }
@@ -186,61 +189,24 @@ describe('twoFaRateLimiter middleware', () => {
 
     beforeAll(() => {
         // twoFaRateLimiter uses req.session.pending2FA.userId for the key
-        const freshApp = express();
-        freshApp.use(cookieParser());
-        freshApp.use(express.json());
-        freshApp.use(express.urlencoded({ extended: true }));
-        freshApp.use(
-            session({
-                secret: 'test-secret',
-                resave: false,
-                saveUninitialized: true,
-                cookie: { secure: false },
-            })
-        );
-        freshApp.use(flashMessages);
-        freshApp.use((req, _res, next) => {
-            req.__ = (key) => key;
-            next();
-        });
-        freshApp.post('/dp-2fa-verify', twoFaRateLimiter, (_req, res) => res.status(401).json({ ok: true }));
-        app = freshApp;
+        app = buildApp(twoFaRateLimiter, '/dp-2fa-verify', 401);
     });
 
     it('allows the first 5 failed requests', async () => {
-        const userId = `2fa-user-${++loginSeq}`;
         const agent = request.agent(app);
-        // Seed the session with pending2FA
-        await agent.post('/dp-2fa-verify').send({ userId });
         for (let i = 0; i < 5; i++) {
-            const res = await agent.post('/dp-2fa-verify').set('X-Test-UserId', userId).send({});
+            const res = await agent.post('/dp-2fa-verify').send({});
             // May be 401 or 302 — just confirm no server error
             expect([401, 302]).toContain(res.status);
         }
     });
 
     it('blocks requests after the limit with a redirect to /dp-2fa-verify', async () => {
-        // Build a dedicated app that injects session.pending2FA
-        const blockApp = express();
-        blockApp.use(cookieParser());
-        blockApp.use(express.json());
-        blockApp.use(express.urlencoded({ extended: true }));
-        blockApp.use(
-            session({
-                secret: 'test-secret',
-                resave: false,
-                saveUninitialized: true,
-                cookie: { secure: false },
-            })
-        );
-        blockApp.use(flashMessages);
-        blockApp.use((req, _res, next) => {
-            req.__ = (key) => key;
-            // Inject a stable userId so all requests share the same rate-limit key
+        // Build a dedicated app that injects session.pending2FA so all requests share the same key
+        const blockApp = buildApp(twoFaRateLimiter, '/dp-2fa-verify', 401, (req, _res, next) => {
             req.session.pending2FA = { userId: '2fa-block-user' };
             next();
         });
-        blockApp.post('/dp-2fa-verify', twoFaRateLimiter, (_req, res) => res.status(401).json({ ok: true }));
 
         const agent = request.agent(blockApp);
         for (let i = 0; i < 5; i++) {
@@ -281,25 +247,10 @@ describe('resetPasswordRateLimiter middleware', () => {
 describe('twoFaConfigRateLimiter middleware', () => {
     it('blocks requests after the limit with a redirect to /dashboard', async () => {
         const stableUserId = `2fa-config-user-${++loginSeq}`;
-        const configApp = express();
-        configApp.use(cookieParser());
-        configApp.use(express.json());
-        configApp.use(express.urlencoded({ extended: true }));
-        configApp.use(
-            session({
-                secret: 'test-secret',
-                resave: false,
-                saveUninitialized: true,
-                cookie: { secure: false },
-            })
-        );
-        configApp.use(flashMessages);
-        configApp.use((req, _res, next) => {
-            req.__ = (key) => key;
+        const configApp = buildApp(twoFaConfigRateLimiter, '/dp-2fa-config', 401, (req, _res, next) => {
             req.session.user = { id: stableUserId };
             next();
         });
-        configApp.post('/dp-2fa-config', twoFaConfigRateLimiter, (_req, res) => res.status(401).json({ ok: true }));
 
         const agent = request.agent(configApp);
         for (let i = 0; i < 5; i++) {
@@ -311,25 +262,8 @@ describe('twoFaConfigRateLimiter middleware', () => {
     });
 
     it('keyGenerator uses "unknown" and handler logs "unknown" when user is absent from session', async () => {
-        const noUserApp = express();
-        noUserApp.use(cookieParser());
-        noUserApp.use(express.json());
-        noUserApp.use(express.urlencoded({ extended: true }));
-        noUserApp.use(
-            session({
-                secret: 'test-secret',
-                resave: false,
-                saveUninitialized: true,
-                cookie: { secure: false },
-            })
-        );
-        noUserApp.use(flashMessages);
-        noUserApp.use((req, _res, next) => {
-            req.__ = (key) => key;
-            // No req.session.user set → keyGenerator returns 'unknown'
-            next();
-        });
-        noUserApp.post('/dp-2fa-config-no-user', twoFaConfigRateLimiter, (_req, res) => res.status(401).json({ ok: true }));
+        // No extra middleware → session has no user → keyGenerator returns 'unknown'
+        const noUserApp = buildApp(twoFaConfigRateLimiter, '/dp-2fa-config-no-user', 401);
 
         const agent = request.agent(noUserApp);
         for (let i = 0; i < 5; i++) {
