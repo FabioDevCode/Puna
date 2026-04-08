@@ -30,15 +30,18 @@ describe('handlebars helpers', () => {
     });
 
     describe('_uppercase', () => {
-        it('returns undefined for non-string (no explicit return)', () => {
-            // The implementation uses a ternary without `return`, so it always returns undefined
+        it('always returns undefined because the implementation has no return statement', () => {
+            // The ternary `typeof str === 'string' ? str.toUpperCase() : ''` has no `return`,
+            // so the function always returns undefined regardless of the input type.
             expect(helpers._uppercase('hello')).toBeUndefined();
+            expect(helpers._uppercase(123)).toBeUndefined();
         });
     });
 
     describe('_lowercase', () => {
-        it('returns undefined for non-string (no explicit return)', () => {
+        it('always returns undefined because the implementation has no return statement', () => {
             expect(helpers._lowercase('HELLO')).toBeUndefined();
+            expect(helpers._lowercase(123)).toBeUndefined();
         });
     });
 
