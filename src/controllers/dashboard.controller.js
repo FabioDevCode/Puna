@@ -40,7 +40,7 @@ export const dashboard = async (req, res) => {
             show2FABanner: show2FABannerBase && !userHas2FA,
         });
     } catch (err) {
-        console.error(err);
+        errorLogger.error(err);
         res.render('dashboard', {});
     }
 };
