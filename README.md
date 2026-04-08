@@ -1,5 +1,11 @@
 # Puna
 
+## Tests coverage
+
+| Statements                                                                            | Branches                                                                       | Functions                                                                           | Lines                                                                       |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| ![Statements](https://img.shields.io/badge/statements-84.68%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-76.79%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-87.63%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-84.55%25-yellow.svg?style=flat) |
+
 ## Licence
 
 Ce projet est distribué sous licence **GNU AGPLv3**.
