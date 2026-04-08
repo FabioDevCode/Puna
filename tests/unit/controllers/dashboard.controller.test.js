@@ -129,7 +129,7 @@ describe('dashboard', () => {
     });
 
     it('shows 2FA banner when TOTP is enabled and user has no 2FA', async () => {
-        process.env.TOTP_ENABLED = 'true';
+        vi.stubEnv('TOTP_ENABLED', 'true');
         getSitesWithCounts.mockResolvedValue([]);
         getGlobalStatsFromSites.mockReturnValue({});
         models.User.findByPk.mockResolvedValue({ totp_enabled: false });
@@ -139,11 +139,11 @@ describe('dashboard', () => {
         const call = res.render.mock.calls[0][1];
         expect(call.show2FABanner).toBe(true);
 
-        process.env.TOTP_ENABLED = 'false';
+        vi.unstubAllEnvs();
     });
 
     it('does not show 2FA banner when user already has 2FA enabled', async () => {
-        process.env.TOTP_ENABLED = 'true';
+        vi.stubEnv('TOTP_ENABLED', 'true');
         getSitesWithCounts.mockResolvedValue([]);
         getGlobalStatsFromSites.mockReturnValue({});
         models.User.findByPk.mockResolvedValue({ totp_enabled: true });
@@ -153,17 +153,19 @@ describe('dashboard', () => {
         const call = res.render.mock.calls[0][1];
         expect(call.show2FABanner).toBe(false);
 
-        process.env.TOTP_ENABLED = 'false';
+        vi.unstubAllEnvs();
     });
 
     it('does not check 2FA when TOTP is disabled', async () => {
-        process.env.TOTP_ENABLED = 'false';
+        vi.stubEnv('TOTP_ENABLED', 'false');
         getSitesWithCounts.mockResolvedValue([]);
         getGlobalStatsFromSites.mockReturnValue({});
 
         await dashboard(req, res);
 
         expect(models.User.findByPk).not.toHaveBeenCalled();
+
+        vi.unstubAllEnvs();
     });
 
     it('renders dashboard with empty object on service error', async () => {
