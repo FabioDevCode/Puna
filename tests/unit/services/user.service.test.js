@@ -48,6 +48,10 @@ vi.mock('../../../src/services/auth.service.js', () => ({
     hashPassword: vi.fn().mockResolvedValue('$2b$10$hashed'),
 }));
 
+vi.mock('../../../src/services/session.service.js', () => ({
+    destroyUserSessions: vi.fn().mockResolvedValue(0),
+}));
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------

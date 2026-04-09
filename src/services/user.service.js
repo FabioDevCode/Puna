@@ -11,6 +11,7 @@ import { sendMail, mailEnabled } from '../config/mailer.js';
 import { renderMailTemplate } from '../helpers/mail.helpers.js';
 import models from '../models/index.js';
 import { hashPassword } from './auth.service.js';
+import { destroyUserSessions } from './session.service.js';
 
 const VALID_STATUSES = ['active', 'inactive', 'suspended', 'banned', 'anonymized'];
 
@@ -397,6 +398,9 @@ export async function deleteUserWithRelations(userId) {
         where: { id: userId },
     });
 
+    // Purger les sessions de l'utilisateur supprimé
+    await destroyUserSessions(userId);
+
     return result > 0;
 }
 
@@ -603,6 +607,11 @@ export async function changeUserStatus(userId, newStatus, changedBy, reason = nu
         ip,
         timestamp: new Date().toISOString(),
     });
+
+    // Purger immédiatement les sessions de l'utilisateur si le statut est non-actif
+    if (newStatus !== 'active') {
+        await destroyUserSessions(userId);
+    }
 
     return { success: true, previousStatus, newStatus };
 }

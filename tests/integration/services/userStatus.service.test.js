@@ -6,6 +6,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import models from '../../../src/models/index.js';
+import { destroyUserSessions } from '../../../src/services/session.service.js';
 import { changeUserStatus, deleteUserWithRelations, findUsersWithFilters, incrementFailedAttempts, resetFailedAttempts } from '../../../src/services/user.service.js';
 
 // ---------------------------------------------------------------------------
@@ -37,6 +38,10 @@ vi.mock('../../../src/models/index.js', () => ({
         Sequelize: {},
         Op: {},
     },
+}));
+
+vi.mock('../../../src/services/session.service.js', () => ({
+    destroyUserSessions: vi.fn().mockResolvedValue(0),
 }));
 
 // ---------------------------------------------------------------------------
@@ -188,6 +193,33 @@ describe('changeUserStatus', () => {
     it('invalid status: throws for unrecognised status value', async () => {
         await expect(changeUserStatus('target-user-uuid', 'unknown_status', ADMIN_SUPER)).rejects.toThrow('Invalid status: unknown_status');
         expect(models.User.findByPk).not.toHaveBeenCalled();
+    });
+
+    // -----------------------------------------------------------------------
+    it('→ non-active: purges user sessions immediately', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
+
+        await changeUserStatus('target-user-uuid', 'inactive', ADMIN_SUPER);
+
+        expect(destroyUserSessions).toHaveBeenCalledWith('target-user-uuid');
+    });
+
+    // -----------------------------------------------------------------------
+    it('→ banned: purges user sessions immediately', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'active' }));
+
+        await changeUserStatus('target-user-uuid', 'banned', ADMIN_SUPER, 'Spam abuse');
+
+        expect(destroyUserSessions).toHaveBeenCalledWith('target-user-uuid');
+    });
+
+    // -----------------------------------------------------------------------
+    it('→ active: does NOT purge user sessions', async () => {
+        vi.mocked(models.User.findByPk).mockResolvedValue(makeMockUser({ status: 'inactive' }));
+
+        await changeUserStatus('target-user-uuid', 'active', ADMIN_SUPER);
+
+        expect(destroyUserSessions).not.toHaveBeenCalled();
     });
 
     // -----------------------------------------------------------------------
@@ -348,6 +380,12 @@ describe('deleteUserWithRelations', () => {
         expect(models.SiteUser.destroy).toHaveBeenCalledWith({ where: { fk_id_user: 'target-user-uuid' } });
         expect(models.User.destroy).toHaveBeenCalledWith({ where: { id: 'target-user-uuid' } });
         expect(result).toBe(true);
+    });
+
+    it('hard-delete: purges user sessions after deletion', async () => {
+        await deleteUserWithRelations('target-user-uuid');
+
+        expect(destroyUserSessions).toHaveBeenCalledWith('target-user-uuid');
     });
 
     it('calls SiteUser.destroy before User.destroy', async () => {

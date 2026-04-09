@@ -47,10 +47,12 @@ describe('handlebars helpers', () => {
 
     describe('log', () => {
         it('does not throw in non-production environment', () => {
+            const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
             const original = process.env.NODE_ENV;
             process.env.NODE_ENV = 'test';
             expect(() => helpers.log({ foo: 'bar' })).not.toThrow();
             process.env.NODE_ENV = original;
+            spy.mockRestore();
         });
 
         it('does not log in production environment', () => {

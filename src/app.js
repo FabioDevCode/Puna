@@ -19,6 +19,7 @@ import database from './config/database.js';
 import { helmetMiddleware } from './config/helmet.config.js';
 import { logger, apiLogger, errorLogger } from './config/logger.js';
 import { mailEnabled } from './config/mailer.js';
+import { setSessionStore } from './config/sessionStore.js';
 import { initializePassport } from './helpers/authHelper.js';
 import hbs_fn from './helpers/hbs_fn.js';
 import { initAdminUser } from './helpers/init_admin_user.js';
@@ -128,6 +129,9 @@ if (database.dialect === 'sqlite') {
     const MySQLStore = MySQLStoreConstructor(session);
     sessionStore = new MySQLStore(database);
 }
+
+// Rendre le session store accessible aux services (purge de sessions par userId)
+setSessionStore(sessionStore);
 
 const sessionConfig = {
     name: 'puna',
