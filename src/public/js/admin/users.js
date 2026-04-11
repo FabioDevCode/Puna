@@ -256,7 +256,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     statusBadge = `<span class="badge_s_inactive">${statusLabel}</span>`;
             }
 
-            // Classes conditionnelles pour "Créé par" et "Dernière connexion"
+            // Classes conditionnelles pour "Email", "Créé par" et "Dernière connexion"
+            const hasValidEmail = user.email && user.email !== 'null' && user.email.includes('@');
+            const emailDisplay = hasValidEmail ? user.email : 'N/A';
+            const emailClass = hasValidEmail ? 'font-medium' : 'text-sm text-neutral-content';
             const createdByClass = user.created_by === 'N/A' ? 'text-sm text-neutral-content' : 'text-sm';
             const lastConnectionClass = user.last_connection === 'N/A' ? 'text-sm text-neutral-content' : 'text-sm';
 
@@ -270,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tr.innerHTML = `
                 <td>${user.login}</td>
                 <td class="text-left">${statusBadge}</td>
-                <td class="font-medium">${user.email}</td>
+                <td class="${emailClass}">${emailDisplay}</td>
                 <td class="${lastConnectionClass}">${user.last_connection}</td>
                 <td>${roleBadge}</td>
                 <td class="${createdByClass}">${user.created_by}</td>

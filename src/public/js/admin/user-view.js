@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         deleteBtn.addEventListener('click', () => {
             userIdInput.value = deleteBtn.dataset.userId;
-            userLoginSpan.textContent = deleteBtn.dataset.userLogin;
+            if (userLoginSpan) {
+                userLoginSpan.textContent = deleteBtn.dataset.userLogin;
+            }
             form.action = '/admin/users/delete';
             modal.showModal();
         });
