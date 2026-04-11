@@ -120,6 +120,10 @@ async function createPrompt() {
             askPassword(question) {
                 return new Promise((resolve) => {
                     rl.pause();
+                    // Mute readline echo — prevents it from writing typed chars to stdout
+                    const savedOutput = rl.output;
+                    rl.output = null;
+
                     process.stdout.write(`? ${question} : `);
 
                     let password = '';
@@ -137,6 +141,7 @@ async function createPrompt() {
                             process.stdin.setRawMode(false);
                             process.stdin.removeListener('data', onData);
                             process.stdout.write('\n');
+                            rl.output = savedOutput;
                             rl.resume();
                             resolve(password);
                             return;
