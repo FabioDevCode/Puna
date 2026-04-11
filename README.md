@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="src/public/img/puna_logo.png" alt="Puna Logo" width="200" />
+  <img src="src/public/img/puna.svg" alt="Puna Logo" width="200" />
 </p>
 
 <h1 align="center">Puna</h1>
 
 <p align="center">
-  Application de gestion de formulaires de feedback — auto-hébergée, sécurisée, open source.
+  Application de gestion de formulaires de feedback - auto-hébergée, sécurisée, open source.
 </p>
 
 <p align="center">
@@ -141,21 +141,101 @@ Elle expose deux surfaces distinctes partageant le même serveur Express :
 
 ## Captures d'écran
 
-> _Captures d'écran à venir._
+### Application
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Dashboard</strong><br/>
+      Vue d'ensemble avec graphiques interactifs, heatmap des soumissions et compteurs par site.
+    </td>
+    <td width="67%">
+      <img src="docs/screenshots/screenshot-dashboard.png" alt="Dashboard" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Liste des sites</strong><br/>
+      Gestion des sites avec accès rapide aux formulaires, tokens API et assignations utilisateurs.
+    </td>
+    <td width="67%">
+      <img src="docs/screenshots/screenshot-site.png" alt="Liste des sites" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Détail d'un site</strong><br/>
+      Fiche complète du site : formulaires rattachés, token API, code de contrôle et paramètres.
+    </td>
+    <td width="67%">
+      <img src="docs/screenshots/screenshot-site-view.png" alt="Détail d'un site" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Boîte de réception</strong><br/>
+      Consultation des soumissions collectées avec filtrage, pagination et suppression en masse.
+    </td>
+    <td width="67%">
+      <img src="docs/screenshots/screenshot-inbox.png" alt="Boîte de réception" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Compte utilisateur</strong><br/>
+      Profil, préférences, configuration 2FA TOTP et gestion des codes de secours.
+    </td>
+    <td width="67%">
+      <img src="docs/screenshots/screenshot-account.png" alt="Compte utilisateur" width="100%" />
+    </td>
+  </tr>
+</table>
+
+### Administration
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Panneau d'administration</strong><br/>
+      Vue d'ensemble de l'administration : statistiques globales et accès rapide aux fonctionnalités.
+    </td>
+    <td width="67%">
+      <img src="docs/screenshots/screenshot-admin.png" alt="Panneau d'administration" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Gestion des utilisateurs</strong><br/>
+      Création, modification, ban, désactivation et export des comptes utilisateurs.
+    </td>
+    <td width="67%">
+      <img src="docs/screenshots/screenshot-admin-users.png" alt="Gestion des utilisateurs" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">
+      <strong>Visualiseur de logs</strong><br/>
+      Exploration des logs applicatifs avec filtrage par niveau, mot-clé et période.
+    </td>
+    <td width="67%">
+      <img src="docs/screenshots/screenshot-admin-logs.png" alt="Visualiseur de logs" width="100%" />
+    </td>
+  </tr>
+</table>
 
 ---
 
 ## Prérequis
 
-| Outil            | Version  | Obligatoire |
-| ---------------- | -------- | ----------- |
-| Node.js          | ≥ 24     | Oui         |
-| npm              | ≥ 10     | Oui         |
-| MariaDB ou MySQL | 11+ / 8+ | Oui         |
-| Git              | —        | Oui         |
-| Docker & Compose | —        | Non         |
-| ClamAV           | —        | Non         |
-| Serveur SMTP     | —        | Non         |
+| Outil            | Version | Obligatoire |
+| ---------------- | ------- | ----------- |
+| Node.js          | ≥ 24    | Oui         |
+| npm              | ≥ 10    | Oui         |
+| MariaDB          | 11+.    | Oui         |
+| Git              | -       | Oui         |
+| Docker & Compose | -       | Non         |
+| ClamAV           | -       | Non         |
+| Serveur SMTP     | -       | Non         |
 
 ---
 
@@ -250,8 +330,8 @@ Le fichier `.env` est généré interactivement via `node scripts/setup.js`. Voi
 | `APP_URL`                 | `http://localhost:3000` | URL de l'application (liens dans les mails)         |
 | `TOTP_ENABLED`            | `false`                 | Activer la 2FA TOTP globalement                     |
 | `TOTP_ISSUER`             | `Puna`                  | Nom affiché dans l'app d'authentification           |
-| `ADMIN_LOGIN`             | —                       | Login du premier administrateur (premier démarrage) |
-| `ADMIN_EMAIL`             | —                       | Email du premier administrateur (optionnel)         |
+| `ADMIN_LOGIN`             | -                       | Login du premier administrateur (premier démarrage) |
+| `ADMIN_EMAIL`             | -                       | Email du premier administrateur (optionnel)         |
 
 ### Configuration SMTP (optionnelle)
 
@@ -307,7 +387,7 @@ ADMIN_EMAIL=admin@mon-domaine.fr
 # 2FA (optionnel)
 TOTP_ENABLED=false
 
-# SMTP (optionnel — toutes les variables ou aucune)
+# SMTP (optionnel - toutes les variables ou aucune)
 # SMTP_HOST=smtp.example.com
 # SMTP_PORT=587
 # SMTP_USER=user@example.com
@@ -336,9 +416,9 @@ POST /api/v1/send/:code
 
 Chaque requête doit passer les 3 vérifications dans l'ordre :
 
-1. **`X-KEY-PUNA`** — En-tête contenant la clé API globale (variable `API_KEY`). Comparaison à temps constant pour prévenir les attaques par timing.
-2. **`Authorization: Bearer <token>`** — Token JWT signé avec `KEY_TK`, dont le payload contient l'identifiant du site et son `control_code` chiffré. Le token est généré depuis l'interface web (page du site).
-3. **`:code`** — Paramètre d'URL correspondant au code unique d'un formulaire rattaché au site authentifié.
+1. **`X-KEY-PUNA`** - En-tête contenant la clé API globale (variable `API_KEY`). Comparaison à temps constant pour prévenir les attaques par timing.
+2. **`Authorization: Bearer <token>`** - Token JWT signé avec `KEY_TK`, dont le payload contient l'identifiant du site et son `control_code` chiffré. Le token est généré depuis l'interface web (page du site).
+3. **`:code`** - Paramètre d'URL correspondant au code unique d'un formulaire rattaché au site authentifié.
 
 ### Pipeline d'upload
 
@@ -403,7 +483,7 @@ graph TB
 
     subgraph Puna
         direction TB
-        subgraph Web["Surface Web — SSR"]
+        subgraph Web["Surface Web - SSR"]
             Routes["Routes auto-chargées<br/>src/routes/*.routes.js"]
             Controllers[Controllers]
             Views[Vues Handlebars]
@@ -421,8 +501,8 @@ graph TB
     subgraph Infra
         DB[(MariaDB / MySQL)]
         Storage["storage/uploads/"]
-        ClamAV["ClamAV — Optionnel"]
-        SMTP["Serveur SMTP — Optionnel"]
+        ClamAV["ClamAV - Optionnel"]
+        SMTP["Serveur SMTP - Optionnel"]
     end
 
     Browser -->|Session + CSRF| Web
@@ -496,11 +576,11 @@ Pour le détail complet, voir [SECURITY.md](SECURITY.md).
 ### Commandes
 
 ```bash
-npm test              # Vitest — exécution unique (unit + integration)
-npm run test:watch    # Vitest — mode interactif
-npm run test:coverage # Vitest — avec rapport de couverture
-npm run test:e2e      # Playwright — tests end-to-end
-npm run test:e2e:ui   # Playwright — mode UI interactif
+npm test              # Vitest - exécution unique (unit + integration)
+npm run test:watch    # Vitest - mode interactif
+npm run test:coverage # Vitest - avec rapport de couverture
+npm run test:e2e      # Playwright - tests end-to-end
+npm run test:e2e:ui   # Playwright - mode UI interactif
 ```
 
 ### Stack de tests
@@ -585,4 +665,4 @@ Voir le texte complet dans [License.md](License.md).
 
 ## Auteur
 
-**Fabio RAMOS LOPES** — [GitHub](https://github.com/FabioDevCode)
+**Fabio RAMOS LOPES** - [GitHub](https://github.com/FabioDevCode)

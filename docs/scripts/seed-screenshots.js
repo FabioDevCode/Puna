@@ -13,9 +13,9 @@
 import bcrypt from 'bcrypt';
 
 // ── Dynamic imports (after env is loaded) ─────────────────────────
-const { default: models } = await import('../src/models/index.js');
-const { encryptString } = await import('../src/utils/crypto.js');
-const { default: stringUtils } = await import('../src/utils/string.js');
+const { default: models } = await import('../../src/models/index.js');
+const { encryptString } = await import('../../src/utils/crypto.js');
+const { default: stringUtils } = await import('../../src/utils/string.js');
 
 // ── Helpers ───────────────────────────────────────────────────────
 

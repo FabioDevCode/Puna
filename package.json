@@ -27,7 +27,7 @@
 		"logs:clean": "node scripts/clean-logs.js",
 		"logs:stats": "node scripts/logs-stats.js",
 		"logs:rotate": "node scripts/rotate-logs.js",
-		"seed:demo": "node --env-file=.env scripts/seed-screenshots.js"
+		"seed:demo": "node --env-file=.env docs/scripts/seed-screenshots.js && node --env-file=.env docs/scripts/seed-users-screenshots.js"
 	},
 	"lint-staged": {
 		"*.js": [
