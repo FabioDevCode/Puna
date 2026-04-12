@@ -17,6 +17,7 @@ Avant tout, veuillez lire notre [Code de Conduite](CODE_OF_CONDUCT.md). Toute pa
 - [Proposer une fonctionnalité](#proposer-une-fonctionnalité)
 - [Soumettre une Pull Request](#soumettre-une-pull-request)
 - [Tests](#tests)
+- [Scripts utilitaires](#scripts-utilitaires)
 - [Licence](#licence)
 
 ---
@@ -61,6 +62,56 @@ docker compose up -d
 ## Architecture du projet
 
 Puna est une application Node.js (ESM) avec Express 5, Sequelize (MariaDB) et des vues Handlebars.
+
+### Vue d'ensemble
+
+```mermaid
+graph TB
+    subgraph Client
+        Browser[Navigateur Web]
+        ExtApp[Application Externe]
+    end
+
+    subgraph Puna
+        direction TB
+        subgraph Web["Surface Web - SSR"]
+            Routes["Routes auto-chargées<br/>src/routes/*.routes.js"]
+            Controllers[Controllers]
+            Views[Vues Handlebars]
+        end
+
+        subgraph API["Surface API REST"]
+            ApiRoutes["Routes API auto-chargées<br/>src/api/v1/*.api.js"]
+            ApiMiddlewares["Pipeline Upload<br/>+ Auth 3 couches"]
+        end
+
+        Services["Services<br/>Logique métier"]
+        Models["Modèles Sequelize<br/>Déclaratifs JSON"]
+    end
+
+    subgraph Infra
+        DB[(MariaDB / MySQL)]
+        Storage["storage/uploads/"]
+        ClamAV["ClamAV - Optionnel"]
+        SMTP["Serveur SMTP - Optionnel"]
+    end
+
+    Browser -->|Session + CSRF| Web
+    ExtApp -->|"X-KEY-PUNA + JWT"| API
+    Web --> Services
+    API --> Services
+    Services --> Models
+    Models --> DB
+    Services --> Storage
+    ApiMiddlewares --> ClamAV
+    Services --> SMTP
+```
+
+### Middleware Stack (ordre strict)
+
+```
+helmet → cors(/api) → session → passport → flash → injectUserRole → csrfProtection → sanitize
+```
 
 ### Deux surfaces distinctes
 
@@ -281,6 +332,43 @@ vi.mock('../../../src/utils/crypto.js', () => ({
 
 - Fichier de référence : `tests/unit/services/twoFactor.service.test.js`
 - Les tests ne doivent pas dépendre d'une base de données réelle (utiliser des mocks Sequelize)
+
+---
+
+## Scripts utilitaires
+
+### Développement
+
+| Commande          | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| `npm run dev`     | Démarrage avec rechargement automatique (`--watch`) |
+| `npm start`       | Démarrage en production                             |
+| `npm run setup`   | Génération interactive du fichier `.env`            |
+| `npm run prepare` | Installation des hooks Husky (git hooks)            |
+
+### Qualité de code
+
+| Commande               | Description                         |
+| ---------------------- | ----------------------------------- |
+| `npm run lint`         | Vérification ESLint                 |
+| `npm run lint:fix`     | Correction automatique ESLint       |
+| `npm run format`       | Formatage Prettier (JS, JSON) + HBS |
+| `npm run format:check` | Vérification du formatage (CI)      |
+
+### Logs
+
+| Commande              | Description                      |
+| --------------------- | -------------------------------- |
+| `npm run logs:rotate` | Rotation manuelle des logs       |
+| `npm run logs:clean`  | Nettoyage des archives de logs   |
+| `npm run logs:stats`  | Statistiques et analyse des logs |
+
+### Données
+
+| Commande                | Description                          |
+| ----------------------- | ------------------------------------ |
+| `npm run test:e2e:seed` | Seed de la base de test (Playwright) |
+| `npm run seed:demo`     | Seed de données de démonstration     |
 
 ---
 

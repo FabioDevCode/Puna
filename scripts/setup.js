@@ -244,7 +244,28 @@ async function main() {
     const dockerEnv = isDocker();
 
     // ── Banner ──────────────────────────────────────────────────────────────
-
+    console.log('');
+    console.log(`
+             xddddd
+         ddddddddddd ccccc
+       ddddddddddddd cccccc ''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+       ddddddddddddd cccccc '''''
+        dddddddddddd cccccc ''''
+           kdddddddd cccc
+               dddd
+    `);
     console.log('');
     console.log('╔══════════════════════════════════════╗');
     console.log('║     Puna — Environment Setup         ║');

@@ -1,7 +1,7 @@
 # =============================================================================
 # STAGE 1 — deps : installation des dépendances de production uniquement
 # =============================================================================
-FROM node:22-alpine AS deps
+FROM node:24-alpine AS deps
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN npm ci --omit=dev --ignore-scripts
 # =============================================================================
 # STAGE 2 — runner : image finale légère
 # =============================================================================
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 
 # Métadonnées
 LABEL org.opencontainers.image.title="Puna"

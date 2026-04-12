@@ -5,16 +5,12 @@
 <h1 align="center">Puna</h1>
 
 <p align="center">
-  Application de gestion de formulaires de feedback - auto-hébergée, sécurisée, open source.
+  Panel d'administration auto-hébergé pour centraliser tous vos formulaires et gérer leurs soumissions.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/licence-AGPLv3-blue.svg" alt="Licence AGPLv3" />
   <img src="https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg" alt="Node >= 24" />
-  <img src="https://img.shields.io/badge/statements-84.68%25-yellow.svg?style=flat" alt="Statements" />
-  <img src="https://img.shields.io/badge/branches-76.79%25-red.svg?style=flat" alt="Branches" />
-  <img src="https://img.shields.io/badge/functions-87.63%25-yellow.svg?style=flat" alt="Functions" />
-  <img src="https://img.shields.io/badge/lines-84.55%25-yellow.svg?style=flat" alt="Lines" />
 </p>
 
 ---
@@ -29,10 +25,8 @@
 - [Installation avec Docker](#installation-avec-docker)
 - [Configuration](#configuration)
 - [API publique](#api-publique)
-- [Architecture](#architecture)
 - [Sécurité](#sécurité)
 - [Tests](#tests)
-- [Scripts utilitaires](#scripts-utilitaires)
 - [Contribution](#contribution)
 - [Licence](#licence)
 - [Auteur](#auteur)
@@ -41,18 +35,7 @@
 
 ## Présentation
 
-**Puna** est une application web auto-hébergée permettant de :
-
-1. **Créer des sites** et y associer des formulaires HTML personnalisés.
-2. **Collecter les soumissions** (boîte de réception) via une API REST publique sécurisée.
-3. **Exporter les données** au format Excel (.xlsx) ou CSV.
-
-Elle expose deux surfaces distinctes partageant le même serveur Express :
-
-| Surface      | Préfixe     | Authentification          | CSRF |
-| ------------ | ----------- | ------------------------- | ---- |
-| Web (SSR)    | `/`         | Session + Passport        | Oui  |
-| API publique | `/api/v1/…` | `X-KEY-PUNA` + Bearer JWT | Non  |
+**Puna** est un panel d'administration auto-hébergé pour centraliser tous vos formulaires au même endroit. Branchez vos formulaires HTML existants sur Puna via une API REST - les soumissions arrivent directement dans la boîte de réception, sans avoir à définir de nouvelle base de données, gérer les champs ou maintenir les types de données vous-même.
 
 **Stack technique** : Node.js (ESM), Express 5, Sequelize (MariaDB/MySQL), Handlebars, TailwindCSS + daisyUI.
 
@@ -60,82 +43,12 @@ Elle expose deux surfaces distinctes partageant le même serveur Express :
 
 ## Fonctionnalités
 
-### Gestion des sites
-
-- CRUD complet (création, modification, suppression)
-- Génération de tokens API par site
-- Régénération / révocation des codes de contrôle
-- Assignation d'utilisateurs à un site (multi-rôles)
-
-### Formulaires
-
-- CRUD complet avec templates HTML (Handlebars)
-- Définition de champs personnalisés
-- Support de l'upload de fichiers (images, archives)
-- Code unique par formulaire pour la soumission API
-
-### Boîte de réception (Inbox)
-
-- Collecte automatique des soumissions
-- Filtrage et pagination
-- Consultation détaillée du contenu (JSON)
-- Suppression en masse
-
-### Export de données
-
-- Export Excel (.xlsx) et CSV
-- Export par formulaire ou global (toutes les soumissions)
-
-### Authentification & Sécurité
-
-- Login local avec rate limiting (10 tentatives / 15 min)
-- Sessions persistantes (MySQL store, 12 h par défaut)
-- 2FA TOTP optionnel (avec codes de secours)
-- Réinitialisation de mot de passe par email (SMTP)
-
-### RBAC (Contrôle d'accès par rôles)
-
-5 rôles avec une matrice de permissions granulaire :
-
-| Rôle          | Portée                                        |
-| ------------- | --------------------------------------------- |
-| `super_admin` | Accès total, suppression utilisateurs, logs   |
-| `owner`       | Administration, gestion de tous les sites     |
-| `beta`        | Accès étendu (fonctionnalités en test)        |
-| `editor`      | Création et modification de sites/formulaires |
-| `viewer`      | Consultation seule                            |
-
-### Panneau d'administration
-
-- Gestion des utilisateurs (création, ban, désactivation, export)
-- Visualiseur de logs (filtrage par niveau, mot-clé, période)
-- Audit trail complet
-
-### API publique
-
-- Endpoint unique : `POST /api/v1/send/:code`
-- Authentification 3 couches (clé API, JWT, code formulaire)
-- Pipeline d'upload sécurisé (9 étapes)
-- Rate limiting : 10 requêtes / minute par formulaire
-
-### Antivirus ClamAV (optionnel)
-
-- Scan automatique des fichiers uploadés
-- Connexion Unix socket ou TCP
-- Vérification de connectivité au démarrage
-
-### Dashboard & Statistiques
-
-- Tableau de bord avec graphiques interactifs (ApexCharts)
-- Heatmap des soumissions
-- Compteurs par site et par formulaire
-
-### Logs & Monitoring
-
-- Logs structurés JSON (Pino)
-- Loggers séparés (app, API, erreurs)
-- Rotation automatique (cron) et manuelle
-- Interface d'exploration dans le panneau admin
+- **Sites & Formulaires** - Créez des sites, attachez-y des formulaires HTML personnalisés avec champs libres, upload de fichiers et code unique de soumission.
+- **Boîte de réception** - Les soumissions arrivent automatiquement, consultables, filtrables et exportables en Excel/CSV.
+- **API publique** - Un seul endpoint `POST /api/v1/send/:code` avec authentification 3 couches (clé API, JWT, code formulaire).
+- **Authentification** - Login local, sessions persistantes, 2FA TOTP optionnel et réinitialisation par email.
+- **RBAC** - 5 rôles (`super_admin`, `owner`, `beta`, `editor`, `viewer`) avec une matrice de permissions granulaire.
+- **Admin & monitoring** - Gestion des utilisateurs, visualiseur de logs, tableau de bord avec graphiques (ApexCharts) et antivirus ClamAV optionnel sur chaque upload.
 
 ---
 
@@ -311,7 +224,7 @@ Le fichier `.env` est généré interactivement via `node scripts/setup.js`. Voi
 | `DB_USER`        | Nom d'utilisateur BDD                                       |
 | `DB_PWD`         | Mot de passe BDD                                            |
 | `DB_NAME`        | Nom de la base de données                                   |
-| `DB_DIALECT`     | Dialecte : `mariadb`, `mysql`, `postgres` ou `sqlite`       |
+| `DB_DIALECT`     | Dialecte : `mariadb`                                        |
 | `KEY_TK`         | Clé de signature JWT (tokens API)                           |
 | `KEV`            | Clé de chiffrement AES (64 caractères hex, 32 octets)       |
 | `KIV`            | Vecteur d'initialisation AES (32 caractères hex, 16 octets) |
@@ -356,50 +269,6 @@ Activer avec `CLAMAV_ENABLED=true`. Deux modes de connexion (mutuellement exclus
 
 Au démarrage, un test `PING → PONG` vérifie la connectivité. Le serveur ne démarre pas si ClamAV est activé mais injoignable.
 
-### Exemple de fichier `.env`
-
-```env
-# Base de données
-DB_IP=localhost
-DB_PORT=3306
-DB_USER=puna_user
-DB_PWD=mon_mot_de_passe_securise
-DB_NAME=puna
-DB_DIALECT=mariadb
-
-# Sécurité
-KEY_TK=une_cle_jwt_longue_et_aleatoire_32_chars_min
-KEV=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-KIV=0123456789abcdef0123456789abcdef
-SESSION_SECRET=un_secret_de_session_aleatoire_32_chars_min
-CSRF_SECRET=un_secret_csrf_aleatoire_32_chars_min
-API_KEY=une_cle_api_aleatoire_32_chars_min
-
-# Application
-PORT=3022
-NODE_ENV=production
-APP_URL=https://mon-domaine.fr
-
-# Premier administrateur
-ADMIN_LOGIN=admin
-ADMIN_EMAIL=admin@mon-domaine.fr
-
-# 2FA (optionnel)
-TOTP_ENABLED=false
-
-# SMTP (optionnel - toutes les variables ou aucune)
-# SMTP_HOST=smtp.example.com
-# SMTP_PORT=587
-# SMTP_USER=user@example.com
-# SMTP_PASS=smtp_password
-# SMTP_FROM=noreply@example.com
-
-# ClamAV (optionnel)
-# CLAMAV_ENABLED=true
-# CLAMAV_HOST=clamav
-# CLAMAV_PORT=3310
-```
-
 > La validation complète est effectuée au démarrage par [`src/config/env.validator.js`](src/config/env.validator.js). Le processus est bloqué si la configuration est invalide.
 
 ---
@@ -419,132 +288,6 @@ Chaque requête doit passer les 3 vérifications dans l'ordre :
 1. **`X-KEY-PUNA`** - En-tête contenant la clé API globale (variable `API_KEY`). Comparaison à temps constant pour prévenir les attaques par timing.
 2. **`Authorization: Bearer <token>`** - Token JWT signé avec `KEY_TK`, dont le payload contient l'identifiant du site et son `control_code` chiffré. Le token est généré depuis l'interface web (page du site).
 3. **`:code`** - Paramètre d'URL correspondant au code unique d'un formulaire rattaché au site authentifié.
-
-### Pipeline d'upload
-
-Après authentification, les requêtes multipart traversent ce pipeline :
-
-```
-multipartUpload → validateUpload → inspectArchive → scanUpload → moveFilesToUploads
-→ updateFormFileKeys → sanitizeRequestBody → updateFormTemplate → sendHandler
-```
-
-Le contenu sanitisé est stocké en JSON dans la table `Inbox`.
-
-### Rate limiting
-
-10 requêtes par minute par formulaire.
-
-### Exemple d'appel
-
-```bash
-curl -X POST https://mon-domaine.fr/api/v1/send/MON_CODE_FORM \
-  -H "X-KEY-PUNA: ma_cle_api" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
-  -H "Content-Type: application/json" \
-  -d '{"nom": "Jean Dupont", "message": "Mon feedback"}'
-```
-
-Avec upload de fichier :
-
-```bash
-curl -X POST https://mon-domaine.fr/api/v1/send/MON_CODE_FORM \
-  -H "X-KEY-PUNA: ma_cle_api" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
-  -F "nom=Jean Dupont" \
-  -F "message=Mon feedback" \
-  -F "fichier=@photo.jpg"
-```
-
-### Réponses
-
-| Code | Description                       |
-| ---- | --------------------------------- |
-| 200  | Soumission enregistrée            |
-| 400  | Données invalides / code manquant |
-| 401  | Clé API ou token invalide         |
-| 403  | Site non trouvé / accès refusé    |
-| 404  | Formulaire non trouvé             |
-| 429  | Rate limit dépassé                |
-| 500  | Erreur interne                    |
-
----
-
-## Architecture
-
-### Vue d'ensemble
-
-```mermaid
-graph TB
-    subgraph Client
-        Browser[Navigateur Web]
-        ExtApp[Application Externe]
-    end
-
-    subgraph Puna
-        direction TB
-        subgraph Web["Surface Web - SSR"]
-            Routes["Routes auto-chargées<br/>src/routes/*.routes.js"]
-            Controllers[Controllers]
-            Views[Vues Handlebars]
-        end
-
-        subgraph API["Surface API REST"]
-            ApiRoutes["Routes API auto-chargées<br/>src/api/v1/*.api.js"]
-            ApiMiddlewares["Pipeline Upload<br/>+ Auth 3 couches"]
-        end
-
-        Services["Services<br/>Logique métier"]
-        Models["Modèles Sequelize<br/>Déclaratifs JSON"]
-    end
-
-    subgraph Infra
-        DB[(MariaDB / MySQL)]
-        Storage["storage/uploads/"]
-        ClamAV["ClamAV - Optionnel"]
-        SMTP["Serveur SMTP - Optionnel"]
-    end
-
-    Browser -->|Session + CSRF| Web
-    ExtApp -->|"X-KEY-PUNA + JWT"| API
-    Web --> Services
-    API --> Services
-    Services --> Models
-    Models --> DB
-    Services --> Storage
-    ApiMiddlewares --> ClamAV
-    Services --> SMTP
-```
-
-### Middleware Stack (ordre strict)
-
-```
-helmet → cors(/api) → session → passport → flash → injectUserRole → csrfProtection → sanitize
-```
-
-### Conventions d'auto-chargement
-
-| Fichier                  | Montage automatique                 |
-| ------------------------ | ----------------------------------- |
-| `src/routes/*.routes.js` | `/` (ex : `foo.routes.js` → `/foo`) |
-| `src/api/v1/*.api.js`    | `/api/v1/<name>`                    |
-| `src/models/*.models.js` | Chargé par `models/index.js`        |
-
-### Pattern Controller → Service
-
-- Les **controllers** gèrent le HTTP (`req`, `res`) : lecture des paramètres, appel aux services, flash messages, redirections ou rendu de vues.
-- Les **services** contiennent toute la logique métier et les requêtes Sequelize. Ils retournent du JSON pur (`.toJSON()`), jamais d'instances Sequelize brutes.
-
-### Modèles déclaratifs
-
-Les modèles sont définis en JSON, pas en code Sequelize :
-
-```
-src/models/attributes/<model>.attributes.json   ← Définition des colonnes
-src/models/relations/<model>.relations.json     ← Associations
-src/models/<model>.models.js                    ← Appelle le builder
-src/helpers/models_hlps.js                      ← Builder (JSON → DataTypes)
-```
 
 ---
 
@@ -573,15 +316,12 @@ Pour le détail complet, voir [SECURITY.md](SECURITY.md).
 
 ## Tests
 
-### Commandes
-
-```bash
-npm test              # Vitest - exécution unique (unit + integration)
-npm run test:watch    # Vitest - mode interactif
-npm run test:coverage # Vitest - avec rapport de couverture
-npm run test:e2e      # Playwright - tests end-to-end
-npm run test:e2e:ui   # Playwright - mode UI interactif
-```
+<p>
+  <img src="https://img.shields.io/badge/statements-84.68%25-yellow.svg?style=flat" alt="Statements" />
+  <img src="https://img.shields.io/badge/branches-76.79%25-red.svg?style=flat" alt="Branches" />
+  <img src="https://img.shields.io/badge/functions-87.63%25-yellow.svg?style=flat" alt="Functions" />
+  <img src="https://img.shields.io/badge/lines-84.55%25-yellow.svg?style=flat" alt="Lines" />
+</p>
 
 ### Stack de tests
 
@@ -595,55 +335,6 @@ npm run test:e2e:ui   # Playwright - mode UI interactif
 | Statements | Branches | Functions | Lines   |
 | ---------- | -------- | --------- | ------- |
 | 84.68 %    | 76.79 %  | 87.63 %   | 84.55 % |
-
-### Conventions
-
-Dans les tests unitaires, toujours mocker ces trois modules :
-
-```js
-vi.mock('../../../src/config/logger.js', () => ({ logger: { info: vi.fn(), … } }));
-vi.mock('../../../src/models/index.js', () => ({ default: { ModelName: { findByPk: vi.fn() } } }));
-vi.mock('../../../src/utils/crypto.js', () => ({ encryptString: vi.fn(s => `enc:${s}`) }));
-```
-
-Voir [`tests/unit/services/twoFactor.service.test.js`](tests/unit/services/twoFactor.service.test.js) comme référence.
-
----
-
-## Scripts utilitaires
-
-### Développement
-
-| Commande          | Description                                         |
-| ----------------- | --------------------------------------------------- |
-| `npm run dev`     | Démarrage avec rechargement automatique (`--watch`) |
-| `npm start`       | Démarrage en production                             |
-| `npm run setup`   | Génération interactive du fichier `.env`            |
-| `npm run prepare` | Installation des hooks Husky (git hooks)            |
-
-### Qualité de code
-
-| Commande               | Description                         |
-| ---------------------- | ----------------------------------- |
-| `npm run lint`         | Vérification ESLint                 |
-| `npm run lint:fix`     | Correction automatique ESLint       |
-| `npm run format`       | Formatage Prettier (JS, JSON) + HBS |
-| `npm run format:check` | Vérification du formatage (CI)      |
-
-### Logs
-
-| Commande              | Description                      |
-| --------------------- | -------------------------------- |
-| `npm run logs:rotate` | Rotation manuelle des logs       |
-| `npm run logs:clean`  | Nettoyage des archives de logs   |
-| `npm run logs:stats`  | Statistiques et analyse des logs |
-
-### Données
-
-| Commande                | Description                          |
-| ----------------------- | ------------------------------------ |
-| `npm run test:e2e:seed` | Seed de la base de test (Playwright) |
-| `npm run seed:demo`     | Seed de données de démonstration     |
 
 ---
 
