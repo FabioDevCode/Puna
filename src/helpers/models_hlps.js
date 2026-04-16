@@ -1,4 +1,5 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize';
+import { v7 as uuidv7 } from 'uuid';
 import stringUtils from '../utils/string.js';
 
 export const buildAttributes = (attributes) => {
@@ -26,7 +27,9 @@ export const buildAttributes = (attributes) => {
                 case 'UUID':
                     object[prop] = { ...currentValue };
                     object[prop].type = DataTypes[currentValue.type];
-                    object[prop].defaultValue = Sequelize.UUIDV4;
+                    if (!Object.prototype.hasOwnProperty.call(currentValue, 'defaultValue')) {
+                        object[prop].defaultValue = uuidv7;
+                    }
                     break;
                 case 'LONGTEXT':
                     object[prop] = { ...currentValue };
@@ -47,10 +50,6 @@ export const buildAttributes = (attributes) => {
 };
 
 export const buildIndexes = (attributes) => {
-    // SQLite manages PRIMARY KEY indexes automatically — skip explicit creation
-    const isSQLite = (process.env.DB_DIALECT || '').toLowerCase() === 'sqlite';
-    if (isSQLite) return [];
-
     const indexes = [];
     for (const key in attributes) {
         if (Object.prototype.hasOwnProperty.call(attributes, key) && Object.prototype.hasOwnProperty.call(attributes[key], 'primaryKey') && attributes[key].primaryKey) {
