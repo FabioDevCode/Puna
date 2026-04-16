@@ -66,7 +66,7 @@ export async function getTopForms(userId, days = 7) {
         .subtract(days - 1, 'day');
 
     const sql = `
-        SELECT i.fk_id_form AS fk_id_form, f.name AS form_name, s.domain AS site_domain, COUNT(i.id) AS cnt
+        SELECT i.fk_id_form AS fk_id_form, f.name AS form_name, s.id AS site_id, s.domain AS site_domain, COUNT(i.id) AS cnt
         FROM inbox i
         JOIN form f ON f.id = i.fk_id_form
         JOIN site s ON s.id = f.fk_id_site
@@ -88,8 +88,8 @@ export async function getTopForms(userId, days = 7) {
 
     return (rows || []).map((r, idx) => ({
         rank: idx + 1,
-        form_id: r.fk_id_form,
         form_name: r.form_name || null,
+        site_id: r.site_id || null,
         site_domain: r.site_domain || null,
         count: Number(r.cnt) || 0,
     }));

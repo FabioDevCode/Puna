@@ -20,10 +20,10 @@
             const pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
 
             const tr = document.createElement('tr');
-            if (it && it.form_id) {
+            if (it && it.site_id) {
                 tr.classList.add('cursor-pointer', 'hover');
                 tr.addEventListener('click', () => {
-                    window.location.href = `/form/${it.form_id}/inbox`;
+                    window.location.href = `/site/${it.site_id}/view?f=${encodeURI(formName)}`;
                 });
             }
             tr.innerHTML = `

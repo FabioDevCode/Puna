@@ -32,7 +32,7 @@
             const items = labels
                 .map((label, i) => ({ label, count: data[i] || 0, siteId: ids[i] }))
                 .filter((it) => it.count > 0)
-                .slice(0, 12);
+                .slice(0, 8);
 
             if (items.length === 0) {
                 el.innerHTML = `<p class="text-sm text-muted text-center">${(window.__i18n && window.__i18n.no_submissions) || 'Aucune soumission pour le moment'}</p>`;
@@ -40,7 +40,7 @@
             }
 
             // 2 columns if more than 7 items, else 1 column
-            const cols = items.length > 7 ? 2 : 1;
+            const cols = items.length > 4 ? 2 : 1;
             el.classList.remove('flex', 'flex-col', 'justify-center');
             el.style.display = 'grid';
             el.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -54,11 +54,11 @@
                 row.className = 'flex flex-col gap-1 px-1 py-1 rounded hover:bg-base-200 transition-colors cursor-pointer no-underline';
 
                 row.innerHTML = `
-                    <div class="flex items-center justify-between gap-1">
+                    <div class="flex flex-col items-left justify-center gap-1">
                         <span class="text-sm truncate">${label}</span>
                         <span class="text-xs text-muted">${count} (${pct}%)</span>
                     </div>
-                    <div class="w-full bg-base-200 rounded-full h-2 overflow-hidden">
+                    <div class="bg-base-200 rounded-full h-2 overflow-hidden">
                         <div class="bg-secondary h-2 rounded-full transition-all" style="width: ${pct}%"></div>
                     </div>
                 `;
