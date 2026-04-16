@@ -5,21 +5,11 @@
 <h1 align="center">Puna</h1>
 
 <p align="center">
-  Centralisez tous les formulaires de vos sites web au même endroit via une API unique et simple, pour une gestion simplifiée de vos données.
+  Centralisez tous les formulaires de vos sites web au même endroit via une API unique et simple,<br> pour une gestion simplifiée de vos données.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/licence-AGPLv3-blue.svg?style=for-the-badge" alt="Licence AGPLv3" />
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Node.JS-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js"/>
-  <img src="https://img.shields.io/badge/Express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express" />
-  <img src="https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white" alt="Sequelize" />
-  <img src="https://img.shields.io/badge/MariaDB-1F305F?style=for-the-badge&logo=mariadb&logoColor=white" alt="MariaDB" />
-  <img src="https://img.shields.io/badge/handlebars-F0772B?style=for-the-badge&logo=handlebarsdotjs&logoColor=483a2d" alt="Handlebars" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-030712?style=for-the-badge&logo=tailwindcss&logoColor=00BCFF" alt="TailwindCSS" />
-  <img src="https://img.shields.io/badge/daisyUI-2A303C?style=for-the-badge&logo=daisyui&logoColor=FFD028" alt="daisyUI" />
 </p>
 
 ---
@@ -39,7 +29,7 @@
 - **RBAC** - 5 rôles (`super_admin`, `owner`, `beta`, `editor`, `viewer`) avec une matrice de permissions granulaire.
 - **Admin & monitoring** - Gestion des utilisateurs, visualiseur de logs, tableau de bord avec graphiques (ApexCharts) et antivirus ClamAV optionnel sur chaque upload.
 
----
+<!-- ---
 
 ## Captures d'écran
 
@@ -73,21 +63,50 @@
       <img src="docs/screenshots/screenshot-inbox.png" alt="Boîte de réception" width="100%" />
     </td>
   </tr>
-</table>
+</table> -->
 
 ---
 
 ## Démarrage rapide
 
+### Prérequis
+
+| Outil   | Version | Obligatoire |
+| ------- | ------- | ----------- |
+| Node.js | ≥ 24    | Oui         |
+| npm     | ≥ 10    | Oui         |
+| MariaDB | ≥ 11    | Oui         |
+
+**Optionnels :**
+
+- **SMTP** — nécessaire pour la réinitialisation de mot de passe par email. Sans configuration SMTP, la fonctionnalité est simplement désactivée.
+- **ClamAV** — antivirus pour scanner les fichiers uploadés. Doit être installé et démarré avant le serveur si `CLAMAV_ENABLED=true`.
+
+### Installation
+
 ```bash
 git clone https://github.com/FabioDevCode/Puna.git
 cd Puna
-node scripts/setup.js  # génère le fichier .env de manière interactive
+npm run setup  # génère le fichier .env de manière interactive
 npm install
 npm run dev
 ```
 
 Une installation Docker et la référence complète de configuration sont disponibles dans la **documentation**.
+
+---
+
+## Technologies
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Node.JS-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js"/>
+  <img src="https://img.shields.io/badge/Express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express" />
+  <img src="https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white" alt="Sequelize" />
+  <img src="https://img.shields.io/badge/MariaDB-1F305F?style=for-the-badge&logo=mariadb&logoColor=white" alt="MariaDB" />
+  <img src="https://img.shields.io/badge/handlebars-F0772B?style=for-the-badge&logo=handlebarsdotjs&logoColor=483a2d" alt="Handlebars" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-030712?style=for-the-badge&logo=tailwindcss&logoColor=00BCFF" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/daisyUI-2A303C?style=for-the-badge&logo=daisyui&logoColor=FFD028" alt="daisyUI" />
+</p>
 
 ---
 
@@ -108,22 +127,18 @@ Pour le détail complet, voir [SECURITY.md](SECURITY.md).
   <img src="https://img.shields.io/badge/lines-84.55%25-yellow.svg?style=flat" alt="Lines" />
 </p>
 
-Vitest (unit / integration) + Playwright (e2e). Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions et commandes.
+Vitest (unit / integration) + Playwright (e2e).<br>
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions et commandes.
 
 ---
 
 ## Contribution
 
-Les contributions sont les bienvenues ! Consultez le guide complet dans [CONTRIBUTING.md](CONTRIBUTING.md).
+Les contributions sont les bienvenues !<br>
+Consultez le guide complet dans [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## Licence
 
 Ce projet est distribué sous licence **GNU Affero General Public License v3 (AGPLv3)**. Voir [License.md](License.md).
-
----
-
-## Auteur
-
-**Fabio RAMOS LOPES** - [GitHub](https://github.com/FabioDevCode)

@@ -24,8 +24,8 @@ Avant tout, veuillez lire notre [Code de Conduite](CODE_OF_CONDUCT.md). Toute pa
 
 ## Prérequis
 
-- **Node.js** 22+
-- **MariaDB** 11+ — ou **Docker** (recommandé)
+- **Node.js** 24+
+- **MariaDB** 11+ - ou **Docker**
 - **npm** 10+
 - **Git**
 
@@ -39,7 +39,7 @@ git clone https://github.com/<votre-pseudo>/Puna.git
 cd Puna
 
 # 2. Générer le fichier .env (script interactif, aucune dépendance requise)
-node scripts/setup.js
+npm run setup
 
 # 3. Installer les dépendances
 npm install
@@ -53,7 +53,7 @@ Le serveur démarre sur `http://localhost:3022` (ou le port configuré dans votr
 ### Avec Docker
 
 ```bash
-node scripts/setup.js   # Sélectionner le mode Docker quand demandé
+npm run setup # Sélectionner le mode Docker quand demandé
 docker compose up -d
 ```
 
@@ -128,7 +128,7 @@ helmet → cors(/api) → session → passport → flash → injectUserRole → 
 
 ### Pattern Controller → Service
 
-- **Controllers** (`src/controllers/`) : gèrent le HTTP — lisent `req`, appellent les services, redirigent ou rendent les vues.
+- **Controllers** (`src/controllers/`) : gèrent le HTTP - lisent `req`, appellent les services, redirigent ou rendent les vues.
 - **Services** (`src/services/`) : contiennent toute la logique métier et les requêtes Sequelize. Ils retournent du JSON (`model.toJSON()`), jamais des instances Sequelize brutes.
 
 ### Modèles déclaratifs
@@ -149,18 +149,18 @@ Ne jamais écrire `DataTypes.STRING` directement dans un fichier de modèle.
 
 ### Général
 
-- **ESM uniquement** (`import`/`export`) — pas de `require()` ni de CommonJS
-- **Pas de `dotenv`** — les variables d'environnement sont chargées via `node --env-file=.env`
+- **ESM uniquement** (`import`/`export`) - pas de `require()` ni de CommonJS
+- **Pas de `dotenv`** - les variables d'environnement sont chargées via `node --env-file=.env`
 - Les fichiers sont servis directement, **sans étape de build**
 
 ### Formatage et lint
 
 ```bash
-npm run lint:fix    # ESLint 9 flat config — corrige automatiquement
+npm run lint:fix    # ESLint 9 flat config - corrige automatiquement
 npm run format      # Prettier (JS/JSON) + formateur HBS personnalisé
 ```
 
-Le projet utilise ESLint 9 avec une configuration `eslint.config.js` (flat config). Les règles sont déjà configurées — ne pas les modifier sans discussion préalable.
+Le projet utilise ESLint 9 avec une configuration `eslint.config.js` (flat config). Les règles sont déjà configurées - ne pas les modifier sans discussion préalable.
 
 ### Internationalisation
 
@@ -175,7 +175,7 @@ Ne pas ajouter de chaînes françaises directement dans le code.
 ### Sécurité
 
 - Les clés cryptographiques viennent exclusivement des variables d'environnement
-- Les accès aux données sont scopés via `getSiteWhereCondition()` depuis `src/services/access.service.js` — ne jamais hardcoder des conditions WHERE pour le contrôle d'accès
+- Les accès aux données sont scopés via `getSiteWhereCondition()` depuis `src/services/access.service.js` - ne jamais hardcoder des conditions WHERE pour le contrôle d'accès
 - Les permissions sont définies dans `src/config/permissions.js`
 
 ---
@@ -211,7 +211,7 @@ git commit -m "feat(scope): description courte"
 git push origin feature/ma-fonctionnalite
 ```
 
-### Conventions de commits — Conventional Commits
+### Conventions de commits - Conventional Commits
 
 Format : `<type>(<scope>): <description>`
 
@@ -353,6 +353,7 @@ vi.mock('../../../src/utils/crypto.js', () => ({
 | `npm run lint`         | Vérification ESLint                 |
 | `npm run lint:fix`     | Correction automatique ESLint       |
 | `npm run format`       | Formatage Prettier (JS, JSON) + HBS |
+| `npm run format:hbs`   | Formatage HBS uniquement            |
 | `npm run format:check` | Vérification du formatage (CI)      |
 
 ### Logs
@@ -365,10 +366,11 @@ vi.mock('../../../src/utils/crypto.js', () => ({
 
 ### Données
 
-| Commande                | Description                          |
-| ----------------------- | ------------------------------------ |
-| `npm run test:e2e:seed` | Seed de la base de test (Playwright) |
-| `npm run seed:demo`     | Seed de données de démonstration     |
+| Commande                       | Description                                   |
+| ------------------------------ | --------------------------------------------- |
+| `npm run test:e2e:seed`        | Seed de la base de test (Playwright)          |
+| `npm run seed:demo`            | Seed de données de démonstration              |
+| `npm run test:coverage:badges` | Couverture + mise à jour des badges du README |
 
 ---
 

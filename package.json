@@ -1,7 +1,7 @@
 {
 	"name": "puna",
 	"version": "1.0.0",
-	"description": "Application de gestion de feedbacks",
+	"description": "Centralisez tous vos formulaires au même endroit",
 	"main": "server.js",
 	"type": "module",
 	"engines": {

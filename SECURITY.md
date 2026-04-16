@@ -47,7 +47,7 @@ Puna implémente une approche de sécurité **multi-couches** pour protéger les
 | **sequelize**          | ORM (prévention SQL injection)         | ^6.37.7 |
 | **node:crypto**        | Chiffrement AES (module natif Node.js) | natif   |
 | **csrf-csrf**          | Protection CSRF (Double Submit Cookie) | ^4.0.3  |
-| **express-rate-limit** | Rate limiting login & API              | ^7.x    |
+| **express-rate-limit** | Rate limiting login & API              | ^8.2.1  |
 
 ---
 
@@ -79,7 +79,7 @@ Les API publiques (`/send/:code`) utilisent des **tokens JWT** pour l'authentifi
 **Caractéristiques :**
 
 - Signature HMAC SHA-256
-- Sans expiration — le token reste valide tant que le `control_code` du site n'est pas régénéré (révocation = `POST /site/:id/revoke`)
+- Sans expiration - le token reste valide tant que le `control_code` du site n'est pas régénéré (révocation = `POST /site/:id/revoke`)
 - Payload chiffré : `{ id, control_code }` est chiffré via `encryptObject()` (AES-256-CBC), puis stocké dans le champ `data` du JWT
 - Le formulaire est vérifié séparément via le paramètre `:code` dans l'URL
 - Clé secrète dans `.env` (`KEY_TK`)
@@ -178,7 +178,7 @@ app.use(
 
 - Session fixation (cookie régénéré à chaque login)
 - Session hijacking (httpOnly cookie)
-- CSRF (Double Submit Cookie — voir section dédiée)
+- CSRF (Double Submit Cookie - voir section dédiée)
 
 ### Première connexion obligatoire
 
@@ -193,8 +193,8 @@ Lors de la création d'un compte, l'utilisateur **doit** se connecter avec son m
 
 **Fichiers :**
 
-- `src/controllers/auth.controller.js` — flux de première connexion (`dpFirstCoPost`)
-- `src/helpers/init_admin_user.js` — création du compte admin initial
+- `src/controllers/auth.controller.js` - flux de première connexion (`dpFirstCoPost`)
+- `src/helpers/init_admin_user.js` - création du compte admin initial
 
 ---
 
@@ -446,11 +446,11 @@ Upload → Validation → Inspection → Scan antivirus → Déplacement → BDD
 Multer → validateUpload → inspectArchive → scanUpload → moveFiles → saveInbox
 ```
 
-### Scan antivirus — ClamAV (optionnel)
+### Scan antivirus - ClamAV (optionnel)
 
 Le middleware `scanUpload` analyse chaque fichier uploadé via le daemon **ClamAV** (`clamd`) avant qu'il ne soit déplacé vers le stockage permanent.
 
-**Activation :** `CLAMAV_ENABLED=true` dans `.env` (désactivé par défaut — pass-through).
+**Activation :** `CLAMAV_ENABLED=true` dans `.env` (désactivé par défaut - pass-through).
 
 | Mode de connexion | Variables d'environnement                 | Usage typique                          |
 | ----------------- | ----------------------------------------- | -------------------------------------- |
@@ -590,8 +590,8 @@ if (!resolvedPath.startsWith(expectedPrefix)) {
 
 Cette double vérification est appliquée dans :
 
-- **`deleteInboxWithFiles()`** — Avant suppression de fichiers
-- **`verifyFileAccessAndGetPath()`** — Avant téléchargement de fichiers
+- **`deleteInboxWithFiles()`** - Avant suppression de fichiers
+- **`verifyFileAccessAndGetPath()`** - Avant téléchargement de fichiers
 
 **Fichiers :**
 
@@ -660,7 +660,7 @@ Le middleware `csrfTokenInjector` rend le token disponible dans tous les templat
 ```
 
 ```javascript
-// JavaScript client — ajout du header pour requêtes AJAX
+// JavaScript client - ajout du header pour requêtes AJAX
 fetch('/api/endpoint', {
     method: 'POST',
     headers: {
@@ -764,11 +764,16 @@ Le rate limiting est implémenté avec **express-rate-limit** sur les routes sen
 
 ### Routes protégées
 
-| Route               | Limite     | Fenêtre    | Description                              |
-| ------------------- | ---------- | ---------- | ---------------------------------------- |
-| `POST /dp-connect`  | 5 requêtes | 15 minutes | Login                                    |
-| `POST /dp-first-co` | 3 requêtes | 15 minutes | Première connexion                       |
-| `POST /send/:code`  | 30 req/min | 1 minute   | API soumission formulaire (configurable) |
+| Route                                                         | Limite     | Fenêtre    | Description                                    |
+| ------------------------------------------------------------- | ---------- | ---------- | ---------------------------------------------- |
+| `POST /dp-connect`                                            | 5 requêtes | 15 minutes | Login (ne compte pas les succès)               |
+| `POST /dp-first-co`                                           | 3 requêtes | 15 minutes | Première connexion                             |
+| `POST /dp-forgot-password`                                    | 3 requêtes | 15 minutes | Demande de réinitialisation (anti-énumération) |
+| `POST /dp-reset-password/:token`                              | 5 requêtes | 15 minutes | Réinitialisation effective du mot de passe     |
+| `POST /dp-2fa-verify`                                         | 5 requêtes | 15 minutes | Vérification TOTP (ne compte pas les succès)   |
+| `POST /dp-2fa-recovery`                                       | 5 requêtes | 15 minutes | Utilisation d'un code de récupération          |
+| `POST /dp-2fa-setup`, `/dp-2fa-disable`, `/dp-2fa-regenerate` | 5 requêtes | 15 minutes | Actions de configuration 2FA                   |
+| `POST /send/:code`                                            | 30 req/min | 1 minute   | API soumission formulaire (configurable)       |
 
 ### Configuration
 
@@ -786,14 +791,14 @@ const loginRateLimiter = rateLimit({
 const formRateLimiter = rateLimit({
     windowMs: parseInt(process.env.RATE_LIMIT_FORM_WINDOW_MS || '60000'),
     max: parseInt(process.env.RATE_LIMIT_FORM_MAX || '30'),
-    keyGenerator: (req) => `${req.params.siteId}_${req.params.formCode}`,
+    keyGenerator: (req) => `form:${req.site?.id}:${req.params.code}`,
 });
 ```
 
 **Variables d'environnement :**
 
-- `RATE_LIMIT_FORM_MAX` — Requêtes max par fenêtre (défaut : 30)
-- `RATE_LIMIT_FORM_WINDOW_MS` — Fenêtre en ms (défaut : 60000)
+- `RATE_LIMIT_FORM_MAX` - Requêtes max par fenêtre (défaut : 30)
+- `RATE_LIMIT_FORM_WINDOW_MS` - Fenêtre en ms (défaut : 60000)
 
 **Fichiers :**
 
@@ -803,7 +808,7 @@ const formRateLimiter = rateLimit({
 ### Stockage
 
 - **Actuellement :** MemoryStore (mono-instance)
-- **Limitation :** Si le processus Node redémarre (déploiement, crash, OOM), tous les compteurs sont remis à zéro — une fenêtre d'exploitation s'ouvre brièvement.
+- **Limitation :** Si le processus Node redémarre (déploiement, crash, OOM), tous les compteurs sont remis à zéro - une fenêtre d'exploitation s'ouvre brièvement.
 - **Production multi-instances :** Migrer vers Redis (`rate-limit-redis`) pour un stockage partagé et persistant entre les instances.
 
 ---
@@ -955,7 +960,8 @@ options: {
 L'infrastructure Pino est **en place** et la migration des controllers est quasi terminée.
 
 - [x] Remplacer `console.log()` par `logger.info()`
-- [ ] Remplacer les 2 derniers `console.error()` dans `dashboard.controller.js` et `site.controller.js`
+- [x] Remplacer les `console.error()` dans `dashboard.controller.js`
+- [ ] Remplacer le dernier `console.error()` dans `site.controller.js`
 - [x] Utiliser les helpers dans controllers (`logAction`, `logAuthSuccess`, etc.)
 - [ ] Créer interface admin pour visualiser les logs
 
@@ -1014,7 +1020,7 @@ process.on('unhandledRejection', (reason) => {
 Les messages d'erreur internes ne sont **jamais** exposés aux utilisateurs :
 
 ```javascript
-// ✅ Réponse API — message générique
+// ✅ Réponse API - message générique
 res.status(500).json({ error: 'Internal server error' });
 
 // Log interne avec détails complets (Pino)
@@ -1035,7 +1041,7 @@ Si vous découvrez une vulnérabilité de sécurité dans Puna, merci de nous la
 
 **NE PAS** créer d'issue publique sur GitHub pour les vulnérabilités de sécurité.
 
-**Procédure recommandée — GitHub Private Vulnerability Reporting :**
+**Procédure recommandée - GitHub Private Vulnerability Reporting :**
 
 1. Aller sur l'onglet **Security** du dépôt GitHub
 2. Cliquer sur **"Report a vulnerability"** (signalement privé)
@@ -1046,7 +1052,7 @@ Si vous découvrez une vulnérabilité de sécurité dans Puna, merci de nous la
     - Version affectée
     - Preuve de concept (si applicable)
 
-Ce mécanisme est entièrement privé — seuls les mainteneurs du projet peuvent voir le rapport jusqu'à la publication du correctif.
+Ce mécanisme est entièrement privé - seuls les mainteneurs du projet peuvent voir le rapport jusqu'à la publication du correctif.
 
 **Alternative :** contact direct via les informations de profil GitHub du mainteneur.
 
