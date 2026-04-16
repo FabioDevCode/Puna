@@ -19,7 +19,7 @@ vi.mock('clamscan', () => {
     return { default: NodeClamMock };
 });
 
-vi.mock('../../src/helpers/upload_utils.js', () => ({
+vi.mock('../../src/helpers/upload.helpers.js', () => ({
     removeFile: mocks.removeFile,
 }));
 

@@ -83,7 +83,7 @@ vi.mock('node:fs', () => ({
     unlinkSync: vi.fn(),
 }));
 
-vi.mock('../../../src/helpers/upload_utils.js', () => ({
+vi.mock('../../../src/helpers/upload.helpers.js', () => ({
     finalPathFor: vi.fn((site, form, filename) => ({
         dir: `/uploads/${site.domain}`,
         path: `/uploads/${site.domain}/${filename}`,

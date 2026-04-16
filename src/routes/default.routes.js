@@ -9,7 +9,7 @@ import * as passwordResetCtl from '../controllers/passwordReset.controller.js';
 import * as profileCtl from '../controllers/profile.controller.js';
 import * as siteCtl from '../controllers/site.controller.js';
 import * as twoFactorCtl from '../controllers/twoFactor.controller.js';
-import { requireAuth, isConnectDash, requirePending2FA } from '../helpers/authHelper.js';
+import { requireAuth, isConnectDash, requirePending2FA } from '../helpers/auth.helpers.js';
 import { actionAccess, roleAccess } from '../middlewares/checkAccess.js';
 import {
     loginRateLimiter,

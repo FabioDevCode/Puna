@@ -17,7 +17,7 @@ import session from 'express-session';
 import passport from 'passport';
 import request from 'supertest';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { initializePassport } from '../../../src/helpers/authHelper.js';
+import { initializePassport } from '../../../src/helpers/auth.helpers.js';
 import flashMessages from '../../../src/middlewares/flashMessages.js';
 import { injectUserRole } from '../../../src/middlewares/injectUserRole.js';
 import models from '../../../src/models/index.js';

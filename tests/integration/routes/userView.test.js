@@ -19,7 +19,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { create } from 'express-handlebars';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import hbs_fn from '../../../src/helpers/hbs_fn.js';
+import hbs_fn from '../../../src/helpers/hbs.helpers.js';
 
 vi.mock('i18n', () => ({
     default: { __: (s) => s, __n: (s) => s },

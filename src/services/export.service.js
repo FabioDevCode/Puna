@@ -8,7 +8,7 @@ import archiver from 'archiver';
 import dayjs from 'dayjs';
 import ExcelJS from 'exceljs';
 import { format } from 'fast-csv';
-import { finalPathFor } from '../helpers/upload_utils.js';
+import { finalPathFor } from '../helpers/upload.helpers.js';
 import models from '../models/index.js';
 import { getSiteWhereCondition } from './access.service.js';
 

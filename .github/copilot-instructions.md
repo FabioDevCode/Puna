@@ -27,7 +27,7 @@ Models are **declarative JSON + a builder**, not hand-coded Sequelize classes:
 src/models/attributes/form.attributes.json  ← column definitions
 src/models/relations/form.relations.json    ← associations
 src/models/form.models.js                   ← calls builder.buildAttributes() / buildRelations()
-src/helpers/models_hlps.js                  ← the builder (maps string types to DataTypes)
+src/helpers/models.helpers.js                  ← the builder (maps string types to DataTypes)
 ```
 
 Never write `DataTypes.STRING` directly in a model file — add the column to the `.attributes.json` instead.

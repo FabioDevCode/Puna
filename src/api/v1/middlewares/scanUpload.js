@@ -22,7 +22,7 @@
 
 import NodeClam from 'clamscan';
 import { apiLogger, errorLogger } from '../../../config/logger.js';
-import { removeFile } from '../../../helpers/upload_utils.js';
+import { removeFile } from '../../../helpers/upload.helpers.js';
 
 const CLAMAV_ENABLED = process.env.CLAMAV_ENABLED === 'true';
 const CLAMAV_SOCKET = process.env.CLAMAV_SOCKET || '';

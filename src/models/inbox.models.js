@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import * as builder from '../helpers/models_hlps.js';
+import * as builder from '../helpers/models.helpers.js';
 
 const attributes = createRequire(import.meta.url)('./attributes/inbox.attributes.json');
 const relations = createRequire(import.meta.url)('./relations/inbox.relations.json');

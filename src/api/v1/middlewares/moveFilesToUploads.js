@@ -1,6 +1,6 @@
 import path from 'path';
 import { errorLogger } from '../../../config/logger.js';
-import { finalPathFor, sanitizeFileName, moveFile, removeFile } from '../../../helpers/upload_utils.js';
+import { finalPathFor, sanitizeFileName, moveFile, removeFile } from '../../../helpers/upload.helpers.js';
 
 export default async function moveFilesToUploads(req, res, next) {
     try {

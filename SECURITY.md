@@ -194,7 +194,7 @@ Lors de la création d'un compte, l'utilisateur **doit** se connecter avec son m
 **Fichiers :**
 
 - `src/controllers/auth.controller.js` - flux de première connexion (`dpFirstCoPost`)
-- `src/helpers/init_admin_user.js` - création du compte admin initial
+- `src/helpers/init_admin_user.helpers.js` - création du compte admin initial
 
 ---
 
@@ -266,7 +266,7 @@ Les permissions sont également vérifiées côté front-end pour masquer les bo
 {{/roleIs}}
 ```
 
-**Fichier :** `src/helpers/hbs_fn.js`
+**Fichier :** `src/helpers/hbs.helpers.js`
 
 ### Isolation des données
 

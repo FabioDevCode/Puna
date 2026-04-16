@@ -3,7 +3,7 @@ import path from 'node:path';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { errorLogger, auditLogger } from '../config/logger.js';
-import { finalPathFor } from '../helpers/upload_utils.js';
+import { finalPathFor } from '../helpers/upload.helpers.js';
 import models from '../models/index.js';
 import { getSiteWhereCondition } from './access.service.js';
 

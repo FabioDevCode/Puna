@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { requirePending2FA } from '../../src/helpers/authHelper.js';
+import { requirePending2FA } from '../../src/helpers/auth.helpers.js';
 
 vi.mock('../../src/config/logger.js', () => ({
     logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },

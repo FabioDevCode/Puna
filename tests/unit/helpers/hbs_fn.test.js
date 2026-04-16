@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import helpers from '../../../src/helpers/hbs_fn.js';
+import helpers from '../../../src/helpers/hbs.helpers.js';
 
 vi.mock('i18n', () => ({
     default: {
