@@ -16,54 +16,18 @@
 
 ## Présentation
 
-**Puna** est un panel d'administration auto-hébergé pour centraliser tous vos formulaires au même endroit. Branchez vos formulaires HTML existants sur Puna via une API REST - les soumissions arrivent directement dans la boîte de réception, sans avoir à définir de nouvelle base de données, gérer les champs ou maintenir les types de données vous-même.
+**Puna** est un panel d'administration auto-hébergé pour centraliser tous vos formulaires au même endroit. Branchez vos formulaires existants sur Puna via une API. Les soumissions arrivent directement dans l'application, sans avoir à définir de nouvelle base de données, gérer les champs ou maintenir les types de données vous-même.
 
 ---
 
 ## Fonctionnalités
 
-- **Sites & Formulaires** - Créez des sites, attachez-y des formulaires HTML personnalisés avec champs libres, upload de fichiers et code unique de soumission.
-- **Boîte de réception** - Les soumissions arrivent automatiquement, consultables, filtrables et exportables en Excel/CSV.
-- **API publique** - Un seul endpoint `POST /api/v1/send/:code` avec authentification 3 couches (clé API, JWT, code formulaire).
+- **Sites & Formulaires** - Structurez vos intégrations en créant des objets **_Site_** et **_Formulaire_** associés. Ces entités applicatives permettent de regrouper et d'identifier les soumissions par _site_ et _formulaire_.
+- **API publique** - Un seul endpoint `POST /api/v1/send/:code` avec authentification 3 couches (clé API, JWT du _site_, code du _formulaire_). Prend en charge `JSON` & `Multipart Form`.
+- **Soumissions** - Chaque appel à l'API crée une entrée consultable, filtrable et exportable (**Excel**/**CSV**). L'historique complet des données reçues est accessible depuis l'interface de chaque **_site_** et onglet de **_formulaire_**.
 - **Authentification** - Login local, sessions persistantes, 2FA TOTP optionnel et réinitialisation par email.
 - **RBAC** - 5 rôles (`super_admin`, `owner`, `beta`, `editor`, `viewer`) avec une matrice de permissions granulaire.
-- **Admin & monitoring** - Gestion des utilisateurs, visualiseur de logs, tableau de bord avec graphiques (ApexCharts) et antivirus ClamAV optionnel sur chaque upload.
-
-<!-- ---
-
-## Captures d'écran
-
-### Application
-
-<table>
-  <tr>
-    <td width="33%" valign="top">
-      <strong>Dashboard</strong><br/>
-      Vue d'ensemble avec graphiques interactifs, heatmap des soumissions et compteurs par site.
-    </td>
-    <td width="67%">
-      <img src="docs/screenshots/screenshot-dashboard.png" alt="Dashboard" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td width="33%" valign="top">
-      <strong>Liste des sites</strong><br/>
-      Gestion des sites avec accès rapide aux formulaires, tokens API et assignations utilisateurs.
-    </td>
-    <td width="67%">
-      <img src="docs/screenshots/screenshot-site.png" alt="Liste des sites" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td width="33%" valign="top">
-      <strong>Soumission reçu</strong><br/>
-      Consultation des soumissions collectées, avec les différentes et clés et documents.
-    </td>
-    <td width="67%">
-      <img src="docs/screenshots/screenshot-inbox.png" alt="Boîte de réception" width="100%" />
-    </td>
-  </tr>
-</table> -->
+- **Admin & monitoring** - Gestion des utilisateurs, visualiseur de logs, tableau de bord et antivirus ClamAV optionnel sur chaque upload.
 
 ---
 
@@ -79,10 +43,10 @@
 
 **Optionnels :**
 
-- **SMTP** — nécessaire pour la réinitialisation de mot de passe par email. Sans configuration SMTP, la fonctionnalité est simplement désactivée.
-- **ClamAV** — antivirus pour scanner les fichiers uploadés. Doit être installé et démarré avant le serveur si `CLAMAV_ENABLED=true`.
+- **SMTP** - nécessaire pour la réinitialisation de mot de passe par email. Sans configuration SMTP, la fonctionnalité est simplement désactivée.
+- **ClamAV** - antivirus pour scanner les fichiers uploadés. Doit être installé et démarré avant le serveur si `CLAMAV_ENABLED=true`.
 
-### Installation
+### Installation (Développeur)
 
 ```bash
 git clone https://github.com/FabioDevCode/Puna.git
@@ -102,7 +66,7 @@ Une installation Docker et la référence complète de configuration sont dispon
   <img src="https://img.shields.io/badge/Node.JS-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js"/>
   <img src="https://img.shields.io/badge/Express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express" />
   <img src="https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white" alt="Sequelize" />
-  <img src="https://img.shields.io/badge/MariaDB-1F305F?style=for-the-badge&logo=mariadb&logoColor=white" alt="MariaDB" />
+  <img src="https://img.shields.io/badge/MariaDB-1F305F?style=for-the-badge&logo=mariadb&logoColor=white" alt="MariaDB" /><br>
   <img src="https://img.shields.io/badge/handlebars-F0772B?style=for-the-badge&logo=handlebarsdotjs&logoColor=483a2d" alt="Handlebars" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-030712?style=for-the-badge&logo=tailwindcss&logoColor=00BCFF" alt="TailwindCSS" />
   <img src="https://img.shields.io/badge/daisyUI-2A303C?style=for-the-badge&logo=daisyui&logoColor=FFD028" alt="daisyUI" />
@@ -121,10 +85,10 @@ Pour le détail complet, voir [SECURITY.md](SECURITY.md).
 ## Tests
 
 <p>
-  <img src="https://img.shields.io/badge/statements-84.68%25-yellow.svg?style=flat" alt="Statements" />
+  <img src="https://img.shields.io/badge/statements-84.68%25-blue.svg?style=flat" alt="Statements" />
   <img src="https://img.shields.io/badge/branches-76.79%25-red.svg?style=flat" alt="Branches" />
-  <img src="https://img.shields.io/badge/functions-87.63%25-yellow.svg?style=flat" alt="Functions" />
-  <img src="https://img.shields.io/badge/lines-84.55%25-yellow.svg?style=flat" alt="Lines" />
+  <img src="https://img.shields.io/badge/functions-87.63%25-blue.svg?style=flat" alt="Functions" />
+  <img src="https://img.shields.io/badge/lines-84.55%25-blue.svg?style=flat" alt="Lines" />
 </p>
 
 Vitest (unit / integration) + Playwright (e2e).<br>

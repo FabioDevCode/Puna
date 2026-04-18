@@ -13,6 +13,7 @@ import { randomBytes } from 'node:crypto';
 import { existsSync, copyFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { createInterface } from 'node:readline';
+import { Writable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -25,65 +26,69 @@ const ENV_BACKUP_PATH = resolve(PROJECT_ROOT, '.env.backup');
 const messages = {
     fr: {
         langChoice: 'Langue / Language',
-        docker: '🐳 Environnement Docker détecté — valeurs par défaut adaptées.',
-        envFound: '⚠  Un fichier .env existant a été trouvé.',
+        envFound: '\x1b[33m⚠ Un fichier .env existant a été trouvé.\x1b[0m',
         envOverwrite: 'Écraser et créer un .env.backup ?',
         envCancelled: "Installation annulée. Votre fichier .env n'a pas été modifié.",
-        envBackupSaved: '✔ Sauvegarde enregistrée dans .env.backup',
-        secKeysGenerated: '✔ Toutes les clés de sécurité ont été générées automatiquement.',
-        defaultsInfo: '✔ Valeurs par défaut appliquées. Modifiez le .env pour personnaliser.',
-        dialectInfo: '  DB_DIALECT=mariadb (seul dialecte supporté actuellement)',
+        envBackupSaved: '\x1b[32m✔ Sauvegarde enregistrée dans .env.backup\x1b[0m',
+        secKeysGenerated: '\x1b[32m✔ Toutes les clés de sécurité ont été générées automatiquement.\x1b[0m',
+        defaultsInfo: '\x1b[32m✔ Valeurs par défaut appliquées. Modifiez le .env pour personnaliser.\x1b[0m',
+        nodeEnvInfo: '  \x1b[30mNODE_ENV=development\x1b[0m',
+        appUrlInfo: 'APP_URL',
+        dialectInfo: '  \x1b[30mDB_DIALECT=mariadb (seul dialecte supporté actuellement)\x1b[0m',
+        clamavDisableHint: '  \x1b[36m→ Pour désactiver plus tard : CLAMAV_ENABLED=false dans .env\x1b[0m',
+        totpDisableHint: '  \x1b[36m→ Pour désactiver plus tard : TOTP_ENABLED=false dans .env\x1b[0m',
         helmetInfo: '  HELMET_STRICT_TRANSPORT=false',
+        trustProxyInfo: '  TRUST_PROXY=false',
         logsRetention: '  Rétention : app=7j, api=14j, error=30j, audit=90j',
         logsConsole: '  LOG_TO_CONSOLE=true',
         rateInfo: '  Formulaire : 30 req / 60s | Connexion : 10 tentatives max',
         uploadInfo: '  Fichier : 10 Mo | Total : 50 Mo | Fichiers : 10 | Champs : 40',
         clamavEnable: 'Activer ClamAV (scan antivirus) ?',
-        clamavSkipped: '  → Ignoré. Définissez CLAMAV_ENABLED=true dans .env pour activer plus tard.',
+        clamavSkipped: '  \x1b[36m→ Ignoré. Définissez CLAMAV_ENABLED=true dans .env pour activer plus tard.\x1b[0m',
         clamavSocketHint: 'CLAMAV_SOCKET (laisser vide pour TCP)',
         clamavHostHint: 'CLAMAV_HOST (utilisé si socket est vide)',
-        smtpEnable: 'Configurer SMTP pour les emails (réinitialisation mot de passe) ?',
-        smtpSkipped: '  → Ignoré. Les fonctionnalités email seront désactivées.',
-        smtpSkippedHint: '    Ajoutez les variables SMTP_* dans .env pour activer plus tard.',
+        smtpEnable: 'Configurer SMTP pour les emails ?',
+        smtpSkipped: '  \x1b[36m→ Variables SMTP ajoutées en commentaire dans .env.\x1b[0m',
+        smtpSkippedHint: '    Décommentez-les pour activer la fonctionnalité email.',
         totpEnable: "Activer l'authentification à deux facteurs (TOTP) ?",
-        totpSkipped: '  → Ignoré. Définissez TOTP_ENABLED=true dans .env pour activer plus tard.',
+        totpSkipped: '  \x1b[36m→ Ignoré. Définissez TOTP_ENABLED=true dans .env pour activer plus tard.\x1b[0m',
         adminLogin: 'Login administrateur',
         adminEmail: 'Email administrateur (optionnel)',
-        successCreated: '✔ Fichier .env créé avec succès.',
-        successStart: "  → Démarrer l'app : npm run dev (natif) ou docker compose up -d (Docker)",
-        successAdmin: '  → Premier login : le compte admin est en statut « pending ».',
-        successPassword: '    Définissez votre mot de passe sur /dp-first-connexion',
+        successCreated: '\x1b[32m✔ Fichier .env créé avec succès.\x1b[0m',
+        successStart: "  \x1b[36m→ Démarrer l'app : npm run dev\x1b[0m",
     },
     en: {
         langChoice: 'Langue / Language',
-        docker: '🐳 Docker environment detected — defaults adjusted.',
-        envFound: '⚠  An existing .env file was found.',
+        envFound: '\x1b[33m⚠ An existing .env file was found.\x1b[0m',
         envOverwrite: 'Overwrite and create .env.backup?',
         envCancelled: 'Setup cancelled. Your .env file was not modified.',
-        envBackupSaved: '✔ Backup saved to .env.backup',
-        secKeysGenerated: '✔ All security keys generated automatically.',
-        defaultsInfo: '✔ Using defaults. Edit .env to customize.',
-        dialectInfo: '  DB_DIALECT=mariadb (only supported dialect for now)',
+        envBackupSaved: '\x1b[32m✔ Backup saved to .env.backup\x1b[0m',
+        secKeysGenerated: '\x1b[32m✔ All security keys generated automatically.\x1b[0m',
+        defaultsInfo: '\x1b[32m✔ Using defaults. Edit .env to customize.\x1b[0m',
+        nodeEnvInfo: '  \x1b[30mNODE_ENV=development\x1b[0m',
+        appUrlInfo: 'APP_URL',
+        dialectInfo: '  \x1b[30mDB_DIALECT=mariadb (only supported dialect for now)\x1b[0m',
+        clamavDisableHint: '  \x1b[36m→ To disable later: set CLAMAV_ENABLED=false in .env\x1b[0m',
+        totpDisableHint: '  \x1b[36m→ To disable later: set TOTP_ENABLED=false in .env\x1b[0m',
         helmetInfo: '  HELMET_STRICT_TRANSPORT=false',
+        trustProxyInfo: '  TRUST_PROXY=false',
         logsRetention: '  Retention: app=7d, api=14d, error=30d, audit=90d',
         logsConsole: '  LOG_TO_CONSOLE=true',
         rateInfo: '  Form: 30 req / 60s | Login: 10 failed attempts max',
         uploadInfo: '  File: 10 MB | Total: 50 MB | Files: 10 | Fields: 40',
         clamavEnable: 'Enable ClamAV (antivirus scan)?',
-        clamavSkipped: '  → Skipped. Set CLAMAV_ENABLED=true in .env to enable later.',
+        clamavSkipped: '  \x1b[36m→ Skipped. Set CLAMAV_ENABLED=true in .env to enable later.\x1b[0m',
         clamavSocketHint: 'CLAMAV_SOCKET (leave empty for TCP)',
         clamavHostHint: 'CLAMAV_HOST (used if socket is empty)',
-        smtpEnable: 'Configure SMTP for email features (password reset)?',
-        smtpSkipped: '  → Skipped. Mail features (password reset) will be disabled.',
-        smtpSkippedHint: '    Add SMTP_* variables to .env to enable later.',
+        smtpEnable: 'Configure SMTP for email features ?',
+        smtpSkipped: '  \x1b[36m→ SMTP variables added as comments in .env.\x1b[0m',
+        smtpSkippedHint: '    Uncomment them to enable mail features.\x1b[0m',
         totpEnable: 'Enable two-factor authentication (TOTP)?',
-        totpSkipped: '  → Skipped. Set TOTP_ENABLED=true in .env to enable later.',
+        totpSkipped: '  \x1b[36m→ Skipped. Set TOTP_ENABLED=true in .env to enable later.\x1b[0m',
         adminLogin: 'Admin login',
         adminEmail: 'Admin email (optional)',
-        successCreated: '✔ .env file created successfully.',
-        successStart: '  → Start the app: npm run dev (native) or docker compose up -d (Docker)',
-        successAdmin: '  → First login: the admin account is in "pending" status.',
-        successPassword: '    Set your password at /dp-first-connexion',
+        successCreated: '\x1b[32m✔ .env file created successfully.\x1b[0m',
+        successStart: '  \x1b[36m→ Start the app: npm run dev\x1b[0m',
     },
 };
 
@@ -120,14 +125,19 @@ async function createPrompt() {
             askPassword(question) {
                 return new Promise((resolve) => {
                     rl.pause();
-                    // Mute readline echo — prevents it from writing typed chars to stdout
+                    // Redirect readline output to a silent stream to suppress echo
+                    // (do NOT set to null — that corrupts readline's internal state)
                     const savedOutput = rl.output;
-                    rl.output = null;
+                    rl.output = new Writable({
+                        write(chunk, enc, cb) {
+                            cb();
+                        },
+                    });
 
                     process.stdout.write(`? ${question} : `);
 
                     let password = '';
-                    process.stdin.setRawMode(true);
+                    // readline already set stdin to raw mode — do NOT call setRawMode again
                     process.stdin.resume();
                     process.stdin.setEncoding('utf8');
 
@@ -138,7 +148,7 @@ async function createPrompt() {
                             process.exit(0);
                         }
                         if (c === '\r' || c === '\n') {
-                            process.stdin.setRawMode(false);
+                            // do NOT call setRawMode(false) — readline needs raw mode on
                             process.stdin.removeListener('data', onData);
                             process.stdout.write('\n');
                             rl.output = savedOutput;
@@ -221,16 +231,8 @@ async function createPrompt() {
     };
 }
 
-function isDocker() {
-    try {
-        return existsSync('/.dockerenv');
-    } catch {
-        return false;
-    }
-}
-
 function sectionHeader(num, total, title) {
-    console.log(`\n── ${num}/${total} ${title} ${'─'.repeat(Math.max(0, 40 - title.length))}`);
+    console.log(`\x1b[34m\n── ${num}/${total} ${title} ${'─'.repeat(Math.max(0, 40 - title.length))}\x1b[0m`);
 }
 
 function generateKey(bytes, encoding = 'base64url') {
@@ -241,7 +243,6 @@ function generateKey(bytes, encoding = 'base64url') {
 
 async function main() {
     const TOTAL_SECTIONS = 11;
-    const dockerEnv = isDocker();
 
     // ── Banner ──────────────────────────────────────────────────────────────
     console.log('');
@@ -261,15 +262,14 @@ async function main() {
        ddddddddddddd cccccc '''''
        ddddddddddddd cccccc '''''
        ddddddddddddd cccccc '''''
-       ddddddddddddd cccccc '''''
         dddddddddddd cccccc ''''
            kdddddddd cccc
-               dddd
+             xddddd
     `);
     console.log('');
-    console.log('╔══════════════════════════════════════╗');
-    console.log('║     Puna — Environment Setup         ║');
-    console.log('╚══════════════════════════════════════╝');
+    console.log('╔═══════════════════════════════════════╗');
+    console.log('║     \x1b[34mPuna - Dev Environment Setup\x1b[0m      ║');
+    console.log('╚═══════════════════════════════════════╝');
     console.log('');
 
     // ── Language selection ───────────────────────────────────────────────────
@@ -278,10 +278,6 @@ async function main() {
 
     const langChoice = await prompt.ask('Langue / Language (fr/en)', 'fr');
     lang = langChoice.toLowerCase() === 'en' ? 'en' : 'fr';
-
-    if (dockerEnv) {
-        console.log(`${t('docker')}\n`);
-    }
 
     if (existsSync(ENV_PATH)) {
         console.log(t('envFound'));
@@ -302,13 +298,15 @@ async function main() {
     // — Section 1: Application ———————————————————————————————————————————————
 
     sectionHeader(1, TOTAL_SECTIONS, 'Application');
-    env.NODE_ENV = await prompt.ask('NODE_ENV', 'development');
+    env.NODE_ENV = 'development';
+    console.log(t('nodeEnvInfo'));
     env.PORT = await prompt.ask('PORT', '3022');
+    env.APP_URL = await prompt.ask(t('appUrlInfo'), `http://localhost:${env.PORT}`);
 
     // — Section 2: Database ——————————————————————————————————————————————————
 
     sectionHeader(2, TOTAL_SECTIONS, 'Database');
-    env.DB_IP = await prompt.ask('DB_IP', dockerEnv ? 'db' : '127.0.0.1');
+    env.DB_IP = await prompt.ask('DB_IP', '127.0.0.1');
     env.DB_PORT = await prompt.ask('DB_PORT', '3306');
     env.DB_USER = await prompt.ask('DB_USER', 'root');
     env.DB_PWD = await prompt.askPassword('DB_PWD');
@@ -316,9 +314,26 @@ async function main() {
     env.DB_DIALECT = 'mariadb';
     console.log(t('dialectInfo'));
 
-    // — Section 3: Security Keys (auto) ——————————————————————————————————————
+    // — Section 3: SMTP (optional) ———————————————————————————————————————————
 
-    sectionHeader(3, TOTAL_SECTIONS, 'Security Keys');
+    sectionHeader(3, TOTAL_SECTIONS, 'SMTP');
+    const enableSmtp = await prompt.askYesNo(t('smtpEnable'), true);
+    if (enableSmtp) {
+        env.SMTP_HOST = await prompt.ask('SMTP_HOST', 'smtp.example.com');
+        env.SMTP_PORT = await prompt.ask('SMTP_PORT', '587');
+        env.SMTP_USER = await prompt.ask('SMTP_USER');
+        env.SMTP_PASS = await prompt.askPassword('SMTP_PASS');
+        env.SMTP_FROM = await prompt.ask('SMTP_FROM', `Puna <${env.SMTP_USER || 'no-reply@example.com'}>`);
+        env._smtpEnabled = true;
+    } else {
+        env._smtpEnabled = false;
+        console.log(t('smtpSkipped'));
+        console.log(t('smtpSkippedHint'));
+    }
+
+    // — Section 4: Security Keys (auto) ——————————————————————————————————————
+
+    sectionHeader(4, TOTAL_SECTIONS, 'Security Keys');
     env.KEY_TK = generateKey(48, 'base64url');
     env.KEV = generateKey(32, 'hex');
     env.KIV = generateKey(16, 'hex');
@@ -335,14 +350,16 @@ async function main() {
     console.log(`  CSRF_SECRET ..... ${env.CSRF_SECRET.length} chars`);
     console.log(`  API_KEY ......... ${env.API_KEY.length} hex chars`);
 
-    // — Sections 4–7: Defaults (Helmet, Logs, Rate Limiting, Upload) —————————
+    // — Sections 5–8: Defaults (Helmet, Logs, Rate Limiting, Upload) —————————
 
-    sectionHeader(4, TOTAL_SECTIONS, 'Helmet');
+    sectionHeader(5, TOTAL_SECTIONS, 'Helmet / Trust Proxy');
     env.HELMET_STRICT_TRANSPORT = 'false';
+    env.TRUST_PROXY = 'false';
     console.log(t('defaultsInfo'));
     console.log(t('helmetInfo'));
+    console.log(t('trustProxyInfo'));
 
-    sectionHeader(5, TOTAL_SECTIONS, 'Logs');
+    sectionHeader(6, TOTAL_SECTIONS, 'Logs');
     env.LOG_RETENTION_APP = '7';
     env.LOG_RETENTION_API = '14';
     env.LOG_RETENTION_ERROR = '30';
@@ -352,14 +369,14 @@ async function main() {
     console.log(t('logsRetention'));
     console.log(t('logsConsole'));
 
-    sectionHeader(6, TOTAL_SECTIONS, 'Rate Limiting');
+    sectionHeader(7, TOTAL_SECTIONS, 'Rate Limiting');
     env.RATE_LIMIT_FORM_MAX = '30';
     env.RATE_LIMIT_FORM_WINDOW_MS = '60000';
     env.MAX_FAILED_LOGIN_ATTEMPTS = '10';
     console.log(t('defaultsInfo'));
     console.log(t('rateInfo'));
 
-    sectionHeader(7, TOTAL_SECTIONS, 'Upload Limits');
+    sectionHeader(8, TOTAL_SECTIONS, 'Upload Limits');
     env.API_MAX_FILE_SIZE = '10485760';
     env.API_MAX_TOTAL_SIZE = '52428800';
     env.API_MAX_FILES = '10';
@@ -368,43 +385,22 @@ async function main() {
     console.log(t('defaultsInfo'));
     console.log(t('uploadInfo'));
 
-    // — Section 8: ClamAV (optional) —————————————————————————————————————————
+    // — Section 9: ClamAV (optional) —————————————————————————————————————————
 
-    sectionHeader(8, TOTAL_SECTIONS, 'ClamAV');
+    sectionHeader(9, TOTAL_SECTIONS, 'ClamAV');
     const enableClamav = await prompt.askYesNo(t('clamavEnable'), true);
     if (enableClamav) {
         env.CLAMAV_ENABLED = 'true';
-        if (dockerEnv) {
-            env.CLAMAV_SOCKET = await prompt.ask(t('clamavSocketHint'), '');
-            env.CLAMAV_HOST = await prompt.ask('CLAMAV_HOST', 'clamav');
-            env.CLAMAV_PORT = await prompt.ask('CLAMAV_PORT', '3310');
-        } else {
-            env.CLAMAV_SOCKET = await prompt.ask('CLAMAV_SOCKET', '/tmp/clamd.socket');
-            env.CLAMAV_HOST = await prompt.ask(t('clamavHostHint'), '127.0.0.1');
-            env.CLAMAV_PORT = await prompt.ask('CLAMAV_PORT', '3310');
-        }
+        env.CLAMAV_SOCKET = await prompt.ask('CLAMAV_SOCKET', '/tmp/clamd.socket');
+        env.CLAMAV_HOST = await prompt.ask(t('clamavHostHint'), '127.0.0.1');
+        env.CLAMAV_PORT = await prompt.ask('CLAMAV_PORT', '3310');
+        console.log(t('clamavDisableHint'));
     } else {
         env.CLAMAV_ENABLED = 'false';
         env.CLAMAV_SOCKET = '';
         env.CLAMAV_HOST = '';
         env.CLAMAV_PORT = '3310';
         console.log(t('clamavSkipped'));
-    }
-
-    // — Section 9: SMTP (optional) ———————————————————————————————————————————
-
-    sectionHeader(9, TOTAL_SECTIONS, 'SMTP');
-    const enableSmtp = await prompt.askYesNo(t('smtpEnable'), true);
-    if (enableSmtp) {
-        env.SMTP_HOST = await prompt.ask('SMTP_HOST', 'smtp.example.com');
-        env.SMTP_PORT = await prompt.ask('SMTP_PORT', '587');
-        env.SMTP_USER = await prompt.ask('SMTP_USER');
-        env.SMTP_PASS = await prompt.askPassword('SMTP_PASS');
-        env.SMTP_FROM = await prompt.ask('SMTP_FROM', `Puna <${env.SMTP_USER || 'no-reply@example.com'}>`);
-        env.APP_URL = await prompt.ask('APP_URL', `http://localhost:${env.PORT}`);
-    } else {
-        console.log(t('smtpSkipped'));
-        console.log(t('smtpSkippedHint'));
     }
 
     // — Section 10: TOTP (optional) ——————————————————————————————————————————
@@ -414,6 +410,7 @@ async function main() {
     if (enableTotp) {
         env.TOTP_ENABLED = 'true';
         env.TOTP_ISSUER = await prompt.ask('TOTP_ISSUER', 'Puna');
+        console.log(t('totpDisableHint'));
     } else {
         env.TOTP_ENABLED = 'false';
         env.TOTP_ISSUER = 'Puna';
@@ -435,8 +432,8 @@ async function main() {
 
     console.log(`\n${t('successCreated')}`);
     console.log(t('successStart'));
-    console.log(t('successAdmin'));
-    console.log(`${t('successPassword')}\n`);
+    // console.log(t('successAdmin'));
+    // console.log(`${t('successPassword')}\n`);
 }
 
 // ─── .env file builder ──────────────────────────────────────────────────────
@@ -456,6 +453,7 @@ function buildEnvContent(env) {
     ln('# Application');
     val('NODE_ENV');
     val('PORT');
+    val('APP_URL');
     ln();
 
     ln('# Helmet');
@@ -469,6 +467,22 @@ function buildEnvContent(env) {
     val('DB_PWD');
     val('DB_NAME');
     val('DB_DIALECT');
+    ln();
+
+    ln('# SMTP');
+    if (env._smtpEnabled) {
+        val('SMTP_HOST');
+        val('SMTP_PORT');
+        val('SMTP_USER');
+        val('SMTP_PASS');
+        val('SMTP_FROM');
+    } else {
+        ln('# SMTP_HOST="smtp.example.com"');
+        ln('# SMTP_PORT=587');
+        ln('# SMTP_USER="no-reply@example.com"');
+        ln('# SMTP_PASS="your_smtp_password_here"');
+        ln('# SMTP_FROM="Puna <no-reply@example.com>"');
+    }
     ln();
 
     ln('# Security Keys (auto-generated)');
@@ -520,18 +534,6 @@ function buildEnvContent(env) {
         val('CLAMAV_PORT');
     }
     ln();
-
-    if (env.SMTP_HOST) {
-        ln('# SMTP');
-        val('SMTP_HOST');
-        val('SMTP_PORT');
-        val('SMTP_USER');
-        val('SMTP_PASS');
-        val('SMTP_FROM');
-        ln();
-        val('APP_URL');
-        ln();
-    }
 
     ln('# TOTP (2FA)');
     val('TOTP_ENABLED');

@@ -1,6 +1,7 @@
 .project_docs
 .env
 .env.backup
+.env.copy
 .DS_Store
 node_modules
 node_modules/*
@@ -11,6 +12,11 @@ storage/
 Puna/
 migrations/**/**
 migrations/
+docker-compose.yml
+docker-compose.yaml
+compose.yml
+compose.yaml
+
 # Logs
 ./logs/
 *.log

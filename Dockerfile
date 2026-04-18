@@ -9,7 +9,11 @@ WORKDIR /app
 # (cette couche ne se rebuilde que si package.json ou package-lock.json change)
 COPY package.json package-lock.json ./
 
-RUN npm ci --omit=dev --ignore-scripts
+# python3 / make / g++ sont requis par node-gyp pour compiler bcrypt
+# npm pkg delete scripts.prepare : évite l'erreur "husky: not found" (devDep absente en prod)
+RUN apk add --no-cache python3 make g++ \
+    && npm pkg delete scripts.prepare \
+    && npm ci --omit=dev
 
 
 # =============================================================================
@@ -19,7 +23,7 @@ FROM node:24-alpine AS runner
 
 # Métadonnées
 LABEL org.opencontainers.image.title="Puna"
-LABEL org.opencontainers.image.description="Application de gestion de feedbacks"
+LABEL org.opencontainers.image.description="Centralisez tous vos formulaires au même endroit"
 LABEL org.opencontainers.image.authors="Fabio RAMOS LOPES"
 
 WORKDIR /app

@@ -16,6 +16,7 @@ docker-compose.yml
 .dockerignore
 
 # Dev tools & CI
+.github/
 .git/
 .gitignore
 .husky/
@@ -23,6 +24,14 @@ docker-compose.yml
 .prettierrc*
 eslint.config.*
 prettier.config.*
+.project_docs/
+coverage/
+docs/
+logs/
+playwright-report/
+Puna/
+test-results/
+tests/
 
 # Documentation
 *.md

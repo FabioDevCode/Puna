@@ -39,6 +39,10 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+if (process.env.TRUST_PROXY === 'true') {
+    app.set('trust proxy', 1);
+}
+
 // Sécurité: HTTP headers avec Helmet.js
 // Doit être appliqué en premier, avant tous les autres middlewares
 app.use(helmetMiddleware);
