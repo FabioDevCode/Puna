@@ -43,8 +43,8 @@
 
 **Optionnels :**
 
-- **SMTP** - nécessaire pour la réinitialisation de mot de passe par email. Sans configuration SMTP, la fonctionnalité est simplement désactivée.
-- **ClamAV** - antivirus pour scanner les fichiers uploadés. Doit être installé et démarré avant le serveur si `CLAMAV_ENABLED=true`.
+- **SMTP** - nécessaire pour la réinitialisation de mot de passe et email de bienvenue lors de la création d'un user. Sans configuration SMTP, la fonctionnalité est simplement désactivée.
+- **ClamAV** - antivirus pour scanner les fichiers uploadés. Doit être installé et démarré avant le serveur si `CLAMAV_ENABLED=true`. accessible via socket
 
 ### Installation (Développeur)
 
