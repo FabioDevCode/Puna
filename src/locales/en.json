@@ -262,7 +262,7 @@
         "wrong_password": "Incorrect password."
     },
     "form": {
-        "code_label": "CODE:",
+        "code_label": "CODE",
         "columns_desc": "Check the columns to display in the list.",
         "columns_title": "Column selection",
         "confirm_delete": "Are you sure you want to delete this form? This action is irreversible.",

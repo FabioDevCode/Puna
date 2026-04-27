@@ -4,10 +4,26 @@
     </h3>
 {{/slot}}
 
+{{#if show2FABanner}}
+    <div class="col-span-2 md:col-span-6 lg:col-span-12">
+        <div class="bg-secondary text-white shadow-lg rounded-xl p-2 pb-4 border-4 border-base-100">
+            <div class="p-2 px-4 flex flex-col justify-left items-center gap-2">
+                <span class="py-2 text-center text-white">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    {{__ "twoFactor.banner_message"}}
+                </span>
+                <a href="/dp-2fa-setup" class="btn btn-sm btn-wide shadow-sm">
+                    {{__ "twoFactor.banner_setup"}}
+                </a>
+            </div>
+        </div>
+    </div>
+{{/if}}
+
 <div class="col-span-2 md:col-span-6 lg:col-span-6">
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card bg-base-100 shadow-xl rounded-xl">
         <div class="card-body p-6">
-            <h2 class="card-title text-base font-semibold">{{__ "profile.info_title"}}</h2>
+            <h2 class="card-title text-base font-semibold mb-1">{{__ "profile.info_title"}}</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 py-1">
                 <div>
@@ -40,9 +56,9 @@
 </div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-6">
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card bg-base-100 shadow-xl rounded-xl">
         <div class="card-body p-6">
-            <h2 class="card-title text-base font-semibold">{{__ "profile.language_title"}}</h2>
+            <h2 class="card-title text-base font-semibold mb-1">{{__ "profile.language_title"}}</h2>
             <p class="text-sm text-gray-500 mb-2">{{__ "profile.language_desc"}}</p>
 
             <form action="/profile/locale" method="post">

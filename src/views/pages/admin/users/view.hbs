@@ -52,7 +52,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade-in">
         {{#roleIs roles='super_admin'}}
             {{#unless (eq user.status "anonymized")}}
-                <div id="status_btn_box" class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
+                <div id="status_btn_box" class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3 rounded-xl">
                     {{> components/buttons/user-status-actions }}
                 </div>
             {{/unless}}
@@ -60,7 +60,7 @@
         {{#roleIs roles='owner'}}
             {{#unless (eq user.role "super_admin")}}
                 {{#unless (eq user.status "anonymized")}}
-                    <div id="status_btn_box" class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
+                    <div id="status_btn_box" class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3 rounded-xl">
                         {{> components/buttons/user-status-actions }}
                     </div>
                 {{/unless}}
@@ -69,7 +69,7 @@
 
         <!-- Colonne gauche: Profil résumé -->
         <div class="col-span-1">
-            <div class="card bg-base-100 shadow-xl border border-base-200">
+            <div class="card bg-base-100 shadow-xl border border-base-200 rounded-xl">
                 <div class="card-body items-center text-center p-6">
                     <h2 class="card-title text-2xl font-bold mb-1">
                         {{user.login}}
@@ -126,7 +126,7 @@
         <!-- Colonne droite: Détails -->
         <div class="col-span-1 lg:col-span-2 space-y-6">
             <!-- Informations détaillées -->
-            <div class="card bg-base-100 shadow-xl border border-base-200">
+            <div class="card bg-base-100 shadow-xl border border-base-200 rounded-xl">
                 <div class="card-body p-6">
                     <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
                         {{__ "admin.user_account_info"}}
@@ -179,7 +179,7 @@
         </div>
 
         <!-- Sites assignés -->
-        <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3">
+        <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3 rounded-xl">
             <div class="card-body p-6">
                 <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
                     {{__ "admin.user_assigned_sites"}}

@@ -86,7 +86,13 @@ describe('profilePage', () => {
         await profilePage(req, res);
 
         expect(getUserById).toHaveBeenCalledWith('user-1');
-        expect(res.render).toHaveBeenCalledWith('profile/index', { user });
+        expect(res.render).toHaveBeenCalledWith(
+            'profile/index',
+            expect.objectContaining({
+                user,
+                show2FABanner: false,
+            })
+        );
     });
 
     it('redirects to dashboard on service error', async () => {

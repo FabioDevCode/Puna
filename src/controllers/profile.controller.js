@@ -4,7 +4,17 @@ export const profilePage = async (req, res) => {
     const userId = req.session.user?.id;
     try {
         const user = await getUserById(userId);
-        res.render('profile/index', { user });
+
+        const show2FABannerBase = process.env.TOTP_ENABLED === 'true' && req.session.user;
+        let userHas2FA = false;
+        if (show2FABannerBase) {
+            userHas2FA = user?.totp_enabled || false;
+        }
+
+        res.render('profile/index', {
+            user,
+            show2FABanner: show2FABannerBase && !userHas2FA,
+        });
     } catch (_err) {
         res.redirect('/dashboard');
     }

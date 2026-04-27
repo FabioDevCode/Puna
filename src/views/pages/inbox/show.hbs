@@ -23,7 +23,7 @@
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12">
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body p-4 overflow-hidden">
-            <h2 class="card-title select-none">{{__ "inbox.general_info"}}</h2>
+            <h2 class="card-title select-none mb-1">{{__ "inbox.general_info"}}</h2>
             <div id="{{inbox.id}}" class="flex flex-wrap items-center gap-4">
                 <div>
                     <p class="text-sm text-muted select-none">{{__ "inbox.site_label"}}</p>
@@ -45,7 +45,7 @@
 
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body p-4 overflow-hidden">
-            <h2 class="card-title select-none">{{__ "inbox.form_data"}}</h2>
+            <h2 class="card-title select-none mb-1">{{__ "inbox.form_data"}}</h2>
             {{#if contentEntries}}
                 <div class="overflow-x-auto">
                     <table class="table w-full">
@@ -77,7 +77,7 @@
         <div class="card bg-base-100 shadow-xl select-none">
             <div class="card-body p-4 overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
-                    <h2 class="card-title select-none">
+                    <h2 class="card-title select-none mb-1">
                         {{__ "inbox.received_files"}}
                     </h2>
                     {{> components/buttons/download-all-files inbox_id=inbox.id}}

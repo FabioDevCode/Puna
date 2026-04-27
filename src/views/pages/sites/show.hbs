@@ -42,7 +42,7 @@
 <!-- Contenu principal -->
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12">
     <!-- Card: Gestion des formulaires -->
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card bg-base-100 shadow-xl rounded-xl">
         <div class="card-body p-4 overflow-hidden">
             {{#if forms}}
                 <div class="flex flex-wrap items-center gap-2">
@@ -79,13 +79,12 @@
 
     <!-- Card: Informations du formulaire sélectionné -->
     {{#if forms}}
-        <div class="card bg-base-100 shadow-xl {{#actionCan entity='form' action='update'}}{{else}}none{{/actionCan}}">
+        <div class="card bg-base-100 shadow-xl rounded-xl {{#actionCan entity='form' action='update'}}{{else}}none{{/actionCan}}">
             <div class="card-body p-4 overflow-hidden" id="info_form_panel">
                 <div class="flex flex-row items-center flex-wrap justify-between gap-2">
                     <div class="flex flex-col w-auto min-w-[160px]">
                         <div id="info_form_code_wrap" class="flex items-center gap-2 opacity-25">
-                            <span class="text-sm text-muted select-none">{{__ "form.code_label"}}&nbsp;</span>
-                            <code id="info_form_code" class="text-sm font-mono bg-base-200 px-2 py-1 rounded"></code>
+                            <code id="info_form_code" class="text-sm font-mono bg-base-200/50 px-2 py-1 rounded"></code>
 
                             {{#actionCan entity='form' action='update'}}
                                 <button id="btn_copy_code" class="btn btn-sm btn-outline btn-info none">
@@ -117,7 +116,7 @@
 
     {{#if forms}}
         <!-- Card: Table des entrées Inbox -->
-        <div class="card bg-base-100 shadow-xl">
+        <div class="card bg-base-100 shadow-xl rounded-xl">
             <div class="card-body p-4 overflow-hidden">
                 <!-- Actions de la table (masquée par défaut) -->
                 <div id="tableActions" class="none">
@@ -149,7 +148,7 @@
                                         <i class="fa-solid fa-caret-down"></i>
                                     </div>
                                     <ul tabindex="0"
-                                    class="dropdown-content menu bg-base-100 gap-1 rounded-box z-[100] w-52 p-2 mt-1 shadow-xl border border-base-300">
+                                    class="dropdown-content menu bg-base-100 gap-1 rounded-box rounded-xl z-[100] w-52 p-2 mt-1 shadow-xl border border-base-300">
                                         <li>
                                             <button id="exportExcelBtn"
                                             class="flex items-center gap-2 text-green-800 bg-green-100 hover:bg-green-700 hover:text-base-100">
