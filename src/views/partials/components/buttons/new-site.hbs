@@ -12,7 +12,7 @@
         </h2>
         <p class="py-1 text-sm text-muted">{{__ "site.create_help"}}</p>
 
-        <form id="fromCreateSite" action="/create-site" method="post" class="flex flex-col mt-2 gap-4">
+        <form id="fromCreateSite" action="/site/create" method="post" class="flex flex-col mt-2 gap-4">
             <input type="hidden" name="_csrf" value="{{csrfToken}}" />
         <input type="text" name="domain" class="input input-sm input-bordered w-full" placeholder="puna.fr" maxlength="128" required="" />
     <p id="create_site_msg" class="text-sm text-error hidden">{{__ "site.exists_error"}}</p>

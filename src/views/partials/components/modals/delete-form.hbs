@@ -10,7 +10,7 @@
         <h3 class="font-bold text-lg text-error">{{__ "modal.confirm_delete"}}</h3>
         <p class="py-2">{{__ "form.confirm_delete"}}</p>
 
-        <form id="formDeleteForm" action="/delete-form" method="post" class="hidden">
+        <form id="formDeleteForm" action="/form/delete" method="post" class="hidden">
             <input type="hidden" name="_csrf" value="{{csrfToken}}" />
         <input type="hidden" name="form_id" id="form_delete_id" value="" />
 </form>

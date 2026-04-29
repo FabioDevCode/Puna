@@ -7,9 +7,9 @@
  * Routes tested:
  *   GET  /admin              — admin dashboard (super_admin, owner only)
  *   GET  /admin/users        — users list (super_admin, owner only)
- *   POST /create-site        — create a site (requires site:create permission)
+ *   POST /site/create        — create a site (requires site:create permission)
  *   GET  /site/all           — list all sites (requires site:read permission)
- *   POST /delete-site/:id    — delete a site (requires site:delete permission)
+ *   POST /site/:id/delete    — delete a site (requires site:delete permission)
  */
 
 import cookieParser from 'cookie-parser';
@@ -21,7 +21,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initializePassport } from '../../../src/helpers/auth.helpers.js';
 import flashMessages from '../../../src/middlewares/flashMessages.js';
 import { injectUserRole } from '../../../src/middlewares/injectUserRole.js';
-import defaultRouter from '../../../src/routes/default.routes.js';
+import mountRoutes from '../../../src/routes/index.js';
 
 // ---------------------------------------------------------------------------
 // Mocks — hoisted before all imports by Vitest
@@ -233,7 +233,9 @@ function buildTestApp() {
         next();
     });
 
-    app.use('/', defaultRouter);
+    // Monter dynamiquement toutes les routes comme en production
+    // (index.js exporte une fonction asynchrone)
+    // Le montage doit être fait dans beforeAll
 
     return app;
 }
@@ -245,8 +247,9 @@ function buildTestApp() {
 describe('RBAC routes', () => {
     let app;
 
-    beforeAll(() => {
+    beforeAll(async () => {
         app = buildTestApp();
+        await mountRoutes(app);
     });
 
     beforeEach(() => {
@@ -291,16 +294,16 @@ describe('RBAC routes', () => {
     });
 
     // -----------------------------------------------------------------------
-    describe('POST /create-site', () => {
+    describe('POST /site/create', () => {
         it('allows beta user to create a site (under volume limit)', async () => {
-            const res = await request(app).post('/create-site').set('X-Test-User', makeSessionUser('beta')).send({ domain: 'beta.example.com' });
+            const res = await request(app).post('/site/create').set('X-Test-User', makeSessionUser('beta')).send({ domain: 'beta.example.com' });
 
             // actionAccess('site', 'create') passes for beta → controller redirect
             expect(res.status).toBe(302);
         });
 
         it('returns 403 for viewer (site:create denied)', async () => {
-            const res = await request(app).post('/create-site').set('X-Test-User', makeSessionUser('viewer')).send({ domain: 'viewer.example.com' });
+            const res = await request(app).post('/site/create').set('X-Test-User', makeSessionUser('viewer')).send({ domain: 'viewer.example.com' });
 
             expect(res.status).toBe(403);
         });
@@ -316,9 +319,9 @@ describe('RBAC routes', () => {
     });
 
     // -----------------------------------------------------------------------
-    describe('POST /delete-site/:id', () => {
+    describe('POST /site/:id/delete', () => {
         it('returns 403 for editor (site:delete denied)', async () => {
-            const res = await request(app).post('/delete-site/some-site-id').set('X-Test-User', makeSessionUser('editor')).send({ confirm_domain: 'editor.example.com' });
+            const res = await request(app).post('/site/some-site-id/delete').set('X-Test-User', makeSessionUser('editor')).send({ confirm_domain: 'editor.example.com' });
 
             expect(res.status).toBe(403);
         });

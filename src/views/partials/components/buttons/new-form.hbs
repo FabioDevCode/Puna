@@ -20,7 +20,7 @@ id=site.id
         <h2 class="text-lg font-bold mb-2">{{__ "form.create_title"}}</h2>
         <p class="py-1 text-sm text-muted">{{__ "form.create_help"}}</p>
 
-        <form id="formCreateForm_{{id}}" action="/create-form" method="post" class="flex flex-col mt-2 gap-4">
+        <form id="formCreateForm_{{id}}" action="/form/create" method="post" class="flex flex-col mt-2 gap-4">
             <input type="hidden" name="_csrf" value="{{csrfToken}}" />
         <input type="hidden" name="fk_id_site" value="{{id}}" />
     <input type="text" name="name" class="input input-sm input-bordered w-full" placeholder="Contact" maxlength="50" required="" />

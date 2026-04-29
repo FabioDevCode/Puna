@@ -25,8 +25,8 @@ import { can, hasRole } from '../config/permissions.js';
  *
  * @example
  * // Dans les routes
- * router.post('/create-site', isConnected, actionAccess('site', 'create'), siteCtl.createSite);
- * router.delete('/delete-form', isConnected, actionAccess('form', 'delete'), formCtl.deleteForm);
+ * router.post('/site/create', isConnected, actionAccess('site', 'create'), siteCtl.createSite);
+ * router.delete('/form/delete', isConnected, actionAccess('form', 'delete'), formCtl.deleteForm);
  * router.get('/inbox/:id/view', isConnected, actionAccess('inbox', 'read'), inboxCtl.showInbox);
  */
 export function actionAccess(entity, action) {
@@ -85,7 +85,7 @@ export function actionAccess(entity, action) {
  * @example
  * // Dans les routes
  * router.get('/admin', isConnected, roleAccess(['super_admin']), adminCtl.admin);
- * router.post('/create-site', isConnected, roleAccess(['super_admin', 'owner', 'beta']), siteCtl.createSite);
+ * router.post('/site/create', isConnected, roleAccess(['super_admin', 'owner', 'beta']), siteCtl.createSite);
  * router.get('/stats', isConnected, roleAccess(['super_admin', 'owner', 'editor']), dashboardCtl.getStats);
  */
 export function roleAccess(allowedRoles) {
@@ -170,7 +170,7 @@ export function requireOwner() {
  *
  * @example
  * // Seulement super_admin et owner peuvent créer des sites
- * router.post('/create-site', isConnected, requireRoleAndPermission(['super_admin', 'owner'], 'site', 'create'), siteCtl.createSite);
+ * router.post('/site/create', isConnected, requireRoleAndPermission(['super_admin', 'owner'], 'site', 'create'), siteCtl.createSite);
  */
 export function requireRoleAndPermission(allowedRoles, entity, action) {
     return (req, res, next) => {

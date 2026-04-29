@@ -59,7 +59,7 @@ test.describe("RBAC — Contrôle d'accès", () => {
         await expect(ownerPage.locator('.error-code')).toHaveText('403');
     });
 
-    test('viewer ne peut pas créer de site (POST /create-site → 403)', async ({ viewerPage }) => {
+    test('viewer ne peut pas créer de site (POST /site/create → 403)', async ({ viewerPage }) => {
         // Navigate to sites page first (to get valid session + CSRF)
         await viewerPage.goto('/site/all');
 
@@ -67,7 +67,7 @@ test.describe("RBAC — Contrôle d'accès", () => {
         const result = await viewerPage.evaluate(async () => {
             const csrfMeta = document.querySelector('meta[name="csrf-token"]');
             const csrf = csrfMeta ? csrfMeta.getAttribute('content') : '';
-            const res = await fetch('/create-site', {
+            const res = await fetch('/site/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `domain=hack.test&_csrf=${encodeURIComponent(csrf)}`,

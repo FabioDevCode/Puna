@@ -9,7 +9,6 @@
  *   - unauthenticated request → redirect to /dp-login
  *   - editor role → 403 Forbidden
  */
-
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import session from 'express-session';
@@ -19,7 +18,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initializePassport } from '../../../src/helpers/auth.helpers.js';
 import flashMessages from '../../../src/middlewares/flashMessages.js';
 import { injectUserRole } from '../../../src/middlewares/injectUserRole.js';
-import defaultRouter from '../../../src/routes/default.routes.js';
+import mountRoutes from '../../../src/routes/index.js';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -223,8 +222,6 @@ function buildTestApp() {
         next();
     });
 
-    app.use('/', defaultRouter);
-
     return app;
 }
 
@@ -236,8 +233,9 @@ describe('POST /admin/users/:id/status', () => {
     let app;
     const TARGET_USER_ID = 'some-target-user-id';
 
-    beforeAll(() => {
+    beforeAll(async () => {
         app = buildTestApp();
+        await mountRoutes(app);
     });
 
     beforeEach(() => {
@@ -289,8 +287,9 @@ describe('POST /admin/users/:id/status', () => {
 describe('POST /admin/users/delete', () => {
     let app;
 
-    beforeAll(() => {
+    beforeAll(async () => {
         app = buildTestApp();
+        await mountRoutes(app);
     });
 
     beforeEach(() => {

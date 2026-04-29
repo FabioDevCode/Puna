@@ -23,7 +23,7 @@ domain="puna.fr"
             {{__ "site.confirm_delete_title"}}
         </h2>
         <p class="mb-2">{{__ "site.confirm_delete_hint"}} <b>{{domain}}</b>&nbsp;:</p>
-        <form id="formDeleteSite_{{id}}" action="/delete-site/{{id}}" method="post" class="flex flex-col gap-4">
+        <form id="formDeleteSite_{{id}}" action="/site/{{id}}/delete" method="post" class="flex flex-col gap-4">
             <input type="hidden" name="_csrf" value="{{csrfToken}}" />
         <input id="confirm_domain_{{id}}" type="text" name="confirm_domain"
         class="input input-sm input-bordered w-full" placeholder="{{domain}}" required />

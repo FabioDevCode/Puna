@@ -60,7 +60,7 @@ export class FormPage extends BasePage {
         await this.page.evaluate((id) => {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '/delete-form';
+            form.action = '/form/delete';
             const csrfMeta = document.querySelector('meta[name="csrf-token"]');
             const csrf = csrfMeta ? csrfMeta.content : '';
 

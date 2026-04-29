@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { logger, errorLogger } from '../config/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -11,11 +11,12 @@ const routesFiles = fs.readdirSync(__dirname).filter((file) => file.endsWith('ro
 export default async (app) => {
     for (const file of routesFiles) {
         const isDefault = file === 'default.routes.js';
-        const routePath = isDefault ? '/' : `/${file.split('.')[0]}`;
+        const routePath = isDefault ? '/' : `/${path.basename(file, '.routes.js')}`;
         const filePath = path.join(__dirname, file);
+        const fileUrl = pathToFileURL(filePath).href;
 
         try {
-            const module = await import(filePath);
+            const module = await import(fileUrl);
             const routes = module.default;
 
             if (routes) {
