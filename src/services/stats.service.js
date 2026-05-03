@@ -235,7 +235,7 @@ export async function getInboxCountsBySite(userId) {
         LEFT JOIN inbox i ON i.fk_id_form = f.id
         WHERE s.fk_id_user = :userId
         GROUP BY s.id, s.domain
-        ORDER BY s.domain ASC
+        ORDER BY cnt DESC
     `;
 
     const rows = await models.sequelize.query(sql, {
