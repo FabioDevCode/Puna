@@ -27,24 +27,6 @@
         </ul>
     </nav>
 
-    {{!--
-    {{#if show2FABanner}}
-        <div class="col-span-2 md:col-span-6 lg:col-span-12">
-            <div class="bg-secondary text-white shadow-lg rounded-2xl mb-4 p-2">
-                <div class="flex flex-col items-left gap-2">
-                    <span class="p-2">
-                        <i class="fas fa-shield-alt"></i>
-                        {{__ "twoFactor.banner_message"}}
-                    </span>
-                    <a href="/dp-2fa-setup" class="btn btn-sm shadow-sm">
-                        {{__ "twoFactor.banner_setup"}}
-                    </a>
-                </div>
-            </div>
-        </div>
-    {{/if}}
-    --}}
-
     <div class="mt-auto text-sm text-neutral">
         <ul class="menu p-2 gap-[1px]">
             {{#roleIs roles='super_admin,owner'}}

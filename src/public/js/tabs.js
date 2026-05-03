@@ -768,6 +768,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             try {
                                 modalFilter.showModal();
+                                requestAnimationFrame(() => {
+                                    modalFilter.focus();
+                                });
                             } catch (_e) {
                                 try {
                                     modalFilter.classList.remove('none');

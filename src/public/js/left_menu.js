@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const anchors = Array.from(asideNav.querySelectorAll('a[href]'));
+        const profile_anchor = document.querySelector('a[href="/profile"]');
+
         if (!anchors.length) {
             return;
         }
@@ -16,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // find best matching anchor (longest matching path)
         let bestMatch = null;
         let bestScore = -1;
+        let isProfile = false;
 
         anchors.forEach((a) => {
             const href = a.getAttribute('href');
@@ -68,16 +71,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
+
+            if (activeSegments?.[0] == 'profile') {
+                isProfile = true;
+            }
         });
 
         // Clear previous active classes on anchors
         anchors.forEach((a) => {
+            profile_anchor.classList.remove('bg-secondary-content');
             a.classList.remove('bg-secondary-content');
         });
 
         // Apply active classes to bestMatch anchor
         if (bestMatch) {
             bestMatch.classList.add('bg-secondary-content');
+        }
+
+        if (isProfile) {
+            profile_anchor.classList.add('bg-secondary-content');
         }
     } catch (_err) {
         // silent fail
