@@ -91,7 +91,11 @@ Pour le détail complet, voir [SECURITY.md](SECURITY.md).
   <img src="https://img.shields.io/badge/lines-84.55%25-blue.svg?style=flat" alt="Lines" />
 </p>
 
-Vitest (unit / integration) + Playwright (e2e).<br>
+| Outil      | Type               | Configuration          |
+| ---------- | ------------------ | ---------------------- |
+| Vitest     | Unit / Integration | `vitest.config.js`     |
+| Playwright | End-to-end         | `playwright.config.js` |
+
 Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions et commandes.
 
 ---
