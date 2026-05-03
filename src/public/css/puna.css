@@ -54,15 +54,6 @@
     color: whitesmoke;
 }
 
-/* #puna {
-    background: linear-gradient(to right, #2f6ea9, #101e26);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    margin-top: 3px;
-} */
-
 body,
 html {
     overscroll-behavior: none;

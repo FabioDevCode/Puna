@@ -8,12 +8,11 @@
     {{> widgets/inbox-counts }}
 </div>
 
-<div class="col-span-2 md:col-span-6 lg:col-span-8">
-    {{> widgets/top-forms }}
-</div>
-
-<div class="col-span-2 md:col-span-6 lg:col-span-4">
-    {{> widgets/site-distribution }}
+<div class="col-span-2 md:col-span-6 lg:col-span-12">
+    <div class="flex flex-col xl:flex-row gap-4">
+        {{> widgets/top-forms }}
+        {{> widgets/site-distribution }}
+    </div>
 </div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-12">
