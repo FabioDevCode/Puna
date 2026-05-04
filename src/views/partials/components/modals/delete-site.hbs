@@ -17,7 +17,7 @@ domain="puna.fr"
     </span>
 </button>
 
-<dialog id="delete_site_modal_{{id}}" class="modal">
+<dialog id="delete_site_modal_{{id}}" class="modal" data-component="delete-site" data-site-id="{{id}}" data-expected-domain="{{domain}}">
     <div class="modal-box w-12/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
         <h2 class="text-lg font-bold mb-2 text-error">
             {{__ "site.confirm_delete_title"}}
@@ -38,22 +38,4 @@ domain="puna.fr"
 </div>
 </dialog>
 
-<script>
-    (function () {
-    try {
-    const input = document.getElementById('confirm_domain_{{id}}');
-    const btn = document.getElementById('btnConfirmDelete_{{id}}');
-    const domain = '{{domain}}';
-    if (!input || !btn) return;
-    btn.disabled = true;
-    input.addEventListener('input', function (e) {
-    const v = (e.target.value || '').trim();
-    if (v === domain) {
-    btn.disabled = false;
-    } else {
-    btn.disabled = true;
-    }
-    });
-    } catch (err) { }
-    })();
-</script>
+<script src="/js/views/delete-site.js"></script>

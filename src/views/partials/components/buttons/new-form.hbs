@@ -15,7 +15,7 @@ id=site.id
     </span>
 </a>
 
-<dialog id="modal_create_form_{{id}}" class="modal">
+<dialog id="modal_create_form_{{id}}" class="modal" data-component="new-form" data-site-id="{{id}}">
     <div class="modal-box w-11/12 md:w-8/12 lg:w-5/12 max-w-5xl min-w-[300px]">
         <h2 class="text-lg font-bold mb-2">{{__ "form.create_title"}}</h2>
         <p class="py-1 text-sm text-muted">{{__ "form.create_help"}}</p>
@@ -35,46 +35,4 @@ id=site.id
 </div>
 </dialog>
 
-<script>
-    (function(){
-    try {
-    const modal = document.getElementById('modal_create_form_{{id}}');
-    const input = modal ? modal.querySelector('input[name="name"]') : document.querySelector('#modal_create_form_{{id}} input[name="name"]');
-    const submit = document.getElementById('btnCreateForm_{{id}}');
-    const msg = document.getElementById('create_form_msg_{{id}}');
-    if (!input || !submit) return;
-
-    const gatherNames = () => {
-    return Array.from(document.querySelectorAll('.tabs [data-name]')).map(el => (el.getAttribute('data-name') || '').trim());
-    };
-
-    const checkDuplicate = () => {
-    const val = (input.value || '').trim();
-    if (!val) {
-    submit.disabled = false;
-    if (msg) msg.classList.add('hidden');
-    return;
-    }
-    const names = gatherNames();
-    const exists = names.includes(val);
-    submit.disabled = !!exists;
-    if (msg) {
-    if (exists) msg.classList.remove('hidden'); else msg.classList.add('hidden');
-    }
-    };
-
-    input.addEventListener('input', checkDuplicate);
-    // run initial check in case input prefilled
-    checkDuplicate();
-
-    // observe tabs area so dynamic changes update validation
-    const tabsContainer = document.querySelector('.tabs');
-    if (tabsContainer && window.MutationObserver) {
-    const mo = new MutationObserver(() => checkDuplicate());
-    mo.observe(tabsContainer, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-name'] });
-    }
-    } catch (e) {
-    // silent
-    }
-    })();
-</script>
+<script src="/js/views/new-form.js"></script>
