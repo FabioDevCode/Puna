@@ -1,0 +1,32 @@
+{
+    "expires_at": {
+        "allowNull": true,
+        "type": "DATE"
+    },
+    "id": {
+        "allowNull": false,
+        "primaryKey": true,
+        "type": "UUID",
+        "unique": true
+    },
+    "is_active": {
+        "allowNull": false,
+        "defaultValue": true,
+        "type": "BOOLEAN"
+    },
+    "key_hash": {
+        "allowNull": false,
+        "type": "STRING",
+        "unique": true
+    },
+    "name": {
+        "allowNull": false,
+        "type": "STRING"
+    },
+    "scope": {
+        "allowNull": false,
+        "defaultValue": "read",
+        "type": "ENUM",
+        "values": ["read", "read_write", "read_write_access"]
+    }
+}

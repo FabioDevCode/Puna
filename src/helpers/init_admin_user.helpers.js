@@ -17,6 +17,7 @@ export const initAdminUser = async () => {
                 status: 'pending',
                 enabled: false,
                 created_by: null,
+                mcp_enabled: true,
             });
             logger.info(`Admin user "${login}" created with status "pending"`);
         }
