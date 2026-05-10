@@ -1,0 +1,24 @@
+<dialog id="modal_show_mcp_token" class="modal">
+    <div class="modal-box w-11/12 md:w-7/12 lg:w-5/12 max-w-2xl">
+        <h2 class="text-lg font-bold mb-4">Clé créée avec succès</h2>
+
+        <div class="alert alert-warning text-sm rounded-lg mb-2">
+            <i class="fas fa-triangle-exclamation mr-1"></i>
+            <span>Copiez cette clé maintenant. Elle ne sera <strong>plus visible</strong> une fois cette fenêtre fermée.</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <input id="mcp-token-display" type="text" class="input input-sm input-bordered w-full font-mono text-xs" readonly />
+        <button id="btn-copy-mcp-token" class="btn btn-sm btn-outline btn-info" title="Copier">
+            <i class="fas fa-copy"></i>
+        </button>
+    </div>
+    <p id="mcp-token-copied" class="text-sm text-success mt-2 hidden"><i class="fas fa-check mr-1"></i>Copié !</p>
+
+    <div class="modal-action mt-6">
+        <form method="dialog">
+            <button class="btn btn-sm" id="btn-close-mcp-token">Fermer</button>
+        </form>
+    </div>
+</div>
+</dialog>

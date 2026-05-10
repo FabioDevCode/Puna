@@ -21,7 +21,7 @@
 {{/if}}
 
 <div class="col-span-2 md:col-span-6 lg:col-span-6">
-    <div class="card bg-base-100 shadow-xl rounded-xl">
+    <div class="card bg-base-100 shadow-xl rounded-xl min-h-[160px]">
         <div class="card-body p-6">
             <h2 class="card-title text-base font-semibold mb-1">{{__ "profile.info_title"}}</h2>
 
@@ -56,9 +56,9 @@
 </div>
 
 <div class="col-span-2 md:col-span-6 lg:col-span-6">
-    <div class="card bg-base-100 shadow-xl rounded-xl">
+    <div class="card bg-base-100 shadow-xl rounded-xl min-h-[160px]">
         <div class="card-body p-6">
-            <h2 class="card-title text-base font-semibold mb-1">{{__ "profile.language_title"}}</h2>
+            <h2 class="card-title text-base font-semibold">{{__ "profile.language_title"}}</h2>
             <p class="text-sm text-gray-500 mb-2">{{__ "profile.language_desc"}}</p>
 
             <form action="/profile/locale" method="post">
@@ -76,3 +76,49 @@
     </div>
 </div>
 </div>
+
+<div class="col-span-2 md:col-span-6 lg:col-span-12">
+    <div class="card bg-base-100 shadow-xl rounded-xl">
+        <div class="card-body p-6">
+
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="card-title text-base font-semibold">Clés d'accès MCP</h2>
+                    <p class="text-sm text-gray-500 mt-0.5">Tokens d'accès pour l'API MCP. Chaque clé n'est visible qu'une seule fois à sa création.</p>
+                </div>
+                <button id="btn-new-mcp-key" class="btn btn-sm btn-secondary">
+                    <i class="fas fa-plus"></i>
+                    <span class="hidden md:flex">Créer une clé</span>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto w-full">
+                <table class="table w-full" id="mcp-keys-table">
+                    <thead class="text-[14px] bg-base-200">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Scope</th>
+                            <th>Expiration</th>
+                            <th>Dernière utilisation</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mcp-keys-body">
+                        <tr id="mcp-keys-empty">
+                            <td colspan="5" class="text-center text-gray-400 py-6">
+                                <i class="fas fa-key mr-2"></i>Aucune clé d'accès créée
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{{> components/modals/delete-mcp-key}}
+{{> components/modals/new-mcp-key}}
+{{> components/modals/show-mcp-token}}
+
+<script src="/js/views/mcp-keys.js"></script>

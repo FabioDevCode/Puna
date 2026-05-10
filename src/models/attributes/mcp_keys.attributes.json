@@ -19,6 +19,10 @@
         "type": "STRING",
         "unique": true
     },
+    "last_used_at": {
+        "allowNull": true,
+        "type": "DATE"
+    },
     "name": {
         "allowNull": false,
         "type": "STRING"

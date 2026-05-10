@@ -16,5 +16,11 @@
         "foreignKey": "fk_id_user",
         "relation": "hasMany",
         "target": "SiteUser"
+    },
+    {
+        "as": "mcpKeys",
+        "foreignKey": "fk_id_user",
+        "relation": "hasMany",
+        "target": "Mcp_keys"
     }
 ]
