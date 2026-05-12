@@ -170,6 +170,34 @@ h3.font-inter {
     border: 1px solid rgb(30, 30, 30);
 }
 
+/* badge mcp */
+.badge_mcp_read {
+    background-color: #2f6ea9;
+    color: rgb(223, 233, 237);
+    border: 1px solid #2f6ea9;
+    text-wrap: nowrap;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.badge_mcp_read_write {
+    background-color: #1d4367;
+    color: rgb(232, 237, 239);
+    border: 1px solid #1d4367;
+    text-wrap: nowrap;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.badge_mcp_read_write_access {
+    background-color: #101e26;
+    color: rgb(248, 252, 253);
+    border: 1px solid #101e26;
+    text-wrap: nowrap;
+    border-radius: 4px;
+    padding: 8px;
+}
+
 /* Style de base pour tous les badges */
 [class^='badge_s_'] {
     display: inline-flex;

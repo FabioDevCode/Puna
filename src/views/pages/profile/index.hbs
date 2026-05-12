@@ -83,30 +83,31 @@
 
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h2 class="card-title text-base font-semibold">Clés d'accès MCP</h2>
-                    <p class="text-sm text-gray-500 mt-0.5">Tokens d'accès pour l'API MCP. Chaque clé n'est visible qu'une seule fois à sa création.</p>
+                    <h2 class="card-title text-base font-semibold mb-2">{{__ "mcp.section_title"}}</h2>
+                    <p class="text-sm text-gray-500">{{__ "mcp.section_desc"}}</p>
                 </div>
                 <button id="btn-new-mcp-key" class="btn btn-sm btn-secondary">
                     <i class="fas fa-plus"></i>
-                    <span class="hidden md:flex">Créer une clé</span>
+                    <span class="hidden md:flex">{{__ "mcp.btn_new_key"}}</span>
                 </button>
             </div>
 
             <div class="overflow-x-auto w-full">
                 <table class="table w-full" id="mcp-keys-table">
-                    <thead class="text-[14px] bg-base-200">
+                    <thead class="text-[14px]">
                         <tr>
-                            <th>Nom</th>
-                            <th>Scope</th>
-                            <th>Expiration</th>
-                            <th>Dernière utilisation</th>
-                            <th class="text-right">Actions</th>
+                            <th>{{__ "mcp.col_created_at"}}</th>
+                            <th>{{__ "mcp.col_name"}}</th>
+                            <th>{{__ "mcp.col_scope"}}</th>
+                            <th>{{__ "mcp.col_expires"}}</th>
+                            <th>{{__ "mcp.col_last_used"}}</th>
+                            <th class="text-right">{{__ "mcp.col_actions"}}</th>
                         </tr>
                     </thead>
                     <tbody id="mcp-keys-body">
                         <tr id="mcp-keys-empty">
-                            <td colspan="5" class="text-center text-gray-400 py-6">
-                                <i class="fas fa-key mr-2"></i>Aucune clé d'accès créée
+                            <td colspan="6" class="text-center text-gray-400 py-6">
+                                <i class="fas fa-key mr-2"></i>{{__ "mcp.empty_state"}}
                             </td>
                         </tr>
                     </tbody>

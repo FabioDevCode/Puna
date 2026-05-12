@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 (function () {
     if (window.__mcpKeysInit) return;
     window.__mcpKeysInit = true;
@@ -9,32 +10,40 @@
 
     if (!tbody || !modalCreate || !modalToken) return;
 
+    const fpExpires = flatpickr(document.getElementById('mcp-key-expires'), {
+        appendTo: modalCreate,
+        dateFormat: 'Y-m-d',
+        locale: window.__i18n?.locale_short || 'fr',
+        disableMobile: false,
+    });
+
     function csrfToken() {
         return document.querySelector('meta[name="csrf-token"]')?.content || '';
     }
 
     function formatDate(value) {
         if (!value) return '-';
-        return new Date(value).toLocaleDateString('fr-FR', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
+        const d = new Date(value);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
     }
 
     function scopeBadge(scope) {
         const map = {
-            read: 'badge-info',
-            read_write: 'badge-warning',
-            read_write_access: 'badge-error',
+            read: 'badge_mcp_read',
+            read_write: 'badge_mcp_read_write',
+            read_write_access: 'badge_mcp_read_write_access',
         };
-        return `<span class="badge badge-sm badge-outline ${map[scope] || ''}">${scope}</span>`;
+        return `<span class="badge badge-sm ${map[scope] || ''}">${scope}</span>`;
     }
 
     function buildRow(key) {
         const tr = document.createElement('tr');
         tr.dataset.id = key.id;
         tr.innerHTML = `
+            <td class="text-sm">${formatDate(key.createdAt)}</td>
             <td class="font-medium">${escapeHtml(key.name)}</td>
             <td>${scopeBadge(key.scope)}</td>
             <td class="text-sm">${formatDate(key.expires_at)}</td>
@@ -77,7 +86,7 @@
     document.getElementById('btn-new-mcp-key')?.addEventListener('click', () => {
         document.getElementById('mcp-key-name').value = '';
         document.getElementById('mcp-key-scope').value = 'read';
-        document.getElementById('mcp-key-expires').value = '';
+        fpExpires?.clear();
         document.getElementById('mcp-key-name-error').classList.add('hidden');
         modalCreate.showModal();
     });
@@ -90,7 +99,7 @@
         const nameError = document.getElementById('mcp-key-name-error');
 
         if (!name) {
-            nameError.textContent = 'Le nom est requis.';
+            nameError.textContent = window.__i18n?.mcp_name_required || 'Le nom est requis.';
             nameError.classList.remove('hidden');
             return;
         }
@@ -98,7 +107,7 @@
 
         const btn = document.getElementById('btn-submit-mcp-key');
         btn.disabled = true;
-        btn.textContent = 'Création…';
+        btn.textContent = window.__i18n?.mcp_creating || 'Création…';
 
         try {
             const res = await fetch('/mcp_keys', {
@@ -114,7 +123,7 @@
             const data = await res.json();
 
             if (!res.ok) {
-                nameError.textContent = data.error || 'Une erreur est survenue.';
+                nameError.textContent = data.error || window.__i18n?.mcp_error || 'Une erreur est survenue.';
                 nameError.classList.remove('hidden');
                 return;
             }
@@ -131,11 +140,11 @@
             document.getElementById('mcp-token-copied').classList.add('hidden');
             modalToken.showModal();
         } catch (_e) {
-            nameError.textContent = 'Erreur réseau. Veuillez réessayer.';
+            nameError.textContent = window.__i18n?.mcp_network_error || 'Erreur réseau. Veuillez réessayer.';
             nameError.classList.remove('hidden');
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Créer la clé';
+            btn.textContent = window.__i18n?.mcp_btn_create || 'Créer la clé';
         }
     });
 
