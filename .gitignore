@@ -1,6 +1,6 @@
 .github/instructions/*
 .github/skills/*
-.agents/*
+.agents/copilot-instructions.md
 .project_docs
 .env
 .env.backup
