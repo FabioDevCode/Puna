@@ -43,9 +43,9 @@
         const tr = document.createElement('tr');
         tr.dataset.id = key.id;
         tr.innerHTML = `
-            <td class="text-sm">${formatDate(key.createdAt)}</td>
             <td class="font-medium">${escapeHtml(key.name)}</td>
             <td>${scopeBadge(key.scope)}</td>
+            <td class="text-sm">${formatDate(key.createdAt)}</td>
             <td class="text-sm">${formatDate(key.expires_at)}</td>
             <td class="text-sm">${formatDate(key.last_used_at)}</td>
             <td class="text-right">
@@ -137,7 +137,7 @@
 
             // Afficher le token en clair dans la modal one-shot
             document.getElementById('mcp-token-display').value = data.token;
-            document.getElementById('mcp-token-copied').classList.add('hidden');
+            resetCopyBtn();
             modalToken.showModal();
         } catch (_e) {
             nameError.textContent = window.__i18n?.mcp_network_error || 'Erreur réseau. Veuillez réessayer.';
@@ -149,13 +149,25 @@
     });
 
     // ── Copier le token ──────────────────────────────────────────
+    function resetCopyBtn() {
+        const btn = document.getElementById('btn-copy-mcp-token');
+        if (!btn) return;
+        btn.disabled = false;
+        btn.querySelector('i').className = 'fas fa-copy';
+        const span = btn.querySelector('span');
+        if (span) span.textContent = window.__i18n?.mcp_token_copy_title || 'Copier';
+    }
+
     document.getElementById('btn-copy-mcp-token')?.addEventListener('click', () => {
         const val = document.getElementById('mcp-token-display').value;
         if (!val) return;
+        const btn = document.getElementById('btn-copy-mcp-token');
         navigator.clipboard.writeText(val).then(() => {
-            const msg = document.getElementById('mcp-token-copied');
-            msg.classList.remove('hidden');
-            setTimeout(() => msg.classList.add('hidden'), 3000);
+            btn.disabled = true;
+            btn.querySelector('i').className = 'fas fa-check';
+            const span = btn.querySelector('span');
+            if (span) span.textContent = window.__i18n?.mcp_copied || 'Copié !';
+            setTimeout(resetCopyBtn, 3000);
         });
     });
 

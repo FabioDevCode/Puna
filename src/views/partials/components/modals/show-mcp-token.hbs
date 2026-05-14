@@ -9,13 +9,16 @@
 
         <div class="flex items-center gap-2">
             <input id="mcp-token-display" type="text" class="input input-sm input-bordered w-full font-mono text-xs" readonly />
-        <button id="btn-copy-mcp-token" class="btn btn-sm btn-outline btn-info" title="{{__ "mcp.token_copy_title"}}">
-            <i class="fas fa-copy"></i>
-        </button>
     </div>
-    <p id="mcp-token-copied" class="text-sm text-success mt-2 hidden"><i class="fas fa-check mr-1"></i>{{__ "mcp.copied"}}</p>
 
     <div class="modal-action mt-6">
+        <button id="btn-copy-mcp-token" class="btn btn-sm btn-outline btn-info" title="{{__ "mcp.token_copy_title"}}">
+            <i class="fas fa-copy"></i>
+            <span class="hidden md:flex">
+                {{__ "mcp.token_copy_title"}}
+            </span>
+        </button>
+
         <form method="dialog">
             <button class="btn btn-sm" id="btn-close-mcp-token">{{__ "btn.close"}}</button>
         </form>
