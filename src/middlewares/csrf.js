@@ -39,7 +39,7 @@ const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
  */
 export const csrfProtection = (req, res, next) => {
     // Exclure les routes API et les soumissions de formulaires publics
-    if (req.path.startsWith('/api') || req.path.startsWith('/send')) {
+    if (req.path.startsWith('/api') || req.path.startsWith('/send') || req.path.startsWith('/mcp')) {
         return next();
     }
 
@@ -52,7 +52,7 @@ export const csrfProtection = (req, res, next) => {
  */
 export const csrfTokenInjector = (req, res, next) => {
     // Ne pas générer de token pour les routes API/send
-    if (req.path.startsWith('/api') || req.path.startsWith('/send')) {
+    if (req.path.startsWith('/api') || req.path.startsWith('/send') || req.path.startsWith('/mcp')) {
         return next();
     }
 
