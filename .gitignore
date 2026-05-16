@@ -2,6 +2,7 @@
 .github/skills/*
 .agents/copilot-instructions.md
 .project_docs
+.vscode/mcp.json
 .env
 .env.backup
 .env.copy

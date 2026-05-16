@@ -1,8 +1,6 @@
 import crypto from 'node:crypto';
 import models from '../models/index.js';
 
-const VALID_SCOPES = ['read', 'read_write', 'read_write_access'];
-
 function hashToken(token) {
     return crypto.createHmac('sha256', process.env.MCP_HASH_SECRET).update(token).digest('hex');
 }
@@ -15,13 +13,11 @@ export async function listMcpKeys(userId) {
     });
 }
 
-export async function createMcpKey(userId, { name, scope, expires_at }) {
+export async function createMcpKey(userId, { name, expires_at }) {
     if (!name || typeof name !== 'string' || name.trim().length === 0 || name.length > 100) {
         throw Object.assign(new Error('Invalid name'), { status: 400 });
     }
-    if (!VALID_SCOPES.includes(scope)) {
-        throw Object.assign(new Error('Invalid scope'), { status: 400 });
-    }
+
     if (expires_at !== undefined && expires_at !== null && expires_at !== '') {
         const expiryDate = new Date(expires_at);
         if (isNaN(expiryDate.getTime()) || expiryDate <= new Date()) {
@@ -35,7 +31,6 @@ export async function createMcpKey(userId, { name, scope, expires_at }) {
     const record = await models.Mcp_keys.create({
         id: crypto.randomUUID(),
         name: name.trim(),
-        scope,
         key_hash,
         is_active: true,
         expires_at: expires_at || null,

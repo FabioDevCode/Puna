@@ -5,6 +5,12 @@ import { createMcpServer } from './index.js';
 
 const mcpRouter = Router();
 
+// Mode SSE - not supported
+mcpRouter.get('/', (req, res) => {
+    res.status(405).json({ error: 'SSE not supported, use POST' });
+});
+
+// Mode HTTP stateless
 mcpRouter.post('/', mcpAuth, async (req, res) => {
     const server = createMcpServer(req.mcpUser);
 

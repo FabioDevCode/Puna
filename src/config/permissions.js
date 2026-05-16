@@ -296,40 +296,6 @@ export function getRateLimit(role, entity) {
 }
 
 /**
- * Scopes MCP autorisés par rôle
- * Définit les niveaux d'accès API qu'un rôle peut attribuer à ses tokens MCP
- * @type {Object.<string, string[]>}
- */
-export const mcpScopes = {
-    super_admin: ['read', 'read_write', 'read_write_access'],
-    owner: ['read', 'read_write', 'read_write_access'],
-    beta: ['read', 'read_write', 'read_write_access'],
-    editor: ['read'],
-    viewer: ['read'],
-};
-
-/**
- * Retourner les scopes MCP autorisés pour un rôle
- *
- * @param {string} role - Rôle de l'utilisateur
- * @returns {string[]} Liste des scopes autorisés, vide si rôle inconnu
- */
-export function getAllowedMcpScopes(role) {
-    return mcpScopes[role] ?? [];
-}
-
-/**
- * Vérifier si un rôle peut créer un token avec un scope donné
- *
- * @param {string} role - Rôle de l'utilisateur
- * @param {string} scope - Scope demandé (read, read_write, read_write_access)
- * @returns {boolean}
- */
-export function canUseMcpScope(role, scope) {
-    return (mcpScopes[role] ?? []).includes(scope);
-}
-
-/**
  * Liste des rôles disponibles
  * @type {string[]}
  */
@@ -350,14 +316,11 @@ export const ACTIONS = ['read', 'create', 'update', 'delete'];
 export default {
     permissions,
     rateLimits,
-    mcpScopes,
     can,
     hasRole,
     getPermissions,
     isRateLimitReached,
     getRateLimit,
-    getAllowedMcpScopes,
-    canUseMcpScope,
     ROLES,
     ENTITIES,
     ACTIONS,

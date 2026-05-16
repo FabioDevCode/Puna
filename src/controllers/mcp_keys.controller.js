@@ -10,9 +10,9 @@ export const list = async (req, res) => {
 };
 
 export const create = async (req, res) => {
-    const { name, scope, expires_at } = req.body;
+    const { name, expires_at } = req.body;
     try {
-        const result = await mcpKeysService.createMcpKey(req.session.user.id, { name, scope, expires_at });
+        const result = await mcpKeysService.createMcpKey(req.session.user.id, { name, expires_at });
         return res.status(201).json(result);
     } catch (err) {
         return res.status(err.status || 500).json({ error: err.message || 'Internal server error' });

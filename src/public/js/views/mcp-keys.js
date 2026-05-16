@@ -33,8 +33,6 @@
     function scopeBadge(scope) {
         const map = {
             read: 'badge_mcp_read',
-            read_write: 'badge_mcp_read_write',
-            read_write_access: 'badge_mcp_read_write_access',
         };
         return `<span class="badge badge-sm ${map[scope] || ''}">${scope}</span>`;
     }
@@ -85,7 +83,6 @@
     // ── Ouverture modal création ─────────────────────────────────
     document.getElementById('btn-new-mcp-key')?.addEventListener('click', () => {
         document.getElementById('mcp-key-name').value = '';
-        document.getElementById('mcp-key-scope').value = 'read';
         fpExpires?.clear();
         document.getElementById('mcp-key-name-error').classList.add('hidden');
         modalCreate.showModal();
@@ -94,7 +91,6 @@
     // ── Soumission création ──────────────────────────────────────
     document.getElementById('btn-submit-mcp-key')?.addEventListener('click', async () => {
         const name = document.getElementById('mcp-key-name').value.trim();
-        const scope = document.getElementById('mcp-key-scope').value;
         const expires_at = document.getElementById('mcp-key-expires').value || null;
         const nameError = document.getElementById('mcp-key-name-error');
 
@@ -117,7 +113,7 @@
                     'x-csrf-token': csrfToken(),
                     Accept: 'application/json',
                 },
-                body: JSON.stringify({ name, scope, expires_at }),
+                body: JSON.stringify({ name, expires_at }),
             });
 
             const data = await res.json();

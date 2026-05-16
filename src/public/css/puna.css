@@ -180,24 +180,6 @@ h3.font-inter {
     padding: 8px;
 }
 
-.badge_mcp_read_write {
-    color: #0075c3;
-    background-color: #cfe3f5;
-    border: 1px solid #cfe3f5;
-    text-wrap: nowrap;
-    border-radius: 4px;
-    padding: 8px;
-}
-
-.badge_mcp_read_write_access {
-    color: rgb(248, 252, 253);
-    background-color: #101e26;
-    border: 1px solid #101e26;
-    text-wrap: nowrap;
-    border-radius: 4px;
-    padding: 8px;
-}
-
 /* Style de base pour tous les badges */
 [class^='badge_s_'] {
     display: inline-flex;

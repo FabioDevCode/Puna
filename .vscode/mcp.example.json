@@ -1,0 +1,11 @@
+{
+    "servers": {
+        "puna": {
+            "headers": {
+                "Authorization": "Bearer your_mcp_key"
+            },
+            "type": "http",
+            "url": "http://localhost:3022/mcp"
+        }
+    }
+}
