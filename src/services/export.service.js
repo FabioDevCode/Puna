@@ -276,7 +276,7 @@ export async function getAllSubmissionsForExport(userId, userRole) {
             {
                 model: models.Form,
                 as: 'form',
-                attributes: ['id', 'name', 'endpoint'],
+                attributes: ['id', 'name'],
                 include: [
                     {
                         model: models.Site,

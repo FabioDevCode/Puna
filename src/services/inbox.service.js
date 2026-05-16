@@ -51,7 +51,7 @@ export async function getSubmissionsForUser(userId, userRole, page = 1, limit = 
             {
                 model: models.Form,
                 as: 'form',
-                attributes: ['id', 'name', 'endpoint'],
+                attributes: ['id', 'name'],
                 include: [
                     {
                         model: models.Site,
@@ -91,7 +91,7 @@ export async function getSubmissionById(submissionId, includeForm = false) {
             {
                 model: models.Form,
                 as: 'form',
-                attributes: ['id', 'name', 'endpoint', 'fk_id_site'],
+                attributes: ['id', 'name', 'fk_id_site'],
                 include: [
                     {
                         model: models.Site,
@@ -179,7 +179,7 @@ export async function getSubmissionsWithFiles(formId = null) {
             {
                 model: models.Form,
                 as: 'form',
-                attributes: ['id', 'name', 'endpoint'],
+                attributes: ['id', 'name'],
             },
         ],
     });

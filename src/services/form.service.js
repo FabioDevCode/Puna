@@ -23,7 +23,7 @@ const uploadsDir = path.resolve(__dirname, '../../storage/uploads');
 export async function getFormsBySite(siteId) {
     const forms = await models.Form.findAll({
         where: { fk_id_site: siteId },
-        attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'name', 'template', 'columns', 'createdAt', 'updatedAt'],
         order: [['createdAt', 'DESC']],
     });
 
@@ -40,7 +40,7 @@ export async function getFormsForUser(userId, userRole) {
     const siteWhereCondition = getSiteWhereCondition(userId, userRole);
 
     const forms = await models.Form.findAll({
-        attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'name', 'template', 'columns', 'createdAt', 'updatedAt'],
         include: [
             {
                 model: models.Site,
@@ -63,7 +63,7 @@ export async function getFormsForUser(userId, userRole) {
  */
 export async function getFormById(formId, includeSite = false) {
     const options = {
-        attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'fk_id_site', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'name', 'template', 'columns', 'fk_id_site', 'createdAt', 'updatedAt'],
     };
 
     if (includeSite) {
@@ -89,7 +89,7 @@ export async function getFormById(formId, includeSite = false) {
 export async function getFormByEndpoint(endpoint, includeSite = false) {
     const options = {
         where: { endpoint },
-        attributes: ['id', 'name', 'endpoint', 'template', 'columns', 'fk_id_site', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'name', 'template', 'columns', 'fk_id_site', 'createdAt', 'updatedAt'],
     };
 
     if (includeSite) {
@@ -245,7 +245,7 @@ export async function getFormTemplates() {
         where: {
             template: { [Op.ne]: null },
         },
-        attributes: ['id', 'name', 'endpoint', 'template', 'fk_id_site'],
+        attributes: ['id', 'name', 'template', 'fk_id_site'],
         include: [
             {
                 model: models.Site,
