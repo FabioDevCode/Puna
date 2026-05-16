@@ -1,56 +1,31 @@
 import { z } from 'zod';
-import { hasScope } from '../helpers/index.js';
+import { checkSiteAccess } from '../../services/access.service.js';
+import { hasScope, mcpResponse, mcpError } from '../helpers/index.js';
+import { getMcpSites, getMcpSiteDetails } from '../services/site.js';
 
 const registerSiteTools = (server, mcpUser) => {
-    const { scope, userId } = mcpUser;
+    const { scope, userId, userRole } = mcpUser;
 
-    if (hasScope(scope, ['read', 'read_write', 'read_write_access'])) {
+    if (hasScope(scope, ['read'])) {
         server.tool('get_sites', "Liste tous les sites web de l'utilisateur", {}, async () => {
-            return {
-                content: [{ type: 'text', text: JSON.stringify([]) }],
-            };
+            const sites = await getMcpSites(userId, userRole);
+            return mcpResponse(sites);
         });
-    }
 
-    if (hasScope(scope, ['read_write', 'read_write_access'])) {
         server.tool(
-            'create_site',
-            'Crée un nouveau site web',
-            {
-                domain: z.string().describe('Domaine ou nom du site'),
-            },
-            async ({ domain }) => {
-                return {
-                    content: [{ type: 'text', text: JSON.stringify({}) }],
-                };
-            }
-        );
-    }
-
-    if (hasScope(scope, ['read_write_access'])) {
-        server.tool(
-            'get_site_token',
-            "Récupère le token d'un site web",
+            'get_site_details',
+            "Récupère les données d'un site ainsi que la liste des formulaires associés",
             {
                 site_id: z.string().describe('Identifiant du site'),
             },
             async ({ site_id }) => {
-                return {
-                    content: [{ type: 'text', text: JSON.stringify({}) }],
-                };
-            }
-        );
+                const allowed = await checkSiteAccess(site_id, userId, userRole);
+                if (!allowed) return mcpError('Access denied');
 
-        server.tool(
-            'revoke_site_token',
-            "Révoque le token d'un site web",
-            {
-                site_id: z.string().describe('Identifiant du site'),
-            },
-            async ({ site_id }) => {
-                return {
-                    content: [{ type: 'text', text: JSON.stringify({}) }],
-                };
+                const result = await getMcpSiteDetails(site_id);
+                if (!result) return mcpError('Site not found');
+
+                return mcpResponse(result);
             }
         );
     }

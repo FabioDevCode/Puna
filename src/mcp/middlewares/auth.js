@@ -56,10 +56,17 @@ const mcpAuth = async (req, res, next) => {
         }
     );
 
-    // 8. Disponible pour le router et les outils
+    // 8. Récupérer le rôle de l'utilisateur (nécessaire pour les services de contrôle d'accès)
+    const user = await models.User.findByPk(keyData.fk_id_user, {
+        attributes: ['role'],
+        raw: true,
+    });
+
+    // 9. Disponible pour le router et les outils
     req.mcpUser = {
         userId: keyData.fk_id_user,
         scope: keyData.scope,
+        userRole: user?.role ?? 'viewer',
     };
 
     next();
