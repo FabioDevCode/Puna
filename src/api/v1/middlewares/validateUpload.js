@@ -5,6 +5,9 @@ import { errorLogger } from '../../../config/logger.js';
 
 const ALLOWED = (process.env.ALLOWED_EXTENSIONS || '.png,.jpg,.jpeg,.webp,.pdf,.doc,.docx,.odt,.txt,.xls,.xlsx,.csv').split(',').map((s) => s.trim().toLowerCase());
 
+// Aliases for extensions that share the same format (file-type always returns the canonical form)
+const EXT_ALIASES = { '.jpeg': '.jpg' };
+
 function extFromName(name) {
     return path.extname(name || '').toLowerCase();
 }
@@ -114,8 +117,9 @@ export default async function validateUpload(req, res, next) {
             const ft = await fileTypeFromFile(f.path);
             if (ft && ft.ext) {
                 const detectedExt = `.${ft.ext.toLowerCase()}`;
+                const normalizedNameExt = EXT_ALIASES[nameExt] ?? nameExt;
                 // detected type must match declared extension
-                if (detectedExt !== nameExt) {
+                if (detectedExt !== normalizedNameExt) {
                     await fs.unlink(f.path).catch((e) => {
                         errorLogger.error({ err: e, path: f.path }, 'Failed to cleanup uploaded file');
                     });
