@@ -127,10 +127,47 @@
                 <form action="/admin/users/{{user.id}}/update" method="POST" class="flex flex-col gap-0">
                     <input type="hidden" name="_csrf" value="{{csrfToken}}" />
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Sites assignés -->
+                    <div class="form-control w-full {{#if showMcpAdmin}}md:col-span-2{{else}}md:col-span-3{{/if}}">
+                        <label class="label p-0 mb-5">
+                            <h3 class="text-lg font-bold border-b border-base-200 pb-3 flex w-full items-center gap-2">
+                                {{__ "admin.user_assigned_sites"}}
+                            </h3>
+                        </label>
+
+                        <!-- Recherche de sites -->
+                        <div class="relative mb-2">
+                            <input type="text" id="siteSearchInput" placeholder="{{__ "admin.user_filter_sites_placeholder"}}" class="input input-md input-bordered w-full pl-8">
+                            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-content text-xs"></i>
+                        </div>
+
+                        <!-- Liste des sites (Checkboxes) -->
+                        <div id="sitesListContainer"  class="border border-base-300 rounded-md h-48 overflow-y-auto bg-base-100 p-1">
+                            {{#each sites}}
+                                <label
+                                class="cursor-pointer label hover:bg-base-200 rounded-md px-3 py-2 transition-colors justify-start gap-3">
+                                    <input type="checkbox" name="sites" value="{{this.id}}"
+                                    class="checkbox checkbox-sm checkbox-secondary rounded-md site-checkbox" {{#if
+                                    this.isAssigned}}checked{{/if}} />
+                                    <span class="label-text flex-1 truncate" title="{{this.domain}}">{{this.domain}}</span>
+                                </label>
+                            {{else}}
+                                <div class="text-center text-neutral text-sm p-8 flex flex-col items-center gap-2">
+                                    <i class="fa-solid fa-globe text-2xl opacity-20"></i>
+                                    <span>{{__ "admin.user_no_sites_available"}}</span>
+                                </div>
+                            {{/each}}
+
+                            <!-- Message aucun résultat recherche -->
+                            <div id="noSiteFound" class="hidden text-center text-neutral text-sm p-4">
+                                {{__ "admin.user_no_site_match"}}
+                            </div>
+                        </div>
+                    </div>
+
                     {{#if showMcpAdmin}}
-                        <!-- Accès MCP -->
-                        <div class="form-control w-full md:col-span-2 mb-4">
+                        <div class="form-control w-full md:col-span-1 mb-4">
                             <label class="label p-0 mb-5">
                                 <h3 class="text-lg font-bold border-b border-base-200 pb-3 w-full flex items-center gap-2">
                                     {{__ "admin.user_mcp_access_title"}}
@@ -142,44 +179,6 @@
                         </div>
                     </div>
                 {{/if}}
-
-                <!-- Sites assignés -->
-                <div class="form-control w-full md:col-span-2">
-                    <label class="label p-0 mb-5">
-                        <h3 class="text-lg font-bold border-b border-base-200 pb-3 flex w-full items-center gap-2">
-                            {{__ "admin.user_assigned_sites"}}
-                        </h3>
-                    </label>
-
-                    <!-- Recherche de sites -->
-                    <div class="relative mb-2">
-                        <input type="text" id="siteSearchInput" placeholder="{{__ "admin.user_filter_sites_placeholder"}}" class="input input-md input-bordered w-full pl-8">
-                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-content text-xs"></i>
-                    </div>
-
-                    <!-- Liste des sites (Checkboxes) -->
-                    <div id="sitesListContainer"  class="border border-base-300 rounded-lg h-48 overflow-y-auto bg-base-100 p-1">
-                        {{#each sites}}
-                            <label
-                            class="cursor-pointer label hover:bg-base-200 rounded-md px-3 py-2 transition-colors justify-start gap-3">
-                                <input type="checkbox" name="sites" value="{{this.id}}"
-                                class="checkbox checkbox-sm checkbox-neutral rounded-md site-checkbox" {{#if
-                                this.isAssigned}}checked{{/if}} />
-                                <span class="label-text flex-1 truncate" title="{{this.domain}}">{{this.domain}}</span>
-                            </label>
-                        {{else}}
-                            <div class="text-center text-neutral text-sm p-8 flex flex-col items-center gap-2">
-                                <i class="fa-solid fa-globe text-2xl opacity-20"></i>
-                                <span>{{__ "admin.user_no_sites_available"}}</span>
-                            </div>
-                        {{/each}}
-
-                        <!-- Message aucun résultat recherche -->
-                        <div id="noSiteFound" class="hidden text-center text-neutral text-sm p-4">
-                            {{__ "admin.user_no_site_match"}}
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Actions -->

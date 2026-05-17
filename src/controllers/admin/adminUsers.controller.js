@@ -281,6 +281,7 @@ export const adminDeleteUser = async (req, res) => {
 export const adminViewUser = async (req, res) => {
     try {
         const userId = req.params.id;
+        const currentUserRole = req.session.user?.role;
 
         // Récupérer l'utilisateur avec ses relations via le service
         const user = await getUserWithRelations(userId);
@@ -293,9 +294,12 @@ export const adminViewUser = async (req, res) => {
         user.last_connection = user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : null;
         user.createdAt = dayjs(user.createdAt).format('YYYY-MM-DD HH:mm');
 
+        const showMcpAdmin = process.env.MCP_ENABLED === 'true' && currentUserRole === 'super_admin';
+
         res.render('admin/users/view', {
             layout: 'admin',
             user,
+            showMcpAdmin,
         });
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminViewUser error');

@@ -358,10 +358,6 @@ h3.font-inter {
     transition: all 200ms ease-in-out !important;
 }
 
-.none {
-    display: none !important;
-}
-
 .ellipsis-truncate {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -523,4 +519,14 @@ h3.font-inter {
 /* Style pour le code */
 #info_form_code {
     letter-spacing: 0.5px;
+}
+
+.disabled {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    /* opacity: 0.7 !important; */
+}
+
+.none {
+    display: none !important;
 }

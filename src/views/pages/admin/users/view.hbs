@@ -179,7 +179,7 @@
         </div>
 
         <!-- Sites assignés -->
-        <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-3 rounded-xl">
+        <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-2 rounded-xl">
             <div class="card-body p-6">
                 <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
                     {{__ "admin.user_assigned_sites"}}
@@ -193,7 +193,7 @@
                     </div>
                 {{else}}
                     {{#if user.siteassignments}}
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
                             {{#each user.siteassignments}}
                                 <div class="flex items-center gap-4 bg-base-200/80 p-3.5 rounded-lg border border-base-200 cursor-default">
                                     <div class="bg-base-100 shadow-sm w-8 h-8 rounded-md flex items-center justify-center text-neutral text-sm">
@@ -223,7 +223,28 @@
                 {{/if}}
             </div>
         </div>
+
+        {{#if showMcpAdmin}}
+            <!-- Accès MCP -->
+            <div class="card bg-base-100 shadow-xl border border-base-200 col-span-1 lg:col-span-1 rounded-xl">
+                <div class="card-body p-6">
+                    <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-2 flex items-center gap-2">
+                        {{__ "admin.user_mcp_access_title"}}
+                    </h3>
+                    <div class="flex items-center gap-3 ">
+                        {{#if user.mcp_enabled}}
+                            {{!-- <input type="checkbox" checked="checked" class="checkbox checkbox-secondary disabled" /> --}}
+                            <input type="checkbox" class="toggle toggle-secondary disabled" checked="checked" />
+                        <span class="text-sm text-base-content/60">{{__ "admin.user_mcp_access_enabled"}}</span>
+                    {{else}}
+                        <input type="checkbox" class="toggle toggle-secondary disabled" />
+                    <span class="text-sm text-base-content/60">{{__ "admin.user_mcp_access_disabled"}}</span>
+                {{/if}}
+            </div>
+        </div>
     </div>
+{{/if}}
+</div>
 </div>
 
 {{> components/modals/delete-user }}

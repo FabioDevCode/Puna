@@ -90,6 +90,8 @@
         "user_label_role": "System role",
         "user_last_connection": "Last connection",
         "user_mcp_access_desc": "Allow this user to generate MCP API keys.",
+        "user_mcp_access_disabled": "MCP access disabled",
+        "user_mcp_access_enabled": "MCP access enabled",
         "user_mcp_access_title": "MCP Access",
         "user_never": "Never",
         "user_no_assigned_sites": "No assigned sites",
