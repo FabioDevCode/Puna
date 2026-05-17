@@ -89,6 +89,8 @@
         "user_label_login": "Identifiant (Login)",
         "user_label_role": "Rôle Système",
         "user_last_connection": "Dernière connexion",
+        "user_mcp_access_desc": "Autoriser cet utilisateur à générer des clés d'API MCP.",
+        "user_mcp_access_title": "Accès MCP",
         "user_never": "Jamais",
         "user_no_assigned_sites": "Aucun site assigné",
         "user_no_site_match": "Aucun site ne correspond à votre recherche",

@@ -10,6 +10,7 @@ import {
     userExists,
     createUserAdmin,
     getUserWithRelations,
+    updateUserAdmin,
     changeUserStatus,
     deleteUserWithRelations,
     sendWelcomeEmail,
@@ -338,10 +339,13 @@ export const adminEditUser = async (req, res) => {
         user.last_connection = user.last_connection ? dayjs(user.last_connection).format('YYYY-MM-DD HH:mm') : null;
         user.createdAt = dayjs(user.createdAt).format('YYYY-MM-DD HH:mm');
 
+        const showMcpAdmin = process.env.MCP_ENABLED === 'true' && currentUserRole === 'super_admin';
+
         res.render('admin/users/edit', {
             layout: 'admin',
             user,
             sites: sitesWithAssignment,
+            showMcpAdmin,
         });
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'adminEditUser error');
@@ -368,6 +372,12 @@ export const adminUpdateUser = async (req, res) => {
         // Gérer les sites assignés via le service
         const siteIds = sites ? (Array.isArray(sites) ? sites : [sites]) : [];
         await updateUserSiteAssignments(userId, siteIds);
+
+        // Mise à jour mcp_enabled (super_admin uniquement, si MCP activé globalement)
+        if (process.env.MCP_ENABLED === 'true' && currentUserRole === 'super_admin') {
+            const mcpEnabled = req.body.mcp_enabled === 'on';
+            await updateUserAdmin(userId, { mcp_enabled: mcpEnabled });
+        }
 
         res.flash('success', req.__('flash.admin_user_updated'));
         res.redirect(`/admin/users/${userId}/view`);

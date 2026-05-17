@@ -11,9 +11,12 @@ export const profilePage = async (req, res) => {
             userHas2FA = user?.totp_enabled || false;
         }
 
+        const showMcpSection = process.env.MCP_ENABLED === 'true' && user?.mcp_enabled === true;
+
         res.render('profile/index', {
             user,
             show2FABanner: show2FABannerBase && !userHas2FA,
+            showMcpSection,
         });
     } catch (_err) {
         res.redirect('/dashboard');
