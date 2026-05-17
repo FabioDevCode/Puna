@@ -20,7 +20,7 @@ import { getSiteWhereCondition } from './access.service.js';
  * @returns {Promise<Object|null>} - { inbox, form, site, files }
  */
 export async function getInboxWithFiles(inboxId, userId, userRole) {
-    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+    const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
     const inbox = await models.Inbox.findByPk(inboxId, {
         include: [
@@ -139,7 +139,7 @@ export function createZipArchive(files) {
  * @returns {Promise<Object|null>} - { form, site, submissions }
  */
 export async function getFormDataForExport(formId, userId, userRole) {
-    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+    const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
     const form = await models.Form.findByPk(formId, {
         include: [
@@ -268,7 +268,7 @@ export async function generateExcelWorkbook(form, submissions, customColumns = [
  * @returns {Promise<Array>} - Liste des soumissions avec infos form/site
  */
 export async function getAllSubmissionsForExport(userId, userRole) {
-    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+    const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
     const submissions = await models.Inbox.findAll({
         attributes: ['id', 'content', 'createdAt'],

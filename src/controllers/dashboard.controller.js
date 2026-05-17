@@ -50,11 +50,12 @@ export const dashboard = async (req, res) => {
  */
 export const getTopFroms = async (req, res) => {
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
     const daysRaw = parseInt(req.query.days, 10) || 7;
     const days = [7, 30].includes(daysRaw) ? daysRaw : 7;
 
     try {
-        const items = await getTopForms(userId, days);
+        const items = await getTopForms(userId, userRole, days);
         return res.json({ days, items });
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'getTopFroms error');
@@ -67,11 +68,12 @@ export const getTopFroms = async (req, res) => {
  */
 export const getInboxCounts = async (req, res) => {
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
     const daysRaw = parseInt(req.query.days, 10) || 7;
     const days = [7, 30].includes(daysRaw) ? daysRaw : 7;
 
     try {
-        const result = await getInboxCountsByDay(userId, days);
+        const result = await getInboxCountsByDay(userId, userRole, days);
         return res.json({ ...result, days });
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxCounts error');
@@ -84,9 +86,10 @@ export const getInboxCounts = async (req, res) => {
  */
 export const getInboxCountsBySite = async (req, res) => {
     const userId = req.session.user?.id;
+    const userRole = req.userRole || req.session.user?.role || 'viewer';
 
     try {
-        const result = await getInboxCountsBySiteService(userId);
+        const result = await getInboxCountsBySiteService(userId, userRole);
         return res.json(result);
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'getInboxCountsBySite error');

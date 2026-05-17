@@ -43,7 +43,7 @@ export async function getSubmissionsByForm(formId, page = 1, limit = 50) {
  */
 export async function getSubmissionsForUser(userId, userRole, page = 1, limit = 50) {
     const offset = (page - 1) * limit;
-    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+    const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
     const { rows: submissions, count: total } = await models.Inbox.findAndCountAll({
         attributes: ['id', 'content', 'createdAt'],
@@ -335,7 +335,7 @@ export async function getSubmissionsByFormWithFilters(formId, filters = {}, limi
  * @returns {Promise<Object|null>} - Données complètes pour l'affichage ou null
  */
 export async function getInboxForDisplay(inboxId, userId, userRole) {
-    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+    const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
     const includeOptions = {
         model: models.Form,
@@ -421,7 +421,7 @@ export async function getInboxForDisplay(inboxId, userId, userRole) {
  */
 export async function deleteInboxWithFiles(inboxId, userId, userRole) {
     try {
-        const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
         const includeOptions = {
             model: models.Form,
@@ -527,7 +527,7 @@ export async function deleteInboxWithFiles(inboxId, userId, userRole) {
  */
 export async function verifyFileAccessAndGetPath(inboxId, filename, userId, userRole) {
     try {
-        const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+        const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
         const includeOptions = {
             model: models.Form,

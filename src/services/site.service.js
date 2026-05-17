@@ -23,7 +23,7 @@ const uploadsDir = path.resolve(__dirname, '../../storage/uploads');
  * @returns {Promise<Array>} - Liste des sites
  */
 export async function getSitesForUser(userId, userRole) {
-    const whereCondition = getSiteWhereCondition(userId, userRole);
+    const whereCondition = await getSiteWhereCondition(userId, userRole);
 
     const sites = await models.Site.findAll({
         where: whereCondition,
@@ -184,7 +184,7 @@ export async function countSites(userId = null, userRole = null) {
         return await models.Site.count();
     }
 
-    const whereCondition = getSiteWhereCondition(userId, userRole);
+    const whereCondition = await getSiteWhereCondition(userId, userRole);
     return await models.Site.count({ where: whereCondition });
 }
 
@@ -281,7 +281,7 @@ export async function verifySiteAccess(siteId, userId, userRole) {
     }
 
     // Vérifier l'accès au site selon le rôle
-    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+    const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
     if (siteWhereCondition) {
         const accessibleSite = await models.Site.findOne({

@@ -5,6 +5,7 @@
 
 import dayjs from 'dayjs';
 import models from '../models/index.js';
+import { getSiteWhereCondition } from './access.service.js';
 
 /**
  * Récupérer les statistiques globales d'un utilisateur
@@ -13,16 +14,16 @@ import models from '../models/index.js';
  * @returns {Promise<Object>} - Statistiques (sites, forms, submissions, etc.)
  */
 export async function getGlobalStats(userId, userRole) {
-    const siteWhere = userRole === 'super_admin' ? {} : { fk_id_user: userId };
+    const siteWhere = await getSiteWhereCondition(userId, userRole);
 
     const [sitesCount, formsCount, submissionsCount] = await Promise.all([
-        models.Site.count({ where: siteWhere }),
+        models.Site.count(siteWhere ? { where: siteWhere } : {}),
         models.Form.count({
             include: [
                 {
                     model: models.Site,
                     as: 'site',
-                    where: siteWhere,
+                    ...(siteWhere ? { where: siteWhere } : {}),
                     attributes: [],
                 },
             ],
@@ -36,7 +37,7 @@ export async function getGlobalStats(userId, userRole) {
                         {
                             model: models.Site,
                             as: 'site',
-                            where: siteWhere,
+                            ...(siteWhere ? { where: siteWhere } : {}),
                             attributes: [],
                         },
                     ],
@@ -59,19 +60,28 @@ export async function getGlobalStats(userId, userRole) {
  * @param {number} days - Nombre de jours (7 ou 30)
  * @returns {Promise<Array>} - Top formulaires avec compteurs
  */
-export async function getTopForms(userId, days = 7) {
+export async function getTopForms(userId, userRole = 'owner', days = 7) {
     const end = dayjs().endOf('day');
     const start = dayjs()
         .startOf('day')
         .subtract(days - 1, 'day');
+
+    let siteFilter;
+    if (userRole === 'super_admin') {
+        siteFilter = '';
+    } else if (userRole === 'editor' || userRole === 'viewer') {
+        siteFilter = 'AND s.id IN (SELECT fk_id_site FROM site_user WHERE fk_id_user = :userId)';
+    } else {
+        siteFilter = 'AND s.fk_id_user = :userId';
+    }
 
     const sql = `
         SELECT i.fk_id_form AS fk_id_form, f.name AS form_name, s.id AS site_id, s.domain AS site_domain, COUNT(i.id) AS cnt
         FROM inbox i
         JOIN form f ON f.id = i.fk_id_form
         JOIN site s ON s.id = f.fk_id_site
-        WHERE s.fk_id_user = :userId
-          AND i.createdAt BETWEEN :start AND :end
+        WHERE i.createdAt BETWEEN :start AND :end
+          ${siteFilter}
         GROUP BY i.fk_id_form, f.name, s.domain
         ORDER BY cnt DESC
         LIMIT 5
@@ -101,7 +111,7 @@ export async function getTopForms(userId, days = 7) {
  * @param {number} days - Nombre de jours (7 ou 30)
  * @returns {Promise<Object>} - { labels, data }
  */
-export async function getInboxCountsByDay(userId, days = 7) {
+export async function getInboxCountsByDay(userId, userRole = 'owner', days = 7) {
     const end = dayjs().endOf('day');
     const start = dayjs()
         .startOf('day')
@@ -114,14 +124,23 @@ export async function getInboxCountsByDay(userId, days = 7) {
         labels.push(dt.format('YYYY-MM-DD'));
     }
 
+    let siteFilter;
+    if (userRole === 'super_admin') {
+        siteFilter = '';
+    } else if (userRole === 'editor' || userRole === 'viewer') {
+        siteFilter = 'AND s.id IN (SELECT fk_id_site FROM site_user WHERE fk_id_user = :userId)';
+    } else {
+        siteFilter = 'AND s.fk_id_user = :userId';
+    }
+
     // Requête SQL pour compter par jour
     const sql = `
         SELECT DATE(i.createdAt) AS day_str, COUNT(i.id) AS cnt
         FROM inbox i
         JOIN form f ON f.id = i.fk_id_form
         JOIN site s ON s.id = f.fk_id_site
-        WHERE s.fk_id_user = :userId
-          AND i.createdAt BETWEEN :start AND :end
+        WHERE i.createdAt BETWEEN :start AND :end
+          ${siteFilter}
         GROUP BY DATE(i.createdAt)
     `;
 
@@ -154,10 +173,10 @@ export async function getInboxCountsByDay(userId, days = 7) {
  * @returns {Promise<Array>} - Sites avec compteurs
  */
 export async function getSitesWithCounts(userId, userRole) {
-    const siteWhere = userRole === 'super_admin' ? {} : { fk_id_user: userId };
+    const siteWhere = await getSiteWhereCondition(userId, userRole);
 
     const sites = await models.Site.findAll({
-        where: siteWhere,
+        ...(siteWhere ? { where: siteWhere } : {}),
         attributes: ['id', 'domain'],
         include: [
             {
@@ -227,13 +246,22 @@ export function getGlobalStatsFromSites(sitesWithCounts) {
  * @param {string} userId - ID de l'utilisateur
  * @returns {Promise<Object>} - { labels: [domains], data: [counts] }
  */
-export async function getInboxCountsBySite(userId) {
+export async function getInboxCountsBySite(userId, userRole = 'owner') {
+    let siteFilter;
+    if (userRole === 'super_admin') {
+        siteFilter = '';
+    } else if (userRole === 'editor' || userRole === 'viewer') {
+        siteFilter = 'WHERE s.id IN (SELECT fk_id_site FROM site_user WHERE fk_id_user = :userId)';
+    } else {
+        siteFilter = 'WHERE s.fk_id_user = :userId';
+    }
+
     const sql = `
         SELECT s.id AS site_id, s.domain AS site_domain, COUNT(i.id) AS cnt
         FROM site s
         LEFT JOIN form f ON f.fk_id_site = s.id
         LEFT JOIN inbox i ON i.fk_id_form = f.id
-        WHERE s.fk_id_user = :userId
+        ${siteFilter}
         GROUP BY s.id, s.domain
         ORDER BY cnt DESC
     `;
@@ -264,7 +292,14 @@ export async function getInboxHeatmap(userId, userRole, days = 7, locale = 'fr')
     start.setHours(0, 0, 0, 0);
     start.setDate(start.getDate() - (days - 1));
 
-    const siteFilter = userRole === 'super_admin' ? '' : 'AND s.fk_id_user = :userId';
+    let siteFilter;
+    if (userRole === 'super_admin') {
+        siteFilter = '';
+    } else if (userRole === 'editor' || userRole === 'viewer') {
+        siteFilter = 'AND s.id IN (SELECT fk_id_site FROM site_user WHERE fk_id_user = :userId)';
+    } else {
+        siteFilter = 'AND s.fk_id_user = :userId';
+    }
 
     const sql = `
         SELECT

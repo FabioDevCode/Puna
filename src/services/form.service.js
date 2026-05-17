@@ -37,7 +37,7 @@ export async function getFormsBySite(siteId) {
  * @returns {Promise<Array>} - Liste des formulaires avec infos du site
  */
 export async function getFormsForUser(userId, userRole) {
-    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+    const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
     const forms = await models.Form.findAll({
         attributes: ['id', 'name', 'template', 'columns', 'createdAt', 'updatedAt'],
@@ -287,7 +287,7 @@ export async function verifyFormAccess(formId, userId, userRole) {
     }
 
     // Vérifier l'accès au site selon le rôle
-    const siteWhereCondition = getSiteWhereCondition(userId, userRole);
+    const siteWhereCondition = await getSiteWhereCondition(userId, userRole);
 
     if (siteWhereCondition) {
         const accessibleSite = await models.Site.findOne({
