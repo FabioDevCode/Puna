@@ -179,7 +179,7 @@
         </div>
 
         <!-- Sites assignés -->
-        <div class="card bg-base-100 shadow-xl col-span-1 lg:col-span-2 rounded-xl">
+        <div class="card bg-base-100 shadow-xl col-span-1 {{#if showMcpAdmin}}lg:col-span-2{{else}}lg:col-span-3{{/if}} rounded-xl">
             <div class="card-body p-6">
                 <h3 class="text-lg font-bold border-b border-base-200 pb-3 mb-5 flex items-center gap-2">
                     {{__ "admin.user_assigned_sites"}}

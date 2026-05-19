@@ -1,15 +1,34 @@
 <aside class="hidden md:flex md:flex-col md:min-w-[208px] md:w-[208px] h-screen bg-base-100 p-2">
     <a href="/dashboard" class="flex justify-start items-center p-4 cursor-pointer gap-2">
-        <div class="w-[24px] select-none">
+        <div class="w-[18px] select-none">
             <img src="/img/puna_short_logo.png" alt="Puna logo">
         </div>
+        <h1 class="font-inter font-bold">
+            Puna
+        </h1>
     </a>
 
+    {{#roleIs roles='super_admin,owner'}}
+        <div class="mt-auto text-sm text-neutral">
+            <div class="px-4 py-2 pb-0 text-xs font-bold text-neutral-content uppercase tracking-wider select-none">
+                {{__ "menu.menu"}}
+            </div>
+            <ul class="menu p-2 pb-0">
+                <li>
+                    <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2 rounded-md">
+                        <i class="fa-solid fa-sliders"></i>
+                        {{__ "menu.administration"}}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    {{/roleIs}}
+
     <nav class="flex-1">
-        <div class="px-4 py-2 text-xs font-bold text-neutral-content uppercase tracking-wider select-none">
+        <div class="px-4 py-2 pb-0 text-xs font-bold text-neutral-content uppercase tracking-wider select-none">
             {{__ "menu.app"}}
         </div>
-        <ul class="menu p-2 gap-[1px] rounded-lg">
+        <ul class="menu p-2 gap-[1px]">
             <li>
                 <a href="/dashboard"
                 class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2 rounded-md">
@@ -29,15 +48,6 @@
 
     <div class="mt-auto text-sm text-neutral">
         <ul class="menu p-2 gap-[1px]">
-            {{#roleIs roles='super_admin,owner'}}
-                <li>
-                    <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2 rounded-md">
-                        <i class="fa-solid fa-sliders"></i>
-                        {{__ "menu.administration"}}
-                    </a>
-                </li>
-            {{/roleIs}}
-
             <li>
                 <a href="/profile" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100 gap-2 px-3 py-2 rounded-md">
                     <i class="fa-regular fa-user"></i>
