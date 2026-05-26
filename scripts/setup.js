@@ -54,6 +54,10 @@ const messages = {
         totpSkipped: '  \x1b[36m→ Ignoré. Définissez TOTP_ENABLED=true dans .env pour activer plus tard.\x1b[0m',
         adminLogin: 'Login administrateur',
         adminEmail: 'Email administrateur (optionnel)',
+        mcpEnable: 'Activer le serveur MCP (intégration IA) ?',
+        mcpDisableHint: '  \x1b[36m→ Pour activer plus tard : MCP_ENABLED=true dans .env\x1b[0m',
+        mcpSkipped: '  \x1b[36m→ Ignoré. Définissez MCP_ENABLED=true dans .env pour activer plus tard.\x1b[0m',
+        mcpKeyGenerated: '  MCP_HASH_SECRET générée automatiquement.',
         successCreated: '\x1b[32m✔ Fichier .env créé avec succès.\x1b[0m',
         successStart: "  \x1b[36m→ Démarrer l'app : npm run dev\x1b[0m",
     },
@@ -87,6 +91,10 @@ const messages = {
         totpSkipped: '  \x1b[36m→ Skipped. Set TOTP_ENABLED=true in .env to enable later.\x1b[0m',
         adminLogin: 'Admin login',
         adminEmail: 'Admin email (optional)',
+        mcpEnable: 'Enable MCP server (AI integration)?',
+        mcpDisableHint: '  \x1b[36m→ To enable later: set MCP_ENABLED=true in .env\x1b[0m',
+        mcpSkipped: '  \x1b[36m→ Skipped. Set MCP_ENABLED=true in .env to enable later.\x1b[0m',
+        mcpKeyGenerated: '  MCP_HASH_SECRET generated automatically.',
         successCreated: '\x1b[32m✔ .env file created successfully.\x1b[0m',
         successStart: '  \x1b[36m→ Start the app: npm run dev\x1b[0m',
     },
@@ -242,7 +250,7 @@ function generateKey(bytes, encoding = 'base64url') {
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 async function main() {
-    const TOTAL_SECTIONS = 11;
+    const TOTAL_SECTIONS = 12;
 
     // ── Banner ──────────────────────────────────────────────────────────────
     console.log('');
@@ -331,9 +339,61 @@ async function main() {
         console.log(t('smtpSkippedHint'));
     }
 
-    // — Section 4: Security Keys (auto) ——————————————————————————————————————
+    // — Section 4: Admin ————————————————————————————————————————————————————
 
-    sectionHeader(4, TOTAL_SECTIONS, 'Security Keys');
+    sectionHeader(4, TOTAL_SECTIONS, 'Admin');
+    env.ADMIN_LOGIN = await prompt.ask(t('adminLogin'), 'admin');
+    env.ADMIN_EMAIL = await prompt.ask(t('adminEmail'), '');
+
+    // — Section 5: TOTP (optional) ——————————————————————————————————————————
+
+    sectionHeader(5, TOTAL_SECTIONS, 'TOTP (2FA)');
+    const enableTotp = await prompt.askYesNo(t('totpEnable'), true);
+    if (enableTotp) {
+        env.TOTP_ENABLED = 'true';
+        env.TOTP_ISSUER = await prompt.ask('TOTP_ISSUER', 'Puna');
+        console.log(t('totpDisableHint'));
+    } else {
+        env.TOTP_ENABLED = 'false';
+        env.TOTP_ISSUER = 'Puna';
+        console.log(t('totpSkipped'));
+    }
+
+    // — Section 6: ClamAV (optional) —————————————————————————————————————————
+
+    sectionHeader(6, TOTAL_SECTIONS, 'ClamAV');
+    const enableClamav = await prompt.askYesNo(t('clamavEnable'), true);
+    if (enableClamav) {
+        env.CLAMAV_ENABLED = 'true';
+        env.CLAMAV_SOCKET = await prompt.ask('CLAMAV_SOCKET', '/tmp/clamd.socket');
+        env.CLAMAV_HOST = await prompt.ask(t('clamavHostHint'), '127.0.0.1');
+        env.CLAMAV_PORT = await prompt.ask('CLAMAV_PORT', '3310');
+        console.log(t('clamavDisableHint'));
+    } else {
+        env.CLAMAV_ENABLED = 'false';
+        env.CLAMAV_SOCKET = '';
+        env.CLAMAV_HOST = '';
+        env.CLAMAV_PORT = '3310';
+        console.log(t('clamavSkipped'));
+    }
+
+    // — Section 7: MCP ——————————————————————————————————————————————————————
+
+    sectionHeader(7, TOTAL_SECTIONS, 'MCP');
+    const enableMcp = await prompt.askYesNo(t('mcpEnable'), true);
+    if (enableMcp) {
+        env.MCP_ENABLED = 'true';
+        console.log(t('mcpDisableHint'));
+    } else {
+        env.MCP_ENABLED = 'false';
+        console.log(t('mcpSkipped'));
+    }
+    env.MCP_HASH_SECRET = generateKey(32, 'hex');
+    console.log(`  MCP_HASH_SECRET . ${env.MCP_HASH_SECRET.length} hex chars`);
+
+    // — Section 8: Security Keys (auto) ——————————————————————————————————————
+
+    sectionHeader(8, TOTAL_SECTIONS, 'Security Keys');
     env.KEY_TK = generateKey(48, 'base64url');
     env.KEV = generateKey(32, 'hex');
     env.KIV = generateKey(16, 'hex');
@@ -350,16 +410,16 @@ async function main() {
     console.log(`  CSRF_SECRET ..... ${env.CSRF_SECRET.length} chars`);
     console.log(`  API_KEY ......... ${env.API_KEY.length} hex chars`);
 
-    // — Sections 5–8: Defaults (Helmet, Logs, Rate Limiting, Upload) —————————
+    // — Sections 9–12: Defaults (Helmet, Logs, Rate Limiting, Upload) —————————
 
-    sectionHeader(5, TOTAL_SECTIONS, 'Helmet / Trust Proxy');
+    sectionHeader(9, TOTAL_SECTIONS, 'Helmet / Trust Proxy');
     env.HELMET_STRICT_TRANSPORT = 'false';
     env.TRUST_PROXY = 'false';
     console.log(t('defaultsInfo'));
     console.log(t('helmetInfo'));
     console.log(t('trustProxyInfo'));
 
-    sectionHeader(6, TOTAL_SECTIONS, 'Logs');
+    sectionHeader(10, TOTAL_SECTIONS, 'Logs');
     env.LOG_RETENTION_APP = '7';
     env.LOG_RETENTION_API = '14';
     env.LOG_RETENTION_ERROR = '30';
@@ -369,14 +429,14 @@ async function main() {
     console.log(t('logsRetention'));
     console.log(t('logsConsole'));
 
-    sectionHeader(7, TOTAL_SECTIONS, 'Rate Limiting');
+    sectionHeader(11, TOTAL_SECTIONS, 'Rate Limiting');
     env.RATE_LIMIT_FORM_MAX = '30';
     env.RATE_LIMIT_FORM_WINDOW_MS = '60000';
     env.MAX_FAILED_LOGIN_ATTEMPTS = '10';
     console.log(t('defaultsInfo'));
     console.log(t('rateInfo'));
 
-    sectionHeader(8, TOTAL_SECTIONS, 'Upload Limits');
+    sectionHeader(12, TOTAL_SECTIONS, 'Upload Limits');
     env.API_MAX_FILE_SIZE = '10485760';
     env.API_MAX_TOTAL_SIZE = '52428800';
     env.API_MAX_FILES = '10';
@@ -384,44 +444,6 @@ async function main() {
     env.API_MAX_FIELD_SIZE = '10000';
     console.log(t('defaultsInfo'));
     console.log(t('uploadInfo'));
-
-    // — Section 9: ClamAV (optional) —————————————————————————————————————————
-
-    sectionHeader(9, TOTAL_SECTIONS, 'ClamAV');
-    const enableClamav = await prompt.askYesNo(t('clamavEnable'), true);
-    if (enableClamav) {
-        env.CLAMAV_ENABLED = 'true';
-        env.CLAMAV_SOCKET = await prompt.ask('CLAMAV_SOCKET', '/tmp/clamd.socket');
-        env.CLAMAV_HOST = await prompt.ask(t('clamavHostHint'), '127.0.0.1');
-        env.CLAMAV_PORT = await prompt.ask('CLAMAV_PORT', '3310');
-        console.log(t('clamavDisableHint'));
-    } else {
-        env.CLAMAV_ENABLED = 'false';
-        env.CLAMAV_SOCKET = '';
-        env.CLAMAV_HOST = '';
-        env.CLAMAV_PORT = '3310';
-        console.log(t('clamavSkipped'));
-    }
-
-    // — Section 10: TOTP (optional) ——————————————————————————————————————————
-
-    sectionHeader(10, TOTAL_SECTIONS, 'TOTP (2FA)');
-    const enableTotp = await prompt.askYesNo(t('totpEnable'), true);
-    if (enableTotp) {
-        env.TOTP_ENABLED = 'true';
-        env.TOTP_ISSUER = await prompt.ask('TOTP_ISSUER', 'Puna');
-        console.log(t('totpDisableHint'));
-    } else {
-        env.TOTP_ENABLED = 'false';
-        env.TOTP_ISSUER = 'Puna';
-        console.log(t('totpSkipped'));
-    }
-
-    // — Section 11: Admin ————————————————————————————————————————————————————
-
-    sectionHeader(11, TOTAL_SECTIONS, 'Admin');
-    env.ADMIN_LOGIN = await prompt.ask(t('adminLogin'), 'admin');
-    env.ADMIN_EMAIL = await prompt.ask(t('adminEmail'), '');
 
     prompt.close();
 
@@ -543,6 +565,11 @@ function buildEnvContent(env) {
     ln('# Admin');
     val('ADMIN_LOGIN');
     val('ADMIN_EMAIL');
+    ln();
+
+    ln('# MCP');
+    val('MCP_ENABLED');
+    val('MCP_HASH_SECRET');
     ln();
 
     return lines.join('\n');
