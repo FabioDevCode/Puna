@@ -195,7 +195,7 @@ describe('getTopFroms', () => {
 
         await getTopFroms(req, res);
 
-        expect(getTopForms).toHaveBeenCalledWith('user-1', 7);
+        expect(getTopForms).toHaveBeenCalledWith('user-1', 'owner', 7);
         expect(res.json).toHaveBeenCalledWith({
             days: 7,
             items: [{ id: 'f1', name: 'Form1', count: 10 }],
@@ -208,7 +208,7 @@ describe('getTopFroms', () => {
 
         await getTopFroms(req, res);
 
-        expect(getTopForms).toHaveBeenCalledWith('user-1', 7);
+        expect(getTopForms).toHaveBeenCalledWith('user-1', 'owner', 7);
     });
 
     it('uses default 7 days when days is not in allowed values', async () => {
@@ -217,7 +217,7 @@ describe('getTopFroms', () => {
 
         await getTopFroms(req, res);
 
-        expect(getTopForms).toHaveBeenCalledWith('user-1', 7);
+        expect(getTopForms).toHaveBeenCalledWith('user-1', 'owner', 7);
     });
 
     it('allows days=30', async () => {
@@ -226,7 +226,7 @@ describe('getTopFroms', () => {
 
         await getTopFroms(req, res);
 
-        expect(getTopForms).toHaveBeenCalledWith('user-1', 30);
+        expect(getTopForms).toHaveBeenCalledWith('user-1', 'owner', 30);
     });
 
     it('returns 500 on service error', async () => {
@@ -257,7 +257,7 @@ describe('getInboxCounts', () => {
 
         await getInboxCounts(req, res);
 
-        expect(getInboxCountsByDay).toHaveBeenCalledWith('user-1', 7);
+        expect(getInboxCountsByDay).toHaveBeenCalledWith('user-1', 'owner', 7);
         expect(res.json).toHaveBeenCalledWith({ labels: [], data: [], days: 7 });
     });
 
@@ -267,7 +267,7 @@ describe('getInboxCounts', () => {
 
         await getInboxCounts(req, res);
 
-        expect(getInboxCountsByDay).toHaveBeenCalledWith('user-1', 7);
+        expect(getInboxCountsByDay).toHaveBeenCalledWith('user-1', 'owner', 7);
     });
 
     it('allows days=30', async () => {
@@ -276,7 +276,7 @@ describe('getInboxCounts', () => {
 
         await getInboxCounts(req, res);
 
-        expect(getInboxCountsByDay).toHaveBeenCalledWith('user-1', 30);
+        expect(getInboxCountsByDay).toHaveBeenCalledWith('user-1', 'owner', 30);
     });
 
     it('returns 500 on service error', async () => {
@@ -307,7 +307,7 @@ describe('getInboxCountsBySite', () => {
 
         await getInboxCountsBySite(req, res);
 
-        expect(getInboxCountsBySiteService).toHaveBeenCalledWith('user-1');
+        expect(getInboxCountsBySiteService).toHaveBeenCalledWith('user-1', 'owner');
         expect(res.json).toHaveBeenCalledWith([{ siteId: 's1', count: 5 }]);
     });
 
