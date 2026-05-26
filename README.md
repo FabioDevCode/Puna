@@ -26,7 +26,7 @@
 - **API publique** - Un seul endpoint `POST /api/v1/send/:code` avec authentification 3 couches (clé API, JWT du _site_, code du _formulaire_). Prend en charge `JSON` & `Multipart Form`.
 - **Soumissions** - Chaque appel à l'API crée une entrée consultable, filtrable et exportable (**Excel**/**CSV**). L'historique complet des données reçues est accessible depuis l'interface de chaque **_site_** et onglet de **_formulaire_**.
 - **Authentification** - Login local, sessions persistantes, 2FA TOTP optionnel et réinitialisation par email.
-- **RBAC** - 5 rôles (`super_admin`, `owner`, `beta`, `editor`, `viewer`) avec une matrice de permissions granulaire.
+- **RBAC** - 5 rôles (`super_admin`, `owner`, `unique`, `editor`, `viewer`) avec une matrice de permissions granulaire.
 - **Admin & monitoring** - Gestion des utilisateurs, visualiseur de logs, tableau de bord et antivirus ClamAV optionnel sur chaque upload.
 
 ---

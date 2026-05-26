@@ -103,23 +103,15 @@ const USERS = [
         createdAt: randomDateInLastDays(180),
     },
 
-    // ── Beta ────────────────────────────────────────────────────
+    // ── Unique ────────────────────────────────────────────────
     {
         login: 'beta_maxime',
         email: 'maxime.simon@beta.puna.dev',
-        role: 'beta',
+        role: 'unique',
         status: 'active',
         last_connection: randomDateInLastDays(1),
         createdAt: randomDateInLastDays(20),
     },
-    // {
-    //     login: 'beta_inès',
-    //     email: 'ines.david@beta.puna.dev',
-    //     role: 'beta',
-    //     status: 'active',
-    //     last_connection: randomDateInLastDays(4),
-    //     createdAt: randomDateInLastDays(25),
-    // },
 
     // ── Suspended / Banned ──────────────────────────────────────
     {

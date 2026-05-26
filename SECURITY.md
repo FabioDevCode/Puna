@@ -210,7 +210,7 @@ Puna implémente un système d'autorisation **granulaire** avec 5 rôles et des 
 | ------------- | ------ | -------------------------------------------- |
 | `super_admin` | 5      | Accès total (admin utilisateurs, paramètres) |
 | `owner`       | 4      | Propriétaire de sites, gestion utilisateurs  |
-| `beta`        | 3      | Testeur beta avec privilèges étendus         |
+| `unique`      | 3      | Utilisateur unique avec privilèges étendus   |
 | `editor`      | 2      | Édition de contenu                           |
 | `viewer`      | 1      | Lecture seule                                |
 

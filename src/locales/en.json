@@ -50,10 +50,10 @@
         "overview": "Overview",
         "overview_title": "Overview",
         "reactivate": "Reactivate",
-        "role_beta": "Beta Tester",
         "role_editor": "Editor (Can edit)",
         "role_label": "Role",
         "role_owner": "Owner",
+        "role_unique": "Unique",
         "role_viewer": "Viewer (Read only)",
         "select_role": "Select a role",
         "send_welcome_email": "Send a welcome email to this user",
@@ -378,9 +378,6 @@
         "my_account": "My account",
         "profile": "Profile",
         "website": "Website"
-    },
-    "misc": {
-        "beta_version": "beta-0.0.1"
     },
     "modal": {
         "confirm_delete": "Confirm deletion"

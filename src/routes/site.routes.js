@@ -8,8 +8,8 @@ const router = express.Router();
 // Prefix - /site
 router.get('/all', requireAuth, actionAccess('site', 'read'), siteCtl.allSite);
 router.get('/:id/view', requireAuth, actionAccess('site', 'read'), siteCtl.showSite);
-router.get('/:id/token', requireAuth, roleAccess(['super_admin', 'owner', 'editor', 'beta']), actionAccess('site', 'read'), siteCtl.getSiteToken);
-router.put('/:id/revoke-tokens', requireAuth, roleAccess(['super_admin', 'owner', 'beta']), actionAccess('site', 'update'), siteCtl.revokeSiteTokens);
+router.get('/:id/token', requireAuth, roleAccess(['super_admin', 'owner', 'editor', 'unique']), actionAccess('site', 'read'), siteCtl.getSiteToken);
+router.put('/:id/revoke-tokens', requireAuth, roleAccess(['super_admin', 'owner', 'unique']), actionAccess('site', 'update'), siteCtl.revokeSiteTokens);
 router.post('/create', requireAuth, actionAccess('site', 'create'), siteCtl.createSite);
 router.post('/:id/delete', requireAuth, actionAccess('site', 'delete'), siteCtl.deleteSite);
 

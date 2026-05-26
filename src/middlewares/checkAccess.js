@@ -85,7 +85,7 @@ export function actionAccess(entity, action) {
  * @example
  * // Dans les routes
  * router.get('/admin', isConnected, roleAccess(['super_admin']), adminCtl.admin);
- * router.post('/site/create', isConnected, roleAccess(['super_admin', 'owner', 'beta']), siteCtl.createSite);
+ * router.post('/site/create', isConnected, roleAccess(['super_admin', 'owner', 'unique']), siteCtl.createSite);
  * router.get('/stats', isConnected, roleAccess(['super_admin', 'owner', 'editor']), dashboardCtl.getStats);
  */
 export function roleAccess(allowedRoles) {

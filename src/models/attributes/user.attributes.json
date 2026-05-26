@@ -55,7 +55,7 @@
         "allowNull": false,
         "defaultValue": "viewer",
         "type": "ENUM",
-        "values": ["super_admin", "owner", "editor", "viewer", "beta"]
+        "values": ["super_admin", "owner", "editor", "viewer", "unique"]
     },
     "status": {
         "allowNull": false,

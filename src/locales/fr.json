@@ -50,10 +50,10 @@
         "overview": "Vue d'ensemble",
         "overview_title": "Vue d'ensemble",
         "reactivate": "Réactiver",
-        "role_beta": "Beta Tester",
         "role_editor": "Editor (Peut modifier)",
         "role_label": "Rôle",
         "role_owner": "Owner (Propriétaire)",
+        "role_unique": "Unique",
         "role_viewer": "Viewer (Lecture seule)",
         "select_role": "Sélectionner un rôle",
         "send_welcome_email": "Envoyer un email de bienvenue à l'utilisateur",
@@ -378,9 +378,6 @@
         "my_account": "Mon compte",
         "profile": "Profil",
         "website": "Site web"
-    },
-    "misc": {
-        "beta_version": "beta-0.0.1"
     },
     "modal": {
         "confirm_delete": "Confirmer la suppression"

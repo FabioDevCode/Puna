@@ -2,7 +2,7 @@
  * @file tests/integration/routes/rbac.test.js
  * Integration tests for RBAC (Role-Based Access Control) web routes
  *
- * Roles tested: super_admin, owner, editor, viewer, beta
+ * Roles tested: super_admin, owner, editor, viewer, unique
  *
  * Routes tested:
  *   GET  /admin              — admin dashboard (super_admin, owner only)
@@ -295,10 +295,10 @@ describe('RBAC routes', () => {
 
     // -----------------------------------------------------------------------
     describe('POST /site/create', () => {
-        it('allows beta user to create a site (under volume limit)', async () => {
-            const res = await request(app).post('/site/create').set('X-Test-User', makeSessionUser('beta')).send({ domain: 'beta.example.com' });
+        it('allows unique user to create a site (under volume limit)', async () => {
+            const res = await request(app).post('/site/create').set('X-Test-User', makeSessionUser('unique')).send({ domain: 'unique.example.com' });
 
-            // actionAccess('site', 'create') passes for beta → controller redirect
+            // actionAccess('site', 'create') passes for unique → controller redirect
             expect(res.status).toBe(302);
         });
 

@@ -106,11 +106,11 @@ describe('checkAccess middleware', () => {
             expect(next).not.toHaveBeenCalled();
         });
 
-        it('calls next() for beta when role is in the allowed list', () => {
-            const req = makeReq('beta');
+        it('calls next() for unique when role is in the allowed list', () => {
+            const req = makeReq('unique');
             const res = makeRes();
             const next = vi.fn();
-            roleAccess(['super_admin', 'owner', 'beta'])(req, res, next);
+            roleAccess(['super_admin', 'owner', 'unique'])(req, res, next);
             expect(next).toHaveBeenCalled();
             expect(res.status).not.toHaveBeenCalled();
         });
@@ -168,8 +168,8 @@ describe('checkAccess middleware', () => {
             expect(res.status).toHaveBeenCalledWith(403);
         });
 
-        it('returns 403 for beta', () => {
-            const req = makeReq('beta');
+        it('returns 403 for unique', () => {
+            const req = makeReq('unique');
             const res = makeRes();
             const next = vi.fn();
             requireAdmin()(req, res, next);
@@ -194,8 +194,8 @@ describe('checkAccess middleware', () => {
             expect(next).toHaveBeenCalled();
         });
 
-        it('returns 403 for beta', () => {
-            const req = makeReq('beta');
+        it('returns 403 for unique', () => {
+            const req = makeReq('unique');
             const res = makeRes();
             const next = vi.fn();
             requireOwner()(req, res, next);

@@ -11,8 +11,8 @@ export async function getSiteWhereCondition(userId, userRole = 'viewer') {
     if (userRole === 'super_admin') {
         // Super_admin voit tout - pas de filtre
         return null;
-    } else if (userRole === 'owner' || userRole === 'beta') {
-        // Owner et beta voient seulement leurs sites
+    } else if (userRole === 'owner' || userRole === 'unique') {
+        // Owner et unique voient seulement leurs sites
         return { fk_id_user: userId };
     } else if (userRole === 'editor' || userRole === 'viewer') {
         // Editor et viewer voient seulement les sites assignés
@@ -39,7 +39,7 @@ export async function getSiteWhereCondition(userId, userRole = 'viewer') {
 /**
  * Récupère les sites avec leurs compteurs en fonction du rôle
  * @param {string} userId - ID de l'utilisateur
- * @param {string} userRole - Rôle de l'utilisateur (super_admin, owner, editor, viewer, beta)
+ * @param {string} userRole - Rôle de l'utilisateur (super_admin, owner, editor, viewer, unique)
  * @returns {Promise<Array>} Liste des sites avec compteurs
  */
 export async function getSitesWithCounts(userId, userRole = 'viewer') {

@@ -218,7 +218,7 @@ export async function getSiteUsers(siteId) {
  * Ajouter un utilisateur à un site
  * @param {number} siteId - ID du site
  * @param {number} userId - ID de l'utilisateur
- * @param {string} role - Rôle sur le site (owner, beta, editor, viewer)
+ * @param {string} role - Rôle sur le site (owner, unique, editor, viewer)
  * @returns {Promise<Object>} - SiteUser créé
  */
 export async function addUserToSite(siteId, userId, role = 'viewer') {

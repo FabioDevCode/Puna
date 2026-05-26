@@ -53,35 +53,35 @@ describe('permissions config', () => {
     });
 
     describe('isRateLimitReached', () => {
-        it('returns true when beta site count equals the max (4)', () => {
-            expect(isRateLimitReached('beta', 'site', 4)).toBe(true);
+        it('returns true when unique site count equals the max (4)', () => {
+            expect(isRateLimitReached('unique', 'site', 4)).toBe(true);
         });
 
-        it('returns false when beta site count is below the max (3)', () => {
-            expect(isRateLimitReached('beta', 'site', 3)).toBe(false);
+        it('returns false when unique site count is below the max (3)', () => {
+            expect(isRateLimitReached('unique', 'site', 3)).toBe(false);
         });
 
-        it('returns false for non-beta roles regardless of count', () => {
+        it('returns false for non-unique roles regardless of count', () => {
             expect(isRateLimitReached('owner', 'site', 100)).toBe(false);
         });
     });
 
     describe('getRateLimit', () => {
-        it('returns limit object for beta site', () => {
-            const limit = getRateLimit('beta', 'site');
+        it('returns limit object for unique site', () => {
+            const limit = getRateLimit('unique', 'site');
             expect(limit).not.toBeNull();
             expect(limit).toHaveProperty('max', 4);
             expect(limit).toHaveProperty('info');
         });
 
-        it('returns null for non-beta roles', () => {
+        it('returns null for non-unique roles', () => {
             expect(getRateLimit('owner', 'site')).toBeNull();
         });
     });
 
     describe('constants', () => {
         it('ROLES contains exactly the expected roles', () => {
-            expect(ROLES).toEqual(['super_admin', 'owner', 'editor', 'viewer', 'beta']);
+            expect(ROLES).toEqual(['super_admin', 'owner', 'editor', 'viewer', 'unique']);
         });
 
         it('ENTITIES contains the expected entities', () => {

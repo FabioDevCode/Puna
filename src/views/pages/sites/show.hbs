@@ -10,7 +10,7 @@
 {{/slot}}
 
 {{#slot "buttons"}}
-    {{#roleIs roles='super_admin,owner,editor,beta'}}
+    {{#roleIs roles='super_admin,owner,editor,unique'}}
         {{#actionCan entity='site' action='read'}}
             <button id="btn_copy_token" class="btn btn-sm btn-outline btn-info" data-site-id="{{site.id}}">
                 <i class="fa-solid fa-clone"></i>
@@ -21,7 +21,7 @@
         {{/actionCan}}
     {{/roleIs}}
 
-    {{#roleIs roles='super_admin,owner,beta'}}
+    {{#roleIs roles='super_admin,owner,unique'}}
         {{#actionCan entity='site' action='update'}}
             {{> components/buttons/revoke-tokens id=site.id }}
         {{/actionCan}}

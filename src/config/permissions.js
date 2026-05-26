@@ -135,12 +135,12 @@ export const permissions = {
     },
 
     // ============================================================
-    // BETA - Testeur beta
+    // UNIQUE - Utilisateur unique
     // ============================================================
-    // Utilisateur en phase de test avec droits complets mais limités en volume
+    // Utilisateur unique avec droits complets mais limités en volume
     // Rate limiting: 4 sites max, 2 forms/site, 200 inbox/form
     // ============================================================
-    beta: {
+    unique: {
         user: {
             read: false,
             create: false,
@@ -167,11 +167,11 @@ export const permissions = {
 };
 
 /**
- * Limites de rate limiting pour le rôle beta
+ * Limites de rate limiting pour le rôle unique
  * @type {Object}
  */
 export const rateLimits = {
-    beta: {
+    unique: {
         site: { max: 4, info: '4 sites maximum' },
         form: { max: 2, info: '2 formulaires par site maximum' },
         inbox: { max: 200, info: '200 entrées par formulaire maximum' },
@@ -181,7 +181,7 @@ export const rateLimits = {
 /**
  * Vérifier si un rôle a une permission spécifique
  *
- * @param {string} role - Rôle de l'utilisateur (super_admin, owner, editor, viewer, beta)
+ * @param {string} role - Rôle de l'utilisateur (super_admin, owner, editor, viewer, unique)
  * @param {string} entity - Entité concernée (user, site, form, inbox)
  * @param {string} action - Action demandée (read, create, update, delete)
  * @returns {boolean} true si la permission est accordée, false sinon
@@ -255,7 +255,7 @@ export function getPermissions(role) {
 }
 
 /**
- * Vérifier si un utilisateur beta a atteint sa limite pour une entité
+ * Vérifier si un utilisateur unique a atteint sa limite pour une entité
  *
  * @param {string} role - Rôle de l'utilisateur
  * @param {string} entity - Entité concernée (site, form, inbox)
@@ -263,11 +263,11 @@ export function getPermissions(role) {
  * @returns {boolean} true si la limite est atteinte, false sinon
  *
  * @example
- * isRateLimitReached('beta', 'site', 4) // true (limite atteinte)
- * isRateLimitReached('beta', 'site', 3) // false (peut encore créer)
+ * isRateLimitReached('unique', 'site', 4) // true (limite atteinte)
+ * isRateLimitReached('unique', 'site', 3) // false (peut encore créer)
  */
 export function isRateLimitReached(role, entity, currentCount) {
-    if (role !== 'beta') {
+    if (role !== 'unique') {
         return false; // Pas de limite pour les autres rôles
     }
 
@@ -287,7 +287,7 @@ export function isRateLimitReached(role, entity, currentCount) {
  * @returns {Object|null} { max: number, info: string } ou null si pas de limite
  */
 export function getRateLimit(role, entity) {
-    if (role !== 'beta') {
+    if (role !== 'unique') {
         return null;
     }
 
@@ -299,7 +299,7 @@ export function getRateLimit(role, entity) {
  * Liste des rôles disponibles
  * @type {string[]}
  */
-export const ROLES = ['super_admin', 'owner', 'editor', 'viewer', 'beta'];
+export const ROLES = ['super_admin', 'owner', 'editor', 'viewer', 'unique'];
 
 /**
  * Liste des entités gérées par l'ACL

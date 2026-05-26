@@ -223,8 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'viewer':
                     roleBadge = '<span class="badge badge-outline badge_role badge_viewer badge-sm">Viewer</span>';
                     break;
-                case 'beta':
-                    roleBadge = '<span class="badge badge-outline badge_role badge_beta badge-sm">Beta</span>';
+                case 'unique':
+                    roleBadge = '<span class="badge badge-outline badge_role badge_unique badge-sm">Unique</span>';
                     break;
                 default:
                     roleBadge = '<span class="badge badge-outline badge_role badge-ghost badge-sm">N/A</span>';

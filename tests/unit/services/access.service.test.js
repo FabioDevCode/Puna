@@ -62,8 +62,8 @@ describe('access.service', () => {
             expect(result).toEqual({ fk_id_user: 'u1' });
         });
 
-        it('returns { fk_id_user: userId } for beta', async () => {
-            const result = await getSiteWhereCondition('u1', 'beta');
+        it('returns { fk_id_user: userId } for unique', async () => {
+            const result = await getSiteWhereCondition('u1', 'unique');
             expect(result).toEqual({ fk_id_user: 'u1' });
         });
 

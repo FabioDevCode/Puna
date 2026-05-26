@@ -80,7 +80,7 @@ export async function getUserById(userId, includePassword = false) {
  * @param {string} userData.email - Email
  * @param {string} userData.name - Nom
  * @param {string} userData.password - Mot de passe en clair
- * @param {string} userData.role - Rôle (super_admin, owner, beta, editor, viewer)
+ * @param {string} userData.role - Rôle (super_admin, owner, unique, editor, viewer)
  * @returns {Promise<Object>} - Utilisateur créé (sans mot de passe)
  */
 export async function createUser(userData) {

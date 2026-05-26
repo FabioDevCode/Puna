@@ -34,7 +34,7 @@ import { logger } from '../config/logger.js';
  *     const userRole = req.userRole; // ✅ Directement accessible
  *     const userId = req.userId;
  *
- *     if (userRole === 'beta') {
+ *     if (userRole === 'unique') {
  *         // Vérifier rate limiting...
  *     }
  * }

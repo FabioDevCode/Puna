@@ -9,7 +9,7 @@ import models from '../models/index.js';
 /**
  * Obtenir la condition WHERE pour filtrer les sites selon le rôle
  * @param {string} userId - ID de l'utilisateur
- * @param {string} userRole - Rôle de l'utilisateur (super_admin, owner, beta, editor, viewer)
+ * @param {string} userRole - Rôle de l'utilisateur (super_admin, owner, unique, editor, viewer)
  * @returns {Object|null} - Condition WHERE Sequelize ou null pour super_admin
  */
 export async function getSiteWhereCondition(userId, userRole) {
@@ -18,8 +18,8 @@ export async function getSiteWhereCondition(userId, userRole) {
         return null;
     }
 
-    // Owner et beta ont accès à leurs propres sites
-    if (userRole === 'owner' || userRole === 'beta') {
+    // Owner et unique ont accès à leurs propres sites
+    if (userRole === 'owner' || userRole === 'unique') {
         return { fk_id_user: userId };
     }
 
