@@ -70,6 +70,8 @@
         "stats_files": "Fichiers",
         "stats_forms": "Formulaires",
         "stats_logs": "Logs",
+        "stats_mcp_keys": "Clés MCP",
+        "stats_mcp_keys_desc": "Actives et valides",
         "stats_online": "En ligne",
         "stats_sites": "Sites",
         "stats_sites_forms": "Sites / Formulaires",

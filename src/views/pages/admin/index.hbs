@@ -58,7 +58,7 @@
 </div>
 
 <!-- Statistiques d'activité -->
-<div class="col-span-2 md:col-span-3 lg:col-span-6">
+<div class="col-span-2 md:col-span-3 {{#if showMcpStats}}lg:col-span-4{{else}}lg:col-span-6{{/if}}">
     <div class="stats shadow-xl w-full rounded-lg">
         <div class="stat">
             <div class="stat-figure text-success">
@@ -71,7 +71,22 @@
     </div>
 </div>
 
-<div class="col-span-2 md:col-span-3 lg:col-span-6">
+{{#if showMcpStats}}
+    <div class="col-span-2 md:col-span-3 lg:col-span-4">
+        <div class="stats shadow-xl w-full rounded-lg">
+            <div class="stat">
+                <div class="stat-figure text-violet-500">
+                    <i class="fa-solid fa-key text-3xl"></i>
+                </div>
+                <div class="stat-title">{{__ "admin.stats_mcp_keys"}}</div>
+                <div class="stat-value text-violet-500">{{activityStats.mcpKeys}}</div>
+                <div class="stat-desc">{{__ "admin.stats_mcp_keys_desc"}}</div>
+            </div>
+        </div>
+    </div>
+{{/if}}
+
+<div class="col-span-2 md:col-span-3 {{#if showMcpStats}}lg:col-span-4{{else}}lg:col-span-6{{/if}}">
     <div class="stats shadow-xl w-full rounded-lg">
         <div class="stat">
             <div class="stat-figure text-error">

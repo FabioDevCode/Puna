@@ -18,11 +18,14 @@ export async function createMcpKey(userId, { name, expires_at }) {
         throw Object.assign(new Error('Invalid name'), { status: 400 });
     }
 
+    let normalizedExpiry = null;
     if (expires_at !== undefined && expires_at !== null && expires_at !== '') {
         const expiryDate = new Date(expires_at);
+        expiryDate.setHours(23, 59, 59, 999);
         if (isNaN(expiryDate.getTime()) || expiryDate <= new Date()) {
             throw Object.assign(new Error('expires_at must be a future date'), { status: 400 });
         }
+        normalizedExpiry = expiryDate;
     }
 
     const token = crypto.randomBytes(32).toString('hex');
@@ -33,7 +36,7 @@ export async function createMcpKey(userId, { name, expires_at }) {
         name: name.trim(),
         key_hash,
         is_active: true,
-        expires_at: expires_at || null,
+        expires_at: normalizedExpiry,
         fk_id_user: userId,
     });
 

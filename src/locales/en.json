@@ -70,6 +70,8 @@
         "stats_files": "Files",
         "stats_forms": "Forms",
         "stats_logs": "Logs",
+        "stats_mcp_keys": "MCP Keys",
+        "stats_mcp_keys_desc": "Active and valid",
         "stats_online": "Online",
         "stats_sites": "Sites",
         "stats_sites_forms": "Sites / Forms",

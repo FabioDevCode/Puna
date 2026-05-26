@@ -91,6 +91,15 @@ export const admin = async (req, res) => {
 
             activityStats.todaySites = todaySites;
             activityStats.todayForms = todayForms;
+
+            if (process.env.MCP_ENABLED === 'true') {
+                activityStats.mcpKeys = await models.Mcp_keys.count({
+                    where: {
+                        is_active: true,
+                        [models.Op.or]: [{ expires_at: null }, { expires_at: { [models.Op.gt]: new Date() } }],
+                    },
+                });
+            }
         } else if (userRole === 'owner') {
             // Owner voit uniquement ses données
 
@@ -163,6 +172,7 @@ export const admin = async (req, res) => {
             layout: 'admin',
             stats,
             activityStats,
+            showMcpStats: process.env.MCP_ENABLED === 'true' && userRole === 'super_admin',
         });
     } catch (err) {
         errorLogger.error({ err, userId: req.session?.user?.id }, 'admin error');
