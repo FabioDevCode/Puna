@@ -5,6 +5,9 @@
         </div>
         <h1 class="font-inter font-bold">
             Puna
+            <sup class="text-neutral/50 italic text-xs font-medium">
+                1.0.0
+            </sup>
         </h1>
     </a>
 
@@ -15,7 +18,7 @@
             </div>
             <ul class="menu p-2 pb-0">
                 <li>
-                    <a href="/dashboard" class="rounded-lg flex items-center gap-2 px-3 py-2 hover:bg-neutral hover:text-base-100">
+                    <a href="/dashboard" class="rounded-md flex items-center gap-2 px-3 py-2 hover:bg-neutral hover:text-base-100">
                         <i class="fa-solid fa-display"></i>
                         {{__ "menu.app"}}
                     </a>
@@ -29,22 +32,22 @@
         <div class="px-4 py-2 pb-0 text-xs font-bold text-neutral-content uppercase tracking-wider">
             {{__ "menu.administration"}}
         </div>
-        <ul class="menu p-2 gap-[1px] rounded-lg">
+        <ul class="menu p-2">
             <li>
-                <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
+                <a href="/admin" class="hover:bg-neutral hover:text-base-100 rounded-md flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-chart-bar"></i>
                     {{__ "admin.overview"}}
                 </a>
             </li>
             <li>
-                <a href="/admin/users" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
+                <a href="/admin/users" class="hover:bg-neutral hover:text-base-100 rounded-md flex items-center gap-2 px-3 py-2">
                     <i class="fa-solid fa-users-line"></i>
                     {{__ "admin.users"}}
                 </a>
             </li>
             {{#roleIs roles='super_admin'}}
                 <li>
-                    <a href="/admin/logs" class="hover:bg-neutral hover:text-base-100 rounded-lg flex items-center gap-2 px-3 py-2">
+                    <a href="/admin/logs" class="hover:bg-neutral hover:text-base-100 rounded-md flex items-center gap-2 px-3 py-2">
                         <i class="fa-solid fa-list"></i>
                         {{__ "admin.logs"}}
                     </a>
@@ -55,24 +58,26 @@
 
     <!-- Bas du menu -->
     <div class="mt-auto text-sm text-neutral">
-        <ul class="menu p-2 gap-[1px]">
+        <ul class="menu p-2">
             <li>
-                <a href="/profile" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100 gap-2 px-3 py-2">
+                <a href="/profile" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100 gap-2 px-3 py-2 rounded-md">
                     <i class="fa-regular fa-user"></i>
-                    {{__ "menu.my_account"}}
+                    <p class="flex flex-col ml-1">
+                        <span class="mt-[-4px]">
+                            {{user.login}}
+                        </span>
+                        <span class="text-[0.5rem] leading-[0.5rem]">
+                            {{__ "menu.my_account"}}
+                        </span>
+                    </p>
                 </a>
             </li>
-
             <li>
-                <a href="/dp-logout" class="hover:bg-neutral hover:border-neutral text-neutral hover:text-base-100 gap-2 px-3 py-2">
+                <a href="/dp-logout" class="hover:bg-red-700 hover:border-red-700 text-red-700 hover:text-base-100 gap-2 px-3 py-2 rounded-md">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     {{__ "menu.logout"}}
                 </a>
             </li>
         </ul>
-
-        <p class="flex text-neutral/50 italic text-xs pl-5 select-none">
-            1.0.0
-        </p>
     </div>
 </aside>

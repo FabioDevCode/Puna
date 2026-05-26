@@ -22,7 +22,7 @@
 
 <!-- Card: Liste des utilisateurs -->
 <div class="h-full col-span-2 md:col-span-6 lg:col-span-12">
-    <div class="card h-full bg-base-100 shadow-xl rounded-xl">
+    <div class="card h-full bg-base-100 shadow-xl rounded-lg">
         <div id="userContainer" class="card-body h-full p-4 overflow-hidden">
             <!-- Actions de la table -->
             <div id="tableActions">
@@ -108,8 +108,7 @@
             </div>
 
             <!-- Message de chargement -->
-            <div id="loading_users"
-            class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4">
+            <div id="loading_users" class="flex flex-col rounded-lg border-dashed border border-neutral-content items-center justify-center py-12 gap-4">
                 <i class="fa-solid fa-spinner fa-spin text-5xl text-neutral-content"></i>
                 <p class="text-sm text-neutral text-center select-none">
                     {{__ "admin.users_loading"}}
@@ -117,8 +116,7 @@
             </div>
 
             <!-- Message quand aucun utilisateur -->
-            <div id="no_users"
-            class="flex flex-col rounded-xl border-dashed border border-neutral-content items-center justify-center py-12 gap-4 none">
+            <div id="no_users" class="flex flex-col rounded-lg border-dashed border border-neutral-content items-center justify-center py-12 gap-4 none">
                 <i class="fa-solid fa-users text-5xl text-neutral-content"></i>
                 <p class="text-sm text-neutral text-center select-none">
                     {{__ "admin.users_empty"}}
