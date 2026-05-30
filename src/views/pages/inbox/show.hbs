@@ -4,7 +4,7 @@
             <i class="fa-solid fa-arrow-left"></i>
         </a>
         <h3 class="font-inter truncate ellipsis-truncate title-max-w">
-            #{{inbox.id}}
+            {{inbox.id}}
         </h3>
     </div>
 {{/slot}}
@@ -21,7 +21,7 @@
 {{/slot}}
 
 <div class="flex flex-col gap-4 col-span-2 md:col-span-6 lg:col-span-12">
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card bg-base-100 shadow-md rounded-lg border border-base-300">
         <div class="card-body p-4 overflow-hidden">
             <h2 class="card-title select-none mb-1">{{__ "inbox.general_info"}}</h2>
             <div id="{{inbox.id}}" class="flex flex-wrap items-center gap-4">
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card bg-base-100 shadow-md rounded-lg border border-base-300">
         <div class="card-body p-4 overflow-hidden">
             <h2 class="card-title select-none mb-1">{{__ "inbox.form_data"}}</h2>
             {{#if contentEntries}}
@@ -74,7 +74,7 @@
     </div>
 
     {{#if fileEntries}}
-        <div class="card bg-base-100 shadow-xl select-none">
+        <div class="card bg-base-100 shadow-md rounded-lg select-none border border-base-300">
             <div class="card-body p-4 overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
                     <h2 class="card-title select-none mb-1">
@@ -84,10 +84,10 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {{#each fileEntries}}
-                        <div class="download-card relative flex items-center gap-3 p-4 rounded-lg border border-neutral-content bg-neutral-content/30 hover:shadow-md transition-all duration-200 group">
+                        <div class="download-card relative flex items-center gap-3 p-4 rounded-xl bg-base-200/80 transition-all duration-200 group">
                             <div class="flex-shrink-0">
-                                <div class="w-12 h-12 rounded-lg bg-[{{this.bg_color}}] flex items-center justify-center">
-                                    <i class="{{this.icon}} text-3xl text-{{this.color}}"></i>
+                                <div class="w-16 h-16 rounded-lg bg-[{{this.bg_color}}] flex items-center justify-center">
+                                    <i class="{{this.icon}} text-4xl text-{{this.color}}"></i>
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">

@@ -85,11 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Apply active classes to bestMatch anchor
         if (bestMatch) {
-            bestMatch.classList.add('bg-secondary-content');
+            bestMatch.classList.add('bg-neutral');
+            bestMatch.classList.add('hover:bg-neutral');
+            bestMatch.classList.remove('hover:bg-secondary-content/50');
         }
 
         if (isProfile) {
-            profile_anchor.classList.add('bg-secondary-content');
+            profile_anchor.classList.add('bg-neutral');
+            profile_anchor.classList.add('hover:bg-neutral');
+            profile_anchor.classList.remove('hover:bg-secondary-content/50');
         }
     } catch (_err) {
         // silent fail

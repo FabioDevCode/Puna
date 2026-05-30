@@ -86,7 +86,7 @@ h2 {
 }
 
 h3 {
-    font-size: 1.6rem !important;
+    font-size: 1.2rem !important;
     font-weight: 800 !important;
 }
 
@@ -508,7 +508,7 @@ h3.font-inter {
 
 #tableTopContainer,
 #statTopTable {
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 #modal_filter_keys input {
@@ -524,7 +524,6 @@ h3.font-inter {
 .disabled {
     pointer-events: none !important;
     cursor: not-allowed !important;
-    /* opacity: 0.7 !important; */
 }
 
 .none {
