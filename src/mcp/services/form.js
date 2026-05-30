@@ -51,6 +51,6 @@ export async function getMcpFormDetails(formId) {
 
     const has_files = file_keys !== null && file_keys.length > 0;
 
-    const { columns: _rawColumns, template: _rawTemplate, file_keys: _rawFileKeys, ...rest } = formData;
+    const { columns: _rawColumns, template: _rawTemplate, file_keys: _rawFileKeys, code: _code, ...rest } = formData;
     return { ...rest, columns, columns_labels, file_keys, total_submissions, has_files };
 }

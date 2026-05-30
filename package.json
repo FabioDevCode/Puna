@@ -18,6 +18,7 @@
 		"format:check": "prettier --check \"**/*.{js,json}\"",
 		"format:hbs": "node scripts/format-hbs.js \"src/views/**/*.hbs\"",
 		"test": "vitest run",
+		"test:mcp": "vitest run tests/unit/mcp",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"test:coverage:badges": "vitest run --coverage && istanbul-badges-readme",

@@ -28,26 +28,32 @@ export async function getMcpStatsSubmission(userId, days = 7) {
     return { labels, data: labels.map((l) => countMap[l] || 0) };
 }
 
-export async function getMcpStatsTopSite(userId) {
+export async function getMcpStatsTopSite(userId, days = 7) {
+    const end = dayjs().endOf('day').toDate();
+    const start = dayjs()
+        .startOf('day')
+        .subtract(days - 1, 'day')
+        .toDate();
+
     const sql = `
         SELECT s.id AS site_id, s.domain AS site_domain, COUNT(i.id) AS cnt
         FROM site s
         LEFT JOIN form f ON f.fk_id_site = s.id
-        LEFT JOIN inbox i ON i.fk_id_form = f.id
+        LEFT JOIN inbox i ON i.fk_id_form = f.id AND i.createdAt BETWEEN :start AND :end
         WHERE s.fk_id_user = :userId
         GROUP BY s.id, s.domain
         ORDER BY cnt DESC
     `;
 
     const rows = await models.sequelize.query(sql, {
-        replacements: { userId },
+        replacements: { userId, start, end },
         type: models.Sequelize.QueryTypes.SELECT,
     });
 
     return (rows || []).map((r) => ({ site_id: r.site_id, domain: r.site_domain, count: Number(r.cnt) || 0 }));
 }
 
-export async function getMcpStatsTopForm(userId, days = 7) {
+export async function getMcpStatsTopForm(userId, days = 7, limit = 5) {
     const end = dayjs().endOf('day');
     const start = dayjs()
         .startOf('day')
@@ -62,11 +68,11 @@ export async function getMcpStatsTopForm(userId, days = 7) {
           AND i.createdAt BETWEEN :start AND :end
         GROUP BY i.fk_id_form, f.name, s.domain
         ORDER BY cnt DESC
-        LIMIT 5
+        LIMIT :limit
     `;
 
     const rows = await models.sequelize.query(sql, {
-        replacements: { userId, start: start.toDate(), end: end.toDate() },
+        replacements: { userId, start: start.toDate(), end: end.toDate(), limit },
         type: models.Sequelize.QueryTypes.SELECT,
     });
 
@@ -117,5 +123,46 @@ export async function getMcpStatsHeatmap(userId, userRole, days = 7) {
     return {
         hours,
         series: daysOfWeek.map((d, i) => ({ name: d, data: hours.map((h, j) => ({ x: h, y: matrix[i][j] })) })).reverse(),
+    };
+}
+
+export async function getMcpStatsSummary(userId, userRole) {
+    const isAdmin = userRole === 'super_admin';
+    const userFilter = isAdmin ? '' : 'AND s.fk_id_user = :userId';
+
+    const todayStart = dayjs().startOf('day').toDate();
+    const todayEnd = dayjs().endOf('day').toDate();
+    const weekStart = dayjs().startOf('day').subtract(6, 'day').toDate();
+    const weekEnd = dayjs().endOf('day').toDate();
+
+    const [sitesRow, formsRow, totalRow, todayRow, weekRow] = await Promise.all([
+        models.sequelize.query(`SELECT COUNT(s.id) AS cnt FROM site s WHERE 1=1 ${isAdmin ? '' : 'AND s.fk_id_user = :userId'}`, {
+            replacements: { userId },
+            type: models.Sequelize.QueryTypes.SELECT,
+        }),
+        models.sequelize.query(`SELECT COUNT(f.id) AS cnt FROM form f JOIN site s ON s.id = f.fk_id_site WHERE 1=1 ${userFilter}`, {
+            replacements: { userId },
+            type: models.Sequelize.QueryTypes.SELECT,
+        }),
+        models.sequelize.query(`SELECT COUNT(i.id) AS cnt FROM inbox i JOIN form f ON f.id = i.fk_id_form JOIN site s ON s.id = f.fk_id_site WHERE 1=1 ${userFilter}`, {
+            replacements: { userId },
+            type: models.Sequelize.QueryTypes.SELECT,
+        }),
+        models.sequelize.query(
+            `SELECT COUNT(i.id) AS cnt FROM inbox i JOIN form f ON f.id = i.fk_id_form JOIN site s ON s.id = f.fk_id_site WHERE i.createdAt BETWEEN :start AND :end ${userFilter}`,
+            { replacements: { userId, start: todayStart, end: todayEnd }, type: models.Sequelize.QueryTypes.SELECT }
+        ),
+        models.sequelize.query(
+            `SELECT COUNT(i.id) AS cnt FROM inbox i JOIN form f ON f.id = i.fk_id_form JOIN site s ON s.id = f.fk_id_site WHERE i.createdAt BETWEEN :start AND :end ${userFilter}`,
+            { replacements: { userId, start: weekStart, end: weekEnd }, type: models.Sequelize.QueryTypes.SELECT }
+        ),
+    ]);
+
+    return {
+        sites: Number(sitesRow[0]?.cnt) || 0,
+        forms: Number(formsRow[0]?.cnt) || 0,
+        total_submissions: Number(totalRow[0]?.cnt) || 0,
+        submissions_today: Number(todayRow[0]?.cnt) || 0,
+        submissions_last_7_days: Number(weekRow[0]?.cnt) || 0,
     };
 }

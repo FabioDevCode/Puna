@@ -1,11 +1,8 @@
 import { z } from 'zod';
 import { hasScope, mcpResponse } from '../helpers/index.js';
-import { getMcpStatsSubmission, getMcpStatsHeatmap, getMcpStatsTopSite, getMcpStatsTopForm } from '../services/stats.js';
+import { getMcpStatsSubmission, getMcpStatsHeatmap, getMcpStatsTopSite, getMcpStatsTopForm, getMcpStatsSummary } from '../services/stats.js';
 
-const daysSchema = z
-    .union([z.literal(7), z.literal(30)])
-    .optional()
-    .describe('Période en jours (7 ou 30, défaut : 7)');
+const daysSchema = z.number().int().min(1).max(180).optional().describe('Période en jours (min : 1, max : 180, défaut : 7)');
 
 const registerStatsTools = (server, mcpUser) => {
     const { scope, userId, userRole } = mcpUser;
@@ -21,13 +18,26 @@ const registerStatsTools = (server, mcpUser) => {
             return mcpResponse(result);
         });
 
-        server.tool('get_stats_top_site', 'Récupère les sites avec le plus de soumissions', {}, async () => {
-            const result = await getMcpStatsTopSite(userId);
+        server.tool('get_stats_top_site', 'Récupère les sites avec le plus de soumissions sur une période', { days: daysSchema }, async ({ days = 7 }) => {
+            const result = await getMcpStatsTopSite(userId, days);
             return mcpResponse(result);
         });
 
-        server.tool('get_stats_top_form', 'Récupère les formulaires avec le plus de soumissions sur une période', { days: daysSchema }, async ({ days = 7 }) => {
-            const result = await getMcpStatsTopForm(userId, days);
+        server.tool(
+            'get_stats_top_form',
+            'Récupère les formulaires avec le plus de soumissions sur une période',
+            {
+                days: daysSchema,
+                limit: z.number().int().min(1).max(20).optional().describe('Nombre de résultats (défaut : 5, max : 20)'),
+            },
+            async ({ days = 7, limit = 5 }) => {
+                const result = await getMcpStatsTopForm(userId, days, limit);
+                return mcpResponse(result);
+            }
+        );
+
+        server.tool('get_stats_summary', 'Récupère un résumé global : nombre de sites, formulaires, soumissions totales, du jour et des 7 derniers jours', {}, async () => {
+            const result = await getMcpStatsSummary(userId, userRole);
             return mcpResponse(result);
         });
     }

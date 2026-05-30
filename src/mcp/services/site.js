@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import models from '../../models/index.js';
 import { getSiteWhereCondition } from '../../services/access.service.js';
 
@@ -27,8 +28,20 @@ export async function getMcpSiteDetails(siteId) {
 
     if (!site) return null;
 
+    const formIds = forms.map((f) => f.id);
+    let countMap = {};
+    if (formIds.length > 0) {
+        const counts = await models.Inbox.findAll({
+            where: { fk_id_form: { [Op.in]: formIds } },
+            attributes: ['fk_id_form', [models.sequelize.fn('COUNT', models.sequelize.col('id')), 'total']],
+            group: ['fk_id_form'],
+            raw: true,
+        });
+        countMap = Object.fromEntries(counts.map((c) => [c.fk_id_form, Number(c.total) || 0]));
+    }
+
     return {
         site: site.toJSON(),
-        forms: forms.map((f) => f.toJSON()),
+        forms: forms.map((f) => ({ ...f.toJSON(), total_submissions: countMap[f.id] ?? 0 })),
     };
 }
