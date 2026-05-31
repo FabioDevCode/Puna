@@ -23,6 +23,7 @@ import { setSessionStore } from './config/sessionStore.js';
 import { initializePassport } from './helpers/auth.helpers.js';
 import hbs_fn from './helpers/hbs.helpers.js';
 import { initAdminUser } from './helpers/init_admin_user.helpers.js';
+import { mcpLogger } from './mcp/logger.js';
 import { mcpRouter } from './mcp/router.js';
 import { csrfProtection, csrfTokenInjector } from './middlewares/csrf.js';
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
@@ -82,9 +83,10 @@ app.use((req, res, next) => {
     }
 
     // Utiliser le bon logger selon le type de requête
+    const isMcp = req.url.startsWith('/mcp');
     const isApi = req.url.startsWith('/api/') || req.url.startsWith('/send/');
     const httpLogger = pinoHttp({
-        logger: isApi ? apiLogger : logger,
+        logger: isMcp ? mcpLogger : isApi ? apiLogger : logger,
         autoLogging: true,
         customLogLevel: (req, res, _err) => {
             if (res.statusCode >= 500) {

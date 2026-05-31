@@ -1,5 +1,6 @@
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { Router } from 'express';
+import { mcpLogger } from './logger.js';
 import { mcpAuth } from './middlewares/auth.js';
 import { createMcpServer } from './index.js';
 
@@ -12,6 +13,7 @@ mcpRouter.get('/', (req, res) => {
 
 // Mode HTTP stateless
 mcpRouter.post('/', mcpAuth, async (req, res) => {
+    const { userId, scope, userRole } = req.mcpUser;
     const server = createMcpServer(req.mcpUser);
 
     const transport = new StreamableHTTPServerTransport({
@@ -20,6 +22,17 @@ mcpRouter.post('/', mcpAuth, async (req, res) => {
 
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
+
+    mcpLogger.info(
+        {
+            userId,
+            scope,
+            userRole,
+            method: req.body?.method,
+            tool: req.body?.params?.name,
+        },
+        'MCP request'
+    );
 });
 
 export { mcpRouter };
