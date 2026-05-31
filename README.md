@@ -28,6 +28,7 @@
 - **Authentification** - Login local, sessions persistantes, 2FA TOTP optionnel et réinitialisation par email.
 - **RBAC** - 5 rôles (`super_admin`, `owner`, `unique`, `editor`, `viewer`) avec une matrice de permissions granulaire.
 - **Admin & monitoring** - Gestion des utilisateurs, visualiseur de logs, tableau de bord et antivirus ClamAV optionnel sur chaque upload.
+- **Serveur MCP** - Exposez vos données à des agents IA (Claude, ChatGPT, Cursor…) via un serveur Model Context Protocol intégré (`POST /mcp`). Chaque utilisateur gère ses propres clés d'accès. Les outils disponibles couvrent sites, formulaires, soumissions (liste, détail, recherche full-text, dernières entrées) et statistiques. Activable via la variable d'environnement `MCP_ENABLED`.
 
 ---
 
@@ -85,10 +86,10 @@ Pour le détail complet, voir [SECURITY.md](SECURITY.md).
 ## Tests
 
 <p>
-  <img src="https://img.shields.io/badge/statements-84.68%25-blue.svg?style=flat" alt="Statements" />
-  <img src="https://img.shields.io/badge/branches-76.79%25-red.svg?style=flat" alt="Branches" />
-  <img src="https://img.shields.io/badge/functions-87.63%25-blue.svg?style=flat" alt="Functions" />
-  <img src="https://img.shields.io/badge/lines-84.55%25-blue.svg?style=flat" alt="Lines" />
+  <img src="https://img.shields.io/badge/statements-84.83%25-blue.svg?style=flat" alt="Statements" />
+  <img src="https://img.shields.io/badge/branches-76.14%25-red.svg?style=flat" alt="Branches" />
+  <img src="https://img.shields.io/badge/functions-87.38%25-blue.svg?style=flat" alt="Functions" />
+  <img src="https://img.shields.io/badge/lines-84.61%25-blue.svg?style=flat" alt="Lines" />
 </p>
 
 | Outil      | Type               | Configuration          |
