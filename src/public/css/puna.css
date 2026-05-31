@@ -9,13 +9,6 @@
 :root {
     --navbar-height: 4rem;
     --table-head-bg: #f3f8fc;
-    /* Scrollbar variables */
-    /*
-    --scrollbar-width: 30px;
-    --scrollbar-track: rgba(15,23,42,0.04);
-    --scrollbar-thumb: rgba(2,6,23,0.18);
-    --scrollbar-thumb-hover: rgba(2,6,23,0.28);
-    */
 }
 
 [data-theme='fantasy'] {
@@ -82,16 +75,31 @@ h6 {
 }
 
 h2 {
-    font-size: 1.8rem !important;
+    font-size: 1.6rem !important;
 }
 
 h3 {
-    font-size: 1.2rem !important;
+    font-size: 1.6rem !important;
     font-weight: 800 !important;
 }
 
 h3.font-inter {
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
     min-width: max-content;
+}
+
+#login_body {
+    background-image: url('/img/background.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    h1 {
+        font-size: 1.4em !important;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700 !important;
+    }
 }
 
 .btn-neutral {
