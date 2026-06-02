@@ -6,9 +6,9 @@
 # Requires only bash 3.2+ and openssl — no other dependencies.
 #
 # Usage:
-#   bash scripts/setup.sh          (interactive)
+#   bash setup.sh || sh setup.sh                    (interactive)
 #   curl -fsSL <url>/setup.sh | bash
-#   printf "fr\nn\n...\n" | bash scripts/setup.sh   (CI / pipe mode)
+#   printf "fr\nn\n...\n" | bash setup.sh   (CI / pipe mode)
 # ─────────────────────────────────────────────────────────────────────────────
 set -uo pipefail
 
@@ -17,7 +17,7 @@ set -uo pipefail
 # When piped via curl | bash, $BASH_SOURCE[0] is empty — fall back to PWD
 if [ -n "${BASH_SOURCE[0]:-}" ] && [ "${BASH_SOURCE[0]}" != "bash" ]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+    PROJECT_ROOT="$(cd "$SCRIPT_DIR/." && pwd)"
 else
     PROJECT_ROOT="$(pwd)"
 fi
