@@ -18,8 +18,8 @@ const getFileTypeInfo = (filename) => {
     // Images - Jaune/Or
     if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'bmp', 'ico'].includes(ext)) {
         return {
-            color: 'white',
-            bg_color: '#b0a010',
+            color: '#6B46C1',
+            bg_color: '#e8e0fb',
             icon: 'fa-solid fa-file-image',
             label: ext.toUpperCase(),
         };
@@ -28,8 +28,8 @@ const getFileTypeInfo = (filename) => {
     // Excel - Vert foncé
     if (['xls', 'xlsx'].includes(ext)) {
         return {
-            color: 'white',
-            bg_color: '#186E3F',
+            color: '#186E3F',
+            bg_color: '#cef8e2',
             icon: 'fa-solid fa-file-excel',
             label: ext.toUpperCase(),
         };
@@ -38,8 +38,8 @@ const getFileTypeInfo = (filename) => {
     // CSV - Vert
     if (['csv'].includes(ext)) {
         return {
-            color: 'white',
-            bg_color: '#077D3E',
+            color: '#077D3E',
+            bg_color: '#d3f8e6',
             icon: 'fa-solid fa-file-csv',
             label: ext.toUpperCase(),
         };
@@ -48,8 +48,8 @@ const getFileTypeInfo = (filename) => {
     // PDF - Rouge
     if (ext === 'pdf') {
         return {
-            color: 'white',
-            bg_color: '#AA0101',
+            color: '#AA0101',
+            bg_color: '#f8dfdf',
             icon: 'fa-solid fa-file-pdf',
             label: 'PDF',
         };
@@ -58,8 +58,8 @@ const getFileTypeInfo = (filename) => {
     // Word - Bleu foncé
     if (['doc', 'docx'].includes(ext)) {
         return {
-            color: 'white',
-            bg_color: '#2A5893',
+            color: '#2A5893',
+            bg_color: '#dfebf9',
             icon: 'fa-solid fa-file-word',
             label: ext.toUpperCase(),
         };
@@ -68,8 +68,8 @@ const getFileTypeInfo = (filename) => {
     // ODT - Bleu clair
     if (['odt'].includes(ext)) {
         return {
-            color: 'white',
-            bg_color: '#4A90E2',
+            color: '#4A90E2',
+            bg_color: '#e0edfb',
             icon: 'fa-solid fa-file-lines',
             label: ext.toUpperCase(),
         };
@@ -78,18 +78,18 @@ const getFileTypeInfo = (filename) => {
     // TXT - Gris foncé
     if (['txt'].includes(ext)) {
         return {
-            color: 'white',
-            bg_color: '#444444',
+            color: '#444444',
+            bg_color: '#dcdbdb',
             icon: 'fa-solid fa-file-lines',
             label: ext.toUpperCase(),
         };
     }
 
-    // ZIP/Archives - Violet
+    // ZIP/Archives - Jaune/OR
     if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
         return {
-            color: 'white',
-            bg_color: '#6B46C1',
+            color: '#b0a010',
+            bg_color: '#f6f3d7',
             icon: 'fa-solid fa-file-zipper',
             label: ext.toUpperCase(),
         };

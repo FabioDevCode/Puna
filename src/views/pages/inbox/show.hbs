@@ -84,10 +84,10 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {{#each fileEntries}}
-                        <div class="download-card relative flex items-center gap-3 p-4 rounded-xl bg-base-200/80 transition-all duration-200 group">
+                        <div class="download-card relative flex items-center gap-3 p-4 rounded-xl border border-[{{this.bg_color}}] transition-all duration-200 group">
                             <div class="flex-shrink-0">
                                 <div class="w-16 h-16 rounded-lg bg-[{{this.bg_color}}] flex items-center justify-center">
-                                    <i class="{{this.icon}} text-4xl text-{{this.color}}"></i>
+                                    <i class="{{this.icon}} text-4xl text-[{{this.color}}]"></i>
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -105,7 +105,7 @@
                             </div>
 
                             <!-- Download button (visible on hover) -->
-                            <a href="/inbox/{{../inbox.id}}/download/{{this.filename}}" data-download-link="" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn btn-xs btn-neutral gap-1 pointer-events-auto z-10 shadow-md">
+                            <a href="/inbox/{{../inbox.id}}/download/{{this.filename}}" data-download-link="" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 btn btn-xs bg-[{{this.color}}] border-[{{this.color}}] hover:border-[{{this.color}}] text-[{{this.bg_color}}] hover:bg-[{{this.color}}] hover:text-[{{this.bg_color}}] gap-1 pointer-events-auto z-10 shadow-md">
                                 <i class="fa-solid fa-download text-xs"></i>
                                 <span>
                                     {{__ "inbox.download"}}

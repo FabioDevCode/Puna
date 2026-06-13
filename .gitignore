@@ -21,6 +21,10 @@ docker-compose.yaml
 compose.yml
 compose.yaml
 SKILLS_PLAN.md
+DOC_GUIDE.md
+GITHUB_SETUP.md
+LANDING_DEV.md
+LANDING.md
 
 # Logs
 ./logs/
