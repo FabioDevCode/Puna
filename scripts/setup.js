@@ -34,7 +34,7 @@ const messages = {
         defaultsInfo: '\x1b[32m✔ Valeurs par défaut appliquées. Modifiez le .env pour personnaliser.\x1b[0m',
         nodeEnvInfo: '  \x1b[30mNODE_ENV=development\x1b[0m',
         appUrlInfo: 'APP_URL',
-        dialectInfo: '  \x1b[30mDB_DIALECT=mariadb (seul dialecte supporté actuellement)\x1b[0m',
+        dialectInfo: '  \x1b[30mDB_DIALECT=mariadb\x1b[0m',
         clamavDisableHint: '  \x1b[36m→ Pour désactiver plus tard : CLAMAV_ENABLED=false dans .env\x1b[0m',
         totpDisableHint: '  \x1b[36m→ Pour désactiver plus tard : TOTP_ENABLED=false dans .env\x1b[0m',
         helmetInfo: '  HELMET_STRICT_TRANSPORT=false',
@@ -71,7 +71,7 @@ const messages = {
         defaultsInfo: '\x1b[32m✔ Using defaults. Edit .env to customize.\x1b[0m',
         nodeEnvInfo: '  \x1b[30mNODE_ENV=development\x1b[0m',
         appUrlInfo: 'APP_URL',
-        dialectInfo: '  \x1b[30mDB_DIALECT=mariadb (only supported dialect for now)\x1b[0m',
+        dialectInfo: '  \x1b[30mDB_DIALECT=mariadb\x1b[0m',
         clamavDisableHint: '  \x1b[36m→ To disable later: set CLAMAV_ENABLED=false in .env\x1b[0m',
         totpDisableHint: '  \x1b[36m→ To disable later: set TOTP_ENABLED=false in .env\x1b[0m',
         helmetInfo: '  HELMET_STRICT_TRANSPORT=false',
@@ -276,7 +276,7 @@ async function main() {
     `);
     console.log('');
     console.log('╔═══════════════════════════════════════╗');
-    console.log('║     \x1b[34mPuna - Dev Environment Setup\x1b[0m      ║');
+    console.log('║       \x1b[34mPuna - Environment Setup\x1b[0m        ║');
     console.log('╚═══════════════════════════════════════╝');
     console.log('');
 
@@ -305,9 +305,9 @@ async function main() {
 
     // — Section 1: Application ———————————————————————————————————————————————
 
+    // (development, production, test)
     sectionHeader(1, TOTAL_SECTIONS, 'Application');
-    env.NODE_ENV = 'development';
-    console.log(t('nodeEnvInfo'));
+    env.NODE_ENV = await prompt.ask('NODE_ENV (development/production/test)', 'development');
     env.PORT = await prompt.ask('PORT', '3022');
     env.APP_URL = await prompt.ask(t('appUrlInfo'), `http://localhost:${env.PORT}`);
 
@@ -442,6 +442,7 @@ async function main() {
     env.API_MAX_FILES = '10';
     env.API_MAX_FIELDS = '40';
     env.API_MAX_FIELD_SIZE = '10000';
+    env.ALLOWED_EXTENSIONS = '.png,.jpg,.jpeg,.webp,.pdf,.doc,.docx,.odt,.txt,.xls,.xlsx,.csv';
     console.log(t('defaultsInfo'));
     console.log(t('uploadInfo'));
 
@@ -454,8 +455,6 @@ async function main() {
 
     console.log(`\n${t('successCreated')}`);
     console.log(t('successStart'));
-    // console.log(t('successAdmin'));
-    // console.log(`${t('successPassword')}\n`);
 }
 
 // ─── .env file builder ──────────────────────────────────────────────────────
@@ -546,6 +545,7 @@ function buildEnvContent(env) {
     val('API_MAX_FILES');
     val('API_MAX_FIELDS');
     val('API_MAX_FIELD_SIZE');
+    val('ALLOWED_EXTENSIONS');
     ln();
 
     ln('# ClamAV');

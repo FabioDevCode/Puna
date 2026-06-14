@@ -427,7 +427,7 @@ main() {
 BANNER
     echo ""
     echo "╔═══════════════════════════════════════╗"
-    printf "║     ${BLUE}Puna - Production Env Setup${RESET}       ║\n"
+    printf "║       ${BLUE}Puna - Environment Setup${RESET}        ║\n"
     echo "╚═══════════════════════════════════════╝"
     echo ""
 
@@ -463,8 +463,7 @@ BANNER
     # ─────────────────────────────────────────────────────────────────────────
 
     section_header 1 $TOTAL_SECTIONS "Application"
-    E_NODE_ENV="production"
-    t nodeEnvInfo
+    E_NODE_ENV="$(ask "NODE_ENV (development/production/test)" "production")"
     E_PORT="$(ask "PORT" "3022")"
     E_APP_URL="$(ask "$(t appUrlInfo)" "http://localhost:${E_PORT}")"
 
