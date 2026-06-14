@@ -15,7 +15,7 @@ const getFileTypeInfo = (filename) => {
 
     const ext = filename.toLowerCase().split('.').pop();
 
-    // Images - Jaune/Or
+    // Images - Violet
     if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'bmp', 'ico'].includes(ext)) {
         return {
             color: '#6B46C1',
@@ -52,6 +52,36 @@ const getFileTypeInfo = (filename) => {
             bg_color: '#f8dfdf',
             icon: 'fa-solid fa-file-pdf',
             label: 'PDF',
+        };
+    }
+
+    // PowerPoint - Rouge
+    if (['pptx', 'ppt'].includes(ext)) {
+        return {
+            color: '#bf0b0b',
+            bg_color: '#fcd9d9',
+            icon: 'fa-solid fa-file-powerpoint',
+            label: ext.toUpperCase(),
+        };
+    }
+
+    // Audio - Turquoise/bleu-vert
+    if (['mp3', 'm4a', 'aac', 'wav', 'flac', 'ogg'].includes(ext)) {
+        return {
+            color: '#049c80',
+            bg_color: '#d5fbf8',
+            icon: 'fa-solid fa-file-audio',
+            label: ext.toUpperCase(),
+        };
+    }
+
+    // Video - Violet/bleu
+    if (['mp4', 'mkv', 'mov', 'avi', 'webm', 'wmv', 'mpeg', 'mpg'].includes(ext)) {
+        return {
+            color: '#34049c',
+            bg_color: '#e4d9fa',
+            icon: 'fa-solid fa-file-video',
+            label: ext.toUpperCase(),
         };
     }
 
@@ -97,8 +127,8 @@ const getFileTypeInfo = (filename) => {
 
     // Fichier par défaut - Gris
     return {
-        color: 'white',
-        bg_color: '#1F2937',
+        color: '#1F2937',
+        bg_color: '#c9d6e8',
         icon: 'fa-solid fa-file',
         label: ext.toUpperCase(),
     };

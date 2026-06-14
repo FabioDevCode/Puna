@@ -3,7 +3,7 @@ import path from 'path';
 import { fileTypeFromFile } from 'file-type';
 import { errorLogger } from '../../../config/logger.js';
 
-const ALLOWED = (process.env.ALLOWED_EXTENSIONS || '.png,.jpg,.jpeg,.webp,.pdf,.doc,.docx,.odt,.txt,.xls,.xlsx,.csv').split(',').map((s) => s.trim().toLowerCase());
+const ALLOWED = (process.env.ALLOWED_EXTENSIONS || '').split(',').map((s) => s.trim().toLowerCase());
 
 // Aliases for extensions that share the same format (file-type always returns the canonical form)
 const EXT_ALIASES = { '.jpeg': '.jpg' };
