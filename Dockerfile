@@ -11,7 +11,10 @@ COPY package.json package-lock.json ./
 
 # python3 / make / g++ sont requis par node-gyp pour compiler bcrypt
 # npm pkg delete scripts.prepare : évite l'erreur "husky: not found" (devDep absente en prod)
-RUN apk add --no-cache python3 make g++ \
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache python3 make g++ \
+    && rm -rf /var/cache/apk/* \
     && npm pkg delete scripts.prepare \
     && npm ci --omit=dev
 
@@ -20,6 +23,11 @@ RUN apk add --no-cache python3 make g++ \
 # STAGE 2 — runner : image finale légère
 # =============================================================================
 FROM node:24-alpine AS runner
+
+# Mettre à jour les packages système Alpine pour limiter les vulnérabilités
+RUN apk update \
+    && apk upgrade \
+    && rm -rf /var/cache/apk/*
 
 # Métadonnées
 LABEL org.opencontainers.image.title="Puna"
@@ -34,7 +42,10 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copier le code source
 COPY server.js ./
 COPY src/ ./src/
-COPY scripts/ ./scripts/
+COPY scripts/clean-logs.js ./scripts/
+COPY scripts/logs-stats.js ./scripts/
+COPY scripts/rotate-logs.js ./scripts/
+
 
 # Créer les répertoires persistants avec les bonnes permissions
 # Ces dossiers seront montés comme volumes Docker
