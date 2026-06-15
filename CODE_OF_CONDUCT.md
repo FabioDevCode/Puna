@@ -44,7 +44,7 @@ Ce Code de Conduite s'applique dans tous les espaces du projet, et s'applique é
 
 ## Application
 
-Les cas de comportement abusif, harcelant ou autrement inacceptable peuvent être signalés aux responsables de la communauté chargés de l'application à l'adresse suivante : **[à compléter — votre adresse email de contact]**
+Les cas de comportement abusif, harcelant ou autrement inacceptable peuvent être signalés aux responsables de la communauté chargés de l'application via l'onglet **Security** du dépôt GitHub → **"Report a vulnerability"**
 
 Toutes les plaintes seront examinées et feront l'objet d'une enquête rapide et équitable.
 
