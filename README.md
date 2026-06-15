@@ -9,7 +9,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/licence-AGPLv3-blue.svg?style=for-the-badge" alt="Licence AGPLv3" />
+  <img src="https://img.shields.io/badge/licence-AGPLv3-red.svg?style=flat" alt="Licence AGPLv3" />
+  <img src="https://img.shields.io/badge/docker-fabiodevcode/puna-blue.svg?style=flat" alt="docker fabiodevcode/puna" />
+  <img src="https://img.shields.io/badge/coverage-76.14%25-green.svg?style=flat" alt="Coverage 76.14%" />
 </p>
 
 ---
@@ -67,7 +69,8 @@ Une installation Docker et la référence complète de configuration sont dispon
   <img src="https://img.shields.io/badge/Node.JS-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js"/>
   <img src="https://img.shields.io/badge/Express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express" />
   <img src="https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white" alt="Sequelize" />
-  <img src="https://img.shields.io/badge/MariaDB-1F305F?style=for-the-badge&logo=mariadb&logoColor=white" alt="MariaDB" /><br>
+  <img src="https://img.shields.io/badge/MariaDB-1F305F?style=for-the-badge&logo=mariadb&logoColor=white" alt="MariaDB" />
+  <br>
   <img src="https://img.shields.io/badge/handlebars-F0772B?style=for-the-badge&logo=handlebarsdotjs&logoColor=483a2d" alt="Handlebars" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-030712?style=for-the-badge&logo=tailwindcss&logoColor=00BCFF" alt="TailwindCSS" />
   <img src="https://img.shields.io/badge/daisyUI-2A303C?style=for-the-badge&logo=daisyui&logoColor=FFD028" alt="daisyUI" />
@@ -84,13 +87,6 @@ Pour le détail complet, voir [SECURITY.md](SECURITY.md).
 ---
 
 ## Tests
-
-<p>
-  <img src="https://img.shields.io/badge/statements-84.83%25-blue.svg?style=flat" alt="Statements" />
-  <img src="https://img.shields.io/badge/branches-76.14%25-red.svg?style=flat" alt="Branches" />
-  <img src="https://img.shields.io/badge/functions-87.38%25-blue.svg?style=flat" alt="Functions" />
-  <img src="https://img.shields.io/badge/lines-84.61%25-blue.svg?style=flat" alt="Lines" />
-</p>
 
 | Outil      | Type               | Configuration          |
 | ---------- | ------------------ | ---------------------- |

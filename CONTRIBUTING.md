@@ -8,6 +8,7 @@ Avant tout, veuillez lire notre [Code de Conduite](CODE_OF_CONDUCT.md). Toute pa
 
 ## Table des matières
 
+- [Par où commencer ?](#par-où-commencer-)
 - [Prérequis](#prérequis)
 - [Installation pour le développement](#installation-pour-le-développement)
 - [Architecture du projet](#architecture-du-projet)
@@ -22,10 +23,25 @@ Avant tout, veuillez lire notre [Code de Conduite](CODE_OF_CONDUCT.md). Toute pa
 
 ---
 
+## Par où commencer ?
+
+Le projet est encore jeune et les issues taguées `good first issue` n'existent pas encore, elles apparaîtront naturellement au fil du temps.
+
+En attendant, voici ce que vous pouvez faire dès maintenant :
+
+- **Tester l'installation** sur votre environnement (natif ou Docker) et signaler tout ce qui coince
+- **Lire la documentation** et ouvrir une issue si quelque chose est peu clair ou manquant
+- **Signaler un bug** via le template d'issue prévu à cet effet
+- **Lire le code** et poser des questions - une bonne question peut devenir une amélioration de doc
+
+Si vous souhaitez contribuer du code sans savoir par où commencer, ouvrez une issue pour en discuter avant de vous lancer. C'est le meilleur moyen d'éviter un travail qui ne pourrait pas être mergé.
+
+---
+
 ## Prérequis
 
 - **Node.js** 24+
-- **MariaDB** 11+ - ou **Docker**
+- **MariaDB** 11+
 - **npm** 10+
 - **Git**
 
@@ -70,6 +86,7 @@ graph TB
     subgraph Client
         Browser[Navigateur Web]
         ExtApp[Application Externe]
+        AI[Agent IA]
     end
 
     subgraph Puna
@@ -85,6 +102,10 @@ graph TB
             ApiMiddlewares["Pipeline Upload<br/>+ Auth 3 couches"]
         end
 
+        subgraph MCP["Surface MCP"]
+            McpServer["Serveur MCP<br/>src/mcp/"]
+        end
+
         Services["Services<br/>Logique métier"]
         Models["Modèles Sequelize<br/>Déclaratifs JSON"]
     end
@@ -98,8 +119,10 @@ graph TB
 
     Browser -->|Session + CSRF| Web
     ExtApp -->|"X-KEY-PUNA + JWT"| API
+    AI -->|MCP Protocol| McpServer
     Web --> Services
     API --> Services
+    McpServer --> Services
     Services --> Models
     Models --> DB
     Services --> Storage
@@ -288,7 +311,10 @@ Les demandes sans contexte ou sans justification claire seront fermées.
 
 ### Review
 
-Les PRs nécessitent au moins une validation avant d'être mergées. La CI (lint + tests) doit être verte. Les demandes de modification doivent être adressées sous 30 jours, sans quoi la PR sera fermée.
+Les PRs nécessitent au moins une validation avant d'être mergées. La CI (lint + tests) doit être verte.
+
+En tant que mainteneur solo, je m'efforce de répondre aux PRs dans un délai de **7 jours** et de traiter les demandes de modification sous **30 jours**. Ces délais sont donnés à titre indicatif et peuvent être dépassés selon les disponibilités.
+Les PRs sans réponse au-delà de 30 jours seront fermées mais pourront être rouvertes sur demande.
 
 ---
 
@@ -369,7 +395,6 @@ vi.mock('../../../src/utils/crypto.js', () => ({
 | Commande                       | Description                                   |
 | ------------------------------ | --------------------------------------------- |
 | `npm run test:e2e:seed`        | Seed de la base de test (Playwright)          |
-| `npm run seed:demo`            | Seed de données de démonstration              |
 | `npm run test:coverage:badges` | Couverture + mise à jour des badges du README |
 
 ---
