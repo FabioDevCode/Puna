@@ -1,0 +1,93 @@
+services:
+    # ─────────────────────────────────────────
+    # Application - Puna
+    # ─────────────────────────────────────────
+    app:
+        # build:
+        #     context: .
+        #     dockerfile: Dockerfile
+        image: fabiodevcode/puna
+        container_name: puna_app
+        restart: unless-stopped
+        env_file:
+            - .env
+        ports:
+            - '127.0.0.1:3022:3022'
+        volumes:
+            - puna_storage:/app/storage
+            - puna_logs:/app/logs
+        depends_on:
+            db:
+                condition: service_healthy
+            clamav:
+                condition: service_healthy
+
+        networks:
+            - puna_net
+
+    # ─────────────────────────────────────────
+    # Base de données - MariaDB
+    # ─────────────────────────────────────────
+    db:
+        image: mariadb:11.4
+        container_name: puna_db
+        restart: unless-stopped
+        environment:
+            MARIADB_ROOT_PASSWORD: ${DB_PWD}
+            MARIADB_DATABASE: ${DB_NAME}
+            MARIADB_USER: ${DB_USER}
+            MARIADB_PASSWORD: ${DB_PWD}
+        volumes:
+            - puna_db_data:/var/lib/mysql
+        expose:
+            - '3306'
+        healthcheck:
+            test: ['CMD-SHELL', 'healthcheck.sh --connect --innodb_initialized']
+            interval: 5s
+            timeout: 3s
+            retries: 6
+            start_period: 60s
+        networks:
+            - puna_net
+
+    # ─────────────────────────────────────────
+    # Antivirus - ClamAV
+    # ─────────────────────────────────────────
+    clamav:
+        image: clamav/clamav:latest
+        platform: linux/amd64
+        container_name: puna_clamav
+        restart: unless-stopped
+        volumes:
+            - ./storage:/app/storage:ro
+            - puna_clamav_data:/var/lib/clamav
+        expose:
+            - '3310'
+        healthcheck:
+            test: ['CMD-SHELL', 'clamdscan --ping 1 || exit 1']
+            interval: 10s
+            timeout: 5s
+            retries: 8
+            start_period: 90s
+        networks:
+            - puna_net
+
+# ─────────────────────────────────────────
+# Volumes nommés
+# ─────────────────────────────────────────
+volumes:
+    puna_storage:
+        driver: local
+    puna_logs:
+        driver: local
+    puna_db_data:
+        driver: local
+    puna_clamav_data:
+        driver: local
+
+# ─────────────────────────────────────────
+# Réseau interne isolé
+# ─────────────────────────────────────────
+networks:
+    puna_net:
+        driver: bridge

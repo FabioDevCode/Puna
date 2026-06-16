@@ -17,10 +17,6 @@ storage/
 Puna/
 migrations/**/**
 migrations/
-docker-compose.yml
-docker-compose.yaml
-compose.yml
-compose.yaml
 SKILLS_PLAN.md
 DOC_GUIDE.md
 GITHUB_SETUP.md
