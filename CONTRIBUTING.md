@@ -111,7 +111,7 @@ graph TB
     end
 
     subgraph Infra
-        DB[(MariaDB / MySQL)]
+        DB[( MariaDB )]
         Storage["storage/uploads/"]
         ClamAV["ClamAV - Optionnel"]
         SMTP["Serveur SMTP - Optionnel"]
@@ -136,12 +136,13 @@ graph TB
 helmet → cors(/api) → session → passport → flash → injectUserRole → csrfProtection → sanitize
 ```
 
-### Deux surfaces distinctes
+### Trois surfaces distinctes
 
 | Surface    | Préfixe     | Auth                      |
 | ---------- | ----------- | ------------------------- |
 | Web (SSR)  | `/`         | Session + Passport        |
 | API public | `/api/v1/…` | `X-KEY-PUNA` + Bearer JWT |
+| Server MCP | `/mcp/…`    | Bearer JWT                |
 
 ### Conventions d'auto-chargement
 
