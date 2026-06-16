@@ -366,6 +366,7 @@ write_env() {
     env_line "API_MAX_FILES"      "$E_API_MAX_FILES"
     env_line "API_MAX_FIELDS"     "$E_API_MAX_FIELDS"
     env_line "API_MAX_FIELD_SIZE" "$E_API_MAX_FIELD_SIZE"
+    env_line "ALLOWED_EXTENSIONS" "$E_ALLOWED_EXTENSIONS"
     echo ""
 
     # ClamAV
@@ -375,6 +376,10 @@ write_env() {
         env_line "CLAMAV_SOCKET" "$E_CLAMAV_SOCKET"
         env_line "CLAMAV_HOST"   "$E_CLAMAV_HOST"
         env_line "CLAMAV_PORT"   "$E_CLAMAV_PORT"
+    else
+        echo '# CLAMAV_SOCKET=/tmp/clamd.socket'
+        echo '# CLAMAV_HOST=127.0.0.1'
+        echo '# CLAMAV_PORT=3310'
     fi
     echo ""
 
@@ -544,7 +549,9 @@ BANNER
         t clamavDisableHint
     else
         E_CLAMAV_ENABLED="false"
-        E_CLAMAV_SOCKET="" E_CLAMAV_HOST="" E_CLAMAV_PORT="3310"
+        E_CLAMAV_SOCKET=""
+        E_CLAMAV_HOST=""
+        E_CLAMAV_PORT="3310"
         t clamavSkipped
     fi
 
@@ -634,6 +641,7 @@ BANNER
     E_API_MAX_FILES="10"
     E_API_MAX_FIELDS="40"
     E_API_MAX_FIELD_SIZE="10000"
+    E_ALLOWED_EXTENSIONS=".png,.jpg,.jpeg,.webp,.pdf,.doc,.docx,.odt,.txt,.xls,.xlsx,.csv"
     t defaultsInfo
     t uploadInfo
 

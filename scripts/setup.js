@@ -400,7 +400,7 @@ async function main() {
     env.SESSION_SECRET = generateKey(48, 'base64url');
     env.SESSION_MAX_AGE = '10800000';
     env.CSRF_SECRET = generateKey(48, 'base64url');
-    env.API_KEY = generateKey(32, 'hex');
+    env.API_KEY = generateKey(16, 'hex');
 
     console.log(t('secKeysGenerated'));
     console.log(`  KEY_TK .......... ${env.KEY_TK.length} chars`);
@@ -554,6 +554,10 @@ function buildEnvContent(env) {
         val('CLAMAV_SOCKET');
         val('CLAMAV_HOST');
         val('CLAMAV_PORT');
+    } else {
+        ln('# CLAMAV_SOCKET=/tmp/clamd.socket');
+        ln('# CLAMAV_HOST=127.0.0.1');
+        ln('# CLAMAV_PORT=3310');
     }
     ln();
 
