@@ -62,7 +62,7 @@
                 attributeFilter: ['domain'],
             });
         }
-    } catch (e) {
+    } catch (_e) {
         // silent
     }
 })();

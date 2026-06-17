@@ -24,7 +24,7 @@
 
     try {
         document.querySelectorAll('dialog[data-component="delete-site"]').forEach(initDeleteSiteModal);
-    } catch (e) {
+    } catch (_e) {
         // silent
     }
 })();

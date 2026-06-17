@@ -100,7 +100,7 @@ const formatManualLabel = (dateTimeStr) => {
  * Les archives manuelles restent individuelles.
  * @returns {Promise<Array<{ date: string, label: string, filenames: string[], isManual: boolean }>>}
  */
-const listArchives = async (t = null) => {
+const listArchives = async (_t = null) => {
     try {
         await fs.access(archiveDir);
     } catch {

@@ -219,10 +219,8 @@ describe('twoFaRateLimiter middleware', () => {
 });
 
 describe('resetPasswordRateLimiter middleware', () => {
-    let app;
-
     beforeAll(() => {
-        app = buildApp(resetPasswordRateLimiter, '/dp-reset-password', 401);
+        buildApp(resetPasswordRateLimiter, '/dp-reset-password', 401);
     });
 
     it('allows the first 5 requests', async () => {

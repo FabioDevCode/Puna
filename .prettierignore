@@ -1,25 +1,23 @@
-# Dependencies
+_docs/
+.agents/
+.github/
+.husky/
+.project_docs/
+.vscode/
+coverage/
+logs/
 node_modules/
-
-# Storage
+playwright-report/
+Puna/
+Bruno/
 storage/
-
-# Minified files
+test-results/
+test/
 *.min.js
-
-# External libraries
 src/public/plugins/
-
-# Handlebars templates
 *.hbs
-
-# Package files (handled by ESLint with tabs)
 package.json
 package-lock.json
-
-# Build outputs
 dist/
 build/
-
-# Logs
 *.log

@@ -51,7 +51,7 @@
 
     try {
         document.querySelectorAll('dialog[data-component="new-form"]').forEach(initNewFormModal);
-    } catch (e) {
+    } catch (_e) {
         // silent
     }
 })();

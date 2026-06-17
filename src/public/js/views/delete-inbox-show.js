@@ -16,7 +16,7 @@
                 }
             });
         }
-    } catch (e) {
+    } catch (_e) {
         // silent
     }
 })();
