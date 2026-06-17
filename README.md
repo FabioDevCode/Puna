@@ -11,7 +11,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/licence-AGPLv3-red.svg?style=flat" alt="Licence AGPLv3" />
   <img src="https://img.shields.io/badge/docker-fabiodevcode/puna-blue.svg?style=flat" alt="docker fabiodevcode/puna" />
-  <img src="https://img.shields.io/badge/coverage-76.14%25-green.svg?style=flat" alt="Coverage 76.14%" />
+  <img src="https://img.shields.io/badge/coverage-75.99%25-2C7C3E.svg?style=flat" alt="Coverage 75.99%" />
 </p>
 
 ---
