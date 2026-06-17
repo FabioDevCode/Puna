@@ -297,9 +297,19 @@ Les demandes sans contexte ou sans justification claire seront fermées.
 
 ### Avant d'ouvrir la PR
 
+Une CI automatique (lint + tests) se déclenche à l'ouverture de toute PR vers `develop` ou `main`.<br>
+Pour éviter des allers-retours inutiles, vérifiez en local au préalable :
+
+```bash
+npm run lint
+npm run format:check
+npm run test
+```
+
 - [ ] La branche part de `develop` et la PR cible `develop` (jamais `main` directement)
-- [ ] `npm test` passe sans erreur
 - [ ] `npm run lint` ne remonte aucune erreur
+- [ ] `npm run format:check` ne remonte aucune erreur
+- [ ] `npm run test` passe sans erreur
 - [ ] Les nouveaux messages utilisent i18n (pas de chaînes françaises en dur)
 - [ ] Des tests sont ajoutés pour toute nouvelle fonctionnalité ou correction
 
