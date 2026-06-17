@@ -1,0 +1,42 @@
+name: ✨ Demande de fonctionnalité
+description: Proposer une nouvelle fonctionnalité ou une amélioration
+title: '[Feature] '
+labels: ['enhancement']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Merci de votre proposition ! Les demandes sans contexte ou sans justification claire seront fermées.
+
+    - type: textarea
+      id: problem
+      attributes:
+          label: Problème ou besoin
+          description: Quel problème concret cette fonctionnalité résoudrait-elle ?
+          placeholder: Ex. Actuellement il n'est pas possible de...
+      validations:
+          required: true
+
+    - type: textarea
+      id: solution
+      attributes:
+          label: Solution envisagée
+          description: Décrivez la solution que vous proposez
+      validations:
+          required: true
+
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: Alternatives considérées
+          description: Quelles autres solutions avez-vous envisagées, et pourquoi les avez-vous écartées ?
+      validations:
+          required: false
+
+    - type: textarea
+      id: context
+      attributes:
+          label: Contexte additionnel
+          description: Captures d'écran, liens, exemples d'autres projets, etc.
+      validations:
+          required: false
