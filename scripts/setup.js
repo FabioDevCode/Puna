@@ -316,7 +316,7 @@ async function main() {
     sectionHeader(2, TOTAL_SECTIONS, 'Database');
     env.DB_IP = await prompt.ask('DB_IP', '127.0.0.1');
     env.DB_PORT = await prompt.ask('DB_PORT', '3306');
-    env.DB_USER = await prompt.ask('DB_USER', 'root');
+    env.DB_USER = await prompt.ask('DB_USER', 'puna');
     env.DB_PWD = await prompt.askPassword('DB_PWD');
     env.DB_NAME = await prompt.ask('DB_NAME', 'puna');
     env.DB_DIALECT = 'mariadb';
@@ -351,7 +351,7 @@ async function main() {
     const enableTotp = await prompt.askYesNo(t('totpEnable'), true);
     if (enableTotp) {
         env.TOTP_ENABLED = 'true';
-        env.TOTP_ISSUER = await prompt.ask('TOTP_ISSUER', 'Puna');
+        env.TOTP_ISSUER = 'Puna';
         console.log(t('totpDisableHint'));
     } else {
         env.TOTP_ENABLED = 'false';
@@ -403,12 +403,13 @@ async function main() {
     env.API_KEY = generateKey(16, 'hex');
 
     console.log(t('secKeysGenerated'));
-    console.log(`  KEY_TK .......... ${env.KEY_TK.length} chars`);
-    console.log(`  KEV ............. ${env.KEV.length} hex chars (32 bytes AES-256)`);
-    console.log(`  KIV ............. ${env.KIV.length} hex chars (16 bytes AES IV)`);
-    console.log(`  SESSION_SECRET .. ${env.SESSION_SECRET.length} chars`);
-    console.log(`  CSRF_SECRET ..... ${env.CSRF_SECRET.length} chars`);
-    console.log(`  API_KEY ......... ${env.API_KEY.length} hex chars`);
+    console.log(`  KEY_TK ............... ${env.KEY_TK.length} chars`);
+    console.log(`  KEV .................. ${env.KEV.length} hex chars`);
+    console.log(`  KIV .................. ${env.KIV.length} hex chars`);
+    console.log(`  SESSION_SECRET ....... ${env.SESSION_SECRET.length} chars`);
+    console.log(`  CSRF_SECRET .......... ${env.CSRF_SECRET.length} chars`);
+    console.log(`  API_KEY .............. ${env.API_KEY.length} hex chars`);
+    console.log(`  ALLOWED_EXTENSIONS ... 12 default extensions`);
 
     // — Sections 9–12: Defaults (Helmet, Logs, Rate Limiting, Upload) —————————
 

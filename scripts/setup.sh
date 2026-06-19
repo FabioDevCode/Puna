@@ -479,7 +479,7 @@ BANNER
     section_header 2 $TOTAL_SECTIONS "Database"
     E_DB_IP="$(ask "DB_IP" "127.0.0.1")"
     E_DB_PORT="$(ask "DB_PORT" "3306")"
-    E_DB_USER="$(ask "DB_USER" "root")"
+    E_DB_USER="$(ask "DB_USER" "puna")"
     E_DB_PWD="$(ask_password "DB_PWD")"
     E_DB_NAME="$(ask "DB_NAME" "puna")"
     E_DB_DIALECT="mariadb"
@@ -525,7 +525,7 @@ BANNER
 
     if [ "$enable_totp" = "true" ]; then
         E_TOTP_ENABLED="true"
-        E_TOTP_ISSUER="$(ask "TOTP_ISSUER" "Puna")"
+        E_TOTP_ISSUER="Puna"
         t totpDisableHint
     else
         E_TOTP_ENABLED="false"
@@ -585,15 +585,16 @@ BANNER
     E_SESSION_SECRET="$(gen_b64url 48)"
     E_SESSION_MAX_AGE="10800000"
     E_CSRF_SECRET="$(gen_b64url 48)"
-    E_API_KEY="$(gen_hex 32)"
+    E_API_KEY="$(gen_hex 16)"
 
     t secKeysGenerated
-    echo "  KEY_TK .......... ${#E_KEY_TK} chars"
-    echo "  KEV ............. ${#E_KEV} hex chars (32 bytes AES-256)"
-    echo "  KIV ............. ${#E_KIV} hex chars (16 bytes AES IV)"
-    echo "  SESSION_SECRET .. ${#E_SESSION_SECRET} chars"
-    echo "  CSRF_SECRET ..... ${#E_CSRF_SECRET} chars"
-    echo "  API_KEY ......... ${#E_API_KEY} hex chars"
+    echo "  KEY_TK ............... ${#E_KEY_TK} chars"
+    echo "  KEV .................. ${#E_KEV} hex chars"
+    echo "  KIV .................. ${#E_KIV} hex chars"
+    echo "  SESSION_SECRET ....... ${#E_SESSION_SECRET} chars"
+    echo "  CSRF_SECRET .......... ${#E_CSRF_SECRET} chars"
+    echo "  API_KEY .............. ${#E_API_KEY} hex chars"
+    echo "  ALLOWED_EXTENSIONS ... 12 default extensions"
 
     # ─────────────────────────────────────────────────────────────────────────
     # Section 9 — Helmet / Trust Proxy (defaults)
