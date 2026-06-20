@@ -385,7 +385,7 @@
         "confirm_delete": "Confirmer la suppression"
     },
     "password": {
-        "instruct": "password.instruct",
+        "instruct": "Le mot de passe doit comporter au moins :",
         "min_length": "16 caractères.",
         "needs_digit": "Un chiffre.",
         "needs_lowercase": "Une lettre minuscule.",
