@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/public/img/puna.svg" alt="Puna Logo" width="200" />
+  <img src="src/public/img/puna.svg" alt="Puna Logo" width="100" />
 </p>
 
 <h1 align="center">Puna</h1>
