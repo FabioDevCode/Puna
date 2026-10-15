@@ -14,13 +14,11 @@
   <img src="https://img.shields.io/badge/coverage-75.99%25-2C7C3E.svg?style=flat" alt="Coverage 75.99%" />
 </p>
 
----
+<img src="src/public/img/overview.png" alt="Puna overview" />
 
 ## Présentation
 
 **Puna** est un panel d'administration auto-hébergé pour centraliser tous vos formulaires au même endroit. Branchez vos formulaires existants sur Puna via une API. Les soumissions arrivent directement dans l'application, sans avoir à définir de nouvelle base de données, gérer les champs ou maintenir les types de données vous-même.
-
----
 
 ## Fonctionnalités
 
@@ -31,8 +29,6 @@
 - **RBAC** - 5 rôles (`super_admin`, `owner`, `unique`, `editor`, `viewer`) avec une matrice de permissions granulaire.
 - **Admin & monitoring** - Gestion des utilisateurs, visualiseur de logs, tableau de bord et antivirus ClamAV optionnel sur chaque upload.
 - **Serveur MCP** - Exposez vos données à des agents IA (Claude, ChatGPT, Cursor…) via un serveur Model Context Protocol intégré (`POST /mcp`). Chaque utilisateur gère ses propres clés d'accès. Les outils disponibles couvrent sites, formulaires, soumissions (liste, détail, recherche full-text, dernières entrées) et statistiques. Activable via la variable d'environnement `MCP_ENABLED`.
-
----
 
 ## Démarrage rapide
 
@@ -61,8 +57,6 @@ npm run dev
 
 Une installation Docker et la référence complète de configuration sont disponibles dans la **documentation**.
 
----
-
 ## Technologies
 
 <p align="left">
@@ -76,15 +70,11 @@ Une installation Docker et la référence complète de configuration sont dispon
   <img src="https://img.shields.io/badge/daisyUI-2A303C?style=for-the-badge&logo=daisyui&logoColor=FFD028" alt="daisyUI" />
 </p>
 
----
-
 ## Sécurité
 
 Puna applique une approche **défense en profondeur** alignée sur l'OWASP Top 10 : en-têtes Helmet, protection CSRF, bcrypt, JWT + AES-CBC, sanitisation XSS, rate limiting, scan ClamAV et requêtes préparées via Sequelize.
 
 Pour le détail complet, voir [SECURITY.md](SECURITY.md).
-
----
 
 ## Tests
 
@@ -95,14 +85,10 @@ Pour le détail complet, voir [SECURITY.md](SECURITY.md).
 
 Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions et commandes.
 
----
-
 ## Contribution
 
 Les contributions sont les bienvenues !<br>
 Consultez le guide complet dans [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
 
 ## Licence
 
