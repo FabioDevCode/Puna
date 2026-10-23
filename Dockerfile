@@ -1,7 +1,9 @@
+ARG NODE_IMAGE=node:24-alpine3.24
+
 # =============================================================================
 # STAGE 1 — deps : installation des dépendances de production uniquement
 # =============================================================================
-FROM node:24-alpine AS deps
+FROM ${NODE_IMAGE} AS deps
 
 WORKDIR /app
 
@@ -22,7 +24,7 @@ RUN apk update \
 # =============================================================================
 # STAGE 2 — runner : image finale légère
 # =============================================================================
-FROM node:24-alpine AS runner
+FROM ${NODE_IMAGE} AS runner
 
 # Mettre à jour les packages système Alpine pour limiter les vulnérabilités
 RUN apk update \

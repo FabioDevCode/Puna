@@ -1,6 +1,6 @@
 {
 	"name": "puna",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Centralisez tous vos formulaires au même endroit",
 	"main": "server.js",
 	"type": "module",
@@ -28,7 +28,6 @@
 		"logs:clean": "node scripts/clean-logs.js",
 		"logs:stats": "node scripts/logs-stats.js",
 		"logs:rotate": "node scripts/rotate-logs.js",
-		"seed:demo": "node --env-file=.env _docs/scripts/seed-screenshots.js && node --env-file=.env _docs/scripts/seed-users-screenshots.js",
 		"mcp:inspector": "npx @modelcontextprotocol/inspector"
 	},
 	"lint-staged": {
@@ -75,7 +74,7 @@
 		"multer": "^2.0.2",
 		"node-cron": "^4.2.1",
 		"node-stream-zip": "^1.15.0",
-		"nodemailer": "^8.0.5",
+		"nodemailer": "^10.2.1",
 		"otpauth": "^9.5.0",
 		"passport": "^0.7.0",
 		"passport-local": "^1.0.0",
@@ -113,6 +112,15 @@
 		"vitest": "^4.0.18"
 	},
 	"overrides": {
-		"minimatch": "^10.2.1"
+		"minimatch": "^10.2.1",
+		"express-mysql-session": {
+			"mysql2": "^3.23.1"
+		},
+		"exceljs": {
+			"uuid": "^11.1.1"
+		},
+		"sequelize": {
+			"uuid": "^11.1.1"
+		}
 	}
 }

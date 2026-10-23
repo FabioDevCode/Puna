@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { Transform } from 'node:stream';
+import { fileURLToPath } from 'node:url';
 import cron from 'node-cron';
 import pino from 'pino';
 import * as tar from 'tar';
@@ -271,18 +272,46 @@ streams.push({ level, stream: appStream });
 const logToConsole = process.env.LOG_TO_CONSOLE !== 'false';
 if (logToConsole) {
     try {
+        const pinoPrettyModule = await import('pino-pretty');
+        const prettyFactory = pinoPrettyModule.default?.prettyFactory ?? pinoPrettyModule.prettyFactory;
+        const pretty = prettyFactory({
+            colorize: true,
+            translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+            ignore: 'pid,hostname,req,res,responseTime',
+            messageFormat: '{req.url} - {msg} - {res.statusCode}',
+            singleLine: true,
+        });
+
+        let pendingLine = '';
+        const prettyStream = new Transform({
+            transform(chunk, _encoding, callback) {
+                pendingLine += chunk.toString();
+                const lines = pendingLine.split('\n');
+                pendingLine = lines.pop();
+
+                try {
+                    for (const line of lines) {
+                        if (line) this.push(`${pretty(JSON.parse(line))}\n`);
+                    }
+                    callback();
+                } catch (error) {
+                    callback(error);
+                }
+            },
+            flush(callback) {
+                try {
+                    if (pendingLine) this.push(`${pretty(JSON.parse(pendingLine))}\n`);
+                    callback();
+                } catch (error) {
+                    callback(error);
+                }
+            },
+        });
+
+        prettyStream.pipe(process.stdout, { end: false });
         streams.push({
             level,
-            stream: pino.transport({
-                target: 'pino-pretty',
-                options: {
-                    colorize: true,
-                    translateTime: 'yyyy-mm-dd HH:MM:ss.l',
-                    ignore: 'pid,hostname,req,res,responseTime',
-                    messageFormat: '{req.url} - {msg} - {res.statusCode}',
-                    singleLine: true,
-                },
-            }),
+            stream: prettyStream,
         });
     } catch {
         // pino-pretty absent (container Docker sans devDependencies) — on continue sans console
